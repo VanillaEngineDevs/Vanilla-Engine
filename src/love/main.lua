@@ -102,11 +102,6 @@ function love.load()
 
 	curMusicBeat = 0
 
-	if not love.filesystem.getInfo("ratEAT.png") then
-		ratEat = love.image.newImageData("fonts/ratEAT.png")
-		ratEat:encode("png", "ratEAT.png")
-	end
-
 	-- Load libraries
 	baton = require "lib.baton"
 	--ini = require "lib.ini"
