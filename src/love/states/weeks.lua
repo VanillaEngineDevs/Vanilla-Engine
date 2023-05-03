@@ -1099,6 +1099,8 @@ return {
 								numbers[2]:animate(tostring(math.floor(combo / 10 % 10)), false)
 								numbers[3]:animate(tostring(math.floor(combo % 10)), false)
 
+								rating:animate(ratingAnim)
+
 								for i = 1, 5 do
 									if ratingTimers[i] then Timer.cancel(ratingTimers[i]) end
 								end
