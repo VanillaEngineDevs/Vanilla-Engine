@@ -20,8 +20,8 @@ return {
 		self:load()
 
 		tankX = 400
-		tankSpeed = love.math.randomFloat(5, 7)
-		tankAngle = love.math.randomFloat(-90, 45)
+		tankSpeed = util.randomFloat(5, 7)
+		tankAngle = util.randomFloat(-90, 45)
 	end,
 
 	load = function(self)
@@ -82,7 +82,7 @@ return {
 					tankBih.time = gfNotes[i][j].time
 					tankBih.flipX = i < 3
 					tankBih.y = 100 + love.math.random(50, 100)
-					tankBih.endingOffset = love.math.randomFloat(50, 200)
+					tankBih.endingOffset = util.randomFloat(50, 200)
 					tankBih.killed = false
 
 					if love.math.random(1, 10) == 10 then
