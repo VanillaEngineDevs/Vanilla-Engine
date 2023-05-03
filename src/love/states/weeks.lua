@@ -29,6 +29,12 @@ local inputList = {
 	"gameUp",
 	"gameRight"
 }
+local noteList = {
+	"left",
+	"down",
+	"up",
+	"right"
+}
 local arrowAngles = {math.rad(180), math.rad(90), math.rad(270), math.rad(0)}
 if settings.downscroll then
 	-- ezezezezezezezezezezezezez workaround lol
@@ -292,10 +298,11 @@ return {
 			boyfriendArrows[i].y = -400
 			boyfriendSplashes[i].y = -400
 
-			enemyArrows[i]:animate(tostring(i))
-			boyfriendArrows[i]:animate(tostring(i))
 			boyfriendArrows[i].orientation = 0
 			enemyArrows[i].orientation = 0
+
+			boyfriendArrows[i]:animate(noteList[i])
+			enemyArrows[i]:animate(noteList[i])
 
 			if settings.downscroll then 
 				enemyArrows[i].sizeY = -1
@@ -913,12 +920,12 @@ return {
 			boyfriendSplash:update(dt)
 
 			if not enemyArrow:isAnimated() then
-				enemyArrow:animate(tostring(i), false)
+				enemyArrow:animate(noteList[i], false)
 				enemyArrow.orientation = 0
 			end
 			if settings.botPlay then
 				if not boyfriendArrow:isAnimated() then
-					boyfriendArrow:animate(tostring(i), false)
+					boyfriendArrow:animate(noteList[i], false)
 					boyfriendArrow.orientation = 0
 				end
 			end
@@ -927,7 +934,7 @@ return {
 				if (enemyNote[1].y - musicPos <= -410) then
 					voices:setVolume(1)
 
-					enemyArrow:animate(tostring(enemyNote[1].col) .. " confirm", false)
+					enemyArrow:animate(noteList[enemyNote[1].col] .. " confirm", false)
 					if enemyNote[1]:getAnimName() ~= "hold" and enemyNote[1]:getAnimName() ~= "end" then
 						enemyArrow.orientation = enemyArrow.orientation - arrowAngles[enemyNote[1].col]
 						enemyArrow.orientation = enemyArrow.orientation + arrowAngles[i]
@@ -993,7 +1000,7 @@ return {
 					if (boyfriendNote[1].y - musicPos <= -400) then
 						voices:setVolume(1)
 
-						boyfriendArrow:animate(tostring(boyfriendNote[1].col) .. " confirm", false)
+						boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
 						boyfriendArrow.orientation = boyfriendArrow.orientation - arrowAngles[boyfriendNote[1].col]
 						boyfriendArrow.orientation = boyfriendArrow.orientation + arrowAngles[i]
 
@@ -1036,7 +1043,7 @@ return {
 							health = health + 0.095
 							score = score + 350
 
-							boyfriendSplash:animate(tostring(boyfriendNote[1].col) .. love.math.random(1,2), false)
+							boyfriendSplash:animate(noteList[boyfriendNote[1].col] .. love.math.random(1,2), false)
 
 							self:calculateRating()
 						else
@@ -1057,7 +1064,7 @@ return {
 					success = true
 				end
 
-				boyfriendArrow:animate(tostring(i) .. " press", false)
+				boyfriendArrow:animate(noteList[i] .. " press", false)
 				boyfriendArrow.orientation = 0
 
 				if #boyfriendNote > 0 then
@@ -1079,7 +1086,7 @@ return {
 									score = score + 350
 									ratingAnim = "sick"
 
-									boyfriendSplash:animate(tostring(boyfriendNote[j].col) .. love.math.random(1,2), false)
+									boyfriendSplash:animate(noteList[boyfriendNote[j].col] .. love.math.random(1,2), false)
 								elseif notePos <= 90 then -- "Good"
 									score = score + 200
 									ratingAnim = "good"
@@ -1123,9 +1130,10 @@ return {
 								ratingTimers[5] = Timer.tween(2, numbers[3], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
 
 								if not settings.ghostTapping or success then
-									boyfriendArrow:animate(tostring(boyfriendNote[1].col) .. " confirm", false)
+									boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
 									boyfriendArrow.orientation = boyfriendArrow.orientation - arrowAngles[boyfriendNote[1].col]
 									boyfriendArrow.orientation = boyfriendArrow.orientation + arrowAngles[i]
+									print(boyfriendArrow.orientation)
 
 									boyfriend:animate(curAnim, false)
 
@@ -1167,7 +1175,7 @@ return {
 			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].y - musicPos <= -400)) and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
 				voices:setVolume(1)
 
-				boyfriendArrow:animate(tostring(boyfriendNote[1].col) .. " confirm", false)
+				boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
 
 				if boyfriendArrow.orientation == 0 then 
 					boyfriendArrow.orientation = boyfriendArrow.orientation - arrowAngles[boyfriendNote[1].col]
@@ -1184,7 +1192,7 @@ return {
 			end
 
 			if input:released(curInput) then
-				boyfriendArrow:animate(tostring(i), false)
+				boyfriendArrow:animate(noteList[i], false)
 				boyfriendArrow.orientation = 0
 			end
 		end

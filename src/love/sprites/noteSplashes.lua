@@ -44,15 +44,15 @@ return graphics.newSprite(
 		{x = 0, y = 0, width = 1, height = 1, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0} -- 40: none
 	},
     {
-		["11"] = {start = 26, stop = 30, speed = 20, offsetX = 0, offsetY = 0},
-        ["21"] = {start = 6, stop = 10, speed = 20, offsetX = 0, offsetY = 0},
-        ["31"] = {start = 16, stop = 20, speed = 20, offsetX = 0, offsetY = 0},
-        ["41"] = {start = 36, stop = 40, speed = 20, offsetX = 0, offsetY = 0},
+		["left1"] = {start = 26, stop = 30, speed = 20, offsetX = 0, offsetY = 0},
+        ["down1"] = {start = 6, stop = 10, speed = 20, offsetX = 0, offsetY = 0},
+        ["up1"] = {start = 16, stop = 20, speed = 20, offsetX = 0, offsetY = 0},
+        ["right1"] = {start = 36, stop = 40, speed = 20, offsetX = 0, offsetY = 0},
 
-        ["12"] = {start = 20, stop = 25, speed = 20, offsetX = 0, offsetY = 0},
-		["22"] = {start = 1, stop = 5, speed = 20, offsetX = 0, offsetY = 0},
-		["32"] = {start = 11, stop = 15, speed = 20, offsetX = 0, offsetY = 0},
-        ["42"] = {start = 30, stop = 35, speed = 20, offsetX = 0, offsetY = 0},
+        ["left2"] = {start = 20, stop = 25, speed = 20, offsetX = 0, offsetY = 0},
+		["down2"] = {start = 1, stop = 5, speed = 20, offsetX = 0, offsetY = 0},
+		["up2"] = {start = 11, stop = 15, speed = 20, offsetX = 0, offsetY = 0},
+        ["right2"] = {start = 30, stop = 35, speed = 20, offsetX = 0, offsetY = 0},
 		
 		["none"] = {start = 40, stop = 40, speed = 20, offsetX = 0, offsetY = 0},
     },

@@ -3,8 +3,8 @@ return graphics.newSprite(
 	{
         {x = 488, y = 238, width = 155, height = 158, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 1: arrowLEFT0000
 		{x = 647, y = 238, width = 157, height = 155, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 2: arrowDOWN0000
-		{x = 808, y = 238, width = 155, height = 157, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 3: arrowRIGHT0000
-		{x = 323, y = 240, width = 157, height = 154, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 4: arrowUP0000
+		{x = 323, y = 240, width = 157, height = 154, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 3: arrowUP0000
+		{x = 808, y = 238, width = 155, height = 157, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 4: arrowRIGHT0000
 		{x = 1062, y = 452, width = 51, height = 64, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 5: blue tail0000
 		{x = 1282, y = 457, width = 51, height = 44, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 6: blue hold0000
 		{x = 0, y = 240, width = 158, height = 154, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 7: blue alone0000
@@ -91,21 +91,23 @@ return graphics.newSprite(
     },
 	{
         -- Pressed
-		["1 press"] = {start = 23, stop = 42, speed = 24, offsetX = 0, offsetY = 0},
-        ["2 press"] = {start = 12, stop = 15, speed = 24, offsetX = 0, offsetY = 0},
-        ["3 press"] = {start = 84, stop = 87, speed = 24, offsetX = 0, offsetY = 0},
-        ["4 press"] = {start = 53, stop = 79, speed = 24, offsetX = 0, offsetY = 0},
+		["left press"] = {start = 23, stop = 42, speed = 24, offsetX = 0, offsetY = 0},
+        ["down press"] = {start = 12, stop = 15, speed = 24, offsetX = 0, offsetY = 0},
+        ["up press"] = {start = 84, stop = 87, speed = 24, offsetX = 0, offsetY = 0},
+        ["right press"] = {start = 53, stop = 79, speed = 24, offsetX = 0, offsetY = 0},
+
         -- Static
-        ["1"] = {start = 1, stop = 1, speed = 0, offsetX = 0, offsetY = 0},
-        ["2"] = {start = 2, stop = 2, speed = 0, offsetX = 0, offsetY = 0},
-        ["4"] = {start = 3, stop = 3, speed = 0, offsetX = 0, offsetY = 0},
-        ["3"] = {start = 4, stop = 4, speed = 0, offsetX = 0, offsetY = 0},
+        ["left"] = {start = 1, stop = 1, speed = 0, offsetX = 0, offsetY = 0},
+        ["down"] = {start = 2, stop = 2, speed = 0, offsetX = 0, offsetY = 0},
+		["up"] = {start = 3, stop = 3, speed = 0, offsetX = 0, offsetY = 0},
+        ["right"] = {start = 4, stop = 4, speed = 0, offsetX = 0, offsetY = 0},
+
         -- Confirms
-        ["1 confirm"] = {start = 19, stop = 22, speed = 24, offsetX = 0, offsetY = 0},
-        ["2 confirm"] = {start = 8, stop = 11, speed = 24, offsetX = 0, offsetY = 0},
-        ["3 confirm"] = {start = 80, stop = 83, speed = 24, offsetX = 0, offsetY = 0},
-        ["4 confirm"] = {start = 49, stop = 52, speed = 24, offsetX = 0, offsetY = 0},
+        ["left confirm"] = {start = 19, stop = 22, speed = 24, offsetX = 0, offsetY = 0},
+        ["down confirm"] = {start = 8, stop = 11, speed = 24, offsetX = 0, offsetY = 0},
+        ["up confirm"] = {start = 80, stop = 83, speed = 24, offsetX = 0, offsetY = 0},
+        ["right confirm"] = {start = 49, stop = 52, speed = 24, offsetX = 0, offsetY = 0},
 	},
-	"1",
+	"left",
 	false
 )
