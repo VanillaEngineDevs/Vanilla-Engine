@@ -9,13 +9,10 @@ local songNum, songAppend
 local songDifficulty = 2
 
 local difficultyStrs
-local selectSound, confirmSound
 local ratingText
 
 return {
     enter = function(self)
-        selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
-        confirmSound = love.audio.newSource("sounds/menu/confirm.ogg", "static")
         menuBG = graphics.newImage(graphics.imagePath("menu/fp_bg"))
         songSelect = graphics.newImage(graphics.imagePath("menu/fp_songSelect"))
         songStats = graphics.newImage(graphics.imagePath("menu/fp_songStats"))

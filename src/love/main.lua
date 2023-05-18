@@ -333,6 +333,10 @@ function love.load()
 	spriteDebug = require "states.debug.sprite-debug"
 	stageDebug = require "states.debug.stage-debug"
 
+	-- Sounds
+	selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
+	confirmSound = love.audio.newSource("sounds/menu/confirm.ogg", "static")
+
 	-- Load stages
 	stages = {
 		["stage"] = require "stages.stage",

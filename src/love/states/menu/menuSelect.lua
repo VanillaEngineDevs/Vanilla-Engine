@@ -4,9 +4,6 @@ local menuState
 
 local menuButton
 
-local selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
-local confirmSound = love.audio.newSource("sounds/menu/confirm.ogg", "static")
-
 local function switchMenu(menu)
 	menuState = 1
 end

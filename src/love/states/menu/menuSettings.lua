@@ -2,8 +2,6 @@
 
 -- TODO: clean this menu up
 
-local selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
-local confirmSound = love.audio.newSource("sounds/menu/confirm.ogg", "static")
 local menuBG = graphics.newImage(graphics.imagePath("menu/title-bg"))
 
 newlinesMoment = {

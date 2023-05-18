@@ -13,8 +13,6 @@ local difficultyStrs = {
 	"",
 	"-hard"
 }
-local selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
-local confirmSound = love.audio.newSource("sounds/menu/confirm.ogg", "static")
 
 return {
 	enter = function(self, previous)

@@ -1,4 +1,4 @@
-local creditText, selectSound, confirmSound
+local creditText
 -- i literally said we should use a big string and you said no - CH
 creditText = [[
 CREDITS
@@ -77,7 +77,6 @@ return {
         credY = {
             250
         }
-        selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
         graphics:fadeInWipe(0.6)
         bg = graphics.newImage(graphics.imagePath("menu/menuBG"))
     end,

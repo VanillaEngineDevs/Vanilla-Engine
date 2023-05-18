@@ -7,8 +7,6 @@ local menuNum = 1
 local songNum, songAppend
 local songDifficulty = 2
 
-local selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
-local confirmSound = love.audio.newSource("sounds/menu/confirm.ogg", "static")
 local transparency
 
 return {
