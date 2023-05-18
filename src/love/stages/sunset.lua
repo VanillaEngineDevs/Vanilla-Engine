@@ -72,12 +72,11 @@ return {
 			stageImages["Limo Dancer"]:setAnimSpeed(14.4 / (60 / bpm))
 		end
 
-        if love.math.random(500) == 100 and stageImages["Fast Car"].canDrive then
+        if love.math.random(4000) == 100 and stageImages["Fast Car"].canDrive then
             fastCarDrive(dt)
         end
 
         stageImages["Fast Car"].x = stageImages["Fast Car"].x + stageImages["Fast Car"].vx * dt
-        print(stageImages["Fast Car"].x)
     end,
 
     draw = function()
