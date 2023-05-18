@@ -318,13 +318,11 @@ return {
 			end,
 
 			getFrameWidth = function(self)
-				local curFrame = math.floor(frame)
-				return frameData[curFrame].width
+				return frameData[self.curFrame].width
 			end,
 
 			getFrameHeight = function(self)
-				local curFrame = math.floor(frame)
-				return frameData[curFrame].height
+				return frameData[self.curFrame].height
 			end,
 
 			beat = function(self, beat)
@@ -370,7 +368,7 @@ return {
 			draw = function(self)
 				self.curFrame = math.floor(frame)
 
-				if curFrame <= anim.stop then
+				if self.curFrame <= anim.stop then
 					local x = self.x
 					local y = self.y
 					local width
@@ -382,22 +380,22 @@ return {
 					end
 
 					if options and options.noOffset then
-						if frameData[curFrame].offsetWidth ~= 0 then
-							width = frameData[curFrame].offsetX
+						if frameData[self.curFrame].offsetWidth ~= 0 then
+							width = frameData[self.curFrame].offsetX
 						end
-						if frameData[curFrame].offsetHeight ~= 0 then
-							height = frameData[curFrame].offsetY
+						if frameData[self.curFrame].offsetHeight ~= 0 then
+							height = frameData[self.curFrame].offsetY
 						end
 					else
-						if frameData[curFrame].offsetWidth == 0 then
-							width = math.floor(frameData[curFrame].width / 2)
+						if frameData[self.curFrame].offsetWidth == 0 then
+							width = math.floor(frameData[self.curFrame].width / 2)
 						else
-							width = math.floor(frameData[curFrame].offsetWidth / 2) + frameData[curFrame].offsetX
+							width = math.floor(frameData[self.curFrame].offsetWidth / 2) + frameData[self.curFrame].offsetX
 						end
-						if frameData[curFrame].offsetHeight == 0 then
-							height = math.floor(frameData[curFrame].height / 2)
+						if frameData[self.curFrame].offsetHeight == 0 then
+							height = math.floor(frameData[self.curFrame].height / 2)
 						else
-							height = math.floor(frameData[curFrame].offsetHeight / 2) + frameData[curFrame].offsetY
+							height = math.floor(frameData[self.curFrame].offsetHeight / 2) + frameData[self.curFrame].offsetY
 						end
 					end
 
@@ -422,7 +420,7 @@ return {
 					if self.visible then
 						love.graphics.draw(
 							sheet,
-							frames[curFrame],
+							frames[self.curFrame],
 							x,
 							y,
 							self.orientation,
@@ -445,9 +443,9 @@ return {
 			udraw = function(self, sx, sy)
 				local sx = sx or 7
 				local sy = sy or 7
-				local curFrame = math.floor(frame)
+				self.curFrame = math.floor(frame)
 
-				if curFrame <= anim.stop then
+				if self.curFrame <= anim.stop then
 					local x = self.x
 					local y = self.y
 					local width
@@ -459,29 +457,29 @@ return {
 					end
 
 					if options and options.noOffset then
-						if frameData[curFrame].offsetWidth ~= 0 then
-							width = frameData[curFrame].offsetX
+						if frameData[self.curFrame].offsetWidth ~= 0 then
+							width = frameData[self.curFrame].offsetX
 						end
-						if frameData[curFrame].offsetHeight ~= 0 then
-							height = frameData[curFrame].offsetY
+						if frameData[self.curFrame].offsetHeight ~= 0 then
+							height = frameData[self.curFrame].offsetY
 						end
 					else
-						if frameData[curFrame].offsetWidth == 0 then
-							width = math.floor(frameData[curFrame].width / 2)
+						if frameData[self.curFrame].offsetWidth == 0 then
+							width = math.floor(frameData[self.curFrame].width / 2)
 						else
-							width = math.floor(frameData[curFrame].offsetWidth / 2) + frameData[curFrame].offsetX
+							width = math.floor(frameData[self.curFrame].offsetWidth / 2) + frameData[self.curFrame].offsetX
 						end
-						if frameData[curFrame].offsetHeight == 0 then
-							height = math.floor(frameData[curFrame].height / 2)
+						if frameData[self.curFrame].offsetHeight == 0 then
+							height = math.floor(frameData[self.curFrame].height / 2)
 						else
-							height = math.floor(frameData[curFrame].offsetHeight / 2) + frameData[curFrame].offsetY
+							height = math.floor(frameData[self.curFrame].offsetHeight / 2) + frameData[self.curFrame].offsetY
 						end
 					end
 
 					if self.visible then
 						love.graphics.draw(
 							sheet,
-							frames[curFrame],
+							frames[self.curFrame],
 							self.x,
 							self.y,
 							self.orientation,

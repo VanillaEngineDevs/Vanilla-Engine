@@ -16,7 +16,7 @@ return {
         menuBG = graphics.newImage(graphics.imagePath("menu/fp_bg"))
         songSelect = graphics.newImage(graphics.imagePath("menu/fp_songSelect"))
         songStats = graphics.newImage(graphics.imagePath("menu/fp_songStats"))
-        tabs = graphics.newImage(graphics.imagePath("menu/fp_tabs"))
+        tabs = graphics.newImage(graphics.imagePath("menu/fp_tab"))
         weekSelect = graphics.newImage(graphics.imagePath("menu/fp_weekSelect"))
         weekStats = graphics.newImage(graphics.imagePath("menu/fp_weekStats"))
         backButton = graphics.newImage(graphics.imagePath("menu/backBtn"))
@@ -326,9 +326,9 @@ return {
                 graphics.setColor(1,1,1,1)
                 uitextf(weekMeta[weekNum][1], -55, -18, 600, "center")
                 love.graphics.setFont(weekFontSmall)
-                uitextf(curWeekScore, -545, 50, 600, "center")
-                uitextf(averageAccuracy, -825, 50, 600, "center")
-                uitextf(ratingText, -675, 195, 600, "center")
+                --uitextf(curWeekScore, -545, 50, 600, "center")
+                --uitextf(averageAccuracy, -825, 50, 600, "center")
+                --uitextf(ratingText, -675, 195, 600, "center")
             else
                 graphics.setColor(141/255, 130/255, 123/255)
                 love.graphics.setFont(weekFontSmall)
@@ -344,7 +344,7 @@ return {
 
                 graphics.setColor(1,1,1,1)
             end
-            if menuNum == 1 then weekStats:draw() else songStats:draw() end
+            --if menuNum == 1 then weekStats:draw() else songStats:draw() end
             love.graphics.setFont(weekFont)
             -- make the current dificulties first letter uppercase
             local difficultyStr = difficultyStrs[songDifficulty]
