@@ -65,21 +65,21 @@ return {
 
     draw = function()
         love.graphics.push()
-        love.graphics.translate(camera.x * 0.9, camera.y * 0.9)
-        love.graphics.translate(camera.ex * 0.9, camera.ey * 0.9)
+            love.graphics.translate(camera.x * 0.9, camera.y * 0.9)
+            love.graphics.translate(camera.ex * 0.9, camera.ey * 0.9)
 
-        stageImages["Sky"]:draw()
-        stageImages["Watch Tower"]:draw()
-        stageImages["Smoke Left"]:draw()
-        stageImages["Smoke Right"]:draw()
-        stageImages["Tank Rolling"]:draw()
-        if song == 3 then
-            for i = 1, #tankmanRun do
-                tankmanRun[i]:udraw(0.8, 0.8)
+            stageImages["Sky"]:draw()
+            stageImages["Watch Tower"]:draw()
+            stageImages["Smoke Left"]:draw()
+            stageImages["Smoke Right"]:draw()
+            stageImages["Tank Rolling"]:draw()
+            if song == 3 then
+                for i = 1, #tankmanRun do
+                    tankmanRun[i]:udraw(0.8, 0.8)
+                end
             end
-        end
-        stageImages["Ground"]:draw()
-        girlfriend:draw()
+            stageImages["Ground"]:draw()
+            girlfriend:draw()
         love.graphics.pop()
         love.graphics.push()
             love.graphics.translate(camera.x, camera.y)
