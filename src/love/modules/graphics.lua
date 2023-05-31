@@ -312,7 +312,7 @@ return {
 					if self.heyTimer <= 0 and not self:isAnimated() and not (self:getAnimName() == "dies" or self:getAnimName() == "dead" or self:getAnimName() == "dead confirm" or self:getAnimName() == "danceLeft" or self:getAnimName() == "danceRight") then 
 						self.heyTimer = 0 
 						self.specialAnim = false
-						--self:animate("idle", false) 
+						self:animate("idle", false) 
 					end
 				end
 			end,
@@ -326,13 +326,14 @@ return {
 			end,
 
 			beat = function(self, beat)
+				local beat = math.floor(beat) or 0
 				if self.isCharacter then
 					if beatHandler.onBeat() then
 						if not self.danceIdle then
 							if (not self:isAnimated() and util.startsWith(self:getAnimName(), "sing")) or (self:getAnimName() == "idle" or self:getAnimName() == "idle loop") then
 								if beat % self.danceSpeed == 0 then 
 									if self.lastHit > 0 then
-										if self.lastHit + beatHandler.getStepCrochet() * self.singDuration <= musicTime then
+										if beat % math.max(self.danceSpeed, 2) == 0 and self.lastHit + beatHandler.stepCrochet * self.singDuration <= musicTime then
 											self:animate("idle", false, function()
 												if self:isAnimName("idle loop") then 
 													self:animate("idle loop", true)
@@ -340,7 +341,7 @@ return {
 											end)
 											self.lastHit = 0
 										end
-									else
+									elseif beat % self.danceSpeed == 0 then
 										self:animate("idle", false, function()
 											if self:isAnimName("idle loop") then 
 												self:animate("idle loop", true)
