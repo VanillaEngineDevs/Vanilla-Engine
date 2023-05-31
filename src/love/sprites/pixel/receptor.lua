@@ -51,21 +51,21 @@ return graphics.newSprite(
     },
     {
         -- Pressed
-        ["1 press"] = { start = 25, stop = 25, speed = 24, offsetX = 0, offsetY = 0 },
-        ["2 press"] = { start = 36, stop = 36, speed = 24, offsetX = 0, offsetY = 0 },
-        ["3 press"] = { start = 14, stop = 14, speed = 24, offsetX = 0, offsetY = 0 },
-        ["4 press"] = { start = 3, stop = 3, speed = 24, offsetX = 0, offsetY = 0 },
+        ["left press"] = { start = 25, stop = 25, speed = 24, offsetX = 0, offsetY = 0 },
+        ["down press"] = { start = 36, stop = 36, speed = 24, offsetX = 0, offsetY = 0 },
+        ["up press"] = { start = 14, stop = 14, speed = 24, offsetX = 0, offsetY = 0 },
+        ["right press"] = { start = 3, stop = 3, speed = 24, offsetX = 0, offsetY = 0 },
         -- Static
-        ["1"] = { start = 23, stop = 23, speed = 0, offsetX = 0, offsetY = 0 },
-        ["2"] = { start = 34, stop = 34, speed = 0, offsetX = 0, offsetY = 0 },
-        ["3"] = { start = 12, stop = 12, speed = 0, offsetX = 0, offsetY = 0 },
-        ["4"] = { start = 1, stop = 1, speed = 0, offsetX = 0, offsetY = 0 },
+        ["left"] = { start = 23, stop = 23, speed = 0, offsetX = 0, offsetY = 0 },
+        ["down"] = { start = 34, stop = 34, speed = 0, offsetX = 0, offsetY = 0 },
+        ["up"] = { start = 12, stop = 12, speed = 0, offsetX = 0, offsetY = 0 },
+        ["right"] = { start = 1, stop = 1, speed = 0, offsetX = 0, offsetY = 0 },
         -- Confirms
-        ["1 confirm"] = { start = 26, stop = 31, speed = 24, offsetX = 0, offsetY = 0 },
-        ["2 confirm"] = { start = 37, stop = 42, speed = 24, offsetX = 0, offsetY = 0 },
-        ["3 confirm"] = { start = 15, stop = 20, speed = 24, offsetX = 0, offsetY = 0 },
-        ["4 confirm"] = { start = 4, stop = 9, speed = 24, offsetX = 0, offsetY = 0 },
+        ["left confirm"] = { start = 26, stop = 31, speed = 24, offsetX = 0, offsetY = 0 },
+        ["down confirm"] = { start = 37, stop = 42, speed = 24, offsetX = 0, offsetY = 0 },
+        ["up confirm"] = { start = 15, stop = 20, speed = 24, offsetX = 0, offsetY = 0 },
+        ["right confirm"] = { start = 4, stop = 9, speed = 24, offsetX = 0, offsetY = 0 },
     },
-    "off",
+    "left",
     false
 )
