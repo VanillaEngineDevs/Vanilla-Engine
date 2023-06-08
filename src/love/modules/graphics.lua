@@ -193,8 +193,7 @@ return {
 			shearX = 0,
 			shearY = 0,
 
-			scrollX = 1,
-			scrollY = 1,
+			scrollFactor = {x=1,y=1},
 
 			holdTimer = 2,
 			lastHit = 0,

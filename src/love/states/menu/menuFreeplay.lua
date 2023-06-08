@@ -276,12 +276,13 @@ return {
                     0.7,
                     function()
                         songAppend = difficultyStrs[songDifficulty]
+                        _psychmod = false
     
                         storyMode = false
     
                         music:stop()
     
-                        Gamestate.switch(weekData[weekNum], songNum, songAppend)
+                        Gamestate.switch(weekData[weekNum], songNum, songAppend, weekNum)
     
                         status.setLoading(false)
                     end
@@ -324,7 +325,7 @@ return {
             if menuNum == 1 then
                 love.graphics.setFont(weekFont)
                 graphics.setColor(1,1,1,1)
-                uitextf(weekMeta[weekNum][1], -55, -18, 600, "center")
+                uitextf(weekMeta[weekNum][1] or "", -55, -18, 600, "center")
                 love.graphics.setFont(weekFontSmall)
                 --uitextf(curWeekScore, -545, 50, 600, "center")
                 --uitextf(averageAccuracy, -825, 50, 600, "center")

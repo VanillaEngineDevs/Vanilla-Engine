@@ -4,6 +4,10 @@ function util.lerp(a, b, t)
     return a + (b - a) * t
 end
 
+function util.coolLerp(a, b, t)
+    return util.lerp(a, b, t * 60 * love.timer.getDelta())
+end
+
 function util.clamp(x, min, max)
     return x < min and min or (x > max and max or x)
 end
@@ -22,6 +26,13 @@ end
 
 function util.round(x) 
     return x >= 0 and math.floor(x + .5) or math.ceil(x - .5) 
+end
+
+function util.split(str, sep)
+    local sep, fields = sep or ":", {}
+    local pattern = string.format("([^%s]+)", sep)
+    str:gsub(pattern, function(c) fields[#fields+1] = c end)
+    return fields
 end
 
 -- God like coding

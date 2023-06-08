@@ -145,7 +145,7 @@ return {
 			graphics:fadeOutWipe(
 				0.7,
 				function()
-					
+					_psychmod = false
 					songAppend = difficultyStrs[songDifficulty]
 
 					storyMode = true
@@ -178,6 +178,7 @@ return {
 			end
 			enemyDanceLines:animate("week" .. weekNum, true)
 		end
+
 		
 		enemyDanceLines:update(dt)
 		bfDanceLines:update(dt)
@@ -212,8 +213,8 @@ return {
 					currentWeek = currentWeek - 1
 					weekNum = weekNum - 1
 				else
-					currentWeek = 7
-					weekNum = 8
+					currentWeek = #weekMeta - 1
+					weekNum = #weekMeta
 				end
 				if freeplayColours[weekNum] then colourTween() else colourTweenAlt() end
 				menuFunc()
@@ -226,7 +227,7 @@ return {
 					arrowRight:animate("arrow", true)
 				end)
 
-				if currentWeek ~= 7 then
+				if currentWeek ~= #weekMeta - 1 then
 					currentWeek = currentWeek + 1
 					weekNum = weekNum + 1
 				else

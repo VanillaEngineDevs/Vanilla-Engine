@@ -204,6 +204,8 @@ function love.load()
 	Timer = require "lib.timer"
 	json = require "lib.json"
 	lume = require "lib.lume"
+	Object = require "lib.classic"
+	xml = require "lib.xml".parse
 
 	-- Load modules
 	status = require "modules.status"
@@ -215,6 +217,10 @@ function love.load()
 	cutscene = require "modules.cutscene"
 	dialogue = require "modules.dialogue"
 	settings = require "settings"
+	
+	-- XML Modules
+	Sprite = require "modules.xml.Sprite"
+	xmlcamera = require "modules.xml.camera"
 
 	playMenuMusic = true
 
@@ -474,6 +480,18 @@ function love.load()
 
 	lovesize.set(1280, 720)
 
+	function hex2rgb(hex)
+		hex = hex:gsub("#","") -- remove the #
+		local r = hex:sub(1,2) 
+		local g = hex:sub(3,4)
+		local b = hex:sub(5,6)
+
+		hexR = tonumber("0x".. r)
+		hexG = tonumber("0x".. g)
+		hexB = tonumber("0x".. b)
+		return {hexR/255, hexG/255, hexB/255}
+	end
+
 	-- Variables
 	font = love.graphics.newFont("fonts/vcr.ttf", 24)
 	FNFFont = love.graphics.newFont("fonts/fnFont.ttf", 24)
@@ -501,6 +519,10 @@ function love.load()
 		"%.1f  ",
 		(love.audio.getVolume())
 	))
+
+	-- mod folder stuff
+	modweek = require "mods.week"
+	modfolder = require "mods.folder"
 
 	if curOS == "Web" then
 		Gamestate.switch(clickStart)

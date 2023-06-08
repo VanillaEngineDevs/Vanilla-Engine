@@ -214,11 +214,15 @@ return {
 		ratingVisibility = {0}
 		combo = 0
 
-		enemy:animate("idle")
+		if enemy then enemy:animate("idle") end
 		boyfriend:animate("idle")
 
 		if not camera.points["boyfriend"] then camera:addPoint("boyfriend", -boyfriend.x + 100, -boyfriend.y + 75) end
-		if not camera.points["enemy"] then camera:addPoint("enemy", -enemy.x - 100, -enemy.y + 75) end
+		if not camera.points["enemy"] then 
+			if enemy then
+				camera:addPoint("enemy", -enemy.x - 100, -enemy.y + 75) 
+			end
+		end
 
 		graphics:fadeInWipe(0.6)
 	end,
@@ -242,6 +246,8 @@ return {
 		misses = 0
 		ratingPercent = 0.0
 		noteCounter = 0
+
+		songEvents = {}
 
 		if not pixel then
 			sprites.leftArrow = love.filesystem.load("sprites/left-arrow.lua")
@@ -315,12 +321,50 @@ return {
 		end
 	end,
 
-	generateNotes = function(self, chart)
+	generateNotes = function(self, chart, psychweek, song, difficulty)
 		local eventBpm
+		local chart = chart
+		if chart == nil then
+			-- its most likely a psych mod
+			chart = "mods/" .. weekMeta[psychweek][3]
+			chart = chart .. "/data/" .. weekMeta[psychweek][2][song] .. "/" .. weekMeta[psychweek][2][song] .. difficulty .. ".json"
 
+			inst = "mods/" .. weekMeta[psychweek][3]
+			inst = inst .. "/songs/" .. weekMeta[psychweek][2][song] .. "/Inst.ogg"
+
+			inst = love.audio.newSource(inst, "static")
+		end
+		if not love.filesystem.getInfo(chart) then
+			chart = chart:gsub("-hard", ""):gsub("-easy", "")
+		end
+		-- if it still doesn't exist, add -easy to the end
+		if not love.filesystem.getInfo(chart) then
+			chart = chart:gsub(".json", "-easy.json")
+		end
+		-- if it still errors, try hard
+		if not love.filesystem.getInfo(chart) then
+			chart = chart:gsub("-easy", "-hard")
+		end
+
+		-- if it still errors, then fuck your chart lol
 		chart = json.decode(love.filesystem.read(chart))
 		chart = chart["song"]
 		curSong = chart["song"]
+
+		if _psychmod then
+			psychenemy = chart.player2
+			psychboyfriend = chart.player1
+			psychgirlfriend = chart.gfVersion
+			psychstage = chart.stage
+		end
+
+		needsVoices = chart.needsVoices
+		if needsVoices then
+			voices = "mods/" .. weekMeta[psychweek][3]
+			voices = voices .. "/songs/" .. weekMeta[psychweek][2][song] .. "/Voices.ogg"
+
+			voices = love.audio.newSource(voices, "static")
+		end
 
 		for i = 1, #chart["notes"] do
 			bpm = chart["notes"][i]["bpm"]
@@ -679,6 +723,41 @@ return {
 		end
 	end,
 
+	generateEvents = function(self, charte, psychweek, song, difficulty)
+		local charte = charte
+		if charte == nil then
+			-- its most likely a psych mod
+			charte = "mods/" .. weekMeta[psychweek][3]
+			charte = charte .. "/data/" .. weekMeta[psychweek][2][song] .. "/events.json"
+			-- if it exists, use it
+			if not love.filesystem.getInfo(charte) then
+				charte = "mods/" .. weekMeta[psychweek][3]
+				charte = charte .. "/data/" .. weekMeta[psychweek][2][song] .. "/" .. weekMeta[psychweek][2][song] .. difficulty .. ".json"
+			end
+		end
+		if not love.filesystem.getInfo(charte) then
+			charte = charte:gsub("-hard", ""):gsub("-easy", "")
+		end
+		-- if it still doesn't exist, add -easy to the end
+		if not love.filesystem.getInfo(charte) then
+			charte = charte:gsub(".json", "-easy.json")
+		end
+		-- if it still errors, try hard
+		if not love.filesystem.getInfo(charte) then
+			charte = charte:gsub("-easy", "-hard")
+		end
+		charte = json.decode(love.filesystem.read(charte)).song
+		-- for all in charte.events, add it to songEvents
+		for i = 1, #charte.events do
+			local eventTime = charte.events[i][1]
+			local event = charte.events[i][2][1][1]
+			local eventArgs = charte.events[i][2][1][2]
+			local eventArgs2 = charte.events[i][2][1][3]
+
+			table.insert(songEvents, {time = eventTime, event = event, n=event, args = eventArgs, args2 = eventArgs2})
+		end
+	end,
+
 	generateGFNotes = function(self, chartG)
 		-- very bare-bones chart generation
 		-- Does not handle sprites and all that, just note timings and type
@@ -942,9 +1021,9 @@ return {
 
 					if enemyNote[1]:getAnimName() == "hold" or enemyNote[1]:getAnimName() == "end" then
 						if useAltAnims then
-							if enemy.holdTimer > enemy.maxHoldTimer then enemy:animate(curAnim .. " alt", false) end
+							if enemy.holdTimer > enemy.maxHoldTimer then enemy:animate(curAnim .. " alt", _psychmod and true or false) end
 						else
-							if enemy.holdTimer > enemy.maxHoldTimer then enemy:animate(curAnim, false) end
+							if enemy.holdTimer > enemy.maxHoldTimer then enemy:animate(curAnim, (_psychmod and true or false)) end
 						end
 					else
 						if useAltAnims then
