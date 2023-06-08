@@ -324,13 +324,15 @@ return {
 	generateNotes = function(self, chart, psychweek, song, difficulty)
 		local eventBpm
 		local chart = chart
-		if chart == nil then
+		if chart == nil and _psychmod then
 			-- its most likely a psych mod
 			chart = "mods/" .. weekMeta[psychweek][3]
-			chart = chart .. "/data/" .. weekMeta[psychweek][2][song] .. "/" .. weekMeta[psychweek][2][song] .. difficulty .. ".json"
-
+			CURSONGFULLPATH = chart .. "/data/" .. weekMeta[psychweek][2][song]:gsub(" ", "-")
+			chart = chart .. "/data/" .. weekMeta[psychweek][2][song]:gsub(" ", "-") .. "/" .. weekMeta[psychweek][2][song]:gsub(" ", "-"):lower() .. difficulty .. ".json"
+			chartpath = "mods/" .. weekMeta[psychweek][3]
+			chartpath = chartpath .. "/data/" .. weekMeta[psychweek][2][song]:gsub(" ", "-")
 			inst = "mods/" .. weekMeta[psychweek][3]
-			inst = inst .. "/songs/" .. weekMeta[psychweek][2][song] .. "/Inst.ogg"
+			inst = inst .. "/songs/" .. weekMeta[psychweek][2][song]:gsub(" ", "-") .. "/Inst.ogg"
 
 			inst = love.audio.newSource(inst, "static")
 		end
@@ -346,8 +348,18 @@ return {
 			chart = chart:gsub("-easy", "-hard")
 		end
 
-		-- if it still errors, then fuck your chart lol
-		chart = json.decode(love.filesystem.read(chart))
+		-- if it still errors, then load the next json file that isn't "events.json"
+		if not love.filesystem.getInfo(chart) and _psychmod then
+			local files = love.filesystem.getDirectoryItems(chartpath)
+			for i = 1, #files do
+				if files[i] ~= "events.json" and files[i]:sub(-5) == ".json" then
+					chart = chartpath .. "/" .. files[i]
+					break
+				end
+			end
+		end
+		chart = love.filesystem.read(chart)
+		chart = json.decode(chart)
 		chart = chart["song"]
 		curSong = chart["song"]
 
@@ -356,12 +368,14 @@ return {
 			psychboyfriend = chart.player1
 			psychgirlfriend = chart.gfVersion
 			psychstage = chart.stage
+
+			songName = weekMeta[psychweek][2][song]
 		end
 
 		needsVoices = chart.needsVoices
-		if needsVoices then
+		if needsVoices == true and _psychmod then
 			voices = "mods/" .. weekMeta[psychweek][3]
-			voices = voices .. "/songs/" .. weekMeta[psychweek][2][song] .. "/Voices.ogg"
+			voices = voices .. "/songs/" .. weekMeta[psychweek][2][song]:gsub(" ", "-") .. "/Voices.ogg"
 
 			voices = love.audio.newSource(voices, "static")
 		end
@@ -746,16 +760,20 @@ return {
 		if not love.filesystem.getInfo(charte) then
 			charte = charte:gsub("-easy", "-hard")
 		end
-		charte = json.decode(love.filesystem.read(charte)).song
-		-- for all in charte.events, add it to songEvents
-		for i = 1, #charte.events do
-			local eventTime = charte.events[i][1]
-			local event = charte.events[i][2][1][1]
-			local eventArgs = charte.events[i][2][1][2]
-			local eventArgs2 = charte.events[i][2][1][3]
+		pcall(
+			function()
+				charte = json.decode(love.filesystem.read(charte)).song
+				-- for all in charte.events, add it to songEvents
+				for i = 1, #charte.events do
+					local eventTime = charte.events[i][1]
+					local event = charte.events[i][2][1][1]
+					local eventArgs = charte.events[i][2][1][2]
+					local eventArgs2 = charte.events[i][2][1][3]
 
-			table.insert(songEvents, {time = eventTime, event = event, n=event, args = eventArgs, args2 = eventArgs2})
-		end
+					table.insert(songEvents, {time = eventTime, event = event, n=event, args = eventArgs, args2 = eventArgs2})
+				end
+			end
+		)
 	end,
 
 	generateGFNotes = function(self, chartG)
@@ -838,7 +856,7 @@ return {
 										beatHandler.reset(0)
 
 										if inst then inst:play() end
-										voices:play()
+										if voices then voices:play() end
 									end
 								)
 							end
@@ -856,7 +874,7 @@ return {
 				pauseTime = musicTime
 				if paused then 
 					if inst then inst:pause() end
-					voices:pause()
+					if voices then voices:pause() end
 					love.audio.play(sounds.breakfast)
 					sounds.breakfast:setLooping(true) 
 				end
@@ -885,7 +903,7 @@ return {
 				love.audio.stop(sounds.breakfast) -- since theres only 3 options, we can make the sound stop without an else statement
 				if pauseMenuSelection == 1 then
 					if inst then inst:play() end
-					voices:play()
+					if voices then voices:play() end
 					paused = false 
 				elseif pauseMenuSelection == 2 then
 					pauseRestart = true
@@ -893,8 +911,7 @@ return {
 				elseif pauseMenuSelection == 3 then
 					paused = false
 					if inst then inst:stop() end
-					voices:stop()
-					if inst then inst:stop() end
+					if voices then voices:play() end
 					storyMode = false
 					quitPressed = true
 				end
@@ -910,7 +927,7 @@ return {
 		else
 			if not graphics.isFading() then
 				local time = love.timer.getTime()
-				local seconds = voices:tell("seconds")
+				local seconds = voices and voices:tell("seconds") or inst:tell("seconds")
 
 				musicTime = musicTime + (time * 1000) - previousFrameTime
 				previousFrameTime = time * 1000
@@ -1011,7 +1028,7 @@ return {
 
 			if #enemyNote > 0 then
 				if (enemyNote[1].y - musicPos <= -410) then
-					voices:setVolume(1)
+					if voices then voices:setVolume(1) end
 
 					enemyArrow:animate(noteList[enemyNote[1].col] .. " confirm", false)
 					if enemyNote[1]:getAnimName() ~= "hold" and enemyNote[1]:getAnimName() ~= "end" then
@@ -1053,7 +1070,7 @@ return {
 
 			if #boyfriendNote > 0 then
 				if (boyfriendNote[1].y - musicPos < -600) then
-					if inst then voices:setVolume(0) end
+					if voices then voices:setVolume(0) end
 
 					notMissed[noteNum] = false
 
@@ -1077,7 +1094,7 @@ return {
 			if settings.botPlay then 
 				if #boyfriendNote > 0 then
 					if (boyfriendNote[1].y - musicPos <= -400) then
-						voices:setVolume(1)
+						if voices then voices:setVolume(1) end
 
 						boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
 						boyfriendArrow.orientation = boyfriendArrow.orientation - arrowAngles[boyfriendNote[1].col]
@@ -1157,7 +1174,7 @@ return {
 
 								notePos = math.abs(boyfriendNote[j].time - musicTime)
 
-								voices:setVolume(1)
+								if voices then voices:setVolume(1) end
 
 								boyfriend.lastHit = musicTime
 
@@ -1212,7 +1229,6 @@ return {
 									boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
 									boyfriendArrow.orientation = boyfriendArrow.orientation - arrowAngles[boyfriendNote[1].col]
 									boyfriendArrow.orientation = boyfriendArrow.orientation + arrowAngles[i]
-									print(boyfriendArrow.orientation)
 
 									boyfriend:animate(curAnim, false)
 
@@ -1252,7 +1268,7 @@ return {
 			end
 
 			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].y - musicPos <= -400)) and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
-				voices:setVolume(1)
+				if voices then voices:setVolume(1) end
 
 				boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
 
@@ -1600,7 +1616,7 @@ return {
 
 	leave = function(self)
 		if inst then inst:stop() end
-		voices:stop()
+		if voices then voices:stop() end
 
 		playMenuMusic = true
 

@@ -1,8 +1,76 @@
 local psychweek
 local enemyOffsets, boyfriendOffsets, girlfriendOffsets = {}, {}, {}
+empty = ''
+downscroll = settings.downscroll
+local flixelTweenTypes = {
+    ["linear"] = "linear",
+    ["sineIn"] = "in-sine",
+    ["sineOut"] = "out-sine",
+    ["sineInOut"] = "in-out-sine",
+    ["quadIn"] = "in-quad",
+    ["quadOut"] = "out-quad",
+    ["quadInOut"] = "in-out-quad",
+    ["cubicIn"] = "in-cubic",
+    ["cubicOut"] = "out-cubic",
+    ["cubicInOut"] = "in-out-cubic",
+    ["quartIn"] = "in-quartic",
+    ["quartOut"] = "out-quartic",
+    ["quartInOut"] = "in-out-quartic",
+    ["quintIn"] = "in-quintic",
+    ["quintOut"] = "out-quintic",
+    ["quintInOut"] = "in-out-quintic",
+    ["expoIn"] = "in-expo",
+    ["expoOut"] = "out-expo",
+    ["expoInOut"] = "in-out-expo",
+    ["circIn"] = "in-circ",
+    ["circOut"] = "out-circ",
+    ["circInOut"] = "in-out-circ",
+    ["elasticIn"] = "in-elastic",
+    ["elasticOut"] = "out-elastic",
+    ["elasticInOut"] = "in-out-elastic",
+    ["backIn"] = "in-back",
+    ["backOut"] = "out-back",
+    ["backInOut"] = "in-out-back",
+    ["bounceIn"] = "in-bounce",
+    ["bounceOut"] = "out-bounce",
+    ["bounceInOut"] = "in-out-bounce"
+}
+sineIn = "sineIn"
+sineOut = "sineOut"
+sineInOut = "sineInOut"
+quadIn = "quadIn"
+quadOut = "quadOut"
+quadInOut = "quadInOut"
+cubicIn = "cubicIn"
+cubicOut = "cubicOut"
+cubicInOut = "cubicInOut"
+quartIn = "quartIn"
+quartOut = "quartOut"
+quartInOut = "quartInOut"
+quintIn = "quintIn"
+quintOut = "quintOut"
+quintInOut = "quintInOut"
+expoIn = "expoIn"
+expoOut = "expoOut"
+expoInOut = "expoInOut"
+circIn = "circIn"
+circOut = "circOut"
+circInOut = "circInOut"
+elasticIn = "elasticIn"
+elasticOut = "elasticOut"
+elasticInOut = "elasticInOut"
+backIn = "backIn"
+backOut = "backOut"
+backInOut = "backInOut"
+bounceIn = "bounceIn"
+bounceOut = "bounceOut"
+bounceInOut = "bounceInOut"
+
 camGame = xmlcamera()
 camGame.follow = {x=0, y=0}
 camGame.target = {x=0, y=0}
+camHud = xmlcamera()
+other = camHud
 local function tryExcept(f1, f2)
     local ok, err = pcall(f1)
     if not ok then
@@ -35,12 +103,16 @@ end
 
 local stagesprs = {}
 local sprnames = {}
+local textnames = {}
+local stagetexts = {}
+local frontstagesprs = {}
 local tt = {} -- tween timers
+
 function makeLuaSprite(name, path, x, y)
     pcall(
         function()
             local spr = Sprite()
-            if path ~= "" then
+            if path ~= "" and path ~= "empty" then
                 local path = "mods/" .. weekMeta[psychweek][3] .. "/images/" .. path
                 spr:load(getImage(path))
             end
@@ -52,11 +124,15 @@ function makeLuaSprite(name, path, x, y)
         end
     )
 end
-function addLuaSprite(name)
+function addLuaSprite(name, front)
     -- adds a makeLuaSprite object to the stage
-    pcall(
+    local ok, err = pcall(
         function()
-            table.insert(stagesprs, sprnames[name])
+            if not front then
+                table.insert(stagesprs, sprnames[name])
+            else
+                table.insert(frontstagesprs, sprnames[name])
+            end
         end
     )
     
@@ -70,14 +146,16 @@ function removeLuaSprite(name)
     end
 end
 function makeAnimatedLuaSprite(name, path, x, y)
-    pcall(
+    local ok, err = pcall(
         function()
             local spr = Sprite()
+            local path = "mods/" .. weekMeta[psychweek][3] .. "/images/" .. path
+            spr:setFrames(getSparrow(path))
             spr.x = x
             spr.y = y
             spr.camera = camGame
-            spr:setFrames(getSparrow(path))
             sprnames[name] = spr
+            return spr
         end
     )
 end
@@ -105,16 +183,17 @@ function makeGraphic(name, width, height, color)
             sprnames[name]:makeGraphic(width, height, color)
         end
     )
-
-    print(ok, err)
 end
 function setProperty(name, value)
     -- name is given as 'name.property'
     pcall(
         function()
             local name = util.split(name, ".")
-            print(name[1], name[2], value)
-            sprnames[name[1]][name[2]] = value
+            if name[1] == "camFollowPos" then
+                camGame.follow[name[2]] = value
+            else
+                sprnames[name[1]][name[2]] = value
+            end
         end
     ) 
 end
@@ -125,30 +204,63 @@ function screenCenter(name, value)
         end
     )
 end
-function doTweenAlpha(tweenName, name, value, time, type)
+function addAnimationByPrefix(sprname, name, prefix, fps, loop)
     local ok, err = pcall(
         function()
-            local tweenName = tweenName .. name
+            sprnames[sprname]:addAnimByPrefix(name, prefix, fps, loop)
+        end
+    )
+end
+function addAnimationByIndices(sprname, name, indices, fps, loop)
+    pcall(
+        function() end
+    )
+end
+function objectPlayAnimation(name, anim, force)
+    local ok, err = pcall(
+        function()
+            local force = force or true
+            sprnames[name]:animate(anim, force)
+        end
+    )
+end
+function setObjectCamera(name, cameraname)
+    pcall(
+        function()
+            -- cameraname comes as a string, so we need to convert it to a camera object
+            cameraname = _G[cameraname]
+            sprnames[name].camera = cameraname
+        end
+    )
+end
+function doTweenAlpha(tweenName, name, value, time, tweenType)
+    tweenType = flixelTweenTypes[tweenType]
+    local ok, err = pcall(
+        function()
+            local tweenName = tweenName
             if tt[tweenName] then
                 Timer.cancel(tt[tweenName])
                 tt[tweenName] = nil
             end
-            print(name, value, time, type)
             if name ~= "boyfriend" and name ~= "dad" and name ~= "gf" then
-                tt[tweenName] = Timer.tween(tonumber(time), sprnames[name], {alpha = tonumber(value)}, type)
+                tt[tweenName] = Timer.tween(tonumber(time), sprnames[name], {alpha = tonumber(value)}, tweenType)
             else
                 if name == "boyfriend" then
-                    tt[tweenName] = Timer.tween(tonumber(time), boyfriend, {alpha = tonumber(value)}, type)
+                    tt[tweenName] = Timer.tween(tonumber(time), boyfriend, {alpha = tonumber(value)}, tweenType)
                 elseif name == "dad" then
-                    tt[tweenName] = Timer.tween(tonumber(time), enemy, {alpha = tonumber(value)}, type)
+                    tt[tweenName] = Timer.tween(tonumber(time), enemy, {alpha = tonumber(value)}, tweenType)
                 elseif name == "gf" then
-                    tt[tweenName] = Timer.tween(tonumber(time), girlfriend, {alpha = tonumber(value)}, type)
+                    tt[tweenName] = Timer.tween(tonumber(time), girlfriend, {alpha = tonumber(value)}, tweenType)
                 end
             end
         end
     )
 end
-function doTweenColor(tweenName, name, value, time, type)
+function close()
+    -- is a function for some reason but does really nothing tbh
+end
+function doTweenColor(tweenName, name, value, time, tweenType)
+    tweenType = flixelTweenTypes[tweenType]
     local ok, err = pcall(
         function()
             value = hex2rgb(value)
@@ -157,19 +269,93 @@ function doTweenColor(tweenName, name, value, time, type)
                 Timer.cancel(tt[tweenName])
                 tt[tweenName] = nil
             end
-            print(name, value, time, type)
             if name ~= "boyfriend" and name ~= "dad" and name ~= "gf" then
-                print(sprnames[name])
-                tt[tweenName] = Timer.tween(tonumber(time), sprnames[name], {color = value}, type)
+                tt[tweenName] = Timer.tween(tonumber(time), sprnames[name], {color = value}, tweenType)
             else
                 if name == "boyfriend" then
-                    tt[tweenName] = Timer.tween(tonumber(time), boyfriend, {color = value}, type)
+                    tt[tweenName] = Timer.tween(tonumber(time), boyfriend, {color = value}, tweenType)
                 elseif name == "dad" then
-                    tt[tweenName] = Timer.tween(tonumber(time), enemy, {color = value}, type)
+                    tt[tweenName] = Timer.tween(tonumber(time), enemy, {color = value}, tweenType)
                 elseif name == "gf" then
-                    tt[tweenName] = Timer.tween(tonumber(time), girlfriend, {color = value}, type)
+                    tt[tweenName] = Timer.tween(tonumber(time), girlfriend, {color = value}, tweenType)
                 end
             end
+        end
+    )
+end
+
+function doTweenY(tweenName, name, pos, time, tweenType)
+    tweenType = flixelTweenTypes[tweenType]
+    local ok, err = pcall(
+        function()
+            local tweenName = tweenName .. name
+            if tt[tweenName] then
+                Timer.cancel(tt[tweenName])
+                tt[tweenName] = nil
+            end
+            if name ~= "boyfriend" and name ~= "dad" and name ~= "gf" then
+                tt[tweenName] = Timer.tween(tonumber(time), sprnames[name], {y = tonumber(pos)}, tweenType)
+            else
+                if name == "boyfriend" then
+                    tt[tweenName] = Timer.tween(tonumber(time), boyfriend, {y = tonumber(pos)}, tweenType)
+                elseif name == "dad" then
+                    tt[tweenName] = Timer.tween(tonumber(time), enemy, {y = tonumber(pos)}, tweenType)
+                elseif name == "gf" then
+                    tt[tweenName] = Timer.tween(tonumber(time), girlfriend, {y = tonumber(pos)}, tweenType)
+                end
+            end
+        end
+    )
+end
+
+textStr = ""
+textColor = {1, 1, 1}
+function makeLuaText(name, text, posX, posY, limit)
+    local text = {
+        name = name,
+        text = text,
+        x = posX,
+        y = posY,
+        limit = limit,
+        color = {1,1,1},
+        align = "left",
+        size = 24 -- 24px is the default size
+    }
+
+    table.insert(textnames, text)
+end
+function addLuaText(name)
+    local ok, err = pcall(
+        function()
+            table.insert(stagetexts, textnames[name])
+        end
+    )
+end
+function setTextSize(name, size)
+    local ok, err = pcall(
+        function()
+            textnames[name].size = size -- size in px
+        end
+    )
+end
+function setTextString(name, value)
+    local ok, err = pcall(
+        function()
+            textnames[name].text = value
+        end
+    )
+end
+function setTextColor(name, value)
+    local ok, err = pcall(
+        function()
+            textnames[name].color = hex2rgb(value)
+        end
+    )
+end
+function setTextAlignment(name, value)
+    local ok, err = pcall(
+        function()
+            textnames[name].align = value
         end
     )
 end
@@ -195,8 +381,18 @@ function getPropertyFromGroup(group, name, property)
                 end
             end
         end
-    else
+    elseif group == "playerStrums" then
+        if tonumber(name) then
+            name = name + 1
 
+            return 0
+        end
+    elseif group == "opponentStrums" then
+        if tonumber(name) then
+            name = name + 1
+
+            return 0
+        end
     end
 end
 
@@ -238,6 +434,52 @@ function setPropertyFromGroup(group, name, property, value)
     end
 end
 
+function noteTweenY(tweenName, index, pos, time, tweenType)
+    tweenType = flixelTweenTypes[tweenType]
+    local ok, err = pcall(
+        function()
+            index = index + 1
+            if index < 5 then
+                -- enemy arrows
+                tt[tweenName .. index] = Timer.tween(tonumber(time), enemyArrows[index], {offsetY = tonumber(pos)}, tweenType)
+                for i = 1, #enemyNotes[index] do
+                    tt[tweenName .. index .. "note" .. i] = Timer.tween(tonumber(time), enemyNotes[index][i], {offsetY = tonumber(pos)}, tweenType)
+                end
+            else
+                index = index - 4
+                -- boyfriend arrows
+                tt[tweenName .. index] = Timer.tween(tonumber(time), boyfriendArrows[index], {offsetY = tonumber(pos)}, tweenType)
+                for i = 1, #boyfriendNotes[index] do
+                    tt[tweenName .. index .. "note" .. i] = Timer.tween(tonumber(time), boyfriendNotes[index][i], {offsetY = tonumber(pos)}, tweenType)
+                end
+            end
+        end
+    )
+end
+
+function noteTweenX(tweenName, index, pos, time, tweenType)
+    tweenType = flixelTweenTypes[tweenType]
+    local ok, err = pcall(
+        function()
+            index = index + 1
+            if index < 5 then
+                -- enemy arrows
+                tt[tweenName .. index] = Timer.tween(tonumber(time), enemyArrows[index], {offsetX = tonumber(pos)}, tweenType)
+                for i = 1, #enemyNotes[index] do
+                    tt[tweenName .. index .. "note" .. i] = Timer.tween(tonumber(time), enemyNotes[index][i], {offsetX = tonumber(pos)}, tweenType)
+                end
+            else
+                index = index - 4
+                -- boyfriend arrows
+                tt[tweenName .. index] = Timer.tween(tonumber(time), boyfriendArrows[index], {offsetX = tonumber(pos)}, tweenType)
+                for i = 1, #boyfriendNotes[index] do
+                    tt[tweenName .. index .. "note" .. i] = Timer.tween(tonumber(time), boyfriendNotes[index][i], {offsetX = tonumber(pos)}, tweenType)
+                end
+            end
+        end
+    )
+end
+
 function getPropertyFromClass(class, prop)
     if class == "Conductor" then
         if prop == "songPosition" then
@@ -245,9 +487,28 @@ function getPropertyFromClass(class, prop)
         else
             return 0
         end
+    elseif class == "ClientPrefs" then
+        if prop == "downScroll" then
+            return settings.downscroll
+        else
+            return 0
+        end
     else
         return 0
     end
+end
+
+function runTimer(v1, v2)
+    tt[v1] = Timer.after(tonumber(v2), function() 
+        
+    end)
+end
+
+function runHaxeCode()
+    -- forget about it. this isn't haxe. this is lua.
+end
+function addHaxeLibrary()
+    -- forget about it. this isn't haxe. this is lua.
 end
 return {
 	enter = function(self, from, songNum, songAppend, weeknum)
@@ -266,6 +527,9 @@ return {
 		enemyIcon:animate("daddy dearest", false)
 
         psychweek = weeknum
+
+        screenHeight = graphics.getHeight()
+        screenWidth = graphics.getWidth()
 
 		self:load()
 	end,
@@ -456,6 +720,10 @@ return {
                 girlfriend.danceSpeed = 1
 
                 girlfriend:animate("danceLeft", true)
+
+                girlfriendOffsets = {0, 0}
+                girlfriendCamPositions.x = 0
+                girlfriendCamPositions.y = 0
             end
         )
 
@@ -469,17 +737,22 @@ return {
         -- run the stage lua file
         local stage = love.filesystem.load(stageluapath)()
         if onCreate then onCreate() end
+        if onUpdate then stageOnUpdate = onUpdate end
+        if onUpdatePost then stageOnUpdatePost = onUpdatePost end
+        if onBeatHit then stageOnBeatHit = onBeatHit end
 
         for i, v in ipairs(love.filesystem.getDirectoryItems("mods/" .. weekMeta[psychweek][3] .. "/custom_events")) do
             -- if file ends with .lua
             if v:find(".lua") then
                 local event = love.filesystem.load("mods/" .. weekMeta[psychweek][3] .. "/custom_events/" .. v)()
-                if onCreatePost then onCreatePost() end
-                if onSongStart then onSongStart() end
+                if onCreate then onCreate(); onCreate = nil end
+                if onCreatePost then onCreatePost(); onCreatePost = nil end
+                if onSongStart then onSongStart(); onSongStart = nil end
                 customEvents[v:gsub(".lua", "")] = {
                     onEvent = onEvent,
                     onUpdate = onUpdate,
                     onSongStart = onSongStart,
+                    onTimerCompleted = onTimerCompleted,
                 }
             end
         end
@@ -522,6 +795,18 @@ return {
 
         weeks:generateNotes(nil, psychweek, song, difficulty)
         weeks:generateEvents(nil, psychweek, song, difficulty)
+
+        -- load all .lua scripts in CURSONGFULLPATH
+        for i, v in ipairs(love.filesystem.getDirectoryItems(CURSONGFULLPATH)) do
+            -- if file ends with .lua
+            if v:find(".lua") then
+                local event = love.filesystem.load(CURSONGFULLPATH .. "/" .. v)()
+                if onCreate then onCreate() end
+                if onUpdate then onUpdate() end
+                if onSongStart then onSongStart() end
+                if onTimerCompleted then onTimerCompleted() end
+            end
+        end
 	end,
 
 	update = function(self, dt)
@@ -538,7 +823,6 @@ return {
 		end
 
         if stagesprs.whitebg then
-        print(stagesprs['whitebg'].alpha)
         end
         camGame.zoom = camera.zoom
 
@@ -563,7 +847,6 @@ return {
             end
         end
         
-
         -- for all in customEvents, do onUpdate
         for i, v in pairs(customEvents) do
             if v.onUpdate then
@@ -571,7 +854,14 @@ return {
             end
         end
 
-		if not (countingDown or graphics.isFading()) and not (inst:isPlaying() and voices:isPlaying()) and not paused then
+        -- for all in sprnames do update
+        for i, v in pairs(sprnames) do
+            if v.update then
+                v:update(dt)
+            end
+        end
+
+		if not (countingDown or graphics.isFading()) and not (inst:isPlaying()) and not paused then
 			if storyMode and song < 3 then
 				song = song + 1
 
@@ -591,6 +881,14 @@ return {
 		end
 
 		weeks:updateUI(dt)
+        if stageOnUpdate then stageOnUpdate(dt) end
+        if stageOnUpdatePost then stageOnUpdatePost(dt) end
+
+        curBeat = beatHandler.getBeat()
+
+        if beatHandler.onBeat() then
+            if stageOnBeatHit then stageOnBeatHit() end
+        end
 	end,
 
 	draw = function(self)
@@ -599,7 +897,20 @@ return {
             for i, v in ipairs(stagesprs) do
                 v:draw()
             end
+            for i, v in ipairs(stagetexts) do
+                -- convert v.size (its in pixels) to scaling
+                love.graphics.push()
+                    love.graphics.translate(graphics.getWidth()/2, graphics.getHeight()/2)
+                    love.graphics.setColor(v.color)
+                    love.graphics.printf(v.text, v.x, v.y, v.limit, "left", 0, v.size / 100)
+                    love.graphics.setColor(1, 1, 1, 1)
+                love.graphics.pop()
+            end
 		love.graphics.pop()
+
+        for i, v in ipairs(frontstagesprs) do
+            v:draw()
+        end
 
 		weeks:drawUI()
 	end,
