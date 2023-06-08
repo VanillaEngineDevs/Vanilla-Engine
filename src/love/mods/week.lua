@@ -168,12 +168,14 @@ function setLuaSpriteScrollFactor(name, x, y)
     )
 end
 setScrollFactor = setLuaSpriteScrollFactor
-function scaleObject(name, x, y)
+function scaleObject(name, x, y, updateHitbox)
     pcall(
         function()
             sprnames[name].scale.x = x
             sprnames[name].scale.y = y
-            sprnames[name]:updateHitbox()
+            if updateHitbox then
+                sprnames[name]:updateHitbox()
+            end
         end
     )
 end
@@ -186,11 +188,16 @@ function makeGraphic(name, width, height, color)
 end
 function setProperty(name, value)
     -- name is given as 'name.property'
+    -- can also be given as 'V1.scale.x' tho
     pcall(
         function()
             local name = util.split(name, ".")
             if name[1] == "camFollowPos" then
                 camGame.follow[name[2]] = value
+            elseif name[1] == "dad" then
+                enemy[name[2]] = value
+            elseif name[1] == "gf" then
+                girlfriend[name[2]] = value
             else
                 sprnames[name[1]][name[2]] = value
             end
@@ -637,6 +644,9 @@ return {
 
                     boyfriend:addOffset(animname, animoffsets[1], animoffsets[2])
                 end
+
+                if boyfriend:isAnimName("idle") then boyfriend:animate("idle", true)
+                else boyfriend:animate("danceLeft", true) end
             end,
 
             function()
@@ -695,7 +705,8 @@ return {
                     girlfriend:addOffset(animname, animoffsets[1], animoffsets[2])
                 end
 
-                girlfriend:animate("danceLeft")
+                if girlfriend:isAnimName("idle") then girlfriend:animate("idle", true)
+                else girlfriend:animate("danceLeft", true) end
             end,
             
             function()
@@ -840,7 +851,7 @@ return {
 
         for i, event in ipairs(songEvents) do
             if musicTime > event.time then
-                if customEvents[event.n].onEvent then
+                if customEvents[event.n] and customEvents[event.n].onEvent then
                     customEvents[event.n].onEvent(event.n, event.args, event.args2)
                 end
                 table.remove(songEvents, i)

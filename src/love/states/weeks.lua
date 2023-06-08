@@ -410,6 +410,7 @@ return {
 				local altAnim = chart["notes"][i]["altAnim"] or false
 				local noteType = sectionNotes[j][2]
 				local noteTime = sectionNotes[j][1]
+				local noteVer = sectionNotes[j][4] or "normal"
 
 				if j == 1 then
 					table.insert(events, {eventTime = sectionNotes[1][1], mustHitSection = mustHitSection, bpm = bpm, altAnim = altAnim})
@@ -425,7 +426,7 @@ return {
 					sprite = sprites.rightArrow
 				end
 
-				if mustHitSection then
+				if mustHitSection and noteVer ~= "Hurt Note" then
 					if noteType >= 4 then
 					   	local id = noteType - 3
 					   	local c = #enemyNotes[id] + 1
@@ -465,6 +466,7 @@ return {
 					   	enemyNotes[id][c].y = -400 + noteTime * 0.6 * speed
 						enemyNotes[id][c].orientation = enemyNotes[id][c].orientation - arrowAngles[enemyNotes[id][c].col]
 						enemyNotes[id][c].orientation = enemyNotes[id][c].orientation + arrowAngles[id]
+						enemyNotes[id][c].ver = noteVer
 
 						if settings.downscroll then
 							enemyNotes[id][c].sizeY = -1
@@ -482,6 +484,7 @@ return {
 							 	enemyNotes[id][c].x = x
 							 	enemyNotes[id][c].y = -400 + (noteTime + k) * 0.6 * speed
 								enemyNotes[id][c].col = col
+								enemyNotes[id][c].ver = noteVer
 				 
 								enemyNotes[id][c]:animate("hold", false)
 							end
@@ -532,6 +535,7 @@ return {
 						boyfriendNotes[id][c].time = noteTime
 						boyfriendNotes[id][c].orientation = boyfriendNotes[id][c].orientation - arrowAngles[boyfriendNotes[id][c].col]
 						boyfriendNotes[id][c].orientation = boyfriendNotes[id][c].orientation + arrowAngles[id]
+						boyfriendNotes[id][c].ver = noteVer
 						
 						if settings.downscroll then
 							boyfriendNotes[id][c].sizeY = -1
@@ -549,6 +553,7 @@ return {
 							 	boyfriendNotes[id][c].x = x
 							 	boyfriendNotes[id][c].y = -400 + (noteTime + k) * 0.6 * speed
 								boyfriendNotes[id][c].col = col
+								boyfriendNotes[id][c].ver = noteVer
 				 
 							 	boyfriendNotes[id][c]:animate("hold", false)
 						  	end
@@ -560,7 +565,7 @@ return {
 						  	boyfriendNotes[id][c]:animate("end", false)
 					   	end
 					end
-				else
+				elseif not mustHitSection and noteVer ~= "Hurt Note" then
 					if noteType >= 4 then
 					   	local id = noteType - 3
 					   	local c = #boyfriendNotes[id] + 1
@@ -601,6 +606,7 @@ return {
 						boyfriendNotes[id][c].time = noteTime
 						boyfriendNotes[id][c].orientation = boyfriendNotes[id][c].orientation - arrowAngles[boyfriendNotes[id][c].col]
 						boyfriendNotes[id][c].orientation = boyfriendNotes[id][c].orientation + arrowAngles[id]
+						boyfriendNotes[id][c].ver = noteVer
 						
 						if settings.downscroll then
 							boyfriendNotes[id][c].sizeY = -1
@@ -618,6 +624,7 @@ return {
 							 	boyfriendNotes[id][c].x = x
 							 	boyfriendNotes[id][c].y = -400 + (noteTime + k) * 0.6 * speed
 								boyfriendNotes[id][c].col = col
+								boyfriendNotes[id][c].ver = noteVer
 				 
 							 	boyfriendNotes[id][c]:animate("hold", false)
 						  	end
@@ -667,6 +674,7 @@ return {
 					   	enemyNotes[id][c].y = -400 + noteTime * 0.6 * speed
 						enemyNotes[id][c].orientation = enemyNotes[id][c].orientation - arrowAngles[enemyNotes[id][c].col]
 						enemyNotes[id][c].orientation = enemyNotes[id][c].orientation + arrowAngles[id]
+						enemyNotes[id][c].ver = noteVer
 						if settings.downscroll then
 							enemyNotes[id][c].sizeY = -1
 						end
@@ -683,6 +691,7 @@ return {
 							 	enemyNotes[id][c].x = x
 							 	enemyNotes[id][c].y = -400 + (noteTime + k) * 0.6 * speed
 								enemyNotes[id][c].col = col
+								enemyNotes[id][c].ver = noteVer
 							 	if k > sectionNotes[j][3] - 71 / speed then
 									enemyNotes[id][c].offsetY = not pixel and 10 or 2
 				 
@@ -1036,21 +1045,39 @@ return {
 						enemyArrow.orientation = enemyArrow.orientation + arrowAngles[i]
 					end
 
-					if enemyNote[1]:getAnimName() == "hold" or enemyNote[1]:getAnimName() == "end" then
-						if useAltAnims then
-							if enemy.holdTimer > enemy.maxHoldTimer then enemy:animate(curAnim .. " alt", _psychmod and true or false) end
+					if enemyNote[1].ver ~= "GF Sing" then
+						if enemyNote[1]:getAnimName() == "hold" or enemyNote[1]:getAnimName() == "end" then
+							if useAltAnims then
+								if enemy.holdTimer > enemy.maxHoldTimer then enemy:animate(curAnim .. " alt", _psychmod and true or false) end
+							else
+								if enemy.holdTimer > enemy.maxHoldTimer then enemy:animate(curAnim, (_psychmod and true or false)) end
+							end
 						else
-							if enemy.holdTimer > enemy.maxHoldTimer then enemy:animate(curAnim, (_psychmod and true or false)) end
+							if useAltAnims then
+								enemy:animate(curAnim .. " alt", false)
+							else
+								enemy:animate(curAnim, false)
+							end
 						end
-					else
-						if useAltAnims then
-							enemy:animate(curAnim .. " alt", false)
-						else
-							enemy:animate(curAnim, false)
-						end
-					end
 
-					enemy.lastHit = musicTime
+						enemy.lastHit = musicTime
+					else
+						if enemyNote[1]:getAnimName() == "hold" or enemyNote[1]:getAnimName() == "end" then
+							if useAltAnims then
+								if girlfriend.holdTimer > enemy.maxHoldTimer then girlfriend:animate(curAnim .. " alt", _psychmod and true or false) end
+							else
+								if girlfriend.holdTimer > enemy.maxHoldTimer then girlfriend:animate(curAnim, (_psychmod and true or false)) end
+							end
+						else
+							if useAltAnims then
+								girlfriend:animate(curAnim .. " alt", false)
+							else
+								girlfriend:animate(curAnim, false)
+							end
+						end
+
+						girlfriend.lastHit = musicTime
+					end
 
 					if not mustHitSection then 
 						noteCamTweens[i]()
