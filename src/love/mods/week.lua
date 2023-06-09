@@ -13,9 +13,9 @@ local flixelTweenTypes = {
     ["cubicIn"] = "in-cubic",
     ["cubicOut"] = "out-cubic",
     ["cubicInOut"] = "in-out-cubic",
-    ["quartIn"] = "in-quartic",
-    ["quartOut"] = "out-quartic",
-    ["quartInOut"] = "in-out-quartic",
+    ["quartIn"] = "in-quart",
+    ["quartOut"] = "out-quart",
+    ["quartInOut"] = "in-out-quart",
     ["quintIn"] = "in-quintic",
     ["quintOut"] = "out-quintic",
     ["quintInOut"] = "in-out-quintic",
@@ -76,6 +76,8 @@ local function tryExcept(f1, f2)
     if not ok then
         f2(err)
     end
+
+    print(err)
 end
 customEvents = {}
 local function getImage(key)
@@ -112,7 +114,7 @@ function makeLuaSprite(name, path, x, y)
     pcall(
         function()
             local spr = Sprite()
-            if path ~= "" and path ~= "empty" then
+            if path ~= "" and path ~= "empty" or path == nil then
                 local path = "mods/" .. weekMeta[psychweek][3] .. "/images/" .. path
                 spr:load(getImage(path))
             end
@@ -289,6 +291,8 @@ function doTweenColor(tweenName, name, value, time, tweenType)
             end
         end
     )
+
+    print(err)
 end
 
 function doTweenY(tweenName, name, pos, time, tweenType)
@@ -510,6 +514,11 @@ function runTimer(v1, v2)
         
     end)
 end
+function cancelTimer(v1)
+    if tt[v1] then
+        Timer.cancel(tt[v1])
+    end
+end
 
 function runHaxeCode()
     -- forget about it. this isn't haxe. this is lua.
@@ -615,6 +624,7 @@ return {
                 local boyfriendimagepath = boyfriendjson.image
                 local boyfriendrealpath = "mods/" .. weekMeta[psychweek][3] .. "/images/" .. boyfriendimagepath
                 boyfriend = Sprite()
+                print(boyfriendrealpath .. "\nWHY DO YOU NOT LOADDDDDD???? THE FILE EXISTS YOU FAGGOT")  
                 if love.filesystem.getInfo(boyfriendrealpath .. ".png") and love.filesystem.getInfo(boyfriendrealpath .. ".xml") then
                     boyfriend:setFrames(getSparrow(boyfriendrealpath))
                 else
@@ -638,6 +648,7 @@ return {
 
                     if #indices > 0 then
                         boyfriend:addAnimByIndices(animname, animprefix, indices, animfps, animloop)
+                        print("added anim by indices")
                     else
                         boyfriend:addAnimByPrefix(animname, animprefix, animfps, animloop)
                     end
@@ -932,6 +943,20 @@ return {
 		girlfriend = nil
 
 		graphics.clearCache()
+
+        inst = nil
+        voices = nil
+        songEvents = {}
+        customEvents = {}
+        sprnames = {}
+        stagesprs = {}
+        stagetexts = {}
+        frontstagesprs = {}
+        stageOnUpdate = nil
+        stageOnUpdatePost = nil
+        stageOnBeatHit = nil
+        stageOnDraw = nil
+        stageOnDrawPost = nil
 
 		weeks:leave()
 	end

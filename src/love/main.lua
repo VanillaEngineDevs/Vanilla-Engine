@@ -481,7 +481,7 @@ function love.load()
 	lovesize.set(1280, 720)
 
 	function hex2rgb(hex)
-		hex = hex:gsub("#",""):gsub("0x")
+		hex = hex:gsub("#",""):gsub("0x","")
 		local r = hex:sub(1,2) 
 		local g = hex:sub(3,4)
 		local b = hex:sub(5,6)

@@ -12,6 +12,7 @@ function onEvent(n, v1)
 end
 
 function onUpdate(elapsed)
+    local elapsed = elapsed or 0
     if doShake then
         if shakeDuration > 0 then
             shakeDuration = shakeDuration - elapsed

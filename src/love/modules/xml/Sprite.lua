@@ -267,8 +267,15 @@ function Sprite:addAnimByPrefix(n, p, fr, l)
     end
 
     if not self._animations then self._animations = {} end
-    self._animations[n] = a
-    self.animationOffset[n] = {x=0, y=0}
+    pcall(
+        function()
+            self._animations[n] = a
+            self.animationOffset[n] = {x=0, y=0}
+        end
+    )
+    if not ok then
+        print("Error adding animation " .. n .. " with prefix " .. p)
+    end
 end
 
 function Sprite:addAnimByIndices(n, p, i, fr, l)
