@@ -98,13 +98,11 @@ return {
 				icons = love.graphics.newImage(graphics.imagePath("icons")),
 				notes = love.graphics.newImage(graphics.imagePath("notes")),
 				numbers = love.graphics.newImage(graphics.imagePath("numbers")),
-				notesplashes = love.graphics.newImage(graphics.imagePath("noteSplashes"))
 			}
 
 			sprites = {
 				icons = love.filesystem.load("sprites/icons.lua"),
 				numbers = love.filesystem.load("sprites/numbers.lua"),
-				noteSplash = love.filesystem.load("sprites/noteSplashes.lua")
 			}
 
 			rating = love.filesystem.load("sprites/rating.lua")()
@@ -136,13 +134,11 @@ return {
 				icons = love.graphics.newImage(graphics.imagePath("icons")),
 				notes = love.graphics.newImage(graphics.imagePath("pixel/notes")),
 				numbers = love.graphics.newImage(graphics.imagePath("pixel/numbers")),
-				notesplashes = love.graphics.newImage(graphics.imagePath("pixel/pixelSplashes"))
 			}
 
 			sprites = {
 				icons = love.filesystem.load("sprites/icons.lua"),
 				numbers = love.filesystem.load("sprites/pixel/numbers.lua"),
-				noteSplash = love.filesystem.load("sprites/pixel/pixelSplashes.lua")
 			}
 
 			rating = love.filesystem.load("sprites/pixel/rating.lua")()
@@ -265,6 +261,8 @@ return {
 			sprites.receptors = love.filesystem.load("sprites/pixel/receptor.lua")
 		end
 
+		NoteSplash:setup()
+
 		enemyArrows = {
 			sprites.receptors(),
 			sprites.receptors(),
@@ -278,17 +276,9 @@ return {
 			sprites.receptors()
 		}
 
-		boyfriendSplashes = {
-			sprites.noteSplash(),
-			sprites.noteSplash(),
-			sprites.noteSplash(),
-			sprites.noteSplash()
-		}
-
 		for i = 1, 4 do
 			if settings.middleScroll then 
 				boyfriendArrows[i].x = -410 + 165 * i
-				boyfriendSplashes[i].x = -410 + 165 * i
 				-- ew stuff
 				enemyArrows[1].x = -925 + 165 * 1 
 				enemyArrows[2].x = -925 + 165 * 2
@@ -297,12 +287,10 @@ return {
 			else
 				enemyArrows[i].x = -925 + 165 * i
 				boyfriendArrows[i].x = 100 + 165 * i
-				boyfriendSplashes[i].x = 100 + 165 * i
 			end
 
 			enemyArrows[i].y = -400
 			boyfriendArrows[i].y = -400
-			boyfriendSplashes[i].y = -400
 
 			boyfriendArrows[i].orientation = 0
 			enemyArrows[i].orientation = 0
@@ -1008,6 +996,8 @@ return {
 		if paused then return end
 		musicPos = musicTime * 0.6 * speed
 
+		NoteSplash:update(dt)
+
 		for i = 1, 4 do
 			local enemyArrow = enemyArrows[i]
 			local boyfriendArrow = boyfriendArrows[i]
@@ -1015,14 +1005,12 @@ return {
 			local boyfriendNote = boyfriendNotes[i]
 			local curAnim = animList[i]
 			local curInput = inputList[i]
-			local boyfriendSplash = boyfriendSplashes[i]
 			local gfNote = gfNotes[i]
 
 			local noteNum = i
 
 			enemyArrow:update(dt)
 			boyfriendArrow:update(dt)
-			boyfriendSplash:update(dt)
 
 			if not enemyArrow:isAnimated() then
 				enemyArrow:animate(noteList[i], false)
@@ -1166,8 +1154,12 @@ return {
 							health = health + 0.095
 							score = score + 350
 
-							boyfriendSplash:animate(noteList[boyfriendNote[1].col] .. love.math.random(1,2), false)
-
+							NoteSplash:new(
+								{
+									anim = noteList[boyfriendNote[1].col] .. love.math.random(1,2),
+									posX = boyfriendArrow.x,
+								}
+							)
 							self:calculateRating()
 						else
 							health = health + 0.0125
@@ -1209,7 +1201,10 @@ return {
 									score = score + 350
 									ratingAnim = "sick"
 
-									boyfriendSplash:animate(noteList[boyfriendNote[j].col] .. love.math.random(1,2), false)
+									NoteSplash:new({
+										anim = noteList[boyfriendNote[j].col] .. love.math.random(1,2),
+										posX = boyfriendArrow.x,
+									})
 								elseif notePos <= 90 then -- "Good"
 									score = score + 200
 									ratingAnim = "good"
@@ -1490,23 +1485,14 @@ return {
 				graphics.setColor(1, 1, 1)
 				if not pixel then 
 					boyfriendArrows[i]:draw()
-					if boyfriendSplashes[i]:isAnimated() then
-						graphics.setColor(1,1,1,0.5)
-						boyfriendSplashes[i]:draw()
-					end
+					NoteSplash:draw()
 				else
 					if not settings.downscroll then
 						boyfriendArrows[i]:udraw(8, 8)
-						if boyfriendSplashes[i]:isAnimated() then
-							graphics.setColor(1,1,1,0.5)
-							boyfriendSplashes[i]:udraw(8, 8)
-						end
+						NoteSplash:udraw(8, 8)
 					else
 						boyfriendArrows[i]:udraw(8, -8)
-						if boyfriendSplashes[i]:isAnimated() then
-							graphics.setColor(1,1,1,0.5)
-							boyfriendSplashes[i]:udraw(8, -8)
-						end
+						NoteSplash:udraw(8, -8)
 					end
 				end
 				graphics.setColor(1, 1, 1)

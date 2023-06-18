@@ -1,0 +1,59 @@
+local splash = {}
+splash.cache = {}
+splash.spr = nil
+
+function splash:setup()
+    -- called at the start of each song
+    if not pixel then
+        splash.image = love.graphics.newImage(graphics.imagePath("noteSplashes"))
+    else
+        splash.image = love.graphics.newImage(graphics.imagePath("pixel/pixelSplashes"))
+    end
+end
+
+function splash:new(settings)
+    local s = {}
+    s.anim = settings.anim
+    s.posX = settings.posX
+    if not pixel then
+        s.sprite = love.filesystem.load("sprites/noteSplashes.lua")()
+    else
+        s.sprite = love.filesystem.load("sprites/pixel/pixelSplashes.lua")()
+    end
+    s.sprite.x = s.posX
+    s.sprite.y = -400
+    s.sprite:animate(s.anim)
+
+    table.insert(splash.cache, s)
+end
+
+function splash:update(dt)
+    for i, v in ipairs(splash.cache) do
+        if not v then break end
+        v.sprite:update(dt)
+
+        if not v.sprite:isAnimated() then
+            table.remove(splash.cache, i)
+        end
+    end
+end
+
+function splash:draw()
+    for i, v in ipairs(splash.cache) do
+        if not v then break end
+        graphics.setColor(1,1,1,0.5)
+        v.sprite:draw()
+        graphics.setColor(1,1,1,1)
+    end
+end
+
+function splash:udraw(sx, sy)
+    for i, v in ipairs(splash.cache) do
+        if not v then break end
+        graphics.setColor(1,1,1,0.5)
+        v.sprite:udraw(sx, sy)
+        graphics.setColor(1,1,1,1)
+    end
+end
+
+return splash

@@ -126,5 +126,7 @@ return {
 	leave = function(self)
 		Timer.clear()
 		graphics.setFade(1)
+		if inst then inst:stop() end
+		if voices then voices:stop() end
 	end
 }

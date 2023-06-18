@@ -492,6 +492,10 @@ return {
 						)
 					end
 				end
+			end,
+
+			clone = function(self) 
+				return self
 			end
 		}
 

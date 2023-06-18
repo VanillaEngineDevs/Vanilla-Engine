@@ -217,6 +217,7 @@ function love.load()
 	cutscene = require "modules.cutscene"
 	dialogue = require "modules.dialogue"
 	settings = require "settings"
+	NoteSplash = require "modules.Splash"
 	
 	-- XML Modules
 	Sprite = require "modules.xml.Sprite"

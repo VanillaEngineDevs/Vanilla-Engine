@@ -624,7 +624,6 @@ return {
                 local boyfriendimagepath = boyfriendjson.image
                 local boyfriendrealpath = "mods/" .. weekMeta[psychweek][3] .. "/images/" .. boyfriendimagepath
                 boyfriend = Sprite()
-                print(boyfriendrealpath .. "\nWHY DO YOU NOT LOADDDDDD???? THE FILE EXISTS YOU FAGGOT")  
                 if love.filesystem.getInfo(boyfriendrealpath .. ".png") and love.filesystem.getInfo(boyfriendrealpath .. ".xml") then
                     boyfriend:setFrames(getSparrow(boyfriendrealpath))
                 else
@@ -648,7 +647,6 @@ return {
 
                     if #indices > 0 then
                         boyfriend:addAnimByIndices(animname, animprefix, indices, animfps, animloop)
-                        print("added anim by indices")
                     else
                         boyfriend:addAnimByPrefix(animname, animprefix, animfps, animloop)
                     end
@@ -794,10 +792,11 @@ return {
         end
 
         enemy.camera, boyfriend.camera, girlfriend.camera = camGame, camGame, camGame
-
         boyfriend.x, boyfriend.y = stagejson.boyfriend[1] + boyfriendOffsets[1] - 50, stagejson.boyfriend[2] + boyfriendOffsets[2] + 45
         enemy.x, enemy.y = stagejson.opponent[1] + enemyOffsets[1] + 70, stagejson.opponent[2] + enemyOffsets[2] + 30
         girlfriend.x, girlfriend.y = stagejson.girlfriend[1] + girlfriendOffsets[1] + 90, stagejson.girlfriend[2] + girlfriendOffsets[2] + 125
+
+        print(stagejson.boyfriend[1], stagejson.boyfriend[2], " | ", boyfriendOffsets[1], boyfriendOffsets[2], " | ", boyfriend.x, boyfriend.y)
 
         if not camera.points["enemy"] then 
 			if enemy then

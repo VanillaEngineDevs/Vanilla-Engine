@@ -1,5 +1,5 @@
 return graphics.newSprite(
-	images.notesplashes,
+	NoteSplash.image,
 	-- Automatically generated from noteSplashes.xml
 	{
 		{x = 0, y = 0, width = 194, height = 186, offsetX = -77, offsetY = -87, offsetWidth = 291, offsetHeight = 303}, -- 1: note splash blue 10000
