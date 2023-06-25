@@ -1,7 +1,7 @@
 return {
     enter = function(self, from, songNum, songAppend)
-		pauseColor = {50, 50, 50}
 		weeks:enter() 
+
 		stages["tank"]:enter()
 
 		week = 7
@@ -187,25 +187,7 @@ return {
             end
         end
 
-		if not (countingDown or graphics.isFading()) and not (inst:isPlaying() and voices:isPlaying()) and not paused and not inCutscene then
-			if storyMode and song < 3 then
-				song = song + 1
-				died = false
-
-				self:load()
-			else
-				status.setLoading(true)
-
-				graphics:fadeOutWipe(
-					0.7,
-					function()
-						Gamestate.switch(menu)
-
-						status.setLoading(false)
-					end
-				)
-			end
-		end
+		weeks:checkSongOver()
 
 		weeks:updateUI(dt)
 	end,

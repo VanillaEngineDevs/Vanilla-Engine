@@ -232,6 +232,63 @@ return {
 		end
 	end,
 
+	saveData = function(self)
+		local diff = difficulty ~= "" and difficulty or "normal"
+		if savedata[weekNum] then
+			if savedata[weekNum][song] then
+				if savedata[weekNum][song][diff] then
+					local score2 = savedata[weekNum][song][diff].score
+					if score > score2 then
+						savedata[weekNum][song][diff].score = score
+						savedata[weekNum][song][diff].accuracy = ((math.floor(ratingPercent * 10000) / 100))
+					end
+				else
+					savedata[weekNum][song][diff] = {
+						score = score,
+						accuracy = ((math.floor(ratingPercent * 10000) / 100))
+					}
+				end
+			else
+				savedata[weekNum][song] = {}
+				savedata[weekNum][song][diff] = {
+					score = score,
+					accuracy = ((math.floor(ratingPercent * 10000) / 100))
+				}
+			end
+		else
+			savedata[weekNum] = {}
+			savedata[weekNum][song] = {}
+			savedata[weekNum][song][diff] = {
+				score = score,
+				accuracy = ((math.floor(ratingPercent * 10000) / 100))
+			}
+		end
+	end,
+
+	checkSongOver = function(self)
+		if not (countingDown or graphics.isFading()) and not (inst:isPlaying()) and not paused and not inCutscene then
+			if storyMode and song < #weekMeta[weekNum][2] then
+				self:saveData()
+				song = song + 1
+
+				self:load()
+			else
+				self:saveData()
+
+				status.setLoading(true)
+
+				graphics:fadeOutWipe(
+					0.7,
+					function()
+						Gamestate.switch(menu)
+
+						status.setLoading(false)
+					end
+				)
+			end
+		end
+	end,
+
 	initUI = function(self, option)
 		events = {}
 		enemyNotes = {}

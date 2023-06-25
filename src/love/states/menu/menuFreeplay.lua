@@ -3,7 +3,7 @@ local leftFunc, rightFunc, confirmFunc, backFunc, drawFunc
 local menuState
 
 local menuNum = 1
-local songNum, weekNum
+local songNum
 
 local songNum, songAppend
 local songDifficulty = 2
@@ -16,7 +16,7 @@ return {
         menuBG = graphics.newImage(graphics.imagePath("menu/fp_bg"))
         songSelect = graphics.newImage(graphics.imagePath("menu/fp_songSelect"))
         songStats = graphics.newImage(graphics.imagePath("menu/fp_songStats"))
-        tabs = graphics.newImage(graphics.imagePath("menu/fp_tab"))
+        tabs = graphics.newImage(graphics.imagePath("menu/fp_tabs"))
         weekSelect = graphics.newImage(graphics.imagePath("menu/fp_weekSelect"))
         weekStats = graphics.newImage(graphics.imagePath("menu/fp_weekStats"))
         backButton = graphics.newImage(graphics.imagePath("menu/backBtn"))
@@ -34,9 +34,14 @@ return {
         menuNum = 1
         songNum = 1
         weekNum = 1
+
         curWeekScore = 0
         averageAccuracy = 0
         ratingText = "???"
+
+        curSongScore = 0
+        curSongAccuracy = 0
+
         for i = 1, #weekMeta[weekNum][2] do
             curWeekScore = 0
             averageAccuracy = 0
@@ -47,7 +52,7 @@ return {
         elseif averageAccuracy >= 100 then
             ratingText = "Perfect!!!"
         elseif averageAccuracy >= 90 then
-            ratingText = "Marvolous!"
+            ratingText = "Marvelous!"
         elseif averageAccuracy >= 70 then
             ratingText = "Good!"
         elseif averageAccuracy >= 69 then
@@ -83,16 +88,19 @@ return {
                 curWeekScore = 0
                 averageAccuracy = 0
                 for i = 1, #weekMeta[weekNum][2] do
-                    curWeekScore = 0
-                    averageAccuracy = 0
+                    if savedata[weekNum] then
+                        if savedata[weekNum][i] then
+                            curWeekScore = curWeekScore + savedata[weekNum][i].score
+                            averageAccuracy = averageAccuracy + savedata[weekNum][i][2].accuracy
+                        end
+                    end
                 end
-                averageAccuracy = 0
                 if averageAccuracy >= 101 then
                     ratingText = "what"
                 elseif averageAccuracy >= 100 then
                     ratingText = "Perfect!!!"
                 elseif averageAccuracy >= 90 then
-                    ratingText = "Marvolous!"
+                    ratingText = "Marvelous!"
                 elseif averageAccuracy >= 70 then
                     ratingText = "Good!"
                 elseif averageAccuracy >= 69 then
@@ -120,6 +128,16 @@ return {
                 if songNum > #weekMeta[weekNum][2] then
                     songNum = 1
                 end
+                curSongAccuracy = 0
+                curSongScore = 0
+                if savedata[weekNum] then
+                    if savedata[weekNum][songNum] then
+                        curSongScore = savedata[weekNum][songNum].score
+                        curSongAccuracy = savedata[weekNum][songNum][2].accuracy
+                    end
+                end
+
+                curSongAccuracy = string.format("%.2f%%", curSongAccuracy)
             end
             if menuNum ~= 1 then
                 songBefore = weekMeta[weekNum][2][songNum-1] or ""
@@ -135,8 +153,12 @@ return {
                 curWeekScore = 0
                 averageAccuracy = 0
                 for i = 1, #weekMeta[weekNum][2] do
-                    curWeekScore = curWeekScore + 0
-                    averageAccuracy = averageAccuracy + 0
+                    if savedata[weekNum] then
+                        if savedata[weekNum][i] then
+                            curWeekScore = curWeekScore + savedata[weekNum][i][1]
+                            averageAccuracy = averageAccuracy + savedata[weekNum][i][2]
+                        end
+                    end
                 end
                 averageAccuracy = 0
                 if averageAccuracy >= 101 then
@@ -172,6 +194,17 @@ return {
                 if songNum < 1 then
                     songNum = #weekMeta[weekNum][2]
                 end
+
+                curSongAccuracy = 0
+                curSongScore = 0
+                if savedata[weekNum] then
+                    if savedata[weekNum][songNum] then
+                        curSongScore = savedata[weekNum][songNum].score
+                        curSongAccuracy = savedata[weekNum][songNum][2].accuracy
+                    end
+                end
+
+                curSongAccuracy = string.format("%.2f%%", curSongAccuracy)
             elseif menuNum == 3 then
                 songDifficulty = songDifficulty - 1
                 if songDifficulty < 1 then
@@ -202,7 +235,7 @@ return {
             elseif averageAccuracy >= 100 then
                 ratingText = "Perfect!!!"
             elseif averageAccuracy >= 90 then
-                ratingText = "Marvolous!"
+                ratingText = "Marvelous!"
             elseif averageAccuracy >= 70 then
                 ratingText = "Good!"
             elseif averageAccuracy >= 69 then
@@ -244,7 +277,7 @@ return {
             elseif averageAccuracy >= 100 then
                 ratingText = "Perfect!!!"
             elseif averageAccuracy >= 90 then
-                ratingText = "Marvolous!"
+                ratingText = "Marvelous!"
             elseif averageAccuracy >= 70 then
                 ratingText = "Good!"
             elseif averageAccuracy >= 69 then
@@ -290,6 +323,18 @@ return {
             end
             if menuNum ~= 2 then
                 menuNum = menuNum + 1
+
+                curSongAccuracy = 0
+                curSongScore = 0
+
+                if savedata[weekNum] then
+                    if savedata[weekNum][songNum] then
+                        curSongScore = savedata[weekNum][songNum].score
+                        curSongAccuracy = savedata[weekNum][songNum][2].accuracy
+                    end
+                end
+
+                curSongAccuracy = string.format("%.2f%%", curSongAccuracy)
             end
             
             songBefore = weekMeta[weekNum][2][songNum-1] or ""
@@ -323,14 +368,16 @@ return {
             tabs:draw()
             if menuNum == 1 then weekSelect:draw() else songSelect:draw() end
             if menuNum == 1 then
+                weekStats:draw()
                 love.graphics.setFont(weekFont)
                 graphics.setColor(1,1,1,1)
                 uitextf(weekMeta[weekNum][1] or "", -55, -18, 600, "center")
                 love.graphics.setFont(weekFontSmall)
-                --uitextf(curWeekScore, -545, 50, 600, "center")
-                --uitextf(averageAccuracy, -825, 50, 600, "center")
-                --uitextf(ratingText, -675, 195, 600, "center")
+                uitextf(curWeekScore, -545, 50, 600, "center")
+                uitextf(averageAccuracy, -825, 50, 600, "center")
+                uitextf(ratingText, -675, 195, 600, "center")
             else
+                songStats:draw()
                 graphics.setColor(141/255, 130/255, 123/255)
                 love.graphics.setFont(weekFontSmall)
                 love.graphics.printf(songBefore, 60, -72, 600, "center")
@@ -342,6 +389,10 @@ return {
                 graphics.setColor(141/255, 130/255, 123/255)
                 love.graphics.setFont(weekFontSmall)
                 love.graphics.printf(songAfter, 60, 72, 600, "center")
+
+                love.graphics.setFont(weekFontSmall)
+                uitextf(curSongScore, -545, 50, 600, "center")
+                uitextf(curSongAccuracy, -825, 50, 600, "center")
 
                 graphics.setColor(1,1,1,1)
             end

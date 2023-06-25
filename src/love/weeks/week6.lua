@@ -17,18 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
-local canvas, font
-
-local difficulty
-
 return {
 	enter = function(self, from, songNum, songAppend)
 		love.graphics.setDefaultFilter("nearest")
 		weeks:enter("pixel")
-		stages["school"]:enter()
 
-		song = songNum
-		difficulty = songAppend
+		stages["school"]:enter()
 
 		camera.defaultZoom = 0.85
 		camera.zoom = 0.85
@@ -41,6 +35,9 @@ return {
 		enemyIcon:animate("senpai", false)
 
 		pixelFont = love.graphics.newFont("fonts/pixel.fnt")
+
+		song = songNum
+		difficulty = songAppend
 
 		self:load()
 
@@ -160,24 +157,7 @@ return {
 			previousFrameTime = love.timer.getTime() * 1000
 		end
 
-		if not (countingDown or graphics.isFading()) and not (inst:isPlaying() and voices:isPlaying()) and not paused and not inCutscene then
-			if storyMode and song < 3 then
-				song = song + 1
-
-				self:load()
-			else
-				status.setLoading(true)
-
-				graphics:fadeOutWipe(
-					0.7,
-					function()
-						Gamestate.switch(menu)
-
-						status.setLoading(false)
-					end
-				)
-			end
-		end
+		weeks:checkSongOver()
 
 		if inCutscene then
 			dialogue.doDialogue(dt)

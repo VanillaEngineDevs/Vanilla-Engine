@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
-local difficulty
-
 local walls, escalator, christmasTree, snow
 
 local topBop, bottomBop, santa
@@ -28,6 +26,7 @@ local scaryIntro = false
 return {
 	enter = function(self, from, songNum, songAppend)
 		weeks:enter()
+
 		stages["mall"]:enter()
 
 		camera.zoom = 0.7
@@ -137,6 +136,7 @@ return {
 
 			if not (scaryIntro or countingDown or graphics.isFading()) and not (inst:isPlaying() and voices:isPlaying()) and not paused then
 				if storyMode and song < 3 then
+					weeks:saveData()
 					song = song + 1
 
 					-- Winter Horrorland setup
@@ -152,6 +152,7 @@ return {
 						self:load()
 					end
 				else
+					weeks:saveData()
 					status.setLoading(true)
 
 					graphics:fadeOutWipe(

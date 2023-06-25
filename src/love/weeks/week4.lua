@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
-local difficulty
-
 local sunset
 
 local bgLimo, limoDancer, limo
@@ -26,6 +24,7 @@ local bgLimo, limoDancer, limo
 return {
 	enter = function(self, from, songNum, songAppend)
 		weeks:enter()
+
 		stages["sunset"]:enter()
 
 		song = songNum
@@ -100,24 +99,7 @@ return {
 			end
 		end
 
-		if not (countingDown or graphics.isFading()) and not (inst:isPlaying() and voices:isPlaying()) and not paused then
-			if storyMode and song < 3 then
-				song = song + 1
-
-				self:load()
-			else
-				status.setLoading(true)
-
-				graphics:fadeOutWipe(
-					0.7,
-					function()
-						Gamestate.switch(menu)
-
-						status.setLoading(false)
-					end
-				)
-			end
-		end
+		weeks:checkSongOver()
 
 		weeks:updateUI(dt)
 	end,

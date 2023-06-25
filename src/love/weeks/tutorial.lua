@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
-local difficulty
-
 local stageBack, stageFront, curtains
 
 local zoomTimer
@@ -29,6 +27,7 @@ return {
 		weeks:enter()
 
 		difficulty = songAppend
+		song = songNum
 
 		stageBack = graphics.newImage(graphics.imagePath("week1/stage-back"))
 		stageFront = graphics.newImage(graphics.imagePath("week1/stage-front"))
@@ -139,18 +138,7 @@ return {
 			boyfriend:animate("hey", false)
 		end
 
-		if not (countingDown or graphics.isFading()) and not voices:isPlaying() and not paused then
-			storyMode = false
-
-			graphics:fadeOutWipe(
-				0.7,
-				function()
-					Gamestate.switch(menu)
-
-					status.setLoading(false)
-				end
-			)
-		end
+		weeks:checkSongOver()
 
 		weeks:updateUI(dt)
 	end,

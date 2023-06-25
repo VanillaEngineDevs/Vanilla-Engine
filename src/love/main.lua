@@ -218,6 +218,8 @@ function love.load()
 	dialogue = require "modules.dialogue"
 	settings = require "settings"
 	NoteSplash = require "modules.Splash"
+	require "modules.savedata"
+	loadSavedata()
 	
 	-- XML Modules
 	Sprite = require "modules.xml.Sprite"
