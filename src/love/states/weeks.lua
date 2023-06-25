@@ -237,7 +237,7 @@ return {
 		if savedata[weekNum] then
 			if savedata[weekNum][song] then
 				if savedata[weekNum][song][diff] then
-					local score2 = savedata[weekNum][song][diff].score
+					local score2 = savedata[weekNum][song][diff].score or 0
 					if score > score2 then
 						savedata[weekNum][song][diff].score = score
 						savedata[weekNum][song][diff].accuracy = ((math.floor(ratingPercent * 10000) / 100))
@@ -263,6 +263,8 @@ return {
 				accuracy = ((math.floor(ratingPercent * 10000) / 100))
 			}
 		end
+
+		print("Saved data for week " .. weekNum .. ", song " .. song .. ", difficulty " .. diff)
 	end,
 
 	checkSongOver = function(self)

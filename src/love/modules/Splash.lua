@@ -5,9 +5,9 @@ splash.spr = nil
 function splash:setup()
     -- called at the start of each song
     if not pixel then
-        splash.image = love.graphics.newImage(graphics.imagePath("noteSplashes"))
+        self.image = love.graphics.newImage(graphics.imagePath("noteSplashes"))
     else
-        splash.image = love.graphics.newImage(graphics.imagePath("pixel/pixelSplashes"))
+        self.image = love.graphics.newImage(graphics.imagePath("pixel/pixelSplashes"))
     end
 end
 
@@ -24,22 +24,22 @@ function splash:new(settings)
     s.sprite.y = -400
     s.sprite:animate(s.anim)
 
-    table.insert(splash.cache, s)
+    table.insert(self.cache, s)
 end
 
 function splash:update(dt)
-    for i, v in ipairs(splash.cache) do
+    for i, v in ipairs(self.cache) do
         if not v then break end
         v.sprite:update(dt)
 
         if not v.sprite:isAnimated() then
-            table.remove(splash.cache, i)
+            table.remove(self.cache, i)
         end
     end
 end
 
 function splash:draw()
-    for i, v in ipairs(splash.cache) do
+    for i, v in ipairs(self.cache) do
         if not v then break end
         graphics.setColor(1,1,1,0.5)
         v.sprite:draw()
@@ -48,7 +48,7 @@ function splash:draw()
 end
 
 function splash:udraw(sx, sy)
-    for i, v in ipairs(splash.cache) do
+    for i, v in ipairs(self.cache) do
         if not v then break end
         graphics.setColor(1,1,1,0.5)
         v.sprite:udraw(sx, sy)

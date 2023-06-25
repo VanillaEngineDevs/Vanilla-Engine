@@ -90,8 +90,11 @@ return {
                 for i = 1, #weekMeta[weekNum][2] do
                     if savedata[weekNum] then
                         if savedata[weekNum][i] then
-                            curWeekScore = curWeekScore + savedata[weekNum][i].score
-                            averageAccuracy = averageAccuracy + savedata[weekNum][i][2].accuracy
+                            local diff = difficultyStrs[songDifficulty] ~= "" and difficultyStrs[songDifficulty] or "normal"
+                            if savedata[weekNum][i][diff] then
+                                curWeekScore = curWeekScore + savedata[weekNum][i][diff]["score"]
+                                averageAccuracy = averageAccuracy + savedata[weekNum][i][diff]["accuracy"]
+                            end
                         end
                     end
                 end
@@ -132,8 +135,11 @@ return {
                 curSongScore = 0
                 if savedata[weekNum] then
                     if savedata[weekNum][songNum] then
-                        curSongScore = savedata[weekNum][songNum].score
-                        curSongAccuracy = savedata[weekNum][songNum][2].accuracy
+                        local diff = difficultyStrs[songDifficulty] ~= "" and difficultyStrs[songDifficulty] or "normal"
+                        if savedata[weekNum][songNum][diff] then
+                            curSongScore = savedata[weekNum][songNum][diff]["score"]
+                            curSongAccuracy = savedata[weekNum][songNum][diff]["accuracy"]
+                        end
                     end
                 end
 
@@ -155,12 +161,14 @@ return {
                 for i = 1, #weekMeta[weekNum][2] do
                     if savedata[weekNum] then
                         if savedata[weekNum][i] then
-                            curWeekScore = curWeekScore + savedata[weekNum][i][1]
-                            averageAccuracy = averageAccuracy + savedata[weekNum][i][2]
+                            local diff = difficultyStrs[songDifficulty] ~= "" and difficultyStrs[songDifficulty] or "normal"
+                            if savedata[weekNum][i][diff] then
+                                curWeekScore = curWeekScore + savedata[weekNum][i][diff]["score"]
+                                averageAccuracy = averageAccuracy + savedata[weekNum][i][diff]["accuracy"]
+                            end
                         end
                     end
                 end
-                averageAccuracy = 0
                 if averageAccuracy >= 101 then
                     ratingText = "what"
                 elseif averageAccuracy >= 100 then
@@ -199,8 +207,11 @@ return {
                 curSongScore = 0
                 if savedata[weekNum] then
                     if savedata[weekNum][songNum] then
-                        curSongScore = savedata[weekNum][songNum].score
-                        curSongAccuracy = savedata[weekNum][songNum][2].accuracy
+                        local diff = difficultyStrs[songDifficulty] ~= "" and difficultyStrs[songDifficulty] or "normal"
+                        if savedata[weekNum][songNum][diff] then
+                            curSongScore = curSongScore + savedata[weekNum][songNum][diff]["score"]
+                            curSongAccuracy = curSongAccuracy + savedata[weekNum][songNum][diff]["accuracy"]
+                        end
                     end
                 end
 
@@ -329,8 +340,11 @@ return {
 
                 if savedata[weekNum] then
                     if savedata[weekNum][songNum] then
-                        curSongScore = savedata[weekNum][songNum].score
-                        curSongAccuracy = savedata[weekNum][songNum][2].accuracy
+                        local diff = difficultyStrs[songDifficulty] ~= "" and difficultyStrs[songDifficulty] or "normal"
+                        if savedata[weekNum][songNum][diff] then
+                            curSongScore = savedata[weekNum][songNum][diff].score
+                            curSongAccuracy = savedata[weekNum][songNum][diff].accuracy
+                        end
                     end
                 end
 

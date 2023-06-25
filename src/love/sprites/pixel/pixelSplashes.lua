@@ -1,5 +1,5 @@
 return graphics.newSprite(
-	images.notesplashes,
+	NoteSplash.image,
 	-- Automatically generated from splash.xml
 	{
 		{x = 0, y = 0, width = 29, height = 29, offsetX = 0, offsetY = 0, offsetWidth = 29, offsetHeight = 29}, -- 1: splash blue0000
@@ -24,14 +24,14 @@ return graphics.newSprite(
 		{x = 87, y = 87, width = 1, height = 1, offsetX = 0, offsetY = 0, offsetWidth = 29, offsetHeight = 29} -- 20: splash none0000
 	},
     {
-        ["21"] = {start = 1, stop = 5, speed = 24, offsetX = 0, offsetY = 0},
-        ["31"] = {start = 11, stop = 15, speed = 24, offsetX = 0, offsetY = 0},
-        ["11"] = {start = 16, stop = 20, speed = 24, offsetX = 0, offsetY = 0},
-        ["41"] = {start = 6, stop = 10, speed = 24, offsetX = 0, offsetY = 0},
-		["22"] = {start = 1, stop = 5, speed = 24, offsetX = 0, offsetY = 0},
-        ["32"] = {start = 11, stop = 15, speed = 24, offsetX = 0, offsetY = 0},
-        ["12"] = {start = 16, stop = 20, speed = 24, offsetX = 0, offsetY = 0},
-        ["42"] = {start = 6, stop = 10, speed = 24, offsetX = 0, offsetY = 0},
+        ["down1"] = {start = 1, stop = 5, speed = 24, offsetX = 0, offsetY = 0},
+        ["up1"] = {start = 11, stop = 15, speed = 24, offsetX = 0, offsetY = 0},
+        ["left1"] = {start = 16, stop = 20, speed = 24, offsetX = 0, offsetY = 0},
+        ["right1"] = {start = 6, stop = 10, speed = 24, offsetX = 0, offsetY = 0},
+		["down2"] = {start = 1, stop = 5, speed = 24, offsetX = 0, offsetY = 0},
+        ["up2"] = {start = 11, stop = 15, speed = 24, offsetX = 0, offsetY = 0},
+        ["left2"] = {start = 16, stop = 20, speed = 24, offsetX = 0, offsetY = 0},
+        ["right2"] = {start = 6, stop = 10, speed = 24, offsetX = 0, offsetY = 0},
         ["none"] = {start = 20, stop = 20, speed = 24, offsetX = 0, offsetY = 0}
     },
     "none",

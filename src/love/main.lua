@@ -651,3 +651,7 @@ end
 function love.focus(t)
 	Gamestate.focus(t)
 end
+
+function love.quit()
+	saveSavedata()
+end
