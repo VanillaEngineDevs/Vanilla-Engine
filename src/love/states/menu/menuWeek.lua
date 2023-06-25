@@ -176,7 +176,11 @@ return {
 					theTracks = weekMeta[weekNum][2][trackLength]
 				end
 			end
-			enemyDanceLines:animate("week" .. weekNum, true)
+			if enemyDanceLines:isAnimName("week" .. weekNum) then
+				enemyDanceLines:animate("week" .. weekNum, true)
+			else
+				enemyDanceLines:animate("none")
+			end
 		end
 
 		
