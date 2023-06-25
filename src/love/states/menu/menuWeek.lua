@@ -303,7 +303,7 @@ return {
 				love.graphics.setColor(1, 1, 1)
 
 				difficultyAnim:draw()
-				if weekNum ~= 1 then
+				if weekNum ~= 1 and enemyDanceLines:isAnimName("week" .. weekNum) then
 					enemyDanceLines:draw()
 				end
 				bfDanceLines:draw()
