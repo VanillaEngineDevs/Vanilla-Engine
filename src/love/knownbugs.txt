@@ -1,2 +1,1 @@
-Week 7:
-    - Running tankman in stress aren't proper - This makes me so mad, i'm dumb so idk how to make it work properly :(
+...
