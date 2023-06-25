@@ -795,7 +795,7 @@ return {
 
 	generateEvents = function(self, charte, psychweek, song, difficulty)
 		local charte = charte
-		if charte == nil then
+		if charte == nil and _psychmod then
 			-- its most likely a psych mod
 			charte = "mods/" .. weekMeta[psychweek][3]
 			charte = charte .. "/data/" .. weekMeta[psychweek][2][song] .. "/events.json"

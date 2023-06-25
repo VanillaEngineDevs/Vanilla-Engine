@@ -21,6 +21,7 @@ return graphics.newSprite(
 	love.graphics.newImage(graphics.imagePath("week7/gfTankmen")),
 	-- Automatically generated from gfTankmen.xml
 	{
+		{x = 6405, y = 0, width = 911, height = 642, offsetX = 0, offsetY = -6, offsetWidth = 911, offsetHeight = 648} -- 1: GF Dancing at Gunpoint0029
 		{x = 6399, y = 1287, width = 907, height = 634, offsetX = -2, offsetY = -14, offsetWidth = 911, offsetHeight = 648}, -- 1: GF Dancing at Gunpoint0000
 		{x = 2737, y = 1288, width = 907, height = 634, offsetX = -2, offsetY = -14, offsetWidth = 911, offsetHeight = 648}, -- 2: GF Dancing at Gunpoint0001
 		{x = 6399, y = 1925, width = 905, height = 632, offsetX = -3, offsetY = -16, offsetWidth = 911, offsetHeight = 648}, -- 3: GF Dancing at Gunpoint0002
@@ -49,14 +50,13 @@ return graphics.newSprite(
 		{x = 4575, y = 0, width = 911, height = 642, offsetX = 0, offsetY = -6, offsetWidth = 911, offsetHeight = 648}, -- 26: GF Dancing at Gunpoint0025
 		{x = 4575, y = 0, width = 911, height = 642, offsetX = 0, offsetY = -6, offsetWidth = 911, offsetHeight = 648}, -- 27: GF Dancing at Gunpoint0026
 		{x = 5490, y = 0, width = 911, height = 642, offsetX = 0, offsetY = -6, offsetWidth = 911, offsetHeight = 648}, -- 28: GF Dancing at Gunpoint0027
-		{x = 6405, y = 0, width = 911, height = 642, offsetX = 0, offsetY = -6, offsetWidth = 911, offsetHeight = 648}, -- 29: GF Dancing at Gunpoint0028
-		{x = 6405, y = 0, width = 911, height = 642, offsetX = 0, offsetY = -6, offsetWidth = 911, offsetHeight = 648} -- 30: GF Dancing at Gunpoint0029
+		{x = 6405, y = 0, width = 911, height = 642, offsetX = 0, offsetY = -6, offsetWidth = 911, offsetHeight = 648}, -- 30: GF Dancing at Gunpoint0028
 	},
 	--thicc
 	{
-		["idle"] = {start = 1, stop = 30, speed = 24, offsetX = 0, offsetY = 0},
-		["sad"] = {start = 1, stop = 30, speed = 24, offsetX = 0, offsetY = 0}
+		["danceLeft"] = {start = 1, stop = 15, speed = 24, offsetX = 0, offsetY = 0},
+		["danceRight"] = {start = 16, stop = 30, speed = 24, offsetX = 0, offsetY = 0}
 	},
-	"idle",
+	"danceLeft",
 	false
 )
