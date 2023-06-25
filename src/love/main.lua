@@ -229,31 +229,18 @@ function love.load()
 	playMenuMusic = true
 
 	if love.filesystem.getInfo("settings") then 
-		settingdata = love.filesystem.read("settings")
-		settingdata = lume.deserialize(settingdata)
+		settingsdata = lume.deserialize(love.filesystem.read("settings"))
 	
-		settings.hardwareCompression = settingdata.saveSettingsMoment.hardwareCompression
-		settings.downscroll = settingdata.saveSettingsMoment.downscroll
-		settings.ghostTapping = settingdata.saveSettingsMoment.ghostTapping
-		settings.showDebug = settingdata.saveSettingsMoment.showDebug
-		graphics.setImageType(settingdata.saveSettingsMoment.setImageType)
-		settings.sideJudgements = settingdata.saveSettingsMoment.sideJudgements
-		settings.botPlay = settingdata.saveSettingsMoment.botPlay
-		settings.middleScroll = settingdata.saveSettingsMoment.middleScroll
-		settings.practiceMode = settingdata.saveSettingsMoment.practiceMode
-		settings.noMiss = settingdata.saveSettingsMoment.noMiss
-		settings.customScrollSpeed = settingdata.saveSettingsMoment.customScrollSpeed
-		settings.scrollUnderlayTrans = settingdata.saveSettingsMoment.scrollUnderlayTrans
-		settings.noteSkins = settingdata.saveSettingsMoment.noteSkins
-		settings.colourByQuantization = settingdata.saveSettingsMoment.colourByQuantization
-		customBindDown = settingdata.saveSettingsMoment.customBindDown
-		customBindUp = settingdata.saveSettingsMoment.customBindUp
-		customBindLeft = settingdata.saveSettingsMoment.customBindLeft
-		customBindRight = settingdata.saveSettingsMoment.customBindRight
+		settings = settingsdata
+
+		customBindLeft = settings.customBindLeft
+		customBindRight = settings.customBindRight
+		customBindUp = settings.customBindUp
+		customBindDown = settings.customBindDown
 	
-		settingsVer = settingdata.saveSettingsMoment.settingsVer
+		settingsVer = settings.settingsVer
 	
-		settingdata.saveSettingsMoment = {
+		settingdata = {
 			hardwareCompression = settings.hardwareCompression,
 			downscroll = settings.downscroll,
 			ghostTapping = settings.ghostTapping,
@@ -277,11 +264,11 @@ function love.load()
 		serialized = lume.serialize(settingdata)
 		love.filesystem.write("settings", serialized)
 	end
-	if settingsVer ~= 8 then
+	if settingsVer ~= 2 then
 		love.window.showMessageBox("Uh Oh!", "Settings have been reset.", "warning")
 		love.filesystem.remove("settings")
 	end
-	if not love.filesystem.getInfo("settings") or settingsVer ~= 8 then
+	if not love.filesystem.getInfo("settings") or settingsVer ~= 2 then
 		settings.hardwareCompression = true
 		graphics.setImageType("dds")
 		settings.downscroll = false
@@ -303,9 +290,9 @@ function love.load()
 		customBindDown = "s"
 	
 		settings.flashinglights = false
-		settingsVer = 8
+		settingsVer = 2
 		settingdata = {}
-		settingdata.saveSettingsMoment = {
+		settingdata = {
 			hardwareCompression = settings.hardwareCompression,
 			downscroll = settings.downscroll,
 			ghostTapping = settings.ghostTapping,
@@ -320,10 +307,11 @@ function love.load()
 			keystrokes = settings.keystrokes,
 			scrollUnderlayTrans = settings.scrollUnderlayTrans,
 			colourByQuantization = settings.colourByQuantization,
-			customBindLeft = customBindLeft,
-			customBindRight = customBindRight,
-			customBindUp = customBindUp,
-			customBindDown = customBindDown,
+
+			customBindLeft = "a",
+			customBindRight = "d",
+			customBindUp = "w",
+			customBindDown = "s",
 			
 			settingsVer = settingsVer
 		}
