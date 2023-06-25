@@ -212,7 +212,7 @@ return {
                 end
 			end
 		end
-        if settings.hardwareCompression ~= settingdata.saveSettingsMoment.hardwareCompression then
+        if settings.hardwareCompression ~= settingdata.hardwareCompression then
             isRestartNeeded = "(RESTART REQUIRED)"
         else
             isRestartNeeded = ""
@@ -232,7 +232,7 @@ return {
                     love.graphics.print("\n\nGameplay", -628, -300)
                     love.graphics.print("\n\n\n\nKeybinds", -628, -300)
                     love.graphics.print("\n\n\n\n\n\nMisc.", -628, -300)
-                    if settings.hardwareCompression ~= settingdata.saveSettingsMoment.hardwareCompression then
+                    if settings.hardwareCompression ~= settingdata.hardwareCompression then
                         love.graphics.print("\n\n\n\n\n\n\n\nSave settings & Restart", -628, -300)
                     else
                         love.graphics.print("\n\n\n\n\n\n\n\nSave settings", -628, -300)

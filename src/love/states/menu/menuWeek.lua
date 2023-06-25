@@ -161,7 +161,7 @@ return {
 
 	update = function(self, dt)
 		function menuFunc()
-			if weekNum == 7 then -- Due to senpais idlelines being smaller than the rest, we resize it             not every part of him is small tho :hot_face:
+			if weekNum == 7 or weekNum == 8 then -- Due to senpais (and tankmans) idlelines being smaller than the rest, we resize it             not every part of him is small tho :hot_face:
 				enemyDanceLines.sizeX, enemyDanceLines.sizeY = 1, 1
 			elseif weekNum == 4 then
 				enemyDanceLines.sizeX = -0.5  -- pico's dumb ass was facing the wrong way
@@ -176,8 +176,8 @@ return {
 					theTracks = weekMeta[weekNum][2][trackLength]
 				end
 			end
-			if enemyDanceLines:isAnimName("week" .. weekNum) then
-				enemyDanceLines:animate("week" .. weekNum, true)
+			if enemyDanceLines:isAnimName("week" .. weekNum-1) then
+				enemyDanceLines:animate("week" .. weekNum-1, true)
 			else
 				enemyDanceLines:animate("none")
 			end
@@ -199,7 +199,6 @@ return {
 		elseif songDifficulty == 3 then
 			difficultyAnim:animate("hard", true)
 		end
-		--print(weekNum)
 
 		difficultyAnim:update(dt)
 
@@ -303,7 +302,7 @@ return {
 				love.graphics.setColor(1, 1, 1)
 
 				difficultyAnim:draw()
-				if weekNum ~= 1 and enemyDanceLines:isAnimName("week" .. weekNum) then
+				if weekNum ~= 1 and enemyDanceLines:isAnimName("week" .. weekNum-1) then
 					enemyDanceLines:draw()
 				end
 				bfDanceLines:draw()

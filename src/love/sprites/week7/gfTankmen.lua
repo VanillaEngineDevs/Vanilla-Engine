@@ -58,5 +58,10 @@ return graphics.newSprite(
 		["danceRight"] = {start = 16, stop = 30, speed = 24, offsetX = 0, offsetY = 0}
 	},
 	"danceLeft",
-	false
+	false,
+	{
+		danceIdle = true,
+		isCharacter = true,
+		danceSpeed = 1,
+	}
 )

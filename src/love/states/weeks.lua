@@ -196,6 +196,8 @@ return {
 
 		camera.x, camera.y = -boyfriend.x + 100, -boyfriend.y + 75
 
+		curWeekData = weekData[weekNum]
+
 		rating.x = 20
 		if not pixel then
 			for i = 1, 3 do
@@ -264,7 +266,7 @@ return {
 			}
 		end
 
-		print("Saved data for week " .. weekNum .. ", song " .. song .. ", difficulty " .. diff)
+		--print("Saved data for week " .. weekNum-1 .. ", song " .. song .. ", difficulty " .. diff)
 	end,
 
 	checkSongOver = function(self)
@@ -272,8 +274,9 @@ return {
 			if storyMode and song < #weekMeta[weekNum][2] then
 				self:saveData()
 				song = song + 1
+				print(song)
 
-				self:load()
+				curWeekData:load()
 			else
 				self:saveData()
 

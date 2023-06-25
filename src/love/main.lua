@@ -98,14 +98,14 @@ function borderedText(text,x,y,r,sx,sy,ox,oy,kx,ky,alpha)
 end
 
 function saveSettings()
-    if settings.hardwareCompression ~= settingdata.saveSettingsMoment.hardwareCompression then
+    if settings.hardwareCompression ~= settingdata.hardwareCompression then
         settingdata = {}
         if settings.hardwareCompression then
             imageTyppe = "dds" 
         else
             imageTyppe = "png"
         end
-        settingdata.saveSettingsMoment = {
+        settingdata = {
             hardwareCompression = settings.hardwareCompression,
             downscroll = settings.downscroll,
             ghostTapping = settings.ghostTapping,
@@ -145,7 +145,7 @@ function saveSettings()
         else
             imageTyppe = "png"
         end
-        settingdata.saveSettingsMoment = {
+        settingdata = {
             hardwareCompression = settings.hardwareCompression,
             downscroll = settings.downscroll,
             ghostTapping = settings.ghostTapping,
