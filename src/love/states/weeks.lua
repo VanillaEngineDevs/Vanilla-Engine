@@ -1460,7 +1460,7 @@ return {
 		end
 		self:drawHealthbar()
 		love.graphics.push()
-			love.graphics.translate(lovesize.getWidth() / 2, lovesize.getHeight() / 2)
+			love.graphics.translate(push:getWidth() / 2, push:getHeight() / 2)
 			if not settings.downscroll then
 				love.graphics.scale(0.7, 0.7)
 			else
@@ -1661,7 +1661,7 @@ return {
 				end
 				graphics.setColor(1,1,1,1)
 			love.graphics.pop()
-			love.graphics.translate(lovesize.getWidth() / 2, lovesize.getHeight() / 2)
+			love.graphics.translate(push:getWidth() / 2, push:getHeight() / 2)
 			love.graphics.scale(0.7, 0.7)
 			love.graphics.scale(uiScale.zoom, uiScale.zoom)
 

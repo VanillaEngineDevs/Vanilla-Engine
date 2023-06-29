@@ -181,7 +181,7 @@ return {
 				graphics.clear(0.5, 0.5, 0.5)
 
 				love.graphics.push()
-					love.graphics.translate(lovesize.getWidth() / 2, lovesize.getHeight() / 2)
+					love.graphics.translate(push:getWidth() / 2, push:getHeight() / 2)
 					love.graphics.scale(camera.zoom, camera.zoom)
 
 					sprite:draw()

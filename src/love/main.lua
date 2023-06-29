@@ -200,7 +200,7 @@ function love.load()
 	-- Load libraries
 	baton = require "lib.baton"
 	ini = require "lib.ini"
-	lovesize = require "lib.lovesize"
+	push = require "lib.push"
 	Gamestate = require "lib.gamestate"
 	Timer = require "lib.timer"
 	json = require "lib.json"
@@ -470,7 +470,7 @@ function love.load()
 		love.window.setIcon(love.image.newImageData("icons/default.png"))
 	end
 
-	lovesize.set(1280, 720)
+	push.setupScreen(1280, 720, {upscale="normal", canvas = true})
 
 	function hex2rgb(hex)
 		hex = hex:gsub("#",""):gsub("0x","")
@@ -483,7 +483,7 @@ function love.load()
 		hexB = tonumber("0x".. b)
 		return {hexR/255, hexG/255, hexB/255}
 	end
-
+	
 	-- Variables
 	font = love.graphics.newFont("fonts/vcr.ttf", 24)
 	FNFFont = love.graphics.newFont("fonts/fnFont.ttf", 24)
@@ -524,7 +524,7 @@ function love.load()
 end
 
 function love.resize(width, height)
-	lovesize.resize(width, height)
+	push.resize(width, height)
 end
 
 function love.keypressed(key)
@@ -578,7 +578,7 @@ function love.update(dt)
 		Gamestate.update(dt)
 	else
 		love.graphics.setFont(font)
-		graphics.screenBase(lovesize.getWidth(), lovesize.getHeight())
+		graphics.screenBase(push:getWidth(), push:getHeight())
 		graphics.setColor(1, 1, 1) -- Fade effect on
 		Gamestate.update(dt)
 		love.graphics.setColor(1, 1, 1) -- Fade effect off
@@ -591,15 +591,15 @@ end
 
 function love.draw()
 	love.graphics.setFont(font)
-	graphics.screenBase(lovesize.getWidth(), lovesize.getHeight())
+	graphics.screenBase(push:getWidth(), push:getHeight())
 
-	lovesize.begin()
+	push:start()
 		graphics.setColor(1, 1, 1) -- Fade effect on
 		Gamestate.draw()
 		love.graphics.setColor(1, 1, 1) -- Fade effect off
 		love.graphics.setFont(font)
 		if status.getLoading() then
-			love.graphics.print("Loading...", lovesize.getWidth() - 175, lovesize.getHeight() - 50)
+			love.graphics.print("Loading...", push:getWidth() - 175, push:getHeight() - 50)
 		end
 		if volFade > 0  then
 			love.graphics.setColor(1, 1, 1, volFade)
@@ -625,9 +625,9 @@ function love.draw()
 		end
 		if fade.mesh then 
 			graphics.setColor(1,1,1)
-			love.graphics.draw(fade.mesh, 0, fade.y, 0, lovesize.getWidth(), fade.height)
+			love.graphics.draw(fade.mesh, 0, fade.y, 0, push:getWidth(), fade.height)
 		end
-	lovesize.finish()
+	push:finish()
 
 	graphics.screenBase(love.graphics.getWidth(), love.graphics.getHeight())
 

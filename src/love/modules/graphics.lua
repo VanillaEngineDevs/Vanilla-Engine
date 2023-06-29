@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 local imageType = "png"
 fade = {
 	1,
-	height = lovesize.getHeight(),
+	height = push:getHeight(),
 	mesh = nil,
 	y = 0,
 }
@@ -597,7 +597,7 @@ return {
 			Timer.cancel(fadeTimer)
 		end
 
-		fade.height = lovesize.getHeight() * 2
+		fade.height = push:getHeight() * 2
 		fade.mesh = self.newGradient({0,0,0}, {0,0,0}, {0,0,0,0})
 
 		isFading = true
@@ -623,7 +623,7 @@ return {
 			Timer.cancel(fadeTimer)
 		end
 
-		fade.height = lovesize.getHeight() * 2
+		fade.height = push:getHeight() * 2
 		fade.mesh = self.newGradient({0,0,0,0}, {0,0,0}, {0,0,0})
 
 		isFading = false

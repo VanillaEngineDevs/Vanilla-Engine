@@ -148,7 +148,7 @@ if curOS == "NX" then
 		settings.showDebug = false
 	end
 elseif curOS == "Web" then -- For love.js, we won't bother creating and reading a settings file that can't be edited, we'll just preset some settings
-	love.window.setMode(1280, 720) -- Due to shared code, lovesize will be used even though the resolution will never change :/
+	love.window.setMode(1280, 720) -- Due to shared code, push will be used even though the resolution will never change :/
 
 	settings.hardwareCompression = false
 

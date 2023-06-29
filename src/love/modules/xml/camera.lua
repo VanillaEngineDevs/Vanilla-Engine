@@ -3,8 +3,8 @@ local cam = Object:extend()
 function cam:new(x,y,w,h)
     local x = x or 0
     local y = y or 0
-    local w = w or lovesize.getWidth()
-    local h = h or lovesize.getHeight()
+    local w = w or push:getWidth()
+    local h = h or push:getHeight()
 
     self.x = x
     self.y = y
