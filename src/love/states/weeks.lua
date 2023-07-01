@@ -222,6 +222,30 @@ return {
 			end
 		end
 
+		-- Function so people can override it if they want
+		-- Do some cool note effects or something!
+		function updateNotePos()
+			for i = 1, 4 do
+				for j, note in ipairs(boyfriendNotes[i]) do
+					local strumlineY = boyfriendArrows[i].y
+					if settings.downscroll then
+						note.y = (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
+					else
+						note.y = (strumlineY + (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
+					end
+				end
+
+				for _, note in ipairs(enemyNotes[i]) do
+					local strumlineY = enemyArrows[i].y
+					if settings.downscroll then
+						note.y = (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
+					else
+						note.y = (strumlineY + (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
+					end
+				end
+			end
+		end
+
 		graphics:fadeInWipe(0.6)
 	end,
 
@@ -517,6 +541,7 @@ return {
 						enemyNotes[id][c].orientation = enemyNotes[id][c].orientation - arrowAngles[enemyNotes[id][c].col]
 						enemyNotes[id][c].orientation = enemyNotes[id][c].orientation + arrowAngles[id]
 						enemyNotes[id][c].ver = noteVer
+						enemyNotes[id][c].time = noteTime
 
 						if settings.downscroll then
 							enemyNotes[id][c].sizeY = -1
@@ -535,6 +560,7 @@ return {
 							 	enemyNotes[id][c].y = -400 + (noteTime + k) * 0.6 * speed
 								enemyNotes[id][c].col = col
 								enemyNotes[id][c].ver = noteVer
+								enemyNotes[id][c].time = noteTime + k
 				 
 								enemyNotes[id][c]:animate("hold", false)
 							end
@@ -604,6 +630,7 @@ return {
 							 	boyfriendNotes[id][c].y = -400 + (noteTime + k) * 0.6 * speed
 								boyfriendNotes[id][c].col = col
 								boyfriendNotes[id][c].ver = noteVer
+								boyfriendNotes[id][c].time = noteTime + k
 				 
 							 	boyfriendNotes[id][c]:animate("hold", false)
 						  	end
@@ -675,6 +702,7 @@ return {
 							 	boyfriendNotes[id][c].y = -400 + (noteTime + k) * 0.6 * speed
 								boyfriendNotes[id][c].col = col
 								boyfriendNotes[id][c].ver = noteVer
+								boyfriendNotes[id][c].time = noteTime + k
 				 
 							 	boyfriendNotes[id][c]:animate("hold", false)
 						  	end
@@ -725,6 +753,7 @@ return {
 						enemyNotes[id][c].orientation = enemyNotes[id][c].orientation - arrowAngles[enemyNotes[id][c].col]
 						enemyNotes[id][c].orientation = enemyNotes[id][c].orientation + arrowAngles[id]
 						enemyNotes[id][c].ver = noteVer
+						enemyNotes[id][c].time = noteTime
 						if settings.downscroll then
 							enemyNotes[id][c].sizeY = -1
 						end
@@ -742,6 +771,7 @@ return {
 							 	enemyNotes[id][c].y = -400 + (noteTime + k) * 0.6 * speed
 								enemyNotes[id][c].col = col
 								enemyNotes[id][c].ver = noteVer
+								enemyNotes[id][c].time = noteTime + k
 							 	if k > sectionNotes[j][3] - 71 / speed then
 									enemyNotes[id][c].offsetY = not pixel and 10 or 2
 				 
@@ -873,7 +903,6 @@ return {
 		musicTime = (240 / bpm) * -1000
 
 		musicThres = 0
-		musicPos = 0
 
 		countingDown = true
 		countdownFade[1] = 0
@@ -1056,9 +1085,9 @@ return {
 	updateUI = function(self, dt)
 		if inCutscene then return end
 		if paused then return end
-		musicPos = musicTime * 0.6 * speed
 
 		NoteSplash:update(dt)
+		updateNotePos()
 
 		for i = 1, 4 do
 			local enemyArrow = enemyArrows[i]
@@ -1086,7 +1115,7 @@ return {
 			end
 
 			if #enemyNote > 0 then
-				if (enemyNote[1].y - musicPos <= -410) then
+				if (enemyNote[1].time - musicTime <= 0) then
 					if voices then voices:setVolume(1) end
 
 					enemyArrow:animate(noteList[enemyNote[1].col] .. " confirm", false)
@@ -1146,7 +1175,7 @@ return {
 			end
 
 			if #boyfriendNote > 0 then
-				if (boyfriendNote[1].y - musicPos < -600) then
+				if (boyfriendNote[1].y < -600 or boyfriendNote[1].time - musicTime <= -200) then
 					if voices then voices:setVolume(0) end
 
 					notMissed[noteNum] = false
@@ -1170,7 +1199,7 @@ return {
 
 			if settings.botPlay then 
 				if #boyfriendNote > 0 then
-					if (boyfriendNote[1].y - musicPos <= -400) then
+					if (boyfriendNote[1].time - musicTime <= 0) then
 						if voices then voices:setVolume(1) end
 
 						boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
@@ -1220,7 +1249,8 @@ return {
 								{
 									anim = noteList[boyfriendNote[1].col] .. love.math.random(1,2),
 									posX = boyfriendArrow.x,
-								}
+								},
+								noteNum
 							)
 							self:calculateRating()
 						else
@@ -1266,7 +1296,7 @@ return {
 									NoteSplash:new({
 										anim = noteList[boyfriendNote[j].col] .. love.math.random(1,2),
 										posX = boyfriendArrow.x,
-									})
+									}, noteNum)
 								elseif notePos <= 90 then -- "Good"
 									score = score + 200
 									ratingAnim = "good"
@@ -1351,7 +1381,7 @@ return {
 				end
 			end
 
-			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].y - musicPos <= -400)) and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
+			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].y <= -400)) and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
 				if voices then voices:setVolume(1) end
 
 				boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
@@ -1468,19 +1498,16 @@ return {
 			end
 			love.graphics.scale(uiScale.zoom, uiScale.zoom)
 			for i = 1, 4 do
-				love.graphics.push()
-				
-					love.graphics.translate(0, -musicPos)
-				
+				love.graphics.push()				
 					love.graphics.push()
 						for j = #enemyNotes[i], 1, -1 do
-							if enemyNotes[i][j].y - musicPos <= 560 then
+							if enemyNotes[i][j].y <= 560 then
 								local animName = enemyNotes[i][j]:getAnimName()
 								if animName ~= "on" then 
 									if settings.middleScroll then
-										graphics.setColor(1, 1, 1, 0.3)
+										graphics.setColor(1, 1, 1, 0.3 * enemyNotes[i][j].alpha)
 									else
-										graphics.setColor(1, 1, 1, 0.5)
+										graphics.setColor(1, 1, 1, 0.5 * enemyNotes[i][j].alpha)
 									end
 	
 									if not pixel then
@@ -1502,10 +1529,10 @@ return {
 					love.graphics.pop()
 					love.graphics.push()
 						for j = #boyfriendNotes[i], 1, -1 do
-							if boyfriendNotes[i][j].y - musicPos <= 560 then
+							if boyfriendNotes[i][j].y <= 560 then
 								local animName = boyfriendNotes[i][j]:getAnimName()
 								if animName ~= "on" then
-									graphics.setColor(1, 1, 1, math.min(0.5, (500 + (boyfriendNotes[i][j].y - musicPos)) / 150))
+									graphics.setColor(1, 1, 1, math.min(0.5, (500 + (boyfriendNotes[i][j].y)) / 150) * boyfriendNotes[i][j].alpha)
 									if not pixel then
 										boyfriendNotes[i][j]:draw()
 									else
@@ -1530,10 +1557,12 @@ return {
 			for i = 1, 4 do
 				if enemyArrows[i]:getAnimName() == "off" then
 					if not settings.middleScroll then
-						graphics.setColor(0.6, 0.6, 0.6)
+						graphics.setColor(0.6, 0.6, 0.6, enemyArrows[i].alpha)
 					else
-						graphics.setColor(0.6, 0.6, 0.6, 0.6)
+						graphics.setColor(0.6, 0.6, 0.6, 0.6 * enemyArrows[i].alpha)
 					end
+				else
+					graphics.setColor(1, 1, 1, enemyArrows[i].alpha)
 				end
 				if not pixel then
 					enemyArrows[i]:draw()
@@ -1560,17 +1589,15 @@ return {
 				graphics.setColor(1, 1, 1)
 
 				love.graphics.push()
-					love.graphics.translate(0, -musicPos)
-
 					love.graphics.push()
 						for j = #enemyNotes[i], 1, -1 do
-							if enemyNotes[i][j].y - musicPos <= 560 then
+							if enemyNotes[i][j].y <= 560 then
 								local animName = enemyNotes[i][j]:getAnimName()
 								if animName ~= "hold" and animName ~= "end" then
 									if settings.middleScroll then
-										graphics.setColor(1, 1, 1, 0.5)
+										graphics.setColor(1, 1, 1, 0.5 * enemyNotes[i][j].alpha)
 									else
-										graphics.setColor(1, 1, 1, 1)
+										graphics.setColor(1, 1, 1, 1 * enemyNotes[i][j].alpha)
 									end
 
 									if not pixel then
@@ -1589,10 +1616,10 @@ return {
 					love.graphics.pop()
 					love.graphics.push()
 						for j = #boyfriendNotes[i], 1, -1 do
-							if boyfriendNotes[i][j].y - musicPos <= 560 then
+							if boyfriendNotes[i][j].y <= 560 then
 								local animName = boyfriendNotes[i][j]:getAnimName()
 								if animName ~= "hold" and animName ~= "end" then
-									graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y - musicPos)) / 75))
+									graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y)) / 75) * boyfriendNotes[i][j].alpha)
 
 									if not pixel then 
 										boyfriendNotes[i][j]:draw()

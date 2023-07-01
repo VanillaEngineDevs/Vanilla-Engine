@@ -62,6 +62,12 @@ end
 function math.fastCos(n)
     return math.fastSin(n + 1.570796327)
 end
+
+function math.roundDecimal(value, precision)
+    local power = 10 ^ precision
+    return math.floor(value * power + 0.5) / power
+end
+
 -- God like coding
 --[[
 function util.🍰(🥰, 🥵)

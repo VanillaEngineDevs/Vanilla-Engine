@@ -376,6 +376,7 @@ function love.load()
 		require "weeks.week6",
 		require "weeks.week7"
 	}
+	testData = require "weeks.test"
 
 	weekDesc = { -- Add your week description here
 		"LEARN TO FUNK",
@@ -532,8 +533,23 @@ function love.keypressed(key)
 		love.filesystem.createDirectory("screenshots")
 
 		love.graphics.captureScreenshot("screenshots/" .. os.time() .. ".png")
-	elseif key == "7" then
+	elseif key == "7" and not love.keyboard.isDown("lalt") then
 		Gamestate.switch(debugMenu)
+	elseif key == "7" and love.keyboard.isDown("lalt") then
+		status.setLoading(true)
+        graphics:fadeOutWipe(
+            0.7,
+            function()
+                _psychmod = false
+                storyMode = false
+    
+                music:stop()
+    
+                Gamestate.switch(testData, songNum)
+    
+                status.setLoading(false)
+            end
+        )
 	elseif key == "0" then
 		volFade = 1
 		if fixVol == 0 then

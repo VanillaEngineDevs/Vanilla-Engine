@@ -204,6 +204,8 @@ return {
 			clipRect = nil,
 			stencilInfo = nil,
 
+			alpha = 1,
+
 			flipX = optionsTable and optionsTable.flipX or false,
 
 			singDuration = optionsTable and optionsTable.singDuration or 4,

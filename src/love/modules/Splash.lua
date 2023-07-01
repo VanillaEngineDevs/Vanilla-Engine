@@ -11,7 +11,7 @@ function splash:setup()
     end
 end
 
-function splash:new(settings)
+function splash:new(settings, id)
     local s = {}
     s.anim = settings.anim
     s.posX = settings.posX
@@ -22,6 +22,7 @@ function splash:new(settings)
     end
     s.sprite.x = s.posX
     s.sprite.y = -400
+    s.sprite.id = id
     s.sprite:animate(s.anim)
 
     table.insert(self.cache, s)
@@ -31,6 +32,9 @@ function splash:update(dt)
     for i, v in ipairs(self.cache) do
         if not v then break end
         v.sprite:update(dt)
+
+        v.sprite.y = boyfriendArrows[v.sprite.id].y
+        v.sprite.x = boyfriendArrows[v.sprite.id].x
 
         if not v.sprite:isAnimated() then
             table.remove(self.cache, i)
