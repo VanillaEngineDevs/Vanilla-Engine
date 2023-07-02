@@ -58,11 +58,7 @@ return {
                     else
                         note.alpha = 1
 
-                        if settings.downscroll then
-                            note.y = (strumline.y - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
-                        else
-                            note.y = (strumline.y + (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
-                        end
+                        note.y = (strumline.y - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
                     end
                 end
 
@@ -88,11 +84,7 @@ return {
                             table.remove(enemyNotes[i], j)
                         end
                     else
-                        if settings.downscroll then
-                            note.y = (strumline.y - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
-                        else
-                            note.y = (strumline.y + (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
-                        end
+                        note.y = (strumline.y - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
                     end
 
                     if note.time >= 63630 and note.time <= 64000 then
@@ -139,13 +131,8 @@ return {
                     strumline2.y = 400 - 825 * ((musicTime - 32130) % (33130 - 32130)) / (33130 - 32130)
                 end
             else
-                if settings.downscroll then
-                    strumline.y = -400
-                    strumline2.y = -400
-                else
-                    strumline.y = 400
-                    strumline2.y = 400
-                end
+                strumline.y = -400
+                strumline2.y = -400
             end
 
             if musicTime >= 63630 and musicTime <= 64000 then

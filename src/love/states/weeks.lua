@@ -228,20 +228,12 @@ return {
 			for i = 1, 4 do
 				for j, note in ipairs(boyfriendNotes[i]) do
 					local strumlineY = boyfriendArrows[i].y
-					if settings.downscroll then
-						note.y = (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
-					else
-						note.y = (strumlineY + (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
-					end
+					note.y = (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
 				end
 
 				for _, note in ipairs(enemyNotes[i]) do
 					local strumlineY = enemyArrows[i].y
-					if settings.downscroll then
-						note.y = (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
-					else
-						note.y = (strumlineY + (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
-					end
+					note.y = (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
 				end
 			end
 		end
@@ -1175,7 +1167,7 @@ return {
 			end
 
 			if #boyfriendNote > 0 then
-				if (boyfriendNote[1].y < -600 or boyfriendNote[1].time - musicTime <= -200) then
+				if (boyfriendNote[1].time - musicTime <= -200) then
 					if voices then voices:setVolume(0) end
 
 					notMissed[noteNum] = false
@@ -1381,7 +1373,7 @@ return {
 				end
 			end
 
-			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].y <= -400)) and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
+			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].y <= boyfriendArrow.y)) and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
 				if voices then voices:setVolume(1) end
 
 				boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
