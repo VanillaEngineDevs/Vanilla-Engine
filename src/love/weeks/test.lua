@@ -88,7 +88,7 @@ return {
                     end
 
                     if note.time >= 63630 and note.time <= 64000 then
-                        note.orientation = note.orientation + 720 * dt
+                        note.orientation = note.orientation + 420 * dt
                     end
                 end
             end
@@ -136,7 +136,7 @@ return {
             end
 
             if musicTime >= 63630 and musicTime <= 64000 then
-                strumline2.orientation = strumline2.orientation + 720 * dt
+                strumline2.orientation = strumline2.orientation + 420 * dt
             elseif musicTime >= 64000 and musicTime <= 64075 then
                 strumline2.orientation = 0
             end

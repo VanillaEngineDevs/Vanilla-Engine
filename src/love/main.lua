@@ -110,7 +110,7 @@ function saveSettings()
             downscroll = settings.downscroll,
             ghostTapping = settings.ghostTapping,
             showDebug = settings.showDebug,
-            setImageType = "dds",
+            setImageType = imageTyppe,
             sideJudgements = settings.sideJudgements,
             botPlay = settings.botPlay,
             middleScroll = settings.middleScroll,
@@ -150,7 +150,7 @@ function saveSettings()
             downscroll = settings.downscroll,
             ghostTapping = settings.ghostTapping,
             showDebug = settings.showDebug,
-            setImageType = "dds",
+            setImageType = settings.setImageType,
             sideJudgements = settings.sideJudgements,
             botPlay = settings.botPlay,
             middleScroll = settings.middleScroll,
@@ -245,7 +245,7 @@ function love.load()
 			downscroll = settings.downscroll,
 			ghostTapping = settings.ghostTapping,
 			showDebug = settings.showDebug,
-			setImageType = "dds",
+			setImageType = settings.setImageType,
 			sideJudgements = settings.sideJudgements,
 			botPlay = settings.botPlay,
 			middleScroll = settings.middleScroll,
@@ -271,6 +271,7 @@ function love.load()
 	if not love.filesystem.getInfo("settings") or settingsVer ~= 2 then
 		settings.hardwareCompression = true
 		graphics.setImageType("dds")
+		settings.setImageType = "dds"
 		settings.downscroll = false
 		settings.middleScroll = false
 		settings.ghostTapping = false
@@ -297,7 +298,7 @@ function love.load()
 			downscroll = settings.downscroll,
 			ghostTapping = settings.ghostTapping,
 			showDebug = settings.showDebug,
-			setImageType = "dds",
+			setImageType = settings.setImageType,
 			sideJudgements = settings.sideJudgements,
 			botPlay = settings.botPlay,
 			middleScroll = settings.middleScroll,
@@ -318,6 +319,8 @@ function love.load()
 		serialized = lume.serialize(settingdata)
 		love.filesystem.write("settings", serialized)
 	end
+
+	graphics.setImageType(settings.setImageType)
 
 	volumeWidth = {width = 160}
 	volFade = 0
