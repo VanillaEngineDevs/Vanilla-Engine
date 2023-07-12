@@ -543,6 +543,25 @@ return {
 		return love.graphics.newMesh(data, "strip", "static")
 	end,
 
+	newGradientHorizontal = function(...)
+		local colourLen, data = select("#", ...), {}
+
+		for i = 1, colourLen do
+			local colour = select(i, ...)
+			local x = (i - 1) / (colourLen - 1)
+
+			data[#data + 1] = {
+				x, 0, x, 0, colour[1], colour[2], colour[3], colour[4] or 1
+			}
+			data[#data + 1] = {
+				x, 1, x, 1, colour[1], colour[2], colour[3], colour[4] or 1
+			}
+
+		end
+
+		return love.graphics.newMesh(data, "strip", "static")
+	end,
+
 	setFade = function(value)
 		if fadeTimer then
 			Timer.cancel(fadeTimer)

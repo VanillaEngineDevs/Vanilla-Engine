@@ -368,6 +368,8 @@ function love.load()
 	gameOver = require "substates.game-over"
 	settingsKeybinds = require "substates.settings-keybinds"
 
+	TankmanDatingSim = require "misc.dating"
+
 	-- Load week data
 	weekData = {
 		require "weeks.tutorial",
@@ -523,7 +525,7 @@ function love.load()
 	if curOS == "Web" then
 		Gamestate.switch(clickStart)
 	else
-		Gamestate.switch(menu)
+		Gamestate.switch(TankmanDatingSim)
 	end
 end
 
@@ -582,6 +584,10 @@ end
 
 function love.mousepressed(x, y, button, istouch, presses)
 	Gamestate.mousepressed(x, y, button, istouch, presses)
+end
+
+function love.mousemoved(x, y, dx, dy, istouch)
+	Gamestate.mousemoved(x, y, dx, dy, istouch)
 end
 
 function love.update(dt)
@@ -652,7 +658,7 @@ function love.draw()
 
 	-- Debug output
 	if settings.showDebug then
-		borderedText(status.getDebugStr(settings.showDebug), 5, 5, nil, 0.6, 0.6)
+		--borderedText(status.getDebugStr(settings.showDebug), 5, 5, nil, 0.6, 0.6)
 	end
 end
 
