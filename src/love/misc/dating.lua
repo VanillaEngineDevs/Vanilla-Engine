@@ -275,7 +275,6 @@ return {
         -- love level 4, engaged
         -- love level 5, married
 
-
         barGradient = graphics.newGradientHorizontal(
             {1,0,0},
             {1,0,0.1},
@@ -329,7 +328,20 @@ return {
         }
 
         isButtonPress = false
-        inDialogue = false
+        inDialogue = true
+
+        dialogue:setDialogue(
+            {
+                {
+                    "Tankman: Hey, dude! Hows it going?",
+                    "Tankman: I'm so glad you're here.",
+                    "Tankman: I've been waiting for you all day.",
+                }
+            }
+        )
+        dialogue.callback = function()
+            inDialogue = false
+        end
     end,
 
     update = function(self, dt)

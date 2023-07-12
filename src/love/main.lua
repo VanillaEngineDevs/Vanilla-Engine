@@ -525,7 +525,7 @@ function love.load()
 	if curOS == "Web" then
 		Gamestate.switch(clickStart)
 	else
-		Gamestate.switch(TankmanDatingSim)
+		Gamestate.switch(menu)
 	end
 end
 
@@ -555,6 +555,16 @@ function love.keypressed(key)
                 status.setLoading(false)
             end
         )
+	elseif key == "`" and love.keyboard.isDown("lalt") then
+		status.setLoading(true)
+		graphics:fadeOutWipe(
+			0.7,
+			function()
+				music:stop()
+				Gamestate.switch(TankmanDatingSim)
+				status.setLoading(false)
+			end
+		)
 	elseif key == "0" then
 		volFade = 1
 		if fixVol == 0 then
