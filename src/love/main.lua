@@ -96,7 +96,7 @@ function borderedText(text,x,y,r,sx,sy,ox,oy,kx,ky,alpha)
 	graphics.setColor(1,1,1, alpha or 1)
 	love.graphics.print(text,x,y,r,sx,sy,a,ox,oy,kx,ky)
 end
-
+mainDrawing = true
 function saveSettings()
     if settings.hardwareCompression ~= settingdata.hardwareCompression then
         settingdata = {}
@@ -221,6 +221,7 @@ function love.load()
 	NoteSplash = require "modules.Splash"
 	require "modules.savedata"
 	loadSavedata()
+	Alphabet = require "modules.Alphabet"
 	
 	-- XML Modules
 	Sprite = require "modules.xml.Sprite"
@@ -333,6 +334,7 @@ function love.load()
 	debugMenu = require "states.debug.debugMenu"
 	spriteDebug = require "states.debug.sprite-debug"
 	stageDebug = require "states.debug.stage-debug"
+	chartDebug = require "states.debug.charter"
 
 	-- Sounds
 	selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
@@ -479,15 +481,20 @@ function love.load()
 	push.setupScreen(1280, 720, {upscale="normal", canvas = true})
 
 	function hex2rgb(hex)
-		hex = hex:gsub("#",""):gsub("0x","")
-		local r = hex:sub(1,2) 
-		local g = hex:sub(3,4)
-		local b = hex:sub(5,6)
+		if type(hex) == "string" then
+			hex = hex:gsub("#",""):gsub("0x","")
+			local r = hex:sub(1,2) 
+			local g = hex:sub(3,4)
+			local b = hex:sub(5,6)
 
-		hexR = tonumber("0x".. r)
-		hexG = tonumber("0x".. g)
-		hexB = tonumber("0x".. b)
-		return {hexR/255, hexG/255, hexB/255}
+			hexR = tonumber("0x".. r)
+			hexG = tonumber("0x".. g)
+			hexB = tonumber("0x".. b)
+			return {hexR/255, hexG/255, hexB/255}
+		else
+			-- sometimes it can be given as 0xffe7e6e6
+
+		end
 	end
 	
 	-- Variables
@@ -628,44 +635,48 @@ function love.draw()
 	love.graphics.setFont(font)
 	graphics.screenBase(push:getWidth(), push:getHeight())
 
-	push:start()
-		graphics.setColor(1, 1, 1) -- Fade effect on
-		Gamestate.draw()
-		love.graphics.setColor(1, 1, 1) -- Fade effect off
-		love.graphics.setFont(font)
-		if status.getLoading() then
-			love.graphics.print("Loading...", push:getWidth() - 175, push:getHeight() - 50)
-		end
-		if volFade > 0  then
-			love.graphics.setColor(1, 1, 1, volFade)
-			fixVol = tonumber(string.format(
-				"%.1f  ",
-				(love.audio.getVolume())
-			))
-			love.graphics.setColor(0.5, 0.5, 0.5, volFade - 0.3)
+	if mainDrawing then
+		push:start()
+			graphics.setColor(1, 1, 1) -- Fade effect on
+			Gamestate.draw()
+			love.graphics.setColor(1, 1, 1) -- Fade effect off
+			love.graphics.setFont(font)
+			if status.getLoading() then
+				love.graphics.print("Loading...", push:getWidth() - 175, push:getHeight() - 50)
+			end
+			if volFade > 0  then
+				love.graphics.setColor(1, 1, 1, volFade)
+				fixVol = tonumber(string.format(
+					"%.1f  ",
+					(love.audio.getVolume())
+				))
+				love.graphics.setColor(0.5, 0.5, 0.5, volFade - 0.3)
 
-			love.graphics.rectangle("fill", 1110, 0, 170, 50)
+				love.graphics.rectangle("fill", 1110, 0, 170, 50)
 
-			love.graphics.setColor(1, 1, 1, volFade)
+				love.graphics.setColor(1, 1, 1, volFade)
 
-			if volTween then Timer.cancel(volTween) end
-			volTween = Timer.tween(
-				0.2, 
-				volumeWidth, 
-				{width = fixVol * 160},
-				"out-quad"
-			)
-			love.graphics.rectangle("fill", 1113, 10, volumeWidth.width, 30)
-			graphics.setColor(1, 1, 1, 1)
-		end
-		if fade.mesh then 
-			graphics.setColor(1,1,1)
-			love.graphics.draw(fade.mesh, 0, fade.y, 0, push:getWidth(), fade.height)
-		end
-	push:finish()
+				if volTween then Timer.cancel(volTween) end
+				volTween = Timer.tween(
+					0.2, 
+					volumeWidth, 
+					{width = fixVol * 160},
+					"out-quad"
+				)
+				love.graphics.rectangle("fill", 1113, 10, volumeWidth.width, 30)
+				graphics.setColor(1, 1, 1, 1)
+			end
+			if fade.mesh then 
+				graphics.setColor(1,1,1)
+				love.graphics.draw(fade.mesh, 0, fade.y, 0, push:getWidth(), fade.height)
+			end
+		push:finish()
+	end
 
 	graphics.screenBase(love.graphics.getWidth(), love.graphics.getHeight())
-
+	if not mainDrawing then
+		Gamestate.draw()
+	end
 	-- Debug output
 	if settings.showDebug then
 		--borderedText(status.getDebugStr(settings.showDebug), 5, 5, nil, 0.6, 0.6)

@@ -80,7 +80,7 @@ local function tryExcept(f1, f2)
     print(err)
 end
 customEvents = {}
-local function getImage(key)
+function getImage(key)
     local key = key .. ".png"
     if graphics.cache[key] then
         return graphics.cache[key]
@@ -92,7 +92,7 @@ local function getImage(key)
 
     return nil
 end
-local function getSparrow(key)
+function getSparrow(key)
     local ip, xp = key, key .. ".xml"
     local i = getImage(ip)
     if love.filesystem.getInfo(xp) then

@@ -74,6 +74,7 @@ return {
 			if logo then logo:animate("anim", false) end
 		end
 
+		Alphabet:update(dt)
 
 		if not graphics.isFading() then
 			if input:pressed("confirm") then
@@ -111,6 +112,7 @@ return {
 			love.graphics.pop()
 
 		love.graphics.pop()
+		Alphabet:draw()
 	end,
 
 	leave = function(self)

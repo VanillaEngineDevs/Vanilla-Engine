@@ -35,10 +35,10 @@ return {
 		screenWidth, screenHeight = width, height
 	end,
 	getWidth = function()
-		return screenWidth
+		return screenWidth or love.graphics.getWidth()
 	end,
 	getHeight = function()
-		return screenHeight
+		return screenHeight or love.graphics.getHeight()
 	end,
 
 	cache = {},
@@ -319,11 +319,11 @@ return {
 			end,
 
 			getFrameWidth = function(self)
-				return frameData[self.curFrame].width
+				return frameData[self.curFrame or 1].width
 			end,
 
 			getFrameHeight = function(self)
-				return frameData[self.curFrame].height
+				return frameData[self.curFrame or 1].height
 			end,
 
 			beat = function(self, beat)
