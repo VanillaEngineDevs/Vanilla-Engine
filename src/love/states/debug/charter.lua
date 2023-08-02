@@ -29,6 +29,7 @@ end
 function Group:__tostring()
     return "Group"
 end
+
 -- Mini Note.hx remake
 Note = Sprite:extend()
 Note.strumTime = 0
@@ -314,7 +315,6 @@ return {
             self:updateGrid()
 
             if updateMusic then
-                --
                 inst:stop()
                 print("Seeking to: ", self:sectionStartTime()/1000)
                 inst:seek(self:sectionStartTime()/1000)
@@ -367,7 +367,7 @@ return {
     end,
 
     keypressed = function(self, key)
-        if key == "s" then
+        if key == "s" and love.keyboard.isDown("lctrl") then
             -- save the song as a json file as songname.json
             local json2 = {
                 song = _song,
