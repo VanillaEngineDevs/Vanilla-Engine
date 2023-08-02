@@ -1402,14 +1402,14 @@ return {
 			health = 2
 		elseif health > 0.325 and boyfriendIcon:getAnimName() == "boyfriend losing" then
 			if not pixel then 
-				boyfriendIcon:animate("boyfriend", false)
+				boyfriendIcon:animate(bf, false)
 			else
 				boyfriendIcon:animate("boyfriend (pixel)", false)
 			end
 		elseif health <= 0 then -- Game over
 			if not settings.practiceMode then Gamestate.push(gameOver) end
 			health = 0
-		elseif health <= 0.325 and boyfriendIcon:getAnimName() == "boyfriend" then
+		elseif health <= 0.325 and boyfriendIcon:getAnimName() == bf then
 			if not pixel then 
 				boyfriendIcon:animate("boyfriend losing", false)
 			end

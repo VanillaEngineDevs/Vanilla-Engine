@@ -32,13 +32,13 @@ return graphics.newSprite(
 		{x = 1350, y = 0, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 10: Tankman Losing
 		{x = 0, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 11: Unknown
 		{x = 150, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 12: Unknown Losing
-		{x = 300, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 13: Daddy Dearest
-		{x = 450, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 14: Daddy Dearest Losing
+		{x = 300, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 13: dad
+		{x = 450, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 14: dad Losing
 		{x = 600, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 15: Boyfriend (Old)
 		{x = 750, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 16: Boyfriend Losing (Old)
 		{x = 900, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 17: Girlfriend
-		{x = 1050, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 18: Daddy Dearest and Mommy Mearest
-		{x = 1200, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 19: Daddy Dearest and Mommy Mearest Losing
+		{x = 1050, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 18: dad and Mommy Mearest
+		{x = 1200, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 19: dad and Mommy Mearest Losing
 		{x = 1350, y = 150, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 20: Monster
 		{x = 0, y = 300, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 21: Monster Losing
 		{x = 150, y = 300, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 22: Boyfriend (Pixel)
@@ -46,7 +46,7 @@ return graphics.newSprite(
 		{x = 450, y = 300, width = 150, height = 150, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0} -- 24: Spirit
 	},
 	{
-		["boyfriend"] = {start = 1, stop = 1, speed = 0, offsetX = 0, offsetY = 0},
+		["bf"] = {start = 1, stop = 1, speed = 0, offsetX = 0, offsetY = 0},
 		["boyfriend losing"] = {start = 2, stop = 2, speed = 0, offsetX = 0, offsetY = 0},
 		["skid and pump"] = {start = 3, stop = 3, speed = 0, offsetX = 0, offsetY = 0},
 		["skid and pump losing"] = {start = 4, stop = 4, speed = 0, offsetX = 0, offsetY = 0},
@@ -58,8 +58,8 @@ return graphics.newSprite(
 		["tankman losing"] = {start = 10, stop = 10, speed = 0, offsetX = 0, offsetY = 0},
 		["unknown"] = {start = 11, stop = 11, speed = 0, offsetX = 0, offsetY = 0},
 		["unknown losing"] = {start = 12, stop = 12, speed = 0, offsetX = 0, offsetY = 0},
-		["daddy dearest"] = {start = 13, stop = 13, speed = 0, offsetX = 0, offsetY = 0},
-		["daddy dearest losing"] = {start = 14, stop = 14, speed = 0, offsetX = 0, offsetY = 0},
+		["dad"] = {start = 13, stop = 13, speed = 0, offsetX = 0, offsetY = 0},
+		["dad losing"] = {start = 14, stop = 14, speed = 0, offsetX = 0, offsetY = 0},
 		["boyfriend (old)"] = {start = 15, stop = 15, speed = 0, offsetX = 0, offsetY = 0},
 		["boyfrined losing (old)"] = {start = 16, stop = 16, speed = 0, offsetX = 0, offsetY = 0},
 		["girlfriend"] = {start = 17, stop = 17, speed = 0, offsetX = 0, offsetY = 0},
@@ -68,9 +68,10 @@ return graphics.newSprite(
 		["monster"] = {start = 20, stop = 20, speed = 0, offsetX = 0, offsetY = 0},
 		["monster losing"] = {start = 21, stop = 21, speed = 0, offsetX = 0, offsetY = 0},
 		["boyfriend (pixel)"] = {start = 22, stop = 22, speed = 0, offsetX = 0, offsetY = 0},
+		["bf-pixel-opponent"] = {start = 22, stop = 22, speed = 0, offsetX = 0, offsetY = 0},
 		["senpai"] = {start = 23, stop = 23, speed = 0, offsetX = 0, offsetY = 0},
 		["spirit"] = {start = 24, stop = 24, speed = 0, offsetX = 0, offsetY = 0}
 	},
-	"boyfriend",
+	"bf",
 	false
 )

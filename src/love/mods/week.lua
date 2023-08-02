@@ -540,7 +540,7 @@ return {
 		song = songNum
 		difficulty = songAppend
 
-		enemyIcon:animate("daddy dearest", false)
+		enemyIcon:animate("dad", false)
 
         psychweek = weeknum
 
@@ -834,12 +834,12 @@ return {
 		weeks:update(dt)
 
 		if health >= 1.595 then
-			if enemyIcon:getAnimName() == "daddy dearest" then
-				enemyIcon:animate("daddy dearest losing", false)
+			if enemyIcon:getAnimName() == "dad" then
+				enemyIcon:animate("dad losing", false)
 			end
 		else
-			if enemyIcon:getAnimName() == "daddy dearest losing" then
-				enemyIcon:animate("daddy dearest", false)
+			if enemyIcon:getAnimName() == "dad losing" then
+				enemyIcon:animate("dad", false)
 			end
 		end
 

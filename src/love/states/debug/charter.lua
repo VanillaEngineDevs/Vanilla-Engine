@@ -67,7 +67,7 @@ return {
         curSection = 1
         lastSection = 1
 
-        curSong = "Test"
+        curSong = "test"
         amountSteps = 0
         bullshitUI = Group()
 
@@ -91,8 +91,18 @@ return {
         vocals = nil
         inst = nil
 
-        leftIcon = Sprite()
-        rightIcon = Sprite()
+        images = {
+            icons = love.graphics.newImage(graphics.imagePath("icons")),
+        }
+        sprites = {
+            icons = love.filesystem.load("sprites/icons.lua")
+        }
+
+        leftIcon = sprites.icons()
+        rightIcon = sprites.icons()
+
+        leftIcon:animate(_song.player1)
+        rightIcon:animate(_song.player2)
 
         curSection = lastSection
 
@@ -106,16 +116,47 @@ return {
         mainDrawGroup:add(gridBG)
         mainDrawGroup:add(gridBlackLine)
 
-        _song = {
-            song = "Test",
-            notes = {},
-            bpm = 150,
-            needsVoices = true,
-            player1 = "bf",
-            player2 = "dad",
-            speed = 1,
-            validScore = false
-        }
+        mainDrawGroup:add(leftIcon)
+        mainDrawGroup:add(rightIcon)
+
+        leftIcon.sizeX, leftIcon.sizeY = 0.75, 0.75
+        rightIcon.sizeX, rightIcon.sizeY = 0.75, 0.75
+
+        leftIcon.x, leftIcon.y = 75, 680
+        rightIcon.x, rightIcon.y = 250, 680
+
+        if love.filesystem.getInfo("data/" .. curSong) then
+            -- check if curSong.json exists
+            if love.filesystem.getInfo("data/" .. curSong .. "/" .. curSong .. ".json") then
+                -- load curSong.json
+                _song = json.decode(love.filesystem.read("data/" .. curSong .. "/" .. curSong .. ".json")).song
+            else
+                -- create curSong.json
+                _song = {
+                    song = "guns",
+                    notes = {},
+                    bpm = 150,
+                    needsVoices = true,
+                    player1 = "bf",
+                    player2 = "dad",
+                    speed = 1,
+                    validScore = false
+                }
+            end
+        else
+            -- create curSong.json
+            _song = {
+                song = "guns",
+                notes = {},
+                bpm = 150,
+                needsVoices = true,
+                player1 = "bf",
+                player2 = "dad",
+                speed = 1,
+                validScore = false
+            }
+        end
+
 
         musicTime = 0
 
@@ -174,7 +215,7 @@ return {
         _song.song = curSong
 
         strumLine.y = self:getYfromStrum((musicTime - self:sectionStartTime()) % (beatHandler.stepCrochet * _song.notes[curSection].lengthInSteps)) + (GRID_SIZE/2)
-        print(strumLine.y)
+        
         if curBeat % 4 == 0 and curStep >= 16 * curSection then
             if _song.notes[curSection+1] == nil then
                 self:addSection()
@@ -202,6 +243,7 @@ return {
         if not love.keyboard.isDown("lshift") then
             if love.keyboard.isDown("w") or love.keyboard.isDown("s") then
                 inst:pause()
+                if voices then voices:pause() end
                 local daTime = 1000 * dt
                 if love.keyboard.isDown("w") then
                     musicTime = musicTime - daTime
@@ -216,12 +258,33 @@ return {
                 end
 
                 inst:seek(musicTime/1000)
+                if voices then voices:seek(musicTime/1000) end
 
-                print(inst:tell(), daTime)
+                --print(inst:tell(), daTime)
             end
         end
 
         --print(dummyArrow.x, dummyArrow.y)
+    end,
+
+    updateSectionUI = function(self)
+        local sec = _song.notes[curSection]
+
+        check_mustHitSection = sec.mustHitSection
+        print(check_mustHitSection)
+
+        self:updateHeads()
+    end,
+
+    updateHeads = function(self)
+        if check_mustHitSection then
+            leftIcon:animate(_song.player1)
+            rightIcon:animate(_song.player2)
+            --print(leftIcon:isAnimName(_song.player1), leftIcon:isAnimName(_song.player2), rightIcon:isAnimName(_song.player1), rightIcon:isAnimName(_song.player2), _song.player1, _song.player2)
+        else
+            leftIcon:animate(_song.player2)
+            rightIcon:animate(_song.player1)
+        end
     end,
 
     recalculateSteps = function()
@@ -243,7 +306,22 @@ return {
 
     mousepressed = function(self, mx, my)
         if mx > gridBG.x and mx < gridBG.x + gridBG.width and my > gridBG.y and my < gridBG.y + (GRID_SIZE * _song.notes[curSection].lengthInSteps) then
-            self:addNote()
+            --self:addNote()
+
+            -- if the mouse overlaps with any notes in curRenderedNotes.members, delete the first note, if none, add a note
+            local noteFound = false
+            for i = 1, #curRenderedNotes.members do
+                local mx, my = love.mouse.getPosition()
+                if AABB(mx, my+(GRID_SIZE/2), 1, 1, curRenderedNotes.members[i].x, curRenderedNotes.members[i].y, curRenderedNotes.members[i].width, curRenderedNotes.members[i].height) then
+                    noteFound = true
+                    self:deleteNote(curRenderedNotes.members[i])
+                    break
+                end
+            end
+
+            if not noteFound then
+                self:addNote()
+            end
         end
     end,
 
@@ -251,8 +329,19 @@ return {
         if inst ~= nil then
             inst:stop()
         end
+        if voices ~= nil then
+            voices:stop()
+        end
         local instPath = "songs/" .. _song.song:lower() .. "/Inst.ogg"
         inst = love.audio.newSource(instPath, "stream")
+
+        local voicesPath = "songs/" .. _song.song:lower() .. "/Voices.ogg"
+        -- check if file exists
+        if love.filesystem.getInfo(voicesPath) then
+            voices = love.audio.newSource(voicesPath, "stream")
+        else
+            voices = nil
+        end
     end,
 
     addNote = function(self)
@@ -267,7 +356,18 @@ return {
 
         self:updateGrid()
 
-        print("Added note at time, lane, sustain, alt: ", noteStrum, noteData, noteSus, noteAlt)
+        --print("Added note at time, lane, sustain, alt: ", noteStrum, noteData, noteSus, noteAlt)
+    end,
+
+    deleteNote = function(self, note)
+        for i, v in ipairs(_song.notes[curSection].sectionNotes) do
+            if v[1] == note.strumTime and v[2] % 4 == note.noteData then
+                table.remove(_song.notes[curSection].sectionNotes, i)
+                break
+            end
+        end
+
+        self:updateGrid()
     end,
 
     getStrumTime = function(self, ypos)
@@ -309,20 +409,34 @@ return {
     changeSection = function(self, sec, updateMusic)
         local sec = sec or 1
         local updateMusic = (updateMusic == nil and true) or updateMusic
-
+        
         if _song.notes[sec] ~= nil then
             curSection = sec
             self:updateGrid()
 
             if updateMusic then
                 inst:stop()
-                print("Seeking to: ", self:sectionStartTime()/1000)
                 inst:seek(self:sectionStartTime()/1000)
+                if voices then
+                    voices:stop()
+                    voices:seek(self:sectionStartTime()/1000)
+                end
+                musicTime = self:sectionStartTime()
             end
 
             self:updateGrid()
 
             strumLine.y = gridBG.y + gridBG.height
+
+            self:updateSectionUI()
+        else
+            if sec < curSection then
+                curSection = 1
+                self:updateGrid()
+            else
+                self:addSection()
+                self:changeSection(sec)
+            end
         end
     end,
 
@@ -363,7 +477,28 @@ return {
             note.y = math.floor(self:getYfromStrum((daStrumTime - self:sectionStartTime()) % (beatHandler.stepCrochet*_song.notes[curSection].lengthInSteps))) - (GRID_SIZE*0.62)
 
             curRenderedNotes:add(note)
+
+            if daSus > 0 then
+                local sustainVis = Sprite(note.x + (GRID_SIZE*1.90), note.y + (GRID_SIZE*1.45))
+                sustainVis:makeGraphic(8, math.floor(remapToRange(daSus, 0, beatHandler.stepCrochet * 16, 0, gridBG.height)))
+                curRenderedSustains:add(sustainVis)
+            end
         end
+    end,
+
+    changeNoteSustain = function(self, v)
+        if curSelectedNote ~= nil then
+            if curSelectedNote[3] ~= nil then
+                curSelectedNote[3] = curSelectedNote[3] + v
+                curSelectedNote[3] = math.max(curSelectedNote[3], 0)
+            end
+        end
+
+        self:updateNoteUI()
+        self:updateGrid()
+    end,
+
+    updateNoteUI = function()
     end,
 
     keypressed = function(self, key)
@@ -371,17 +506,19 @@ return {
             -- save the song as a json file as songname.json
             local json2 = {
                 song = _song,
-                GeneratedIn = "Vanilla Engine"
+                GeneratedBy = "Vanilla Engine"
             }
             local data = json.encode(json2)
 
             if data ~= nil and #data > 0 then
-                local filename = _song.song .. ".json"
+                local filename = (_song.song .. ".json"):lower()
                 -- check if GeneratedSongs folder exists
                 if not love.filesystem.getInfo("GeneratedSongs") then
                     love.filesystem.createDirectory("GeneratedSongs")
                 end
                 love.filesystem.write("GeneratedSongs/"..filename, data)
+                -- open the folder
+                love.system.openURL("file://"..love.filesystem.getSaveDirectory().."/GeneratedSongs")
             end
         elseif key == "space" then
             if inst then
@@ -391,6 +528,17 @@ return {
                     inst:play()
                 end
             end
+            if voices then
+                if voices:isPlaying() then
+                    voices:pause()
+                else
+                    voices:play()
+                end
+            end
+        elseif key == "e" then
+            self:changeNoteSustain(beatHandler.stepCrochet)
+        elseif key == "q" then
+            self:changeNoteSustain(-beatHandler.stepCrochet)
         elseif key == "right" then
             self:changeSection(curSection + 1)
         elseif key == "left" then
