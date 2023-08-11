@@ -13,9 +13,9 @@ return {
         
 		menuButton = 1
 		songNum = 0
-        selectBGRandom = love.math.random(0, 100)
+        selectBGRandom = love.math.random(0, 200)
 
-        if selectBGRandom < 1 then
+        if selectBGRandom == 0 then
             selectBG = graphics.newImage(graphics.imagePath("menu/quagmire_car"))
             selectBG.x = 430
             selectBG.y = 300

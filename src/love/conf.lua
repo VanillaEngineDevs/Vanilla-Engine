@@ -16,11 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
-
+local version = love.filesystem.getInfo("version.txt") and love.filesystem.read("version.txt") or "vUnknown"
 function love.conf(t)
 	t.identity = "VE-FNFR"
 	t.version = "11.4"
 	t.console = not love.filesystem.isFused() -- lmao i just found out you can use this function in love.conf
 
-	t.window.title = "Friday Night Funkin' Vanilla Engine v1.0.0"
+	t.window.title = "Friday Night Funkin' Vanilla Engine " .. version
 end

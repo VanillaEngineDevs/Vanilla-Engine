@@ -384,6 +384,7 @@ function love.load()
 		require "weeks.week7"
 	}
 	testData = require "weeks.test"
+	__VERSION__ = love.filesystem.getInfo("version.txt") and love.filesystem.read("version.txt") or "vUnknown"
 
 	weekDesc = { -- Add your week description here
 		"LEARN TO FUNK",
