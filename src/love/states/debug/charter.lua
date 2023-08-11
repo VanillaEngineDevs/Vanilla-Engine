@@ -458,6 +458,16 @@ return {
         --print("Added note at time, lane, sustain, alt: ", noteStrum, noteData, noteSus, noteAlt)
     end,
 
+    generateVoicesWaveform = function(self)
+        local audioData = love.sound.newSoundData("songs/" .. _song.song:lower() .. "/Voices.ogg")
+        local samples = audioData:getSampleCount()
+        local waveform = {}
+        for i = 0, samples - 1 do
+            waveform[i] = audioData:getSample(i)
+        end
+        return waveform
+    end,
+
     deleteNote = function(self, note)
         for i, v in ipairs(_song.notes[curSection].sectionNotes) do
             if v[1] == note.strumTime and v[2] % 4 == note.noteData then
