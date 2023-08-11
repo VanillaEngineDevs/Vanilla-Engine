@@ -191,10 +191,11 @@ return {
         dummyArrow:makeGraphic(GRID_SIZE, GRID_SIZE)
         mainDrawGroup:add(dummyArrow)
 
-        local tabs = {
-            {name = "Song", label = "Song"},
-            {name = "Section", label = "Section"},
-            {name = "Note", label = "Note"}
+        tabs = {
+            {name = "Song", label = "Song", selected=true},
+            {name = "Section", label = "Section", selected=false},
+            {name = "Note", label = "Note", selected=false},
+            {name = "Charting", label = "Charting", selected=false},
         }
 
         mainDrawGroup:add(curRenderedNotes)
@@ -225,7 +226,6 @@ return {
         end
 
         local mx, my = love.mouse.getPosition()
-
         if mx > gridBG.x and mx < gridBG.x + gridBG.width and my > gridBG.y and my < gridBG.y + (GRID_SIZE * _song.notes[curSection].lengthInSteps) then
             dummyArrow.x = math.floor(mx/GRID_SIZE) * GRID_SIZE + (GRID_SIZE*1.87)
             if love.keyboard.isDown("lshift") then
@@ -271,9 +271,21 @@ return {
         local sec = _song.notes[curSection]
 
         check_mustHitSection = sec.mustHitSection
-        print(check_mustHitSection)
+        --print(check_mustHitSection)
 
         self:updateHeads()
+    end,
+
+    drawSongUI = function()
+
+    end,
+
+    drawSectionUI = function()
+
+    end,
+
+    drawNoteUI = function()
+
     end,
 
     updateHeads = function(self)
@@ -322,6 +334,79 @@ return {
             if not noteFound then
                 self:addNote()
             end
+        end
+
+        --[[ tabs[1].selected = mx > 650 and mx < 650 + (500/4) and my > 30 and my < 30 + 40
+        tabs[2].selected = mx > 650 + (500/4) and mx < 650 + (500/4)*2 and my > 30 and my < 30 + 40
+        tabs[3].selected = mx > 650 + (500/4)*2 and mx < 650 + (500/4)*3 and my > 30 and my < 30 + 40
+        tabs[4].selected = mx > 650 + (500/4)*3 and mx < 650 + (500/4)*4 and my > 30 and my < 30 + 40 ]]
+
+        if mx > 650 and mx < 650 + (500/4) and my > 30 and my < 30 + 40 then
+            tabs[1].selected = true
+            tabs[2].selected = false
+            tabs[3].selected = false
+            tabs[4].selected = false
+        elseif mx > 650 + (500/4) and mx < 650 + (500/4)*2 and my > 30 and my < 30 + 40 then
+            tabs[1].selected = false
+            tabs[2].selected = true
+            tabs[3].selected = false
+            tabs[4].selected = false
+        elseif mx > 650 + (500/4)*2 and mx < 650 + (500/4)*3 and my > 30 and my < 30 + 40 then
+            tabs[1].selected = false
+            tabs[2].selected = false
+            tabs[3].selected = true
+            tabs[4].selected = false
+        elseif mx > 650 + (500/4)*3 and mx < 650 + (500/4)*4 and my > 30 and my < 30 + 40 then
+            tabs[1].selected = false
+            tabs[2].selected = false
+            tabs[3].selected = false
+            tabs[4].selected = true
+        end
+
+        if tabs[1].selected then
+            if mx > 675 and mx < 675 + 20 and my > 110 and my < 110 + 20 then
+                _song.needsVoices = not _song.needsVoices
+            end
+
+            --love.graphics.rectangle("line", 725, 200, 20, 20)
+            --love.graphics.rectangle("line", 745, 200, 20, 20)
+            -- if the first one is pressed, change _song.curSpeed by +0.1
+            -- else -0.1
+            if mx > 725 and mx < 725 + 20 and my > 200 and my < 200 + 20 then
+                _song.speed = _song.speed + 0.1
+            elseif mx > 745 and mx < 745 + 20 and my > 200 and my < 200 + 20 then
+                _song.speed = _song.speed - 0.1
+            end
+
+            if mx > 725 and mx < 725 + 20 and my > 150 and my < 150 + 20 then
+                _song.bpm = _song.bpm + 1
+            elseif mx > 745 and mx < 745 + 20 and my > 150 and my < 150 + 20 then
+                _song.bpm = _song.bpm - 1
+            end
+
+            -- love.graphics.rectangle("line", 800, 80, 100, 20)
+            -- save button!
+            if mx > 800 and mx < 800 + 100 and my > 80 and my < 80 + 20 then
+                local json2 = {
+                    song = _song,
+                    GeneratedBy = "Vanilla Engine"
+                }
+                local data = json.encode(json2)
+    
+                if data ~= nil and #data > 0 then
+                    local filename = (_song.song .. ".json"):lower()
+                    -- check if GeneratedSongs folder exists
+                    if not love.filesystem.getInfo("GeneratedSongs") then
+                        love.filesystem.createDirectory("GeneratedSongs")
+                    end
+                    love.filesystem.write("GeneratedSongs/"..filename, data)
+                    -- open the folder
+                    love.system.openURL("file://"..love.filesystem.getSaveDirectory().."/GeneratedSongs")
+                end
+            end
+        elseif tabs[2].selected then
+        elseif tabs[3].selected then
+        elseif tabs[4].selected then
         end
     end,
 
@@ -502,25 +587,7 @@ return {
     end,
 
     keypressed = function(self, key)
-        if key == "s" and love.keyboard.isDown("lctrl") then
-            -- save the song as a json file as songname.json
-            local json2 = {
-                song = _song,
-                GeneratedBy = "Vanilla Engine"
-            }
-            local data = json.encode(json2)
-
-            if data ~= nil and #data > 0 then
-                local filename = (_song.song .. ".json"):lower()
-                -- check if GeneratedSongs folder exists
-                if not love.filesystem.getInfo("GeneratedSongs") then
-                    love.filesystem.createDirectory("GeneratedSongs")
-                end
-                love.filesystem.write("GeneratedSongs/"..filename, data)
-                -- open the folder
-                love.system.openURL("file://"..love.filesystem.getSaveDirectory().."/GeneratedSongs")
-            end
-        elseif key == "space" then
+        if key == "space" then
             if inst then
                 if inst:isPlaying() then
                     inst:pause()
@@ -547,7 +614,146 @@ return {
     end,
 
     draw = function()
+        love.graphics.push()
         mainDrawGroup:draw()
+        love.graphics.pop()
+
+        -- draw tabs "Note", "Section", "Song", "Charting"
+        -- if its selected
+        -- draw a slightly rounded rectangle on the right
+        -- draw the text in the middle
+        
+        if not tabs[1].selected then
+            love.graphics.setColor(0.4, 0.4, 0.4, 1)
+        else
+            love.graphics.setColor(0.5, 0.5, 0.5, 1)
+        end
+        love.graphics.rectangle("fill", 650, 30, 500/4, 40, 10, 10)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.print("Song", 650 + (500/4)/2 - (font:getWidth("Song")/2), 30 + (40/2) - (font:getHeight("Song")/2))
+
+        if not tabs[2].selected then
+            love.graphics.setColor(0.4, 0.4, 0.4, 1)
+        else
+            love.graphics.setColor(0.5, 0.5, 0.5, 1)
+        end
+        love.graphics.rectangle("fill", 650 + (500/4), 30, 500/4, 40, 10, 10)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.print("Section", 650 + (500/4) + (500/4)/2 - (font:getWidth("Section")/2), 30 + (40/2) - (font:getHeight("Section")/2))
+
+        if not tabs[3].selected then
+            love.graphics.setColor(0.4, 0.4, 0.4, 1)
+        else
+            love.graphics.setColor(0.5, 0.5, 0.5, 1)
+        end
+        love.graphics.rectangle("fill", 650 + (500/4)*2, 30, 500/4, 40, 10, 10)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.print("Note", 650 + (500/4)*2 + (500/4)/2 - (font:getWidth("Note")/2), 30 + (40/2) - (font:getHeight("Note")/2))
+
+        if not tabs[4].selected then
+            love.graphics.setColor(0.4, 0.4, 0.4, 1)
+        else
+            love.graphics.setColor(0.5, 0.5, 0.5, 1)
+        end
+        love.graphics.rectangle("fill", 650 + (500/4)*3, 30, 500/4, 40, 10, 10)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.print("Charting", 650 + (500/4)*3 + (500/4)/2 - (font:getWidth("Charting")/2), 30 + (40/2) - (font:getHeight("Charting")/2))
+
+        love.graphics.setColor(0.5, 0.5, 0.5, 1)
+        love.graphics.rectangle("fill", 650, 70, 500, 540, 10, 10)
+
+        if tabs[1].selected then
+            -- song
+            --song text box
+            love.graphics.setColor(1,1,1)
+            love.graphics.rectangle("fill", 675, 80, 100, 20)
+            love.graphics.setColor(0,0,0)
+            love.graphics.rectangle("line", 675, 80, 100, 20)
+            love.graphics.setColor(0,0,0)
+            love.graphics.print(curSong, 680, 85, 0, 0.5, 0.5)
+            love.graphics.setColor(1,1,1)
+
+            -- checkmark box
+            love.graphics.rectangle("fill", 675, 110, 20, 20)
+            -- if _song.needsVoices, then print a checkmark
+            if _song.needsVoices then
+                love.graphics.setColor(0,0,0)
+                love.graphics.print("✓", 675, 110, 0, 1.45, 1)
+                love.graphics.setColor(1,1,1)
+            end
+            love.graphics.print("Has voice track", 700, 120, 0, 0.5, 0.5)
+
+            -- song BPM +/-
+            love.graphics.rectangle("fill", 675, 150, 50, 20)
+            love.graphics.setColor(0,0,0)
+            love.graphics.rectangle("line", 675, 150, 50, 20)
+            -- gray buttons
+            love.graphics.setColor(0.65, 0.65, 0.65, 1)
+            love.graphics.rectangle("fill", 725, 150, 20, 20)
+            love.graphics.rectangle("fill", 745, 150, 20, 20)
+            love.graphics.setColor(0,0,0)
+            love.graphics.rectangle("line", 725, 150, 20, 20)
+            love.graphics.rectangle("line", 745, 150, 20, 20)
+            love.graphics.print("+", 728, 150, 0, 0.8, 0.8)
+            love.graphics.print("-", 748, 150, 0, 0.8, 0.8)
+            love.graphics.print(_song.bpm, 680, 155, 0, 0.5, 0.5)
+            love.graphics.setColor(1,1,1)
+            love.graphics.print("BPM: ", 675, 135, 0, 0.5, 0.5)
+
+            -- +/- buttons
+            love.graphics.rectangle("fill", 675, 200, 50, 20)
+            love.graphics.setColor(0,0,0)
+            love.graphics.rectangle("line", 675, 200, 50, 20)
+            -- gray buttons
+            love.graphics.setColor(0.65, 0.65, 0.65, 1)
+            love.graphics.rectangle("fill", 725, 200, 20, 20)
+            love.graphics.rectangle("fill", 745, 200, 20, 20)
+            love.graphics.setColor(0,0,0)
+            love.graphics.rectangle("line", 725, 200, 20, 20)
+            love.graphics.rectangle("line", 745, 200, 20, 20)
+            love.graphics.print("+", 728, 200, 0, 0.8, 0.8)
+            love.graphics.print("-", 748, 200, 0, 0.8, 0.8)
+            love.graphics.print(_song.speed, 680, 205, 0, 0.5, 0.5)
+            love.graphics.setColor(1,1,1)
+            love.graphics.print("Song Speed:", 675, 185, 0, 0.5, 0.5)
+
+            -- save button
+            -- slightly gray like the other buttons
+            love.graphics.setColor(0.75, 0.75, 0.75, 1)
+            love.graphics.rectangle("fill", 800, 80, 100, 20)
+            love.graphics.setColor(0,0,0)
+            love.graphics.rectangle("line", 800, 80, 100, 20)
+            love.graphics.setColor(0.2, 0.2, 0.2, 1)
+            -- save goes in the middle of the button
+            love.graphics.print("Save", 805 + (100/2) - (font:getWidth("Save")/2), 82 + (20/2) - (font:getHeight("Save")/2), 0, 0.8, 0.8)
+            love.graphics.setColor(1,1,1)
+
+            -- reload audio button
+            love.graphics.setColor(0.75, 0.75, 0.75, 1)
+            love.graphics.rectangle("fill", 925, 80, 100, 20)
+            love.graphics.setColor(0,0,0)
+            love.graphics.rectangle("line", 925, 80, 100, 20)
+            love.graphics.setColor(0.2, 0.2, 0.2, 1)
+            -- text goes in the middle of the button
+            love.graphics.print("Reload Audio", 963 + (100/2) - (font:getWidth("Reload Audio")/2), 85 + (20/2) - (font:getHeight("Reload Audio")/2), 0, 0.55, 0.55)
+            love.graphics.setColor(1,1,1)
+
+            -- reload JSON button (under reload audio)
+            love.graphics.setColor(0.75, 0.75, 0.75, 1)
+            love.graphics.rectangle("fill", 925, 110, 100, 20)
+            love.graphics.setColor(0,0,0)
+            love.graphics.rectangle("line", 925, 110, 100, 20)
+            love.graphics.setColor(0.2, 0.2, 0.2, 1)
+            -- text goes in the middle of the button
+            love.graphics.print("Reload JSON", 960 + (100/2) - (font:getWidth("Reload JSON")/2), 115 + (20/2) - (font:getHeight("Reload JSON")/2), 0, 0.55, 0.55)
+            love.graphics.setColor(1,1,1)
+
+            
+        elseif tabs[2].selected then
+            -- section
+        elseif tabs[3].selected then
+            -- note
+        end
     end,
 
     leave = function()
