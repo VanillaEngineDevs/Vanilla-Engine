@@ -336,11 +336,6 @@ return {
             end
         end
 
-        --[[ tabs[1].selected = mx > 650 and mx < 650 + (500/4) and my > 30 and my < 30 + 40
-        tabs[2].selected = mx > 650 + (500/4) and mx < 650 + (500/4)*2 and my > 30 and my < 30 + 40
-        tabs[3].selected = mx > 650 + (500/4)*2 and mx < 650 + (500/4)*3 and my > 30 and my < 30 + 40
-        tabs[4].selected = mx > 650 + (500/4)*3 and mx < 650 + (500/4)*4 and my > 30 and my < 30 + 40 ]]
-
         if mx > 650 and mx < 650 + (500/4) and my > 30 and my < 30 + 40 then
             tabs[1].selected = true
             tabs[2].selected = false
@@ -405,7 +400,26 @@ return {
                 end
             end
         elseif tabs[2].selected then
+            local sec = _song.notes[curSection]
+            
+            if mx > 675 and mx < 675 + 20 and my > 110 and my < 110 + 20 then
+                if sec and sec.mustHitSection ~= nil then
+                    sec.mustHitSection = not sec.mustHitSection
+                    self:updateSectionUI()
+                    self:updateGrid()
+                end
+            end
         elseif tabs[3].selected then
+            -- love.graphics.rectangle("line", 725, 110, 20, 20)
+            -- love.graphics.rectangle("line", 745, 110, 20, 20)
+            -- left is +, right is -
+            -- if + is pressed, call self:changeNoteSustain with 60
+            -- if - is pressed, call self:changeNoteSustain with -60
+            if mx > 725 and mx < 725 + 20 and my > 110 and my < 110 + 20 then
+                self:changeNoteSustain(60)
+            elseif mx > 745 and mx < 745 + 20 and my > 110 and my < 110 + 20 then
+                self:changeNoteSustain(-60)
+            end
         elseif tabs[4].selected then
         end
     end,
@@ -576,6 +590,7 @@ return {
             if curSelectedNote[3] ~= nil then
                 curSelectedNote[3] = curSelectedNote[3] + v
                 curSelectedNote[3] = math.max(curSelectedNote[3], 0)
+                curSelectedNote.sustainLength = curSelectedNote[3]
             end
         end
 
@@ -750,9 +765,46 @@ return {
 
             
         elseif tabs[2].selected then
-            -- section
+            love.graphics.setColor(1,1,1)
+            love.graphics.rectangle("fill", 675, 110, 20, 20)
+            local sec = _song.notes[curSection]
+            -- if sec.mustHitSection, then print a checkmark
+            if sec and sec.mustHitSection then
+                love.graphics.setColor(0,0,0)
+                love.graphics.print("✓", 675, 110, 0, 1.45, 1)
+                love.graphics.setColor(1,1,1)
+            end
+            love.graphics.print("Must hit section", 700, 120, 0, 0.5, 0.5)
         elseif tabs[3].selected then
             -- note
+            -- +/- button for Sustain length of curSelectedNote (or 0)
+            love.graphics.setColor(1,1,1)
+            love.graphics.rectangle("fill", 675, 110, 50, 20)
+            love.graphics.setColor(0,0,0)
+            love.graphics.rectangle("line", 675, 110, 50, 20)
+            -- gray buttons
+            love.graphics.setColor(0.65, 0.65, 0.65, 1)
+            love.graphics.rectangle("fill", 725, 110, 20, 20)
+            love.graphics.rectangle("fill", 745, 110, 20, 20)
+            love.graphics.setColor(0,0,0)
+            love.graphics.rectangle("line", 725, 110, 20, 20)
+            love.graphics.rectangle("line", 745, 110, 20, 20)
+            love.graphics.print("+", 728, 110, 0, 0.8, 0.8)
+            love.graphics.print("-", 748, 110, 0, 0.8, 0.8)
+            love.graphics.print((curSelectedNote.sustainLength or 0), 680, 115, 0, 0.5, 0.5)
+            love.graphics.setColor(1,1,1)
+            love.graphics.print("Sustain Length:", 675, 93, 0, 0.5, 0.5)
+
+            -- text box for Strum time (in miliseconds)
+            love.graphics.setColor(1,1,1)
+            love.graphics.rectangle("fill", 675, 150, 200, 20)
+            love.graphics.setColor(0,0,0)
+            love.graphics.rectangle("line", 675, 150, 200, 20)
+            love.graphics.setColor(1,1,1)
+            love.graphics.print("Strum Time (in miliseconds):", 678, 135, 0, 0.5, 0.5)
+            love.graphics.setColor(0,0,0)
+            love.graphics.print((curSelectedNote.strumTime or 0), 680, 155, 0, 0.5, 0.5)
+            love.graphics.setColor(1,1,1)
         end
     end,
 
