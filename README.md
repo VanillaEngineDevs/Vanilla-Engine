@@ -1,3 +1,5 @@
+# DOWNLOAD NIGHTLY HERE: https://nightly.link/VanillaEngineDevs/Vanilla-Engine/workflows/build/main
+
 # ![Logo](images/logo.png)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/HTV04/funkin-rewritten?style=flat-square)](https://github.com/HTV04/funkin-rewritten/releases/latest) [![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/HTV04/funkin-rewritten?include_prereleases&style=flat-square)](https://github.com/HTV04/funkin-rewritten/releases) [![GitHub all releases](https://img.shields.io/github/downloads/HTV04/funkin-rewritten/total?style=flat-square)](https://github.com/HTV04/funkin-rewritten/releases) [![GitHub issues](https://img.shields.io/github/issues/HTV04/funkin-rewritten?style=flat-square)](https://github.com/HTV04/funkin-rewritten/issues) [![GitHub](https://img.shields.io/github/license/HTV04/funkin-rewritten?style=flat-square)](https://github.com/HTV04/funkin-rewritten/blob/main/LICENSE) [![Discord](https://img.shields.io/discord/852658576577003550?style=flat-square)](https://discord.gg/tQGzN2Wu48)
 
