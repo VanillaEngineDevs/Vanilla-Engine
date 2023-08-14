@@ -221,7 +221,6 @@ function love.load()
 	NoteSplash = require "modules.Splash"
 	require "modules.savedata"
 	loadSavedata()
-	Alphabet = require "modules.Alphabet"
 	
 	-- XML Modules
 	Sprite = require "modules.xml.Sprite"
