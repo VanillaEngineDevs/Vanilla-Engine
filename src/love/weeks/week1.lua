@@ -38,14 +38,14 @@ return {
 		stages["stage"]:load()
 
 		if song == 3 then
-			inst = love.audio.newSource("songs/week1/dadbattle/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week1/dadbattle/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/dadbattle/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/dadbattle/Voices.ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/week1/fresh/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week1/fresh/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/fresh/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/fresh/Voices.ogg", "stream")
 		else
-			inst = love.audio.newSource("songs/week1/bopeebo/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week1/bopeebo/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/bopeebo/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/bopeebo/Voices.ogg", "stream")
 		end
 
 		self:initUI()
@@ -57,11 +57,11 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/week1/dadbattle/dadbattle" .. difficulty .. ".json")
+			weeks:generateNotes("data/dadbattle/dadbattle" .. difficulty .. ".json")
 		elseif song == 2 then
-			weeks:generateNotes("data/week1/fresh/fresh" .. difficulty .. ".json")
+			weeks:generateNotes("data/fresh/fresh" .. difficulty .. ".json")
 		else
-			weeks:generateNotes("data/week1/bopeebo/bopeebo" .. difficulty .. ".json")
+			weeks:generateNotes("data/bopeebo/bopeebo" .. difficulty .. ".json")
 		end
 	end,
 

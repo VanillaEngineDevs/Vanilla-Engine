@@ -62,7 +62,7 @@ return {
 	initUI = function(self)
 		weeks:initUI()
 
-		weeks:generateNotes("data/tutorial/tutorial/tutorial" .. difficulty .. ".json")
+		weeks:generateNotes("data/tutorial/tutorial" .. difficulty .. ".json")
 	end,
 
 	update = function(self, dt)

@@ -30,6 +30,14 @@ for /d %%d in (*) do (
 	mkdir ..\dds\%%d
 	
 	for %%f in (%%d\*) do (
+		rem is it a folder? if so, loop through it
+		if exist %%f\* (
+			for /d %%g in (%%f\*) do (
+				%texconv% -f DXT5 -m 1 -nologo -o ..\dds\%%d\%%~ng -srgb -y %%g
+
+				rename ..\dds\%%d\%%~ng\%%~ng.DDS %%~ng.dds
+			)
+		)
 		%texconv% -f DXT5 -m 1 -nologo -o ..\dds\%%d -srgb -y %%f
 		
 		rename ..\dds\%%d\%%~nf.DDS %%~nf.dds

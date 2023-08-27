@@ -63,14 +63,14 @@ return {
 		end
 
 		if song == 3 then
-			inst = love.audio.newSource("songs/week6/thorns/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week6/thorns/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/thorns/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/thorns/Voices.ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/week6/roses/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week6/roses/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/roses/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/roses/Voices.ogg", "stream")
 		else
-			inst = love.audio.newSource("songs/week6/senpai/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week6/senpai/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/senpai/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/senpai/Voices.ogg", "stream")
 		end
 		enemy.x, enemy.y = -340, -20
 
@@ -81,9 +81,9 @@ return {
 		weeks:initUI("pixel")
 
 		if song == 3 then
-			weeks:generateNotes("data/week6/thorns/thorns" .. difficulty .. ".json")
+			weeks:generateNotes("data/thorns/thorns" .. difficulty .. ".json")
 			if storyMode and not died then
-				dialogue.set("data/week6/thorns/thornsDialogue.txt")
+				dialogue.set("data/thorns/thornsDialogue.txt")
 				dialogue.addSpeaker("dad", graphics.newImage(graphics.imagePath("week6/spiritFaceForward")), 400, 250, 6, 6, false)
 				dialogue.setSpeakerBox("dad", love.filesystem.load("sprites/week6/scaryDialogueBox.lua")(), 650, 375, 6, 6, true, false)
 
@@ -101,9 +101,9 @@ return {
 				weeks:setupCountdown()
 			end
 		elseif song == 2 then
-			weeks:generateNotes("data/week6/roses/roses" .. difficulty .. ".json")
+			weeks:generateNotes("data/roses/roses" .. difficulty .. ".json")
 			if storyMode and not died then
-				dialogue.set("data/week6/roses/rosesDialogue.txt")
+				dialogue.set("data/roses/rosesDialogue.txt")
 				dialogue.addSpeaker("dad", love.filesystem.load("sprites/week6/angrySenpaiBox.lua")(), 650, 375, 6, 6, true, false)
 				dialogue.removeSpeakerBox("dad")
 
@@ -121,9 +121,9 @@ return {
 				weeks:setupCountdown()
 			end
 		else
-			weeks:generateNotes("data/week6/senpai/senpai" .. difficulty .. ".json")
+			weeks:generateNotes("data/senpai/senpai" .. difficulty .. ".json")
 			if storyMode and not died then
-				dialogue.set("data/week6/senpai/senpaiDialogue.txt")
+				dialogue.set("data/senpai/senpaiDialogue.txt")
 
 				dialogue.addSpeaker("dad", love.filesystem.load("sprites/week6/senpaiPortrait.lua")(), 650, 375, 6, 6, true)
 				dialogue.setSpeakerBox("dad", love.filesystem.load("sprites/week6/dialogueBox.lua")(), 650, 375, 6, 6, true)

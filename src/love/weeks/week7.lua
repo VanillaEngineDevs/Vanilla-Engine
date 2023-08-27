@@ -40,18 +40,18 @@ return {
 				video:play()
 			end
 
-			inst = love.audio.newSource("songs/week7/stress/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week7/stress/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/stress/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/stress/Voices.ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/week7/guns/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week7/guns/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/guns/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/guns/Voices.ogg", "stream")
 			if storyMode and not died then
 				video = cutscene.video("videos/gunsCutscene.ogv")
 				video:play()
 			end
 		else
-			inst = love.audio.newSource("songs/week7/ugh/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week7/ugh/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/ugh/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/ugh/Voices.ogg", "stream")
 			if storyMode and not died then
 				video = cutscene.video("videos/ughCutscene.ogv")
 				video:play()
@@ -69,8 +69,8 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/week7/stress/stress" .. difficulty .. ".json")
-            weeks:generateGFNotes("data/week7/stress/picospeaker.json")
+			weeks:generateNotes("data/stress/stress" .. difficulty .. ".json")
+            weeks:generateGFNotes("data/stress/picospeaker.json")
 
 			tankmanRunImg = love.graphics.newImage(graphics.imagePath("week7/tankmanKilled1"))
 
@@ -91,9 +91,9 @@ return {
 				end
 			end
 		elseif song == 2 then
-			weeks:generateNotes("data/week7/guns/guns" .. difficulty .. ".json")
+			weeks:generateNotes("data/guns/guns" .. difficulty .. ".json")
 		else
-			weeks:generateNotes("data/week7/ugh/ugh" .. difficulty .. ".json")
+			weeks:generateNotes("data/ugh/ugh" .. difficulty .. ".json")
 		end
 	end,
 

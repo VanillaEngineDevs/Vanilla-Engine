@@ -32,8 +32,8 @@ return {
 		camera.defaultZoom = 1.1
 
 		sounds["thunder"] = {
-			love.audio.newSource("sounds/week2/thunder1.ogg", "static"),
-			love.audio.newSource("sounds/week2/thunder2.ogg", "static")
+			love.audio.newSource("sounds/thunder1.ogg", "static"),
+			love.audio.newSource("sounds/thunder2.ogg", "static")
 		}
 
 		enemyIcon:animate("skid and pump", false)
@@ -46,20 +46,20 @@ return {
 		stages["hauntedHouse"]:load()
 
 		if song == 3 then
-			enemy = love.filesystem.load("sprites/week2/monster.lua")()
+			enemy = love.filesystem.load("sprites/monster.lua")()
 
 			enemy.x, enemy.y = -610, 120
 
 			enemyIcon:animate("monster", false)
 
-			inst = love.audio.newSource("songs/week2/monster/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week2/monster/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/monster/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/monster/Voices.ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/week2/south/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week2/south/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/south/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/south/Voices.ogg", "stream")
 		else
-			inst = love.audio.newSource("songs/week2/spookeez/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week2/spookeez/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/spookeez/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/spookeez/Voices.ogg", "stream")
 		end
 
 		self:initUI()
@@ -71,11 +71,11 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/week2/monster/monster" .. difficulty .. ".json")
+			weeks:generateNotes("data/monster/monster" .. difficulty .. ".json")
 		elseif song == 2 then
-			weeks:generateNotes("data/week2/south/south" .. difficulty .. ".json")
+			weeks:generateNotes("data/south/south" .. difficulty .. ".json")
 		else
-			weeks:generateNotes("data/week2/spookeez/spookeez" .. difficulty .. ".json")
+			weeks:generateNotes("data/spookeez/spookeez" .. difficulty .. ".json")
 		end
 	end,
 

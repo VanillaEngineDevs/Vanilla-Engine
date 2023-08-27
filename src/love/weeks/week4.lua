@@ -40,14 +40,14 @@ return {
 		stages["sunset"]:load()
 
 		if song == 3 then
-			inst = love.audio.newSource("songs/week4/milf/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week4/milf/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/milf/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/milf/Voices.ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/week4/high/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week4/high/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/high/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/high/Voices.ogg", "stream")
 		else
-			inst = love.audio.newSource("songs/week4/satin-panties/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week4/satin-panties/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/satin-panties/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/satin-panties/Voices.ogg", "stream")
 		end
 
 		self:initUI()
@@ -59,11 +59,11 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/week4/milf/milf" .. difficulty .. ".json")
+			weeks:generateNotes("data/milf/milf" .. difficulty .. ".json")
 		elseif song == 2 then
-			weeks:generateNotes("data/week4/high/high" .. difficulty .. ".json")
+			weeks:generateNotes("data/high/high" .. difficulty .. ".json")
 		else
-			weeks:generateNotes("data/week4/satin-panties/satin-panties" .. difficulty .. ".json")
+			weeks:generateNotes("data/satin-panties/satin-panties" .. difficulty .. ".json")
 		end
 	end,
 

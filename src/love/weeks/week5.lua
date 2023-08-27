@@ -32,8 +32,8 @@ return {
 		camera.zoom = 0.7
 		camera.defaultZoom = 0.7
 
-		sounds.lightsOff = love.audio.newSource("sounds/week5/lights-off.ogg", "static")
-		sounds.lightsOn = love.audio.newSource("sounds/week5/lights-on.ogg", "static")
+		sounds.lightsOff = love.audio.newSource("sounds/lights-off.ogg", "static")
+		sounds.lightsOn = love.audio.newSource("sounds/lights-on.ogg", "static")
 
 		song = songNum
 		difficulty = songAppend
@@ -59,20 +59,20 @@ return {
 				camera.zoom = 0.9
 			end
 
-			enemy = love.filesystem.load("sprites/week5/monster.lua")()
+			enemy = love.filesystem.load("sprites/monster.lua")()
 
 			enemy.x, enemy.y = -780, 420
 
 			enemyIcon:animate("monster", false)
 
-			inst = love.audio.newSource("songs/week5/winter-horrorland/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week5/winter-horrorland/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/winter-horrorland/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/winter-horrorland/Voices.ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/week5/eggnog/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week5/eggnog/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/eggnog/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/eggnog/Voices.ogg", "stream")
 		else
-			inst = love.audio.newSource("songs/week5/cocoa/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/week5/cocoa/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/cocoa/Inst.ogg", "stream")
+			voices = love.audio.newSource("songs/cocoa/Voices.ogg", "stream")
 		end
 
 		self:initUI()
@@ -99,11 +99,11 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/week5/winter-horrorland/winter-horrorland" .. difficulty .. ".json")
+			weeks:generateNotes("data/winter-horrorland/winter-horrorland" .. difficulty .. ".json")
 		elseif song == 2 then
-			weeks:generateNotes("data/week5/eggnog/eggnog" .. difficulty .. ".json")
+			weeks:generateNotes("data/eggnog/eggnog" .. difficulty .. ".json")
 		else
-			weeks:generateNotes("data/week5/cocoa/cocoa" .. difficulty .. ".json")
+			weeks:generateNotes("data/cocoa/cocoa" .. difficulty .. ".json")
 		end
 	end,
 
