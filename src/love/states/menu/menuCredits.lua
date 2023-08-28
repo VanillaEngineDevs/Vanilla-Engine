@@ -69,7 +69,7 @@ return {
                 members = {
                     {name = CreateText("GuglioIsStupid"), desc = "Lead Programmer", selected = false},
                     {name = CreateText("Getsaa"), desc = "Menu Design"},
-                    {name = CreateText("c l o t h i n g h a n g e r", desc = "Former Programmer"), selected = false},
+                    {name = CreateText("clothing hanger"), desc = "Former Programmer", selected = false},
                 }
             },
             ["Funkin Rewritten"] = {
@@ -116,7 +116,7 @@ return {
         end
 
         options = {}
-        extraSpaceIndexes = {3, 4, 9} -- if curOption is at these, add an extra 75 to yOffset
+        extraSpaceIndexes = {4, 5, 10} -- if curOption is at these, add an extra 75 to yOffset
 
         -- add options (heading names and member names) in order
         for i, heading in ipairs(headingOrder) do
