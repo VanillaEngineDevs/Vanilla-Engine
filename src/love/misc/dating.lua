@@ -412,6 +412,64 @@ return {
         end
     end,
 
+    -- same stuff as mouse stuff, but with touch
+    touchpressed = function(self, id, x, y, dx, dy, pressure)
+        if not isButtonPress and not inDialogue then
+            loveScore = loveScore + 1
+            if loveScore >= loveScoreMax then
+                if loveLevel < loveLevelMax then
+                    loveLevel = loveLevel + 1
+                    loveScore = 0
+                    loveScoreMax = loveScoreMax + 5
+
+                    inDialogue = true
+                    dialogue:setDialogue(dialogues["Levels"][loveLevel])
+                    dialogue.callback = function()
+                        inDialogue = false
+                    end
+                else
+                    loveScore = loveScoreMax
+                end
+            end
+        elseif not inDialogue then
+            if isButtonPress then
+                -- check which button label has >
+                for i, button in ipairs(buttons) do
+                    if button.label:find(">") then
+                        inDialogue = true
+                        dialogue:setDialogue(dialogues[button.label:gsub(">", "")][loveLevel])
+                        dialogue.callback = function()
+                            inDialogue = false
+                        end
+                        break
+                    end
+                end
+            end
+        else
+            dialogue:advance()
+        end
+    end,
+
+    touchmoved = function(self, id, x, y, dx, dy, pressure)
+        for i, button in ipairs(buttons) do
+            if x > 0 and x < 400 and y > 100*i and y < 100*i + 100 and not inDialogue then
+                -- remove the ">" if it exists
+                for j, button in ipairs(buttons) do
+                    button.label = button.label:gsub(">", "")
+                end
+                button.label = ">" .. button.label
+
+                isButtonPress = true
+
+                break
+            elseif not inDialogue then
+                button.label = button.label:gsub(">", "")
+
+                isButtonPress = false
+            end
+        end
+    end,
+
     draw = function(self)
         love.graphics.push()
             love.graphics.push()

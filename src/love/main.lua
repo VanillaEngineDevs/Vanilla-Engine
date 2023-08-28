@@ -607,6 +607,14 @@ function love.mousemoved(x, y, dx, dy, istouch)
 	Gamestate.mousemoved(x, y, dx, dy, istouch)
 end
 
+function love.touchpressed(id, x, y, dx, dy, pressure)
+	Gamestate.touchpressed(id, x, y, dx, dy, pressure)
+end
+
+function love.touchmoved(id, x, y, dx, dy, pressure)
+	Gamestate.touchmoved(id, x, y, dx, dy, pressure)
+end
+
 function love.update(dt)
 	dt = math.min(dt, 1 / 30)
 
