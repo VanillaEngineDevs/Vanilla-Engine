@@ -69,6 +69,7 @@ return {
                 members = {
                     {name = CreateText("GuglioIsStupid"), desc = "Lead Programmer", selected = false},
                     {name = CreateText("Getsaa"), desc = "Menu Design"},
+                    {name = CreateText("c l o t h i n g h a n g e r", desc = "Former Programmer"), selected = false},
                 }
             },
             ["Funkin Rewritten"] = {
@@ -177,6 +178,13 @@ return {
             if curSelected > #options then
                 curSelected = 1
             end
+        end
+
+        if input:pressed("gameBack") then
+            graphics:fadeOutWipe(0.5,
+            function()
+                Gamestate.switch(menuSelect)
+            end)
         end
 
         -- util.coolLerp to new yOffset
