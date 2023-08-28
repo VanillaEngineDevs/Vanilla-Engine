@@ -195,7 +195,7 @@ dialogues = {
     }
 }
 
-dialogue = {
+local dialogue = {
     dialogue = {},
     cur = 1,
     timer = 0,
