@@ -577,7 +577,10 @@ return graphics.newSprite(
 	},
 	{
 		["a"] = {start = 185, stop = 188, speed = 24, offsetX = 0, offsetY = 0},
-		["b"] = {start = 205, stop = 208, speed = 24, offsetX = 0, offsetY = 0}
+		["a lower"] = {start = 189, stop = 204, speed = 24, offsetX = 0, offsetY = 0},
+		["b"] = {start = 205, stop = 208, speed = 24, offsetX = 0, offsetY = 0},
+		["b lower"] = {start = 209, stop = 224, speed = 24, offsetX = 0, offsetY = 0},
+
 	},
 	"a",
 	true

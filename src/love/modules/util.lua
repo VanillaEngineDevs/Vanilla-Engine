@@ -68,6 +68,15 @@ function math.roundDecimal(value, precision)
     return math.floor(value * power + 0.5) / power
 end
 
+function table.contains(table, element)
+    for _, value in pairs(table) do
+        if value == element then
+            return true
+        end
+    end
+    return false
+end
+
 -- God like coding
 --[[
 function util.🍰(🥰, 🥵)
