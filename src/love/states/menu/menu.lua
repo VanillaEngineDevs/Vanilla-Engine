@@ -7,7 +7,7 @@ local menuNum = 1
 local songNum, songAppend
 local songDifficulty = 2
 
-local transparency
+local transparency, isMatpat
 
 return {
 	enter = function(self, previous)
@@ -41,10 +41,24 @@ return {
 		)
 		titleBG = graphics.newImage(graphics.imagePath("menu/titleBG"))
 		changingMenu = false
-		logo = love.filesystem.load("sprites/ve-logo.lua")()
+		isMatpat = love.math.random(0, 200) == 0
+		if isMatpat then
+			logo = love.filesystem.load("sprites/menu/matpat.lua")()
+		else
+			logo = love.filesystem.load("sprites/ve-logo.lua")()
+		end
 		
 		girlfriendTitle = love.filesystem.load("sprites/menu/girlfriend-title.lua")()
-		logo:animate("anim", false)
+		function AnimateLogo()
+			logo:animate("anim", false, function()
+				if isMatpat then
+					Timer.after(0.25, AnimateLogo)
+				else
+					AnimateLogo()
+				end
+			end)
+		end
+		AnimateLogo()
 
 		girlfriendTitle:setAnimSpeed(14.4 / (60 / 102))
 
@@ -71,7 +85,7 @@ return {
 		beatHandler.update(dt)
 
 		if beatHandler.onBeat() then 
-			if logo then logo:animate("anim", false) end
+			if logo then logo:animate("anim", true) end
 		end
 
 		if not graphics.isFading() then
