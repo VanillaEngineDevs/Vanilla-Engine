@@ -177,5 +177,6 @@ return graphics.newSprite(
 		sing_duration = 4,
 		isCharacter = true,
 		flipX = true,
+		icon = "tankman"
 	}
 )

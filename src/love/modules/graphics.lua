@@ -219,6 +219,7 @@ return {
 			danced = false,
 
 			setSheet = function(self, imageData)
+				if self.isCharacter then self.icon = self.icon or "boyfriend" end
 				sheet = imageData
 				sheetWidth = sheet:getWidth()
 				sheetHeight = sheet:getHeight()
@@ -318,12 +319,20 @@ return {
 				end
 			end,
 
-			getFrameWidth = function(self)
-				return frameData[self.curFrame or 1].width
+			getFrameWidth = function(self, anim)
+				if anim and anims then
+					return frameData[anims[anim].stop].width
+				else
+					return frameData[curFrame or 1].width
+				end
 			end,
 
-			getFrameHeight = function(self)
-				return frameData[self.curFrame or 1].height
+			getFrameHeight = function(self, anim)
+				if anim and anims then
+					return frameData[anims[anim].stop].height
+				else
+					return frameData[curFrame or 1].height
+				end
 			end,
 
 			beat = function(self, beat)

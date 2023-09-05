@@ -687,7 +687,7 @@ function love.draw()
 	end
 	-- Debug output
 	if settings.showDebug then
-		--borderedText(status.getDebugStr(settings.showDebug), 5, 5, nil, 0.6, 0.6)
+		borderedText(status.getDebugStr(settings.showDebug), 5, 5, nil, 0.6, 0.6)
 	end
 end
 

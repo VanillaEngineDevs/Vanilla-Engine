@@ -176,17 +176,7 @@ return {
 				end
 			end
 		end
-
-		if health >= 1.595 then
-            if enemyIcon:getAnimName() == "tankman" then
-                enemyIcon:animate("tankman losing", false)
-            end
-        else
-            if enemyIcon:getAnimName() == "tankman losing" then
-                enemyIcon:animate("tankman", false)
-            end
-        end
-
+		
 		weeks:checkSongOver()
 
 		weeks:updateUI(dt)

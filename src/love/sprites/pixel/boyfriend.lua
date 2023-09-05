@@ -163,6 +163,7 @@ return graphics.newSprite(
 	true,
 	{
 		sing_duration = 4,
-		isCharacter = true
+		isCharacter = true,
+		icon = "boyfriend (pixel)"
 	}
 )

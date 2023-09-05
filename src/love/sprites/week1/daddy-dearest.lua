@@ -79,5 +79,6 @@ return graphics.newSprite(
 	{
 		sing_duration = 6.1,
 		isCharacter = true,
+		icon = "dad"
 	}
 )

@@ -73,16 +73,6 @@ return {
 			boyfriend:animate("hey", false)
 		end
 
-		if health >= 1.595 then
-			if enemyIcon:getAnimName() == "dad" then
-				enemyIcon:animate("dad losing", false)
-			end
-		else
-			if enemyIcon:getAnimName() == "dad losing" then
-				enemyIcon:animate("dad", false)
-			end
-		end
-
 		weeks:checkSongOver()
 
 		weeks:updateUI(dt)

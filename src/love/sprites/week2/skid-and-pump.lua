@@ -119,6 +119,7 @@ return graphics.newSprite(
 	false,
 	{
 		sing_duration = 4,
-		isCharacter = true
+		isCharacter = true,
+		icon = "skid and pump"
 	}
 )

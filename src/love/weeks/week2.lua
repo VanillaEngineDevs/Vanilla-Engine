@@ -32,8 +32,8 @@ return {
 		camera.defaultZoom = 1.1
 
 		sounds["thunder"] = {
-			love.audio.newSource("sounds/thunder1.ogg", "static"),
-			love.audio.newSource("sounds/thunder2.ogg", "static")
+			love.audio.newSource("sounds/week2/thunder1.ogg", "static"),
+			love.audio.newSource("sounds/week2/thunder2.ogg", "static")
 		}
 
 		enemyIcon:animate("skid and pump", false)
@@ -86,28 +86,6 @@ return {
 		if beatHandler.onBeat() then
 			if enemy:getAnimName() == "idle" then
 				enemy:setAnimSpeed(14.4 / (120 / bpm))
-			end
-		end
-
-		if song == 3 then
-			if health >= 1.595 then
-				if enemyIcon:getAnimName() == "monster" then
-					enemyIcon:animate("monster losing", false)
-				end
-			else
-				if enemyIcon:getAnimName() == "monster losing" then
-					enemyIcon:animate("monster", false)
-				end
-			end
-		else
-			if health >= 1.595 then
-				if enemyIcon:getAnimName() == "skid and pump" then
-					enemyIcon:animate("skid and pump losing", false)
-				end
-			else
-				if enemyIcon:getAnimName() == "skid and pump losing" then
-					enemyIcon:animate("skid and pump", false)
-				end
 			end
 		end
 

@@ -1383,20 +1383,28 @@ return {
 			end
 		end
 
+		-- Enemy
+		if health >= 1.595 then
+			if enemyIcon:getAnimName() == enemy.icon then
+				enemyIcon:animate(enemy.icon .. " losing", false)
+			end
+		elseif health < 1.595 then
+			if enemyIcon:getAnimName() == enemy.icon .. " losing" then
+				enemyIcon:animate(enemy.icon, false)
+			end
+		end
+
+		-- Boyfriend
 		if health > 2 then
 			health = 2
-		elseif health > 0.325 and boyfriendIcon:getAnimName() == "boyfriend losing" then
-			if not pixel then 
-				boyfriendIcon:animate(bf, false)
-			else
-				boyfriendIcon:animate("boyfriend (pixel)", false)
-			end
+		elseif health > 0.325 and boyfriendIcon:getAnimName() == boyfriend.icon .. " losing" then
+			boyfriendIcon:animate(boyfriend.icon, false)
 		elseif health <= 0 then -- Game over
 			if not settings.practiceMode then Gamestate.push(gameOver) end
 			health = 0
-		elseif health <= 0.325 and boyfriendIcon:getAnimName() == bf then
+		elseif health <= 0.325 and boyfriendIcon:getAnimName() == boyfriend.icon then
 			if not pixel then 
-				boyfriendIcon:animate("boyfriend losing", false)
+				boyfriendIcon:animate(boyfriend.icon .. " losing", false)
 			end
 		end
 
@@ -1653,19 +1661,26 @@ return {
 	drawHealthbar = function(self, visibility)
 		local visibility = visibility or 1
 		love.graphics.push()
-			love.graphics.push()
-				graphics.setColor(0,0,0,settings.scrollUnderlayTrans)
-				if settings.middleScroll and not settings.multiplayer then
-					love.graphics.rectangle("fill", 400, -100, 90 + 170 * 2.35, 1000)
-				else
-					love.graphics.rectangle("fill", 755, -100, 90 + 170 * 2.35, 1000)
-				end
-				graphics.setColor(1,1,1,1)
-			love.graphics.pop()
 			love.graphics.translate(push:getWidth() / 2, push:getHeight() / 2)
 			love.graphics.scale(0.7, 0.7)
 			love.graphics.scale(uiScale.zoom, uiScale.zoom)
+			love.graphics.push()
+				graphics.setColor(0,0,0,settings.scrollUnderlayTrans)
+				local baseX = boyfriendArrows[1].x - (boyfriendArrows[1]:getFrameWidth(noteList[i])/2)
+				local scrollWidth = 0
+				-- determine the scrollWidth with the first 4 arrows
+				for i = 1, 4 do
+					scrollWidth = scrollWidth + boyfriendArrows[i]:getFrameWidth(noteList[i])
+				end
+				scrollWidth = scrollWidth + 30
 
+				if settings.middleScroll and not settings.multiplayer then
+					love.graphics.rectangle("fill", baseX, -550, scrollWidth, 1280)
+				else
+					love.graphics.rectangle("fill", baseX, -550, scrollWidth, 1280)
+				end
+				graphics.setColor(1,1,1,1)
+			love.graphics.pop()
 			graphics.setColor(1, 1, 1, visibility)
 			graphics.setColor(1, 0, 0)
 			love.graphics.rectangle("fill", -500, 350+downscrollOffset, 1000, 25)

@@ -109,16 +109,6 @@ return {
 		weeks:update(dt)
 		stages["stage"]:update(dt)
 
-		if health >= 1.595 then
-			if enemyIcon:getAnimName() == "dad" then
-				enemyIcon:animate("dad losing", false)
-			end
-		else
-			if enemyIcon:getAnimName() == "dad losing" then
-				enemyIcon:animate("dad", false)
-			end
-		end
-
         for i = 1, 4 do
             local strumline = boyfriendArrows[i]
             local strumline2 = enemyArrows[i]

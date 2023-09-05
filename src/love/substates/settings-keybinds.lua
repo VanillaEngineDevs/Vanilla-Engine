@@ -6,6 +6,32 @@ local inputList = {
     "gameUp",
     "gameRight"
 }
+local invalidkeys = {
+    ["space"] = " ",
+    ["return"] = "enter",
+    ["tab"] = "tab",
+    ["backspace"] = "backspace",
+    ["delete"] = "delete",
+    ["insert"] = "insert",
+    ["home"] = "home",
+    ["end"] = "end",
+    ["pageup"] = "pageup",
+    ["pagedown"] = "pagedown",
+    ["escape"] = "escape",
+    ["pause"] = "pause",
+    ["numlock"] = "numlock",
+    ["capslock"] = "capslock",
+    ["scrolllock"] = "scrolllock",
+    ["rshift"] = "rshift",
+    ["lshift"] = "lshift",
+    ["rctrl"] = "rctrl",
+    ["lctrl"] = "lctrl",
+    ["ralt"] = "ralt",
+    ["lalt"] = "lalt",
+    ["rsuper"] = "rsuper",
+    ["lsuper"] = "lsuper",
+    ["menu"] = "menu",
+}
 local curInput = inputList[i]
 return {
     enter = function(self)
@@ -75,6 +101,9 @@ return {
     end,
     textinput = function(self, text)
         if doBindSet then
+            if invalidkeys[text] then
+                text = invalidkeys[text]
+            end
             if choice == 1 then
                 customBindLeft = text
             elseif choice == 2 then

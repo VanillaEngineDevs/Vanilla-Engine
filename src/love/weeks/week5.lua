@@ -112,28 +112,6 @@ return {
 			weeks:update(dt)
 			stages["mall"]:update(dt)
 
-			if song == 3 then
-				if health >= 1.595 then
-					if enemyIcon:getAnimName() == "monster" then
-						enemyIcon:animate("monster losing", false)
-					end
-				else
-					if enemyIcon:getAnimName() == "monster losing" then
-						enemyIcon:animate("monster", false)
-					end
-				end
-			else
-				if health >= 1.595 then
-					if enemyIcon:getAnimName() == "dearest duo" then
-						enemyIcon:animate("dearest duo losing", false)
-					end
-				else
-					if enemyIcon:getAnimName() == "dearest duo losing" then
-						enemyIcon:animate("dearest duo", false)
-					end
-				end
-			end
-
 			if not (scaryIntro or countingDown or graphics.isFading()) and not (inst:isPlaying() and voices:isPlaying()) and not paused then
 				if storyMode and song < 3 then
 					weeks:saveData()
