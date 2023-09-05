@@ -194,7 +194,11 @@ return {
 		end
 		useAltAnims = false
 
-		camera.x, camera.y = -boyfriend.x + 100, -boyfriend.y + 75
+		if boyfriend then
+			camera.x, camera.y = -boyfriend.x + 100, -boyfriend.y + 75
+		else
+			camera.x, camera.y = 0, 0
+		end
 
 		curWeekData = weekData[weekNum]
 
@@ -213,12 +217,20 @@ return {
 		combo = 0
 
 		if enemy then enemy:animate("idle") end
-		boyfriend:animate("idle")
+		if boyfriend then boyfriend:animate("idle") end
 
-		if not camera.points["boyfriend"] then camera:addPoint("boyfriend", -boyfriend.x + 100, -boyfriend.y + 75) end
+		if not camera.points["boyfriend"] then
+			if boyfriend then 
+				camera:addPoint("boyfriend", -boyfriend.x + 100, -boyfriend.y + 75) 
+			else
+				camera:addPoint("boyfriend", 0, 0)
+			end
+		end
 		if not camera.points["enemy"] then 
 			if enemy then
 				camera:addPoint("enemy", -enemy.x - 100, -enemy.y + 75) 
+			else
+				camera:addPoint("enemy", 0, 0)
 			end
 		end
 
@@ -1063,13 +1075,13 @@ return {
 			uiScale.zoom = util.lerp(1, uiScale.zoom, util.clamp(1 - (dt * 3.125), 0, 1))
 		end
 
-		girlfriend:update(dt)
-		enemy:update(dt)
-		boyfriend:update(dt)
+		if girlfriend then girlfriend:update(dt) end
+		if enemy then enemy:update(dt) end
+		if boyfriend then boyfriend:update(dt) end
 
-		boyfriend:beat(beatHandler.getBeat())
-		enemy:beat(beatHandler.getBeat())
-		girlfriend:beat(beatHandler.getBeat())
+		if boyfriend then boyfriend:beat(beatHandler.getBeat()) end
+		if enemy then enemy:beat(beatHandler.getBeat()) end
+		if girlfriend then girlfriend:beat(beatHandler.getBeat()) end
 	end,
 
 	updateUI = function(self, dt)
@@ -1113,39 +1125,26 @@ return {
 						enemyArrow.orientation = enemyArrow.orientation + arrowAngles[i]
 					end
 
-					if enemyNote[1].ver ~= "GF Sing" then
-						if enemyNote[1]:getAnimName() == "hold" or enemyNote[1]:getAnimName() == "end" then
-							if useAltAnims then
-								if enemy.holdTimer > enemy.maxHoldTimer then enemy:animate(curAnim .. " alt", _psychmod and true or false) end
-							else
-								if enemy.holdTimer > enemy.maxHoldTimer then enemy:animate(curAnim, (_psychmod and true or false)) end
-							end
-						else
-							if useAltAnims then
-								enemy:animate(curAnim .. " alt", false)
-							else
-								enemy:animate(curAnim, false)
-							end
-						end
-
-						enemy.lastHit = musicTime
-					else
-						if enemyNote[1]:getAnimName() == "hold" or enemyNote[1]:getAnimName() == "end" then
-							if useAltAnims then
-								if girlfriend.holdTimer > enemy.maxHoldTimer then girlfriend:animate(curAnim .. " alt", _psychmod and true or false) end
-							else
-								if girlfriend.holdTimer > enemy.maxHoldTimer then girlfriend:animate(curAnim, (_psychmod and true or false)) end
-							end
-						else
-							if useAltAnims then
-								girlfriend:animate(curAnim .. " alt", false)
-							else
-								girlfriend:animate(curAnim, false)
-							end
-						end
-
-						girlfriend.lastHit = musicTime
+					local whohit = enemy
+					if enemyNote[1].ver == "GF Sing" then
+						whohit = girlfriend
 					end
+
+					if enemyNote[1]:getAnimName() == "hold" or enemyNote[1]:getAnimName() == "end" then
+						if useAltAnims then
+							if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim .. " alt", _psychmod and true or false) end
+						else
+							if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim, (_psychmod and true or false)) end
+						end
+					else
+						if useAltAnims then
+							if whohit then whohit:animate(curAnim .. " alt", false) end
+						else
+							if whohit then whohit:animate(curAnim, false) end
+						end
+					end
+
+					if whohit then whohit.lastHit = musicTime end
 
 					if not mustHitSection then 
 						noteCamTweens[i]()
@@ -1157,7 +1156,7 @@ return {
 
 			if #gfNote > 0 then
 				if gfNote[1].time - musicTime <= 0 then
-					girlfriend:animate(curAnim, false)
+					if girlfriend then girlfriend:animate(curAnim, false) end
 
 					table.remove(gfNote, 1)
 				end
@@ -1178,9 +1177,9 @@ return {
 
 					table.remove(boyfriendNote, 1)
 
-					boyfriend:animate(curAnim .. " miss", false)
+					if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
 
-					if combo >= 5 then girlfriend:animate("sad", false) end
+					if combo >= 5 and girlfriend then girlfriend:animate("sad", false) end
 
 					combo = 0
 				end
@@ -1196,12 +1195,12 @@ return {
 						boyfriendArrow.orientation = boyfriendArrow.orientation + arrowAngles[i]
 
 						if boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end" then
-							if boyfriend.holdTimer >= boyfriend.maxHoldTimer then boyfriend:animate(curAnim, false) end
+							if boyfriend and boyfriend.holdTimer >= boyfriend.maxHoldTimer then boyfriend:animate(curAnim, false) end
 						else
-							boyfriend:animate(curAnim, false)
+							if boyfriend then boyfriend:animate(curAnim, false) end
 						end
 
-						boyfriend.lastHit = musicTime
+						if boyfriend then boyfriend.lastHit = musicTime end
 
 						if boyfriendNote[1]:getAnimName() ~= "hold" and boyfriendNote[1]:getAnimName() ~= "end" then 
 							noteCounter = noteCounter + 1
@@ -1269,7 +1268,7 @@ return {
 
 								if voices then voices:setVolume(1) end
 
-								boyfriend.lastHit = musicTime
+								if boyfriend then boyfriend.lastHit = musicTime end
 
 								if notePos <= 55 then -- "Sick"
 									score = score + 350
@@ -1321,7 +1320,7 @@ return {
 									boyfriendArrow.orientation = boyfriendArrow.orientation - arrowAngles[boyfriendNote[1].col]
 									boyfriendArrow.orientation = boyfriendArrow.orientation + arrowAngles[i]
 
-									boyfriend:animate(curAnim, false)
+									if boyfriend then boyfriend:animate(curAnim, false) end
 
 									if boyfriendNote[j]:getAnimName() ~= "hold" and boyfriendNote[j]:getAnimName() ~= "end" then
 										health = health + 0.095
@@ -1347,9 +1346,9 @@ return {
 
 					notMissed[noteNum] = false
 
-					if combo >= 5 then girlfriend:animate("sad", false) end
+					if combo >= 5 and girlfriend then girlfriend:animate("sad", false) end
 
-					boyfriend:animate(curAnim .. " miss", false)
+					if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
 
 					score = score - 10
 					combo = 0
@@ -1370,8 +1369,8 @@ return {
 
 				health = health + 0.0125
 
-				if boyfriend.holdTimer > boyfriend.maxHoldTimer then
-					boyfriend:animate(curAnim, false)
+				if boyfriend and boyfriend.holdTimer > boyfriend.maxHoldTimer then
+					if boyfriend then boyfriend:animate(curAnim, false) end
 				end
 
 				table.remove(boyfriendNote, 1)
@@ -1385,26 +1384,26 @@ return {
 
 		-- Enemy
 		if health >= 1.595 then
-			if enemyIcon:getAnimName() == enemy.icon then
-				enemyIcon:animate(enemy.icon .. " losing", false)
+			if enemyIcon:getAnimName() == (enemy and enemy.icon or "boyfriend") then
+				enemyIcon:animate((enemy and enemy.icon or "boyfriend") .. " losing", false)
 			end
 		elseif health < 1.595 then
-			if enemyIcon:getAnimName() == enemy.icon .. " losing" then
-				enemyIcon:animate(enemy.icon, false)
+			if enemyIcon:getAnimName() == (enemy and enemy.icon or "boyfriend") .. " losing" then
+				enemyIcon:animate(enemy and enemy.icon or "boyfriend", false)
 			end
 		end
 
 		-- Boyfriend
 		if health > 2 then
 			health = 2
-		elseif health > 0.325 and boyfriendIcon:getAnimName() == boyfriend.icon .. " losing" then
-			boyfriendIcon:animate(boyfriend.icon, false)
+		elseif health > 0.325 and boyfriendIcon:getAnimName() == (boyfriend and boyfriend.icon or "boyfriend") .. " losing" then
+			boyfriendIcon:animate(boyfriend and boyfriend.icon or "boyfriend", false)
 		elseif health <= 0 then -- Game over
 			if not settings.practiceMode then Gamestate.push(gameOver) end
 			health = 0
-		elseif health <= 0.325 and boyfriendIcon:getAnimName() == boyfriend.icon then
+		elseif health <= 0.325 and (boyfriend and boyfriendIcon:getAnimName()) == boyfriend.icon then
 			if not pixel then 
-				boyfriendIcon:animate(boyfriend.icon .. " losing", false)
+				boyfriendIcon:animate((boyfriend and boyfriend.icon or "boyfriend") .. " losing", false)
 			end
 		end
 

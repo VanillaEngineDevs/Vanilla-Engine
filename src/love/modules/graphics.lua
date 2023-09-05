@@ -206,6 +206,8 @@ return {
 
 			alpha = 1,
 
+			icon = optionsTable and optionsTable.icon or "boyfriend",
+
 			flipX = optionsTable and optionsTable.flipX or false,
 
 			singDuration = optionsTable and optionsTable.singDuration or 4,
@@ -219,7 +221,6 @@ return {
 			danced = false,
 
 			setSheet = function(self, imageData)
-				if self.isCharacter then self.icon = self.icon or "boyfriend" end
 				sheet = imageData
 				sheetWidth = sheet:getWidth()
 				sheetHeight = sheet:getHeight()

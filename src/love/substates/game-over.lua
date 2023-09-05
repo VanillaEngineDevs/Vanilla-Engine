@@ -31,14 +31,14 @@ return {
 
 		audio.playSound(sounds["death"])
 
-		boyfriend:animate("dies", false)
+		if boyfriend then boyfriend:animate("dies", false) end
 
 		Timer.clear()
 
 		Timer.tween(
 			2,
 			camera,
-			{x = -boyfriend.x, y = -boyfriend.y, zoom = camera.defaultZoom},
+			{x = boyfriend and -boyfriend.x or 0, y = boyfriend and -boyfriend.y or 0, zoom = camera.defaultZoom},
 			"out-quad",
 			function()
 				if not pixel then
@@ -70,9 +70,13 @@ return {
 
 			Timer.clear()
 
-			camera.x, camera.y = -boyfriend.x, -boyfriend.y
+			if boyfriend then 
+				camera.x, camera.y = -boyfriend.x, -boyfriend.y
+			else
+				camera.x, camera.y = 0, 0
+			end
 
-			boyfriend:animate("dead confirm", false)
+			if boyfriend then boyfriend:animate("dead confirm", false) end
 
 			graphics.fadeOut(
 				3,
@@ -114,10 +118,12 @@ return {
 				love.graphics.scale(camera.zoom, camera.zoom)
 				love.graphics.translate(camera.x, camera.y)
 
-				if not pixel then
-					boyfriend:draw()
-				else
-					boyfriend:udraw()
+				if boyfriend then
+					if not pixel then
+						boyfriend:draw()
+					else
+						boyfriend:udraw()
+					end
 				end
 			love.graphics.pop()
 		love.graphics.pop()
