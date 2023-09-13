@@ -1,3 +1,7 @@
+--[[
+	File created for Vanilla Engine
+]]
+
 local AlphabetImg, AlphabetSpr
 local symbols = {"!", "?", ".", ",", "'", "-", "(", ")", ":", ";", "/", "&", "+", "=", "_", "<", ">", "[", "]", "{", "}", "#", "$", "%", "@", "*"}
 
@@ -15,6 +19,7 @@ function CreateText(text, isBold)
             self.text = {}
             for i = 1, #text do
                 local char = text:sub(i, i)
+                local lastWasSpace = text:sub(i-1, i-1) == " "
                 -- is letter uppercase?
                 isLowercase = char:lower() == char
                 -- is letter a number?
@@ -34,7 +39,10 @@ function CreateText(text, isBold)
                     end
                     self.text[#self.text]:play("anim", true)
                     self.text[#self.text]:updateHitbox()
-                    self.text[#self.text].x = 15 + (isBold and 60 or 50) * (i-1)
+                    if lastWasSpace then self.text[#self.text].x = self.text[#self.text].x + 20 end
+                    self.text[#self.text].x = self.text[#self.text].x + 15 + (self.text[#self.text-1] and self.text[#self.text-1].x + self.text[#self.text-1].width or 57) + 3
+
+                    self.text[#self.text].y = -self.text[#self.text].height
                 end
             end
         end,
@@ -199,7 +207,7 @@ return {
         end
 
         -- newY starts from 0, and adds 75 for each selection index
-        newY = (curSelected - 1) * 75 + extraSpaces * 75
+        newY = (curSelected - 2) * 75 + extraSpaces * 75
 
         yOffset = util.coolLerp(yOffset, newY, 0.1)
     end,

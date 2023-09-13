@@ -1,6 +1,6 @@
--- This file doesn't need to be messed with unless you are adding a new setting
-
--- TODO: clean this menu up
+--[[
+	File created for Vanilla Engine
+]]
 
 local menuBG = graphics.newImage(graphics.imagePath("menu/title-bg"))
 

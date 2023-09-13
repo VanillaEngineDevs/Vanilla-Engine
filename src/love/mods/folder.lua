@@ -30,10 +30,6 @@ for i, v in ipairs(mods.mods.list) do
     end
 end
 
-print("Mods loaded: " .. #mods.mods.list)
-print("VE mods loaded: " .. #mods.mods.ve)
-print("Psych mods loaded: " .. #mods.mods.psych)
-
 -- for each psych mod
 
 for i, v in ipairs(mods.mods.psych) do

@@ -1,3 +1,7 @@
+--[[
+	File created for Vanilla Engine
+]]
+
 local creditText
 -- i literally said we should use a big string and you said no - CH
 creditText = [[

@@ -16,11 +16,21 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
+
+-- Modified by Vanilla Engine Team
+
 local version = love.filesystem.getInfo("version.txt") and love.filesystem.read("version.txt") or "vUnknown"
+local _debug = not love.filesystem.isFused()
+local loveVer
 function love.conf(t)
 	t.identity = "VE-FNFR"
 	t.version = "11.4"
-	t.console = not love.filesystem.isFused() -- lmao i just found out you can use this function in love.conf
+	t.console = _debug
 
-	t.window.title = "Friday Night Funkin' Vanilla Engine " .. version
+	if _debug then
+		local major, minor, revision, codename = love.getVersion()
+		loveVer = major .. "." .. minor .. "." .. revision .. " " .. codename
+	end
+
+	t.window.title = "Friday Night Funkin' Vanilla Engine " .. version .. " | DEBUG | LOVE: " .. (_debug and loveVer or "")
 end
