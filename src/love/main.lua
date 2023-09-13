@@ -128,6 +128,7 @@ function saveSettings()
             flashinglights = settings.flashinglights,
 			colourByQuantization = settings.colourByQuantization,
             window = settings.window,
+			fpsCap = settings.fpsCap,
             customBindDown = customBindDown,
             customBindUp = customBindUp,
             customBindLeft = customBindLeft,
@@ -167,6 +168,8 @@ function saveSettings()
             noteSkins = settings.noteSkins,
             flashinglights = settings.flashinglights,
 			colourByQuantization = settings.colourByQuantization,
+			window = settings.window,
+			fpsCap = settings.fpsCap,
 
             customBindDown = customBindDown,
             customBindUp = customBindUp,
@@ -191,6 +194,8 @@ function love.load() -- Todo, add custom framerate support
 
 end
 ]]
+
+require "modules.overrides"
 
 function love.load()
 	paused = false
@@ -259,16 +264,18 @@ function love.load()
 			customBindLeft = customBindLeft,
 			customBindRight = customBindRight,
 			colourByQuantization = settings.colourByQuantization,
+			window = settings.window,
+			fpsCap = settings.fpsCap,
 			settingsVer = settingsVer
 		}
 		serialized = lume.serialize(settingdata)
 		love.filesystem.write("settings", serialized)
 	end
-	if settingsVer ~= 2 then
+	if settingsVer ~= 3 then
 		love.window.showMessageBox("Uh Oh!", "Settings have been reset.", "warning")
 		love.filesystem.remove("settings")
 	end
-	if not love.filesystem.getInfo("settings") or settingsVer ~= 2 then
+	if not love.filesystem.getInfo("settings") or settingsVer ~= 3 then
 		settings.hardwareCompression = true
 		graphics.setImageType("dds")
 		settings.setImageType = "dds"
@@ -284,6 +291,8 @@ function love.load()
 		settings.keystrokes = false
 		settings.scrollUnderlayTrans = 0
 		settings.colourByQuantization = false
+		settings.window = false
+		settings.fpsCap = 60
 		--settings.noteSkins = 1
 		customBindLeft = "a"
 		customBindRight = "d"
@@ -291,7 +300,7 @@ function love.load()
 		customBindDown = "s"
 	
 		settings.flashinglights = false
-		settingsVer = 2
+		settingsVer = 3
 		settingdata = {}
 		settingdata = {
 			hardwareCompression = settings.hardwareCompression,
@@ -308,6 +317,7 @@ function love.load()
 			keystrokes = settings.keystrokes,
 			scrollUnderlayTrans = settings.scrollUnderlayTrans,
 			colourByQuantization = settings.colourByQuantization,
+			fpsCap = settings.fpsCap,
 
 			customBindLeft = "a",
 			customBindRight = "d",
@@ -319,6 +329,9 @@ function love.load()
 		serialized = lume.serialize(settingdata)
 		love.filesystem.write("settings", serialized)
 	end
+
+	-- disable vsync
+	love.window.setVSync(0)
 
 	graphics.setImageType(settings.setImageType)
 
@@ -534,6 +547,8 @@ function love.load()
 	else
 		Gamestate.switch(menu)
 	end
+
+	love.setFpsCap(settings.fpsCap)
 end
 
 function love.resize(width, height)

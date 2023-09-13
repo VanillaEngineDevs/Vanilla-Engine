@@ -46,8 +46,8 @@ settingsDescriptions1 = { -- The big spaces are so it lines up lol
     "Colour By Quantization" .. 
     "\n       \"Colour By Quantization\" Changes the colour of the arrows\n       based on their quantization",
 
-    --"Noteskins" ..
-    --"\n       \"Noteskins\" ", -- this one is a maybe
+    "Fps Limit" .. 
+    "\n       \"Fps Limit\" Limits the FPS of the game\n       60 = Default, 500 max\n       Nintendo Switch stays as 60.",
 }
 settingsDescriptions2 = {
 
@@ -129,7 +129,7 @@ return {
                         -- 7 is scroll underlay transparency
                         elseif settingSelect == 8 then
                             settings.colourByQuantization = not settings.colourByQuantization
-                        -- 9 is noteskins -- this one is a maybe
+                        -- 9 is fps limit
                         end
                     elseif settingsMenuState == 3 then
                         if settingSelect == 1 then
@@ -176,7 +176,7 @@ return {
                 elseif settingsMenuState == 3 then
                     settingSelect = settingSelect ~= #settingsDescriptions3 and settingSelect + 1 or 1           
                 end
-            elseif input:pressed("right") then
+            elseif input:pressed("right") or (love.keyboard.isDown("lshift") and input:down("right")) then
                 if settingsMenuState == 2 then
                     if settingSelect == 6 then
                         settings.customScrollSpeed = settings.customScrollSpeed + 0.05
@@ -186,9 +186,15 @@ return {
                         else
                             settings.scrollUnderlayTrans = 1
                         end
+                    elseif settingSelect == 9 then
+                        if settings.fpsCap < 500 then
+                            settings.fpsCap = settings.fpsCap + 1
+                        else
+                            settings.fpsCap = 500
+                        end
                     end
                 end
-            elseif input:pressed("left") then
+            elseif input:pressed("left") or (love.keyboard.isDown("lshift") and input:down("left")) then
                 if settingsMenuState == 2 then
                     if settingSelect == 6 then
                         if settings.customScrollSpeed > 0.05 then
@@ -202,12 +208,12 @@ return {
                         else
                             settings.scrollUnderlayTrans = 0
                         end
-                    elseif settingSelect == 10 then
-                        --[[
-                        if settings.noteSkins ~= 1 then
-                            settings.noteSkins = settings.noteSkins - 1
+                    elseif settingSelect == 9 then
+                        if settings.fpsCap > 60 then
+                            settings.fpsCap = settings.fpsCap - 1
+                        else
+                            settings.fpsCap = 60
                         end
-                        --]]
                     end
                 end
 			end
@@ -217,6 +223,8 @@ return {
         else
             isRestartNeeded = ""
         end
+
+        love.setFpsCap(settings.fpsCap)
 	end,
 
 	draw = function(self)
@@ -249,6 +257,7 @@ return {
                     love.graphics.print("\n\n\n\n\n\n\n\n\n\nCustom Scroll Speed = " .. tostring(settings.customScrollSpeed), -628, -300)
                     love.graphics.print("\n\n\n\n\n\n\n\n\n\n\n\nScroll Underlay Transparency = " .. tostring(settings.scrollUnderlayTrans), -628, -300)
                     love.graphics.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\nColour By Quantization = " .. tostring(settings.colourByQuantization), -628, -300)
+                    love.graphics.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFps Limit = " .. tostring(settings.fpsCap), -628, -300)
                     --love.graphics.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNoteskin = " .. tostring(noteskins[settings.noteSkins]), -628, -300)
                 elseif settingsMenuState == 3 then
                     love.graphics.print("Hardware Compression = " .. tostring(settings.hardwareCompression) .. " " .. isRestartNeeded, -628, -300) 
