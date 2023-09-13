@@ -23,6 +23,8 @@ return {
             selectBG = graphics.newImage(graphics.imagePath("menu/selectBG"))
         end
 
+        selectBG.y = 20
+
         selectBGOverlay = graphics.newImage(graphics.imagePath("menu/selectBGOverlay"))
 
         options = love.filesystem.load("sprites/menu/menuButtons.lua")()
@@ -141,7 +143,7 @@ return {
         freeplay:update(dt)
         credits:update(dt)
 
-        selectBG.y = math.sin(love.timer.getTime() * 1.5) * 0.9
+        selectBG.y = 20 + math.sin(love.timer.getTime() * 1.5) * 2
 
 		if not graphics.isFading() then
 			if input:pressed("up") then
