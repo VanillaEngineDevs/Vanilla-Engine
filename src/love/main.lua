@@ -733,5 +733,6 @@ function love.focus(t)
 end
 
 function love.quit()
+	saveSettings(false)
 	saveSavedata()
 end

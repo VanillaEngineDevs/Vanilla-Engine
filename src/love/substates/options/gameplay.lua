@@ -62,8 +62,8 @@ function gameplay:enter()
     self:addOption(o)
 
     o = Option:new(
-        "Scroll Underlay",
-        "How transparent the scroll underlay is",
+        "Scroll Underlay Transparency",
+        "How opaque the scroll underlay is",
         settings.scrollUnderlayTrans,
         "percent"
     )

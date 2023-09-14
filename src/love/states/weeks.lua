@@ -1665,13 +1665,13 @@ return {
 			love.graphics.scale(uiScale.zoom, uiScale.zoom)
 			love.graphics.push()
 				graphics.setColor(0,0,0,settings.scrollUnderlayTrans)
-				local baseX = boyfriendArrows[1].x - (boyfriendArrows[1]:getFrameWidth(noteList[i])/2)
+				local baseX = boyfriendArrows[1].x - (boyfriendArrows[1]:getFrameWidth(noteList[i])/2) * (pixel and 8 or 0) + (pixel and -15 or 0)
 				local scrollWidth = 0
 				-- determine the scrollWidth with the first 4 arrows
 				for i = 1, 4 do
-					scrollWidth = scrollWidth + boyfriendArrows[i]:getFrameWidth(noteList[i])
+					scrollWidth = scrollWidth + boyfriendArrows[i]:getFrameWidth(noteList[i]) * (pixel and 8 or 0)
 				end
-				scrollWidth = scrollWidth + 30
+				scrollWidth = scrollWidth + 30 + (pixel and 95 or 0)
 
 				if settings.middleScroll and not settings.multiplayer then
 					love.graphics.rectangle("fill", baseX, -550, scrollWidth, 1280)
