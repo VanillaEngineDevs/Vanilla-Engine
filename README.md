@@ -1,7 +1,7 @@
 # DOWNLOAD NIGHTLY HERE: https://nightly.link/VanillaEngineDevs/Vanilla-Engine/workflows/build/main
 
 # ![Logo](images/logo.png)
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/HTV04/funkin-rewritten?style=flat-square)](https://github.com/HTV04/funkin-rewritten/releases/latest) [![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/HTV04/funkin-rewritten?include_prereleases&style=flat-square)](https://github.com/HTV04/funkin-rewritten/releases) [![GitHub all releases](https://img.shields.io/github/downloads/HTV04/funkin-rewritten/total?style=flat-square)](https://github.com/HTV04/funkin-rewritten/releases) [![GitHub issues](https://img.shields.io/github/issues/HTV04/funkin-rewritten?style=flat-square)](https://github.com/HTV04/funkin-rewritten/issues) [![GitHub](https://img.shields.io/github/license/HTV04/funkin-rewritten?style=flat-square)](https://github.com/HTV04/funkin-rewritten/blob/main/LICENSE) [![Discord](https://img.shields.io/discord/852658576577003550?style=flat-square)](https://discord.gg/tQGzN2Wu48)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/VanillaEngineDevs/Vanilla-Engine?style=flat-square)](https://github.com/VanillaEngineDevs/Vanilla-Engine/releases/latest) [![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/VanillaEngineDevs/Vanilla-Engine?include_prereleases&style=flat-square)](https://github.com/VanillaEngineDevs/Vanilla-Engine/releases) [![GitHub all releases](https://img.shields.io/github/downloads/VanillaEngineDevs/Vanilla-Engine/total?style=flat-square)](https://github.com/VanillaEngineDevs/Vanilla-Engine/releases) [![GitHub issues](https://img.shields.io/github/issues/VanillaEngineDevs/Vanilla-Engine?style=flat-square)](https://github.com/VanillaEngineDevs/Vanilla-Engine/issues) [![GitHub](https://img.shields.io/github/license/VanillaEngineDevs/Vanilla-Engine?style=flat-square)](https://github.com/VanillaEngineDevs/Vanilla-Engine/blob/main/LICENSE) [![Discord](https://img.shields.io/discord/852658576577003550?style=flat-square)](https://discord.gg/tQGzN2Wu48)
 
 Friday Night Funkin' Rewritten is a rewrite of [Friday Night Funkin'](https://ninja-muffin24.itch.io/funkin) built on [LÖVE](https://love2d.org/) for Windows, macOS, Linux, and Web platforms, as well as previously unsupported platforms, like the Nintendo Switch!
 
@@ -12,7 +12,9 @@ Friday Night Funkin' Rewritten features:
 * Other cool features, like downscroll
 * And more to come!
 
-Join my Discord server for Funkin' Rewritten updates and discussion: https://discord.gg/tQGzN2Wu48
+Join Vanilla Engines server for VE updates and what not: https://discord.gg/TBF3HkXWhq
+
+Join my HTV's server for Funkin' Rewritten updates and discussion: https://discord.gg/tQGzN2Wu48
 
 # Controls
 If using a controller on a PC, a controller with an Xbox button layout is recommended. Controller buttons will be remappable in a future update.
@@ -43,18 +45,18 @@ If using a controller on a PC, a controller with an Xbox button layout is recomm
 ### Keyboard
 * 6 - Take screenshot
   * Screenshot paths:
-    * Windows - `%APPDATA%\funkin-rewritten\screenshots`
-    * macOS - `~/Library/Application Support/funkin-rewritten/screenshots`
-	* Linux - `~/.local/share/love/funkin-rewritten/screenshots`
-	* Nintendo Switch - `./funkin-rewritten/screenshots`
+    * Windows - `%APPDATA%\VE-FNFR\screenshots`
+    * macOS - `~/Library/Application Support/VE-FNFR/screenshots`
+	* Linux - `~/.local/share/love/VE-FNFR/screenshots`
+	* Nintendo Switch - `./VE-FNFR/screenshots`
 * 7 - Open debug menu
 
 # Settings
 The settings file can be found in the following places on the following systems:
-* Windows - `%APPDATA%\funkin-rewritten\settings.ini`
-* macOS - `~/Library/Application Support/funkin-rewritten/settings.ini`
-* Linux - `~/.local/share/love/funkin-rewritten/settings.ini`
-* Nintendo Switch - `./funkin-rewritten/settings.ini`
+* Windows - `%APPDATA%\VE-FNFR\settings.ini`
+* macOS - `~/Library/Application Support/VE-FNFR/settings.ini`
+* Linux - `~/.local/share/love/VE-FNFR/settings.ini`
+* Nintendo Switch - `./VE-FNFR/settings.ini`
 
 # Progress
 **Menus** - 100% Complete
@@ -121,6 +123,7 @@ After running a build method, its release ZIP will be located at `./build/releas
 Follow the official instructions for LÖVE game distribution for your platform: https://love2d.org/wiki/Game_Distribution
 
 # Special Thanks
+* HTV04 for [Funkin' Rewritten](https://github.com/HTV04/Funkin-Rewritten), the original engine used for developing this Engine
 * KadeDev for [FNFDataAPI](https://github.com/KadeDev/FNFDataAPI), which was refrenced while developing the chart-reading system
 * The developers of [BeatFever Mania](https://github.com/Sulunia/beatfever) for their music time interpolation code
 * The developers of the [LÖVE](https://love2d.org/) framework, for making Funkin' Rewritten possible
