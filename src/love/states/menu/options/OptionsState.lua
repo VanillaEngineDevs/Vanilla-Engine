@@ -1,3 +1,7 @@
+--[[
+	File created for Vanilla Engine
+]]
+
 local OptionsState = {}
 
 OptionsState.options = {"Gamemodes", "Gameplay", "Graphics", "Controls", "Miscillaneous"}
@@ -6,10 +10,6 @@ OptionsState.curSelected = 1
 OptionsState.menuBG = nil
 OptionsState.onPlayState = false
 OptionsState.group = Group()
-
-function OptionsState:openSelectedSubstate(label)
-
-end
 
 OptionsState.selectorLeft = nil
 OptionsState.selectorRight = nil
