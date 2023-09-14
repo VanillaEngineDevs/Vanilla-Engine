@@ -295,12 +295,13 @@ function Sprite:addAnimByIndices(n, p, i, fr, l)
     self.animationOffset[n] = {x=0, y=0}
 end
 
-function Sprite:animate(anim, force)
+function Sprite:animate(anim, force, callback)
     if not force and self.curAnim and self.curAnim.name == anim and not self.animFinished then
         self.animFinished = false
         return
     end
 
+    self.animCallback = callback
     self.curAnim = self._animations[anim]
     self.curFrame = 1
     self.animFinished = false
@@ -323,6 +324,9 @@ function Sprite:update(dt)
     if self.curAnim and not self.animFinished then
         self.curFrame = self.curFrame + self.curAnim.framerate * dt
         if self.curFrame >= #self.curAnim.frames then
+            if self.animCallback then
+                self.animCallback()
+            end
             if self.curAnim.looped then
                 self.curFrame = 1
             else
@@ -469,6 +473,7 @@ function Sprite:draw()
         local x, y = self:getScreenPosition(cam)
         local f, r, sx, sy, ox, oy, kx, ky = self:getFrame(), self.angle, self.scale.x, self.scale.y, self.offset.x, self.offset.y, self.shear.x, self.shear.y
 
+        if type(self.color) == "number" then self.color = hex2rgb(self.color) end
         love.graphics.setColor(self.color[1], self.color[2], self.color[3], self.alpha)
 
         local min, mag, anisotropy = self.tex:getFilter()

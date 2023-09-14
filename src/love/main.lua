@@ -17,7 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 __VERSION__ = love.filesystem.read("version.txt")
-if love.filesystem.isFused() then function print() end end -- print functions tend the make the game lag when in update functions, so we do this to prevent that
+if love.filesystem.isFused() then 
+	function print() end 
+else
+	_debug = true
+end -- print functions tend the make the game lag when in update functions, so we do this to prevent that
 function uitextflarge(text,x,y,limit,align,hovered,r,sx,sy,ox,oy,kx,ky)
 	local x = x or 0
 	local y = y or 0
@@ -97,7 +101,8 @@ function borderedText(text,x,y,r,sx,sy,ox,oy,kx,ky,alpha)
 	love.graphics.print(text,x,y,r,sx,sy,a,ox,oy,kx,ky)
 end
 mainDrawing = true
-function saveSettings()
+function saveSettings(menu)
+	local menu = menu == nil and true or menu
     if settings.hardwareCompression ~= settingdata.hardwareCompression then
         settingdata = {}
         if settings.hardwareCompression then
@@ -179,13 +184,15 @@ function saveSettings()
         }
         serialized = lume.serialize(settingdata)
         love.filesystem.write("settings", serialized)
-        graphics:fadeOutWipe(
-            0.7,
-            function()
-                Gamestate.switch(menuSelect)
-                status.setLoading(false)
-            end
-        )
+		if menu then
+			graphics:fadeOutWipe(
+				0.7,
+				function()
+					Gamestate.switch(menuSelect)
+					status.setLoading(false)
+				end
+			)
+		end
     end
 end
 --[[
@@ -223,13 +230,16 @@ function love.load()
 	cutscene = require "modules.cutscene"
 	dialogue = require "modules.dialogue"
 	settings = require "settings"
-	NoteSplash = require "modules.Splash"
+	Group = require "modules.Group"
 	require "modules.savedata"
+	require "modules.Alphabet"
+	Option = require "modules.Option"
 	loadSavedata()
 	
 	-- XML Modules
 	Sprite = require "modules.xml.Sprite"
 	xmlcamera = require "modules.xml.camera"
+	Checkbox = require "modules.Checkbox"
 
 	playMenuMusic = true
 
@@ -281,7 +291,7 @@ function love.load()
 		settings.setImageType = "dds"
 		settings.downscroll = false
 		settings.middleScroll = false
-		settings.ghostTapping = false
+		settings.ghostTapping = true
 		settings.showDebug = false
 		settings.sideJudgements = false
 		settings.botPlay = false
@@ -369,7 +379,7 @@ function love.load()
 	menu = require "states.menu.menu"
 	menuWeek = require "states.menu.menuWeek"
 	menuFreeplay = require "states.menu.menuFreeplay"
-	menuSettings = require "states.menu.menuSettings"
+	menuSettings = require "states.menu.options.OptionsState"
 	menuCredits = require "states.menu.menuCredits"
 	menuSelect = require "states.menu.menuSelect"
 
@@ -379,8 +389,16 @@ function love.load()
 	weeks = require "states.weeks"
 
 	-- Load substates
+	OptionsMenu = require "states.menu.options.OptionsMenu"
 	gameOver = require "substates.game-over"
 	settingsKeybinds = require "substates.settings-keybinds"
+	optionSubstates = {
+		["Gamemodes"] = require "substates.options.gamemodes",
+		["Gameplay"] = require "substates.options.gameplay",
+		["Graphics"] = require "substates.options.graphics",
+		["Controls"] = require "substates.settings-keybinds",
+		["Miscillaneous"] = require "substates.options.miscillaneous"
+	}
 
 	TankmanDatingSim = require "misc.dating"
 
@@ -506,12 +524,16 @@ function love.load()
 			return {hexR/255, hexG/255, hexB/255}
 		else
 			-- sometimes it can be given as 0xffe7e6e6
-
+			local r = bit.band(bit.rshift(hex, 16), 0xff)/255
+			local g = bit.band(bit.rshift(hex, 8), 0xff)/255
+			local b = bit.band(hex, 0xff)/255
+			return {r, g, b}
 		end
 	end
 	
 	-- Variables
 	font = love.graphics.newFont("fonts/vcr.ttf", 24)
+	optionsFont = love.graphics.newFont("fonts/vcr.ttf", 32)
 	FNFFont = love.graphics.newFont("fonts/fnFont.ttf", 24)
 	credFont = love.graphics.newFont("fonts/fnFont.ttf", 32)   -- guglio is a bitch 
 	uiFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 32)

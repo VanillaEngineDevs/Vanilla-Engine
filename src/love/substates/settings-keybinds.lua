@@ -55,8 +55,6 @@ return {
         end
         doBindSet = false
         choice = 0
-        graphics.setFade(0)
-        graphics.fadeIn(0.5)
     end,
     update = function(self, dt)
         for i = 1, 4 do
@@ -88,14 +86,13 @@ return {
                 end
             end
         end
+
+        if input:pressed("back") then
+            graphics:fadeOutWipe(0.3, function() Gamestate.pop() end)
+        end
     end,
     keypressed = function(self, key)
-        if key == "escape" then
-            graphics:fadeOutWipe(0.3,
-            function()
-                Gamestate.switch(menuSettings)
-            end)
-        elseif key == "return" then
+        if key == "return" then
             doBindSet = true
         end
     end,
@@ -135,7 +132,7 @@ return {
         love.graphics.pop()
     end,
     leave = function(self)
-        saveSettings()
+        saveSettings(false)
         if love.system.getOS() == "NX" then
             input:rebindControl("gameLeft", {"axis:triggerleft+", "axis:leftx-", "axis:rightx-", "button:dpleft", "button:x", "key:" .. customBindLeft, "key:left"})
             input:rebindControl("gameDown", {"axis:triggerright+", "axis:lefty-", "axis:righty-", "button:dpdown", "button:a", "key:" .. customBindDown, "key:down"})

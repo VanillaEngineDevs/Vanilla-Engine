@@ -35,6 +35,10 @@ function util.split(str, sep)
     return fields
 end
 
+function util.bound(x, min, max)
+    return math.min(math.max(x, min), max)
+end
+
 -- math overrides
 -- @param n number
 -- @return an approximated sine value
@@ -75,6 +79,10 @@ function table.contains(table, element)
         end
     end
     return false
+end
+
+function math.remapToRange(value, from1, to1, from2, to2)
+    return (value - from1) / (to1 - from1) * (to2 - from2) + from2
 end
 
 -- God like coding

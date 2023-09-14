@@ -1,0 +1,3 @@
+NOTE: All code is based off of https://github.com/ShadowMario/FNF-PsychEngine/blob/main/source/options
+
+I am literally super stupid, but I know how to translate haxe to lua,,,,,, and idk how to make a good options menu
