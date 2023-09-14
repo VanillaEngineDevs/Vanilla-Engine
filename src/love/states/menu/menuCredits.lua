@@ -10,38 +10,39 @@ return {
                 heading = CreateText("Vanilla Engine", true),
                 selected = true,
                 members = {
-                    {name = CreateText("GuglioIsStupid"), desc = "Lead Programmer", selected = false},
-                    {name = CreateText("Getsaa"), desc = "Menu Design"},
-                    {name = CreateText("clothing hanger"), desc = "Former Programmer", selected = false},
+                    {name = CreateText("GuglioIsStupid"), desc = "Lead Programmer", selected = false, callback = function() love.system.openURL("https://ilovefemboys.org") end},
+                    {name = CreateText("Getsaa"), desc = "Menu Design", selected = false, callback = function() love.system.openURL("https://twitter.com/GetsaaNG") end},
+                    {name = CreateText("c l o t h i n g h a n g e r"), desc = "Former Programmer", selected = false, callback = function() love.system.openURL("https://twitter.com/clothinghanger6") end},
                 }
             },
             ["Funkin Rewritten"] = {
                 heading = CreateText("Funkin Rewritten", true),
                 selected = false,
                 members = {
-                    {name = CreateText("HTV04"), desc = "Programmer of Funkin Rewritten", selected = false,},
+                    {name = CreateText("HTV04"), desc = "Programmer of Funkin Rewritten", selected = false, callback = function() love.system.openURL("https://twitter.com/HTV04_") end},
                 }
             },
             ["Friday Night Funkin"] = {
                 heading = CreateText("Friday Night Funkin", true),
                 selected = false,
                 members = {
-                    {name = CreateText("ninjamuffin99"), desc = "Programmer", selected = false,},
-                    {name = CreateText("PhantomArcade"), desc = "Artist", selected = false,},
-                    {name = CreateText("Evilsk8r"), desc = "Artist", selected = false,},
-                    {name = CreateText("Kawaisprite"), desc = "Musician", selected = false,},
-                    {name = CreateText("And all the contributors"), desc = "Contributors", selected = false,},
+                    {name = CreateText("ninjamuffin99"), desc = "Programmer", selected = false, callback = function() love.system.openURL("https://twitter.com/ninja_muffin99") end},
+                    {name = CreateText("PhantomArcade"), desc = "Artist", selected = false, callback = function() love.system.openURL("https://twitter.com/phantomarcade3k") end},
+                    {name = CreateText("Evilsk8r"), desc = "Artist", selected = false, callback = function() love.system.openURL("https://twitter.com/evilsk8r") end},
+                    {name = CreateText("Kawaisprite"), desc = "Musician", selected = false, callback = function() love.system.openURL("https://twitter.com/kawaisprite") end},
+                    {name = CreateText("And all the contributors"), desc = "Contributors", selected = false, callback = function() love.system.openURL("https://github.com/FunkinCrew/Funkin/graphs/contributors") end},
                 }
             },
             ["Miscellaneous"] = {
                 heading = CreateText("Miscellaneous", true),
                 selected = false,
                 members = {
-                    {name = CreateText("PhantomClo"), desc = "Pixel note splashes", selected = false,},
-                    {name = CreateText("Keoki"), desc = "Note splashes", selected = false,},
-                    {name = CreateText("P-sam"), desc = "Developing LOVE-NX (The framework the depracted Switch port uses)", selected = false,},
-                    {name = CreateText("The developers of the LOVE framework"), desc = "LÖVE", selected = false,},
-                    {name = CreateText("RiverOaken"), desc = "Psych Engine credits button", selected = false,},
+                    {name = CreateText("PhantomClo"), desc = "Pixel note splashes", selected = false},
+                    {name = CreateText("Keoki"), desc = "Note splashes", selected = false},
+                    {name = CreateText("P-sam"), desc = "Developing LOVE-NX (The framework the Switch port uses)", selected = false, callback = function() love.system.openURL("https://github.com/retronx-team/love-nx") end},
+                    {name = CreateText("TurtleP"), desc = "Developing LovePotion (The framework the depracted Switch port uses)", selected = false, callback = function() love.system.openURL("https://github.com/lovebrew/lovepotion") end},
+                    {name = CreateText("The developers of the LOVE framework"), desc = "LÖVE", selected = false, callback = function() love.system.openURL("https://love2d.org") end},
+                    {name = CreateText("RiverOaken"), desc = "Psych Engine credits button", selected = false, callback = function() love.system.openURL("https://twitter.com/RiverOaken") end}
                 }
             }
         }
@@ -56,6 +57,7 @@ return {
                 member.name.y = y
                 y = y + 75
             end
+            y = y + 75
         end
 
         options = {}
@@ -83,13 +85,9 @@ return {
             -- if selected is false, and none of the members are selected, make the alpha 0.85
             for j, member in ipairs(heading.members) do
                 if not member.selected then
-                    for i, v in ipairs(member.name.text) do
-                        v.alpha = 0.65
-                    end
+                    member.name.alpha = 0.65
                 else
-                    for i, v in ipairs(member.name.text) do
-                        v.alpha = 1
-                    end
+                    member.name.alpha = 1
                 end
                 member.name:update(dt)
             end
@@ -123,6 +121,19 @@ return {
             end
         end
 
+        if input:pressed("confirm") then
+            -- go to the callback of the selected member
+            for i, heading in ipairs(headingOrder) do
+                for j, member in ipairs(Headings[heading].members) do
+                    if options[curSelected] == member.name.string then
+                        if member.callback then
+                            member.callback()
+                        end
+                    end
+                end
+            end
+        end
+
         if input:pressed("gameBack") then
             graphics:fadeOutWipe(0.5,
             function()
@@ -142,7 +153,7 @@ return {
         end
 
         -- newY starts from 0, and adds 75 for each selection index
-        newY = (curSelected - 2) * 75 + extraSpaces * 75
+        newY = (curSelected - 2) * 75 + extraSpaces * 150
 
         yOffset = util.coolLerp(yOffset, newY, 0.1)
     end,
