@@ -215,6 +215,7 @@ return {
 			danceSpeed = optionsTable and optionsTable.danceSpeed or 2,
 			danceIdle = optionsTable and optionsTable.danceIdle or false,
 			maxHoldTimer = optionsTable and optionsTable.maxHoldTimer or 0.1,
+			align = optionsTable and optionsTable.align or "center",
 
 			visible = true,
 
@@ -429,6 +430,26 @@ return {
 						love.graphics.setStencilTest("greater", 0)
 					end
 
+					local ox, oy = 0, 0
+
+					-- tbh idk why anyone would use this but its here
+					if self.align == "center" then
+						ox = width + anim.offsetX + self.offsetX
+						oy = height + anim.offsetY + self.offsetY
+					elseif self.align == "top left" then
+						ox = anim.offsetX + self.offsetX
+						oy = anim.offsetY + self.offsetY
+					elseif self.align == "top right" then
+						ox = frameData[self.curFrame].width - width + anim.offsetX + self.offsetX
+						oy = anim.offsetY + self.offsetY
+					elseif self.align == "bottom left" then
+						ox = anim.offsetX + self.offsetX
+						oy = frameData[self.curFrame].height - height + anim.offsetY + self.offsetY
+					elseif self.align == "bottom right" then
+						ox = frameData[self.curFrame].width - width + anim.offsetX + self.offsetX
+						oy = frameData[self.curFrame].height - height + anim.offsetY + self.offsetY
+					end
+
 					if self.visible then
 						love.graphics.draw(
 							sheet,
@@ -438,8 +459,8 @@ return {
 							self.orientation,
 							self.sizeX * (self.flipX and -1 or 1),
 							self.sizeY,
-							width + anim.offsetX + self.offsetX,
-							height + anim.offsetY + self.offsetY,
+							ox,
+							oy,
 							self.shearX,
 							self.shearY
 						)

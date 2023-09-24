@@ -53,7 +53,7 @@ love.run = love.system.getOS() ~= "NX" and function()
 	    local delta1 = love.timer.getTime() - m1 -- measure the time at the end of the main iteration and calculate delta
         if love.timer then love.timer.sleep(1/love._fps_cap-delta1) end
     end
-end
+end or love.run
 
 function love.setFpsCap(fps)
     love._fps_cap = fps or 60
