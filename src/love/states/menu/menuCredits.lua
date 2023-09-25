@@ -37,6 +37,7 @@ return {
                 heading = CreateText("Miscellaneous", true),
                 selected = false,
                 members = {
+                    {name = CreateText("MarioG9421"), desc = "Asset Optimizations", selected = false, callback = function() love.system.openURL("https://twitter.com/MarioG9421exdi") end},
                     {name = CreateText("PhantomClo"), desc = "Pixel note splashes", selected = false},
                     {name = CreateText("Keoki"), desc = "Note splashes", selected = false},
                     {name = CreateText("P-sam"), desc = "Developing LOVE-NX (The framework the Switch port uses)", selected = false, callback = function() love.system.openURL("https://github.com/retronx-team/love-nx") end},
