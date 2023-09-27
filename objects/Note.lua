@@ -166,7 +166,7 @@ function Note:update(dt)
     self.super.update(self, dt)
 
     if self.mustPress then
-        self.canBeHit = (self.strumTime > Conductor.songPosition - (Conductor.safeZoneOffset * self.lateHitMult) and self.strumTime < Conductor.songPosition - Conductor.safeZoneOffset * self.earlyHitMult)
+        self.canBeHit = self.strumTime > Conductor.songPosition - Conductor.safeZoneOffset * self.lateHitMult and self.strumTime < Conductor.songPosition + Conductor.safeZoneOffset * self.earlyHitMult
         if self.strumTime < Conductor.songPosition - Conductor.safeZoneOffset and not self.wasGoodHit then
             self.tooLate = true
         end
@@ -232,7 +232,7 @@ function Note:clipToStrumNote(myStrum)
         elseif (self.y + self.offset.y <= center) then
             swagRect.y = vert
             swagRect.width = self:getFrameWidth() * self.scale.x
-            swagRect.height = self:getFrameHeight() * self.scale.y
+            swagRect.height = self:getFrameHeight() * self.scale.y * 1.3
             --print(swagRect.y, swagRect.height)
         else
             -- default to full frame

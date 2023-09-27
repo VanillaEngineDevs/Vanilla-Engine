@@ -126,7 +126,6 @@ PlayState.defaultCamZoom = 1.05
 
 PlayState.daPixelZoom =  6
 PlayState.singAnimations = {"singLEFT", "songDOWN", "singUP", "singRIGHT"}
-PlayState.inputs = {"g_left", "g_down", "g_up", "g_right"}
 
 PlayState.inCutscene = false
 PlayState.skipCountdown = false
@@ -207,18 +206,24 @@ function PlayState:enter()
     self.playerStrums = Group()
 
     self.notes = Group()
-    self.sustainsNotes = Group()
-    self:add(self.sustainsNotes)
+    self.sustainNotes = Group()
+    self:add(self.sustainNotes)
     self:add(self.notes)
 
     Conductor.songPosition = 0
 
     self:generateSong(self.SONG.song)
+
+    self.generatedMusic = true
+
+    Conductor.safeZoneOffset = (10 / 60) * 1000
 end
 
 function PlayState:update(dt)
     self.super.update(self, dt)
-    Conductor.songPosition = Conductor.songPosition + 1000 * dt
+    if self.generatedMusic then
+        Conductor.songPosition = Conductor.songPosition + 1000 * dt
+    end
     for i, member in ipairs(self.members) do
         if member.update then member:update(dt) end
     end
@@ -234,82 +239,97 @@ function PlayState:update(dt)
             if not note.isSustainNote then
                 self.notes:add(note)
             else
-                self.sustainsNotes:add(note)
+                self.sustainNotes:add(note)
             end
             note.spawned = true
             --print(#self.notes.members)
         end
     end
 
-    if #self.notes.members > 0 then
-        if self.startedCountdown then
-            local fakeCrochet = (60 / self.SONG.bpm) * 1000
-            for i, note in ipairs(self.notes.members) do
-                local strumGroup = self.playerStrums
-                if not note.mustPress then strumGroup = self.opponentStrums end
-                --print(#strumGroup.members, note.noteData)
-                local strum = strumGroup.members[note.noteData+1]
-                note:followStrumNote(strum, fakeCrochet, self.songSpeed)
+    if self.generatedMusic then
+        if not self.cpuControlled then
+            self:keysCheck()
+        end
+        if #self.notes.members > 0 then
+            if self.startedCountdown then
+                local fakeCrochet = (60 / self.SONG.bpm) * 1000
+                for i, note in ipairs(self.notes.members) do
+                    local strumGroup = self.playerStrums
+                    if not note.mustPress then strumGroup = self.opponentStrums end
+                    --print(#strumGroup.members, note.noteData)
+                    local strum = strumGroup.members[note.noteData+1]
+                    note:followStrumNote(strum, fakeCrochet, self.songSpeed)
 
-                if note.mustPress then
-                    if self.cpuControlled and not note.blockHit and note.canBeHit and (note.isSustainNote or note.strumTime <= Conductor.songPosition) then
-                        self:goodNoteHit(note)
-                    end
-                elseif note.wasGoodHit and not note.hitByOpponent and not note.ignoreNote then
-                    self:opponentNoteHit(note)
-                end
-
-                if note.isSustainNote and strum.sustainReduce then 
-                    note:clipToStrumNote(strum) 
-                end
-
-                if Conductor.songPosition - note.strumTime > self.noteKillOffset then
-                    if note.mustPress and not self.cpuControlled and not note.ignoreNote and not self.endingSong and (note.tooLate or not note.wasGoodHit) then
-                        --self:noteMiss(note)
+                    if note.mustPress then
+                        if self.cpuControlled and not note.blockHit and note.canBeHit and (note.isSustainNote or note.strumTime <= Conductor.songPosition) then
+                            self:goodNoteHit(note)
+                        end
+                    elseif note.wasGoodHit and not note.hitByOpponent and not note.ignoreNote then
+                        self:opponentNoteHit(note)
                     end
 
-                    note.active = false
-                    note.visible = false
+                    if note.isSustainNote and strum.sustainReduce then 
+                        note:clipToStrumNote(strum) 
+                    end
 
-                    self.notes:remove(note)
+                    if Conductor.songPosition - note.strumTime > self.noteKillOffset then
+                        if note.mustPress and not self.cpuControlled and not note.ignoreNote and not self.endingSong and (note.tooLate or not note.wasGoodHit) then
+                            --self:noteMiss(note)
+                        end
+
+                        note.active = false
+                        note.visible = false
+
+                        self.notes:remove(note)
+                    end
+                end
+            end
+        end
+
+        if #self.sustainNotes.members > 0 then
+            if self.startedCountdown then
+                local fakeCrochet = (60 / self.SONG.bpm) * 1000
+                for i, note in ipairs(self.sustainNotes.members) do
+                    local strumGroup = self.playerStrums
+                    if not note.mustPress then strumGroup = self.opponentStrums end
+                    --print(#strumGroup.members, note.noteData)
+                    local strum = strumGroup.members[note.noteData+1]
+                    note:followStrumNote(strum, fakeCrochet, self.songSpeed)
+    
+                    if note.mustPress then
+                        if self.cpuControlled and not note.blockHit and note.canBeHit and (note.isSustainNote or note.strumTime <= Conductor.songPosition) then
+                            self:goodNoteHit(note)
+                        end
+                    elseif note.wasGoodHit and not note.hitByOpponent and not note.ignoreNote then
+                        self:opponentNoteHit(note)
+                    end
+    
+                    if note.isSustainNote and strum.sustainReduce then 
+                        note:clipToStrumNote(strum) 
+                    end
+    
+                    if Conductor.songPosition - note.strumTime > self.noteKillOffset then
+                        if note.mustPress and not self.cpuControlled and not note.ignoreNote and not self.endingSong and (note.tooLate or not note.wasGoodHit) then
+                            --self:noteMiss(note)
+                        end
+    
+                        note.active = false
+                        note.visible = false
+    
+                        self.notes:remove(note)
+                    end
                 end
             end
         end
     end
 
-    if #self.sustainsNotes.members > 0 then
-        if self.startedCountdown then
-            local fakeCrochet = (60 / self.SONG.bpm) * 1000
-            for i, note in ipairs(self.sustainsNotes.members) do
-                local strumGroup = self.playerStrums
-                if not note.mustPress then strumGroup = self.opponentStrums end
-                --print(#strumGroup.members, note.noteData)
-                local strum = strumGroup.members[note.noteData+1]
-                note:followStrumNote(strum, fakeCrochet, self.songSpeed)
-
-                if note.mustPress then
-                    if self.cpuControlled and not note.blockHit and note.canBeHit and (note.isSustainNote or note.strumTime <= Conductor.songPosition) then
-                        self:goodNoteHit(note)
-                    end
-                elseif note.wasGoodHit and not note.hitByOpponent and not note.ignoreNote then
-                    self:opponentNoteHit(note)
-                end
-
-                if note.isSustainNote and strum.sustainReduce then 
-                    note:clipToStrumNote(strum) 
-                end
-
-                if Conductor.songPosition - note.strumTime > self.noteKillOffset then
-                    if note.mustPress and not self.cpuControlled and not note.ignoreNote and not self.endingSong and (note.tooLate or not note.wasGoodHit) then
-                        --self:noteMiss(note)
-                    end
-
-                    note.active = false
-                    note.visible = false
-
-                    self.notes:remove(note)
-                end
-            end
+    for i = 1, 4 do
+        -- inputs
+        if input:pressed(self.keysArray[i]) then
+            self:keyPressed(i)
+        end
+        if input:released(self.keysArray[i]) then
+            self:keyReleased(i)
         end
     end
 end
@@ -527,6 +547,147 @@ function PlayState:generateStaticArrows(player)
 
         strumLineNotes:add(babyArrow)
         babyArrow:postAddedToGroup()
+    end
+end
+
+function PlayState:keyPressed(key)
+    local inputname = self.keysArray[key]
+    if not self.cpuControlled and self.startedCountdown and not paused and key > -1 then
+        if #self.notes.members > 0 and self.generatedMusic and not self.endingSing then
+            local lastTime = Conductor.songPosition
+
+            local pressNotes = {}
+            local notesStopped = false
+            local sortedNotesList = {}
+
+            for i, note in ipairs(self.notes.members) do
+                if note.canBeHit and note.mustPress and not note.tooLate and not note.wasGoodHit and not note.isSustainNote and not note.blockHit then
+                    if key == note.noteData+1 then
+                        table.insert(sortedNotesList, note)
+                    end
+                    self.canMiss = true
+                end
+            end
+
+            -- sort notes by strumTime
+            table.sort(sortedNotesList, function(a, b) return a.strumTime < b.strumTime end)
+
+            if #sortedNotesList > 0 then
+                for i, epicNote in ipairs(sortedNotesList) do
+                    for i2, doubleNote in ipairs(pressNotes) do
+                        if math.abs(doubleNote.strumTime - epicNote.strumTime) < 1 then
+                            self.notes:remove(doubleNote)
+                        else
+                            notesStopped = true
+                        end
+                    end
+
+                    if not notesStopped then
+                        self:goodNoteHit(epicNote)
+                    end
+                    table.insert(pressNotes, epicNote)
+                end
+            else 
+
+            end
+        end
+    end
+
+    local spr = self.playerStrums.members[key]
+    if spr and spr.curAnim.name ~= "confirm" then
+        spr:playAnim("pressed")
+        spr.resetAnim = 0
+    end
+end
+
+function PlayState:goodNoteHit(note)
+    if not note.wasGoodHit then
+        if self.cpuControlled and (note.ignoreNote or note.hitCausesMiss) then return end
+
+        note.wasGoodHit = true
+
+        if not note.isSustainNote then
+            self.combo = self.combo + 1
+            if self.combo > 9999 then self.combo = 9999 end
+        end
+        self.health = self.health + note.hitHealth * self.healthGain
+
+        if not note.noAnimation then
+            local animToPlay = self.singAnimations[math.floor(math.abs(math.min(#self.singAnimations, note.noteData+1)))]
+            local char = self.boyfriend
+            local animCheck = "hey"
+            if note.gfNote then
+                char = self.gf
+                animCheck = "cheer"
+            end
+            if char ~= nil then
+                char:playAnim(animToPlay + note.animSuffix, true)
+                char.holdTimer = 0
+
+                if note.noteType == "Hey!" then
+                    if char.animations[animCheck] then
+                        char:playAnim(animCheck, true)
+                        char.specialAnim = true
+                        char.heyTimer = 0.6
+                    end
+                end
+            end
+        end
+
+        if not self.cpuControlled then
+            local spr = self.playerStrums.members[note.noteData+1]
+            if spr then
+                spr:playAnim("confirm", true)
+            end
+        else 
+            self:strumPlayAnim(false, math.floor(math.abs(note.noteData+1)), Conductor.stepCrochet * 1.25 / 1000 / self.playbackRate)
+        end 
+        
+        if self.voices then
+            self.voices:setVolume(1)
+        end
+
+        local isSus = note.isSustainNote
+        local leData = math.round(math.abs(note.noteData+1))
+        local leType = note.noteType
+
+        if not note.isSustainNote then
+            self.notes:remove(note)
+        end
+    end
+end
+
+function PlayState:keyReleased(key)
+    if not self.cpuControlled and self.startedCountdown and not paused then
+        local spr = self.playerStrums.members[key]
+        if spr then
+            spr:playAnim("static")
+            spr.resetAnim = 0
+        end
+    end
+end
+
+function PlayState:keysCheck()
+    local holdArray = {}
+    local pressArray = {}
+    local releaseArray = {}
+
+    for i, key in ipairs(self.keysArray) do
+        table.insert(holdArray, input:down(key))
+        table.insert(pressArray, input:pressed(key))
+        table.insert(releaseArray, input:released(key))
+    end
+
+    if self.startedCountdown and self.generatedMusic then
+        if #self.sustainNotes.members > 0 then
+            for i, note in ipairs(self.sustainNotes.members) do
+                if note.canBeHit and note.mustPress and not note.tooLate and not note.wasGoodHit and note.isSustainNote and not note.blockHit then
+                    self:goodNoteHit(note)
+                end
+            end
+        end
+
+        -- bf anim
     end
 end
 
