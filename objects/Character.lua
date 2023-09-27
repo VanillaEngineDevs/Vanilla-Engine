@@ -175,7 +175,7 @@ function Character:dance()
                 self:playAnim("danceLeft" .. self.idleSuffix)
             end
         elseif self.animations["idle" .. self.idleSuffix] then
-            self:playAnim("idle" .. self.idleSuffix)
+            self:playAnim("idle" .. self.idleSuffix, true)
         end
     end
 end 

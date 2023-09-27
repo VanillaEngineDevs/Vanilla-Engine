@@ -175,7 +175,7 @@ function Sprite:update(dt)
 end
 
 function Sprite:play(anim, force)
-    if self.curAnim and self.curAnim.name == anim and not force then return end
+    if self.curAnim and self.curAnim.name == anim and not self.animFinished and not force then return end
     if self.animations and self.animations[anim] then
         self.curAnim = self.animations[anim]
         self.curFrame = 1

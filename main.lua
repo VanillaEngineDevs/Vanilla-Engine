@@ -23,6 +23,7 @@ function love.load()
     Paths = require "backend.Paths"
     Cache = require "backend.Cache"
     Conductor = require "backend.Conductor"
+    Camera = require "backend.Camera"
     Sprite = require "modules.Sprite"
     Group = require "modules.flixel.Group"
     Song = require "backend.Song"

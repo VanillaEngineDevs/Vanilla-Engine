@@ -202,7 +202,8 @@ function PlayState:enter()
     self.gfGroup = Group()
 
     self.boyfriend = Character(0, 0, self.SONG.player1, true)
-    self:add(self.boyfriend)
+    self.boyfriendGroup:add(self.boyfriend)
+    self:add(self.boyfriendGroup)
 
     Conductor.songPosition = -5000 / Conductor.songPosition
 
@@ -674,6 +675,12 @@ function PlayState:keyReleased(key)
     end
 end
 
+function PlayState:beatHit()
+    if self.curBeat % self.boyfriend.danceEveryNumBeats == 0 and self.boyfriend.curAnim ~= nil and not self.boyfriend.curAnim.name:startsWith("sing") then
+        self.boyfriend:dance()
+    end
+end
+
 function PlayState:keysCheck()
     local holdArray = {}
     local pressArray = {}
@@ -695,6 +702,9 @@ function PlayState:keysCheck()
         end
 
         -- bf anim
+        if self.boyfriend.curAnim ~= nil and self.boyfriend.holdTimer > Conductor.stepCrochet * (0.0011 / PlayState.playbackRate) * self.boyfriend.singDuration and self.boyfriend.curAnim.name:startsWith("sing") and not self.boyfriend.curAnim.name:endsWith("miss") then
+            self.boyfriend:dance()
+        end
     end
 end
 
