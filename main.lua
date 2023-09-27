@@ -29,6 +29,7 @@ function love.load()
     MusicBeatState = require "backend.MusicBeatState"
     StrumNote = require "objects.StrumNote"
     Note = require "objects.Note"
+    Character = require "objects.Character"
 
     push.setupScreen(1280, 720, {upscale = "normal"})
 

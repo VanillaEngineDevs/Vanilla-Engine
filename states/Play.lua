@@ -13,7 +13,7 @@ PlayState.ratingStuff = {
     {"Good", 0.8},
     {"Great", 0.9},
     {"Sicl!", 1},
-    {"Perfect!!", 1} -- ermmm,,, not used (why does psych do this? ig i gotta view the code lmao)
+    {"Perfect!!", 1} -- ermmm,,, 2nd var not used (why does psych do this? ig i gotta view the code lmao)
 }
 
 PlayState.isCameraOnForcedPos = false 
@@ -125,7 +125,7 @@ PlayState.deathCounter = 0
 PlayState.defaultCamZoom = 1.05
 
 PlayState.daPixelZoom =  6
-PlayState.singAnimations = {"singLEFT", "songDOWN", "singUP", "singRIGHT"}
+PlayState.singAnimations = {"singLEFT", "singDOWN", "singUP", "singRIGHT"}
 
 PlayState.inCutscene = false
 PlayState.skipCountdown = false
@@ -196,6 +196,13 @@ function PlayState:enter()
     self.DAD_Y = 100
     self.GF_X = 400
     self.GF_Y = 130
+
+    self.boyfriendGroup = Group()
+    self.dadGroup = Group()
+    self.gfGroup = Group()
+
+    self.boyfriend = Character(0, 0, self.SONG.player1, true)
+    self:add(self.boyfriend)
 
     Conductor.songPosition = -5000 / Conductor.songPosition
 
@@ -621,7 +628,7 @@ function PlayState:goodNoteHit(note)
                 animCheck = "cheer"
             end
             if char ~= nil then
-                char:playAnim(animToPlay + note.animSuffix, true)
+                char:playAnim(animToPlay .. note.animSuffix, true)
                 char.holdTimer = 0
 
                 if note.noteType == "Hey!" then

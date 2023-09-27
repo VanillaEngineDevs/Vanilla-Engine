@@ -174,11 +174,13 @@ function Sprite:update(dt)
     end
 end
 
-function Sprite:play(anim) 
-    self.curAnim = self.animations[anim]
-    self.curFrame = frame or 1
-    self.animFinished = false
-    self.animPaused = false
+function Sprite:play(anim, force)
+    if self.curAnim and self.curAnim.name == anim and not force then return end
+    if self.animations and self.animations[anim] then
+        self.curAnim = self.animations[anim]
+        self.curFrame = 1
+        self.animFinished = false
+    end 
 end
 
 function Sprite:getCurrentFrame()
