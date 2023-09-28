@@ -183,7 +183,7 @@ function PlayState:enter()
     self.camOther = Camera()
 
     if not self.SONG then
-        self.SONG = Song:loadFromJson("spookeez")
+        self.SONG = Song:loadFromJson("blammed")
     end
     Conductor.mapBPMChanges(self.SONG)
     Conductor.changeBPM(self.SONG.bpm)
@@ -191,7 +191,6 @@ function PlayState:enter()
     
     if not self.SONG.stage or (self.SONG.stage and #self.SONG.stage < 1) then
         self.SONG.stage = StageData:vanillaSongStage(self.songName)
-        print("Stage: " .. self.SONG.stage)
     end
     self.curStage = self.SONG.stage or "stage"
 
@@ -247,22 +246,32 @@ function PlayState:enter()
         stage = Stages.Stage()
     elseif self.curStage == "spooky" then
         stage = Stages.Spooky()
+    elseif self.curStage == "philly" then
+        stage = Stages.Philly()
     end
 
-    self.boyfriend = Character(self.BF_X, self.BF_Y, self.SONG.player1, true)
-    self:add(self.boyfriend)
+    if not stageData.hide_girlfriend then
+        if not self.SONG.gfVersion or #self.SONG.gfVersion < 1 then self.SONG.gfVersion = "gf" end
+        self.gf = Character(self.GF_X, self.GF_Y, self.SONG.gfVersion, false)
+        self:add(self.gf)
 
-    self.boyfriend.camera = self.camGame
+        self.gf.camera = self.camGame
+    end
 
     self.dad = Character(self.DAD_X, self.DAD_Y, self.SONG.player2, false)
     self:add(self.dad)
 
     self.dad.camera = self.camGame
 
+    self.boyfriend = Character(self.BF_X, self.BF_Y, self.SONG.player1, true)
+    self:add(self.boyfriend)
+
+    self.boyfriend.camera = self.camGame
+
     local camPos = {x = self.girlfriendCameraOffset[1], y = self.girlfriendCameraOffset[2]}
     if self.gf then
-        camPos.x = camPos.x + gf:getMidpoint().x + self.gf.cameraPosition[1]
-        camPos.y = camPos.y + gf:getMidpoint().y + self.gf.cameraPosition[2]
+        camPos.x = camPos.x + self.gf:getMidpoint().x + self.gf.cameraPosition[1]
+        camPos.y = camPos.y + self.gf:getMidpoint().y + self.gf.cameraPosition[2]
     end
 
     self.camFollow.x, self.camFollow.y = camPos.x, camPos.y
@@ -348,6 +357,7 @@ function PlayState:sectionHit()
 end
 
 function PlayState:update(dt)
+    stage:update(dt)
     self.super.update(self, dt)
     if self.generatedMusic then
         Conductor.songPosition = Conductor.songPosition + 1000 * dt
@@ -386,6 +396,7 @@ function PlayState:update(dt)
         self.camGame.zoom = math.lerp(self.defaultCamZoom, self.camGame.zoom, math.bound(1 - (dt * 3.125), 0, 1))
         self.camHUD.zoom = math.lerp(1, self.camHUD.zoom, math.bound(1 - (dt * 3.125), 0, 1))
     end
+    print(self.defaultCamZoom)
 
     if self.generatedMusic then
         if not self.cpuControlled then
@@ -820,6 +831,9 @@ end
 function PlayState:beatHit()
     stage:beatHit()
     self.curBeat = self.curBeat + 1
+    if self.gf and self.curBeat % math.round(self.gfSpeed * self.gf.danceEveryNumBeats) == 0 and self.gf.curAnim and not self.gf.curAnim.name:startsWith("sing") then
+        self.gf:dance()
+    end
     if self.curBeat % self.boyfriend.danceEveryNumBeats == 0 and self.boyfriend.curAnim ~= nil and not self.boyfriend.curAnim.name:startsWith("sing") then
         self.boyfriend:dance()
     end

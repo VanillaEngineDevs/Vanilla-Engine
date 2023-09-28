@@ -81,7 +81,7 @@ end
 
 function StageData:getStageFile(stage)
     local rawJson = nil
-    local path = "data/stages/" .. stage .. ".json"
+    local path = "assets/stages/" .. stage .. ".json"
     if love.filesystem.getInfo(path) then
         rawJson = json.decode(love.filesystem.read(path))
     else

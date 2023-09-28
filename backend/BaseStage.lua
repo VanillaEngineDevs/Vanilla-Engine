@@ -42,6 +42,8 @@ BaseStage.curStep = 0
 BaseStage.curDecStep = 0
 BaseStage.curSection = 0
 
+function BaseStage:update(dt) end
+
 function BaseStage:beatHit() end
 function BaseStage:stepHit() end
 function BaseStage:sectionHit() end

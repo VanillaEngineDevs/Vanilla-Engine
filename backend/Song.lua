@@ -71,7 +71,7 @@ end
 function Song:loadFromJson(jsonInput, folder)
     local rawJson = nil
     --local formattedSong = Paths.formatToSongPath(jsonInput)
-    print("Loading song " .. jsonInput)
+    --print("Loading song " .. jsonInput)
     formattedSong = jsonInput
 
     if not rawJson then

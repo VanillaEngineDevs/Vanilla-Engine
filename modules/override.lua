@@ -20,3 +20,13 @@ end
 function math.bound(x, min, max)
     return math.min(math.max(x, min), max)
 end
+
+-- Love functions
+function love.math.randomIgnore(min, max, ignore)
+    local num = love.math.random(min, max)
+    if num == ignore then
+        return love.math.randomIgnore(min, max, ignore)
+    else
+        return num
+    end
+end

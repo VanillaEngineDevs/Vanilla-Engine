@@ -147,7 +147,7 @@ function Sprite:getScreenPosition(camera)
     local tx, ty = 0, 0
     if camera then
         tx, ty = camera:getPosition(0,0)
-        tm, ty = tx * self.scrollFactor.x, ty * self.scrollFactor.y
+        tx, ty = tx * self.scrollFactor.x, ty * self.scrollFactor.y
     end
     return self.x + tx, self.y + ty
 end

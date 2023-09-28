@@ -75,10 +75,10 @@ function Character:new(x, y, character, isPlayer)
     
     local characterPath = character .. ".json"
 
-    if love.filesystem.getInfo("assets/data/characters/" .. characterPath) then
-        rawJson = json.decode(love.filesystem.read("assets/data/characters/" .. characterPath))
+    if love.filesystem.getInfo("assets/characters/" .. characterPath) then
+        rawJson = json.decode(love.filesystem.read("assets/characters/" .. characterPath))
     else
-        rawJson = json.decode(love.filesystem.read("assets/data/characters/bf.json"))
+        rawJson = json.decode(love.filesystem.read("assets/characters/bf.json"))
     end
 
     self.imageFile = rawJson.image
@@ -90,6 +90,8 @@ function Character:new(x, y, character, isPlayer)
     end
 
     self.x, self.y = self.x + rawJson.position[1], self.y + rawJson.position[2]
+    self.cameraPosition = {rawJson.camera_position[1], rawJson.camera_position[2]}
+    self.flipX = (rawJson.flip_x == true)
 
     self.noAntialiasing = (rawJson.no_antialiasing == true)
     self.antialiasing = not noAntialiasing
@@ -123,10 +125,12 @@ function Character:new(x, y, character, isPlayer)
         self.hasMissAnimations = true
     end
     self:recalculateDanceIdle()
-    self:dance()
 
     if self.isPlayer then
+        self.flipX = not self.flipX
     end
+
+    self:dance()
 
     return self
 end
@@ -217,7 +221,7 @@ function Character:recalculateDanceIdle()
     self.danceIdle = (self.animations["danceLeft" .. self.idleSuffix] ~= nil) and (self.animations["danceRight" .. self.idleSuffix] ~= nil)
 
     if self.settingCharacterUp then
-        self.danceEveryNumBeats = (self.danceIdle) and 1 or 4
+        self.danceEveryNumBeats = (self.danceIdle) and 1 or 2
     elseif lastDanceIdle ~= self.danceIdle then
         local calc = self.danceEveryNumBeats
         if self.danceIdle then

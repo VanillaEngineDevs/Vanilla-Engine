@@ -41,9 +41,20 @@ function love.load()
     Stages = {
         Stage = require "states.stages.Stage",
         Spooky = require "states.stages.Spooky",
+        Philly = require "states.stages.Philly",
     }
 
     push.setupScreen(1280, 720, {upscale = "normal"})
+
+    -- function to convert either #000000 or 0x000000 to {r, g, b, a}
+    function hexToColor(hex)
+        if type(hex) == "string" then
+            hex = hex:gsub("#", "")
+            return {tonumber("0x" .. hex:sub(1, 2)) / 255, tonumber("0x" .. hex:sub(3, 4)) / 255, tonumber("0x" .. hex:sub(5, 6)) / 255, 1}
+        elseif type(hex) == "number" then
+            return {bit.rshift(hex, 16) / 255, bit.band(bit.rshift(hex, 8), 0xFF) / 255, bit.band(hex, 0xFF) / 255, 1}
+        end
+    end
 
     -- States
     TitleState = require "states.Title"
