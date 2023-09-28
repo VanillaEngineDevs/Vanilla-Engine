@@ -311,6 +311,7 @@ function PlayState:enter()
     self.camGame.zoom = self.defaultCamZoom
     self.camHUD.zoom = 1
 
+    TitleState.music:stop()
     MusicBeatState:fadeIn(0.4, function()
         PlayState:startCountdown()
         PlayState.generatedMusic = true

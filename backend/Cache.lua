@@ -6,6 +6,13 @@ Cache.members = {
     font = {},
     shader = {},
     data = {},
+    preload = {
+        image = {},
+        sound = {},
+        font = {},
+        shader = {},
+        data = {}
+    }
 }
 
 return Cache

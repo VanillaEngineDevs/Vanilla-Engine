@@ -1,9 +1,11 @@
 local Group = Object:extend()
 
 Group.members = {}
+Group.visible = true
 
 function Group:new()
     self.members = {}
+    self.visible = true
 end
 
 function Group:add(object)
@@ -31,7 +33,7 @@ end
 
 function Group:draw()
     for i, member in ipairs(self.members) do
-        if member.draw then member:draw() end
+        if member.draw and self.visible then member:draw() end
     end
 end
 

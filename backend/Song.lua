@@ -1,10 +1,3 @@
-local function TryExcept(func1, func2)
-    local status, err = pcall(func1)
-    if not status then
-        func2(err)
-    end
-end
-
 local SwagSong = Object:extend()
 SwagSong.song = ""
 SwagSong.notes = {}
@@ -80,14 +73,15 @@ function Song:loadFromJson(jsonInput, folder)
                 function()
                     --rawJson = love.filesystem.read("assets/data/" .. formattedSong)
                     -- check if file exists
-                    if love.filesystem.getInfo("assets/data/" .. formattedSong .. ".json") then
-                        rawJson = love.filesystem.read("assets/data/" .. formattedSong .. ".json")
+                    print("assets/data/" .. formattedSong .. ".json")
+                    if love.filesystem.getInfo("assets/data/" .. folder .. "/" .. formattedSong .. ".json") then
+                        rawJson = love.filesystem.read("assets/data/" .. folder .. "/" .. formattedSong .. ".json")
                     else
                         Break()
                     end
                 end,
                 function()
-                    rawJson = love.filesystem.read("assets/data/" .. formattedSong .. "/" .. formattedSong .. ".json")
+                    rawJson = love.filesystem.read("assets/data/" .. folder .. "/" .. formattedSong .. ".json")
                 end
             )
         else

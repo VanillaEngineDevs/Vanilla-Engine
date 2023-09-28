@@ -27,6 +27,8 @@ Sprite.shader = nil
 Sprite.x, Sprite.y = 0, 0
 Sprite.width, Sprite.height = 0, 0
 
+Sprite.isMakeGraphic = false
+
 Sprite.Stencil = {
     sprite = {},
     x = 0,
@@ -92,6 +94,7 @@ function Sprite:new(x, y, graphic)
     self.curAnim = nil
     self.curFrame = nil
     self.animFinished = nil
+    self.isMakeGraphic = false
 
     if graphic then self:load(graphic) end
 end
@@ -109,6 +112,18 @@ function Sprite:load(graphic)
 end
 
 function Sprite:setFrames(frames)
+    if self.frames then
+        self.frames = nil
+    end
+    if self.animations then
+        self.animations = nil
+    end
+    if self.curAnim then
+        self.curAnim = nil
+    end
+    if self.graphic then
+        self.graphic = nil
+    end
     self.frames = frames
     self.graphic = frames.graphic
 
@@ -195,6 +210,18 @@ function Sprite:update(dt)
     end
 end
 
+function Sprite:makeGraphic(width, height, color)
+    local width = width or 10
+    local height = height or 10
+    local color = hexToColor(color or 0xFFFFFFFF)
+
+    self.isMakeGraphic = true
+
+    self:setGraphicSize(width, height)
+    self.color = color
+    self:updateHitbox()
+end
+
 function Sprite:play(anim, force)
     if not force and self.curAnim and self.curAnim.name == anim and not self.animFinished then
         self.animFinished = false
@@ -231,6 +258,11 @@ end
 function Sprite:setGraphicSize(w, h)
     local w = w or 0
     local h = h or 0
+
+    if self.isMakeGraphic then
+        self.width = w
+        self.height = h
+    end
 
     self.scale.x = w / self:getFrameWidth()
     self.scale.y = h / self:getFrameHeight()
@@ -271,7 +303,7 @@ function Sprite:screenCenter(axis)
 end
 
 function Sprite:draw()
-    if self.exists and self.alive and self.visible and self.graphic then
+    if self.exists and self.alive and self.visible and (self.graphic or self.isMakeGraphic) then
         local cam = self.camera
         local frame = self.curAnim and self.curAnim.frames[math.floor(self.curFrame)] or nil
         if self.shader then
@@ -283,7 +315,7 @@ function Sprite:draw()
             love.graphics.setStencilTest("greater", 0)
         end
         local x, y
-        if cam ~= PlayState.camHUD then
+        if cam == PlayState.camGame then
             x, y = self:getScreenPosition(cam)
         else
             x, y = self.x, self.y
@@ -321,7 +353,15 @@ function Sprite:draw()
                 love.graphics.scale(cam.zoom)
                 love.graphics.translate(-cam.width / 2, -cam.height / 2)
             end
-            if not frame then
+            if self.isMakeGraphic then
+                local w, h = self.width, self.height
+
+                love.graphics.push()
+                love.graphics.translate(x, y)
+                love.graphics.rotate(angle)
+                love.graphics.rectangle("fill", -(math.abs(self.scale.x) * w)/2, -(math.abs(self.scale.y) * h)/2, math.abs(self.scale.x) * w, math.abs(self.scale.y) * h)
+                love.graphics.pop()
+            elseif not frame then
                 love.graphics.draw(self.graphic, x, y, angle, sx, sy, ox, oy, self.shear.x, self.shear.y)
             else
                 --print('its over /b/ros....')

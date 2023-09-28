@@ -34,4 +34,9 @@ function CoolUtil.newGradient(dir, ...)
     return love.graphics.newMesh(meshData, "strip", "static")
 end
 
+function CoolUtil.coolLerp(a, b, t, dt)
+    local dt = dt or love.timer.getDelta()
+    return a + (b - a) * math.min(t * dt, 1)
+end
+
 return CoolUtil

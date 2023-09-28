@@ -1,5 +1,4 @@
 function love.load()
-    
     -- Libraries
     input = (require "libs.baton").new {
         controls = {
@@ -9,6 +8,11 @@ function love.load()
             g_down = {"key:down", "key:s", "axis:lefty+", "button:dpdown"},
 
             m_confirm = {"key:return", "button:a"},
+            m_down = {"key:down", "button:dpdown"},
+            m_up = {"key:up", "button:dpup"},
+            m_left = {"key:left", "button:dpleft"},
+            m_right = {"key:right", "button:dpright"},
+            m_back = {"key:escape", "button:b"},
         },
         joystick = love.joystick.getJoysticks()[1],
     }
@@ -27,11 +31,14 @@ function love.load()
     Conductor = require "backend.Conductor"
     Camera = require "backend.Camera"
     Sprite = require "modules.Sprite"
+    Text = require "modules.Text"
     Group = require "modules.flixel.Group"
     Song = require "backend.Song"
     MusicBeatState = require "backend.MusicBeatState"
     BaseStage = require "backend.BaseStage"
     StageData = require "backend.StageData"
+    WeekData = require "backend.WeekData"
+    Difficulty = require "backend.Difficulty"
 
     StrumNote = require "objects.StrumNote"
     Note = require "objects.Note"
@@ -47,18 +54,11 @@ function love.load()
 
     push.setupScreen(1280, 720, {upscale = "normal"})
 
-    -- function to convert either #000000 or 0x000000 to {r, g, b, a}
-    function hexToColor(hex)
-        if type(hex) == "string" then
-            hex = hex:gsub("#", "")
-            return {tonumber("0x" .. hex:sub(1, 2)) / 255, tonumber("0x" .. hex:sub(3, 4)) / 255, tonumber("0x" .. hex:sub(5, 6)) / 255, 1}
-        elseif type(hex) == "number" then
-            return {bit.rshift(hex, 16) / 255, bit.band(bit.rshift(hex, 8), 0xFF) / 255, bit.band(hex, 0xFF) / 255, 1}
-        end
-    end
 
     -- States
     TitleState = require "states.Title"
+    MainMenuState = require "states.MainMenu"
+    StoryMenuState = require "states.StoryMenu"
     PlayState = require "states.Play"
 
     Gamestate.switch(TitleState)

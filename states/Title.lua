@@ -1,6 +1,10 @@
-local title = MusicBeatState:extend()
+local TitleState = MusicBeatState:extend()
+TitleState.music = nil
 
-function title:enter()
+function TitleState:enter()
+    self.music = love.audio.newSource("assets/music/freakyMenu.ogg", "stream")
+    self.music:setLooping(true)
+    self.music:play()
     self.danceLeft = true
     Conductor.changeBPM(102)
     self.logo = Sprite(-150, -100)
@@ -21,7 +25,7 @@ function title:enter()
     self.enterText:play("idle")
 end
 
-function title:update(dt)
+function TitleState:update(dt)
     self.super.update(self, dt)
     Conductor.songPosition = Conductor.songPosition + 1000 * dt
     self.logo:update(dt)
@@ -34,13 +38,13 @@ function title:update(dt)
         self.enterText.offset.y = -4
         MusicBeatState:fadeOut(0.3,
             function()
-                MusicBeatState:switchState(PlayState)
+                MusicBeatState:switchState(MainMenuState)
             end
         )
     end
 end
 
-function title:beatHit()
+function TitleState:beatHit()
     self.super.beatHit(self)
 
     if self.gfTitle then
@@ -57,16 +61,16 @@ function title:beatHit()
     end
 end
 
-function title:draw()
+function TitleState:draw()
     self.gfTitle:draw()
     self.logo:draw()
     self.enterText:draw()
 end
 
-function title:leave()
+function TitleState:leave()
     self.logo = nil
     self.gfTitle = nil
     self.enterText = nil
 end
 
-return title
+return TitleState
