@@ -598,7 +598,7 @@ function PlayState:generateSong(dataPath)
             local daNoteData = math.floor(songNotes[2] % 4)
             local gottaHitNote = section.mustHitSection
 
-            if songNotes[2] > 4 then
+            if songNotes[2] > 3 then
                 gottaHitNote = not gottaHitNote
             end
 

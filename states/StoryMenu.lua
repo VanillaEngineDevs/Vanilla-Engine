@@ -243,7 +243,6 @@ function StoryMenuState:selectWeek()
                 local diffic = Difficulty:getFilePath(self.curDifficulty)
                 if not diffic then diffic = "" end
                 PlayState.storyDifficulty = self.curDifficulty
-                print(diffic, PlayState.storyPlaylist[1]:lower() .. diffic)
 
                 -- i am... NOT sorry!
                 PlayState.SONG = Song:loadFromJson(PlayState.storyPlaylist[1]:lower() .. diffic, PlayState.storyPlaylist[1]:lower())
