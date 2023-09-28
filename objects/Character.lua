@@ -68,14 +68,14 @@ function Character:new(x, y, character, isPlayer)
 
     self.super.new(self, x, y)
 
-    self.animoffsets = {}
+    self.animOffsets = {}
     self.curCharacter = character
     self.isPlayer = isPlayer
     local library, rawJson = nil, nil
     
     local characterPath = "characters/" .. character .. ".json"
 
-    if love.filesystem.getInfo(characterPath) then
+    if love.filesystem.getInfo("assets/data/" .. characterPath) then
         rawJson = json.decode(love.filesystem.read("assets/data/" .. characterPath))
     else
         rawJson = json.decode(love.filesystem.read("assets/data/characters/bf.json"))
@@ -88,6 +88,8 @@ function Character:new(x, y, character, isPlayer)
         self:setGraphicSize(math.floor(self.width * self.jsonScale))
         self:updateHitbox()
     end
+
+    self.x, self.y = self.x + rawJson.position[1], self.y + rawJson.position[2]
 
     self.noAntialiasing = (rawJson.no_antialiasing == true)
     self.antialiasing = not noAntialiasing
@@ -104,7 +106,6 @@ function Character:new(x, y, character, isPlayer)
             if animIndices ~= nil and #animIndices > 0 then
                 self:addByIndices(animAnim, animName, animIndices, animFps, animLoop)
             else
-                print(animAnim, animName)
                 self:addByPrefix(animAnim, animName, animFps, animLoop)
             end
 
@@ -126,6 +127,8 @@ function Character:new(x, y, character, isPlayer)
 
     if self.isPlayer then
     end
+
+    return self
 end
 
 function Character:update(dt)

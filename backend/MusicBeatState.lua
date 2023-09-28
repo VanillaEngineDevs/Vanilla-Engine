@@ -1,6 +1,6 @@
 local MusicBeatState = Object:extend()
 
-MusicBeatState.curSection = 0
+MusicBeatState.curSection = 1
 MusicBeatState.stepsToDo = 0
 MusicBeatState.curStep = 0
 MusicBeatState.curBeat = 0
@@ -12,7 +12,19 @@ MusicBeatState.camBeat = nil
 
 MusicBeatState.timePassedOnState = 0
 
+MusicBeatState.fadeTimer = nil
+MusicBeatState.fade = {}
+
 function MusicBeatState:enter() 
+    self.curSection = 1
+    self.stepsToDo = 0
+    self.curStep = 0
+    self.curBeat = 0
+
+    self.curDecStep = 0
+    self.curDecBeat = 0
+
+    self.timePassedOnState = 0
     self.camBeat = nil
 
     self.timePassedOnState = 0
@@ -38,6 +50,44 @@ function MusicBeatState:update(dt)
             end
         end
     end
+end
+
+function MusicBeatState:switchState(nextState)
+    if not nextState then nextState = Gamestate.current() end
+    
+    Gamestate.switch(nextState)
+end
+
+function MusicBeatState:fadeIn(duration, callback)
+    if self.fadeTimer then Timer.cancel(self.fadeTimer) end
+
+    self.fade = {
+        height = push.getHeight() * 2,
+        graphic = CoolUtil.newGradient("vertical", {0, 0, 0, 0}, {0, 0, 0}, {0, 0, 0})
+    }
+
+    self.fade.y = -self.fade.height / 2
+    self.fadeTimer = Timer.tween(duration * 2, self.fade, {y = self.fade.height}, "linear", function()
+        self.fade.graphic:release()
+        self.fade = {}
+        if callback then callback() end
+    end)
+end
+
+function MusicBeatState:fadeOut(duration, callback)
+    if self.fadeTimer then Timer.cancel(self.fadeTimer) end
+
+    self.fade = {
+        height = push.getHeight() * 2,
+        graphic = CoolUtil.newGradient("vertical", {0, 0, 0}, {0, 0, 0}, {0, 0, 0, 0})
+    }
+
+    self.fade.y = -self.fade.height / 2
+    self.fadeTimer = Timer.tween(duration, self.fade, {y = 0}, "linear", function()
+        self.fade.graphic:release()
+        self.fade = {}
+        if callback then callback() end
+    end)
 end
 
 function MusicBeatState:updateSection()

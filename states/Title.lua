@@ -32,7 +32,11 @@ function title:update(dt)
         self.enterText:play("flash")
         self.enterText.offset.x = -9
         self.enterText.offset.y = -4
-        Gamestate.switch(PlayState)
+        MusicBeatState:fadeOut(0.3,
+            function()
+                MusicBeatState:switchState(PlayState)
+            end
+        )
     end
 end
 

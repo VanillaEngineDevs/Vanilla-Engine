@@ -219,7 +219,7 @@ function Note:followStrumNote(myStrum, fakeCrochet, songSpeed)
 end
 
 function Note:clipToStrumNote(myStrum)
-    local center = myStrum.y + Note.swagWidth/1.5
+    local center = myStrum.y + Note.swagWidth/1.35
     local vert = center - self.y
     if self.isSustainNote and (self.mustPress or not self.ignoreNote) and ((not self.mustPress) or (self.wasGoodHit or (self.prevNote.wasGoodHit and not self.canBeHit))) then
         local swagRect = self.clipRect

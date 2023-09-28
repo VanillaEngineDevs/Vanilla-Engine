@@ -37,9 +37,6 @@ PlayState.songSpeedType = "multiplicative"
 PlayState.noteKillOffset = 350
 PlayState.playbackRate = 1
 
-PlayState.boyfriendGroup = Group()
-PlayState.dadGroup = Group()
-PlayState.gfGroup = Group()
 PlayState.curStage = ""
 PlayState.stageUI = "normal"
 PlayState.isPixelStage = false
@@ -105,9 +102,9 @@ PlayState.botplayTxt = ""
 
 PlayState.iconP1 = nil
 PlayState.iconP2 = nil
-PlayState.camHUD = {x=0,y=0,zoom=1,defaultZoom=1}
-PlayState.camGame = {x=0,y=0,zoom=1,defaultZoom=1}
-PlayState.camOther = {x=0,y=0,zoom=1,defaultZoom=1}
+PlayState.camHUD = Camera()
+PlayState.camGame = Camera()
+PlayState.camOther = Camera()
 PlayState.camSpeed = 1
 
 PlayState.songScore = 0
@@ -158,6 +155,10 @@ function PlayState:remove(member)
     end
 end
 
+function PlayState:insert(position, member)
+    table.insert(self.members, position, member)
+end
+
 function PlayState:clear()
     self.members = {}
 end
@@ -174,36 +175,94 @@ function PlayState:enter()
         "g_up",
         "g_right"
     }
+    self.inputsArray = {false, false, false, false}
 
-    self.camGame = {x=0,y=0,zoom=1,defaultZoom=1}
-    self.camHUD = {x=0,y=0,zoom=1,defaultZoom=1}
-    self.camOther = {x=0,y=0,zoom=1,defaultZoom=1}
+    self.camGame = Camera()
+    self.camGame.target = {x = 0, y = 0}
+    self.camHUD = Camera()
+    self.camOther = Camera()
 
     if not self.SONG then
-        self.SONG = Song:loadFromJson("test")
+        self.SONG = Song:loadFromJson("bopeebo")
     end
     Conductor.mapBPMChanges(self.SONG)
     Conductor.changeBPM(self.SONG.bpm)
     self.songName = Paths.formatToSongPath(self.SONG.song)
+    
+    if self.SONG.stage or (self.SONG.stage and #self.SONG.stage < 1) then
+        self.SONG.stage = StageData.vanillaSongStage(songName)
+    end
+    self.curStage = self.SONG.stage or "stage"
 
-    self.defaultCamZoom = 1.05
+    local stageData = StageData:getStageFile(self.curStage)
+    if not stageData then
+        stageData = StageData:dummy()
+    end
+
+    self.defaultCamZoom = stageData.defaultZoom
 
     self.stageUI = "normal"
+    if stageData.stageUI and #stageData.stageUI > 0 then
+        self.stageUI = stageData.stageUI
+    else
+        if stageData.isPixelStage then
+            self.stageUI = "pixel"
+        end
+    end
 
-    self.BF_X = 770
+   --[[  self.BF_X = 770
     self.BF_Y = 100
     self.DAD_X = 100
     self.DAD_Y = 100
     self.GF_X = 400
-    self.GF_Y = 130
+    self.GF_Y = 130 ]]
+    self.BF_X = stageData.boyfriend[1]
+    self.BF_Y = stageData.boyfriend[2]
+    self.DAD_X = stageData.opponent[1]
+    self.DAD_Y = stageData.opponent[2]
+    self.GF_X = stageData.girlfriend[1]
+    self.GF_Y = stageData.girlfriend[2]
 
-    self.boyfriendGroup = Group()
-    self.dadGroup = Group()
-    self.gfGroup = Group()
+    if stageData.camera_speed ~= nil then
+        self.cameraSpeed = stageData.camera_speed
+    end
 
-    self.boyfriend = Character(0, 0, self.SONG.player1, true)
-    self.boyfriendGroup:add(self.boyfriend)
-    self:add(self.boyfriendGroup)
+    self.boyfriendCameraOffset = stageData.camera_boyfriend
+    if not self.boyfriendCameraOffset then
+        self.boyfriendCameraOffset = {0, 0}
+    end
+
+    self.opponentCameraOffset = stageData.camera_opponent
+    if not self.opponentCameraOffset then
+        self.opponentCameraOffset = {0, 0}
+    end
+
+    self.girlfriendCameraOffset = stageData.camera_girlfriend
+    if not self.girlfriendCameraOffset then
+        self.girlfriendCameraOffset = {0, 0}
+    end
+
+    if self.curStage == "stage" then
+        stage = Stages.Stage()
+    end
+
+    self.boyfriend = Character(self.BF_X, self.BF_Y, self.SONG.player1, true)
+    self:add(self.boyfriend)
+
+    self.boyfriend.camera = self.camGame
+
+    self.dad = Character(self.DAD_X, self.DAD_Y, self.SONG.player2, false)
+    self:add(self.dad)
+
+    self.dad.camera = self.camGame
+
+    local camPos = {x = self.girlfriendCameraOffset[1], y = self.girlfriendCameraOffset[2]}
+    if self.gf then
+        camPos.x = camPos.x + gf:getMidpoint().x + self.gf.cameraPosition[1]
+        camPos.y = camPos.y + gf:getMidpoint().y + self.gf.cameraPosition[2]
+    end
+
+    self.camFollow.x, self.camFollow.y = camPos.x, camPos.y
 
     Conductor.songPosition = -5000 / Conductor.songPosition
 
@@ -222,9 +281,58 @@ function PlayState:enter()
 
     self:generateSong(self.SONG.song)
 
-    self.generatedMusic = true
+    self.generatedMusic = false
 
     Conductor.safeZoneOffset = (10 / 60) * 1000
+
+    self:moveCameraSection()
+
+    MusicBeatState:fadeIn(0.4, function()
+        PlayState:startCountdown()
+        PlayState.generatedMusic = true
+    end)
+end
+
+function PlayState:moveCameraSection(sec)
+    if not sec then sec = self.curSection end
+    if sec < 1 then sec = 1 end
+
+    if not self.SONG.notes[sec] then return end
+
+    if self.gf and self.SONG.notes[sec].gfSection then
+    end
+
+    local isBF = self.SONG.notes[sec].mustHitSection
+    self:moveCamera(not isBF)
+end
+
+function PlayState:moveCamera(isDad)
+    if self.camTween then
+        Timer.cancel(self.camTween)
+    end
+    if isDad then
+        self.camTween = Timer.tween(self.cameraSpeed, self.camFollow, 
+            {
+                x = self.dad:getMidpoint().x + 150 + self.dad.cameraPosition[1] + self.opponentCameraOffset[1], 
+                y = self.dad:getMidpoint().y - 100 + self.dad.cameraPosition[2] + self.opponentCameraOffset[2]
+            }, "out-quad"
+        )
+    else
+        self.camTween = Timer.tween(self.cameraSpeed, self.camFollow, 
+            {
+                x = self.boyfriend:getMidpoint().x - 100 - self.boyfriend.cameraPosition[1] - self.boyfriendCameraOffset[1], 
+                y = self.boyfriend:getMidpoint().y - 100 + self.boyfriend.cameraPosition[2] + self.boyfriendCameraOffset[2]
+            }, "out-quad"
+        )
+    end
+end
+
+function PlayState:sectionHit()
+    if self.SONG.notes[self.curSection] then
+        if self.generatedMusic and not self.endingSong and not self.isCameraOnForcedPos then
+            self:moveCameraSection()
+        end
+    end
 end
 
 function PlayState:update(dt)
@@ -253,6 +361,11 @@ function PlayState:update(dt)
             --print(#self.notes.members)
         end
     end
+
+    -- set camGame to camFollow
+    self.camGame.x, self.camGame.y = self.camFollow.x, self.camFollow.y
+    self.camGame.target.x, self.camGame.target.y = self.camFollow.x, self.camFollow.y
+    --print(self.camGame.x, self.camGame.y, self.camFollow.x, self.camFollow.y)
 
     if self.generatedMusic then
         if not self.cpuControlled then
@@ -336,10 +449,18 @@ function PlayState:update(dt)
         if input:pressed(self.keysArray[i]) then
             self:keyPressed(i)
         end
+        if input:down(self.keysArray[i]) then
+            self:keyDown(i)
+        end
         if input:released(self.keysArray[i]) then
             self:keyReleased(i)
         end
     end
+end
+
+function PlayState:keyDown(key)
+    local inputname = PlayState.keysArray[key]
+    self.inputsArray[key] = true
 end
 
 function PlayState:draw(dt)
@@ -496,8 +617,6 @@ function PlayState:generateSong(dataPath)
 
     -- sort unspawnNotes by strumTime
     table.sort(self.unspawnNotes, function(a, b) return a.strumTime < b.strumTime end)
-
-    self:startCountdown()
 end
 
 function PlayState:startCountdown()
@@ -673,11 +792,17 @@ function PlayState:keyReleased(key)
             spr.resetAnim = 0
         end
     end
+
+    self.inputsArray[key] = false
 end
 
 function PlayState:beatHit()
+    self.curBeat = self.curBeat + 1
     if self.curBeat % self.boyfriend.danceEveryNumBeats == 0 and self.boyfriend.curAnim ~= nil and not self.boyfriend.curAnim.name:startsWith("sing") then
         self.boyfriend:dance()
+    end
+    if self.curBeat % self.dad.danceEveryNumBeats == 0 and self.dad.curAnim ~= nil and not self.dad.curAnim.name:startsWith("sing") then
+        self.dad:dance()
     end
 end
 
@@ -695,7 +820,7 @@ function PlayState:keysCheck()
     if self.startedCountdown and self.generatedMusic then
         if #self.sustainNotes.members > 0 then
             for i, note in ipairs(self.sustainNotes.members) do
-                if note.canBeHit and note.mustPress and not note.tooLate and not note.wasGoodHit and note.isSustainNote and not note.blockHit then
+                if note.canBeHit and note.mustPress and not note.tooLate and not note.wasGoodHit and note.isSustainNote and not note.blockHit and self.inputsArray[note.noteData+1] then
                     self:goodNoteHit(note)
                 end
             end

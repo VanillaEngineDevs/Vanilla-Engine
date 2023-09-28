@@ -1,4 +1,5 @@
 function love.load()
+    
     -- Libraries
     input = (require "libs.baton").new {
         controls = {
@@ -20,6 +21,7 @@ function love.load()
 
     -- Modules
     require "modules.override"
+    CoolUtil = require "modules.CoolUtil"
     Paths = require "backend.Paths"
     Cache = require "backend.Cache"
     Conductor = require "backend.Conductor"
@@ -28,9 +30,17 @@ function love.load()
     Group = require "modules.flixel.Group"
     Song = require "backend.Song"
     MusicBeatState = require "backend.MusicBeatState"
+    BaseStage = require "backend.BaseStage"
+    StageData = require "backend.StageData"
+
     StrumNote = require "objects.StrumNote"
     Note = require "objects.Note"
     Character = require "objects.Character"
+    BGSprite = require "objects.BGSprite"
+
+    Stages = {
+        Stage = require "states.stages.Stage",
+    }
 
     push.setupScreen(1280, 720, {upscale = "normal"})
 
@@ -54,6 +64,10 @@ end
 function love.draw()
     push:start()
         Gamestate.draw()
+
+        if MusicBeatState.fade.graphic then
+            love.graphics.draw(MusicBeatState.fade.graphic, 0, MusicBeatState.fade.y, 0, push:getWidth(), MusicBeatState.fade.height)
+        end
     push:finish()
 
     -- print fps

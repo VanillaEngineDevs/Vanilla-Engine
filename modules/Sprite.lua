@@ -136,6 +136,22 @@ function Sprite:addByPrefix(animName, animPrefix, framerate, loop)
     self.animations[animName] = anim
 end
 
+function Sprite:getMidpoint()
+    return {
+        x = self.x + self.width / 2,
+        y = self.y + self.height / 2
+    }
+end
+
+function Sprite:getScreenPosition(camera)
+    local tx, ty = 0, 0
+    if camera then
+        tx, ty = camera:getPosition(0,0)
+        tm, ty = tx * self.scrollFactor.x, ty * self.scrollFactor.y
+    end
+    return self.x + tx, self.y + ty
+end
+
 function Sprite:addByIndices(animName, animPrefix, indices, framerate, loop)
     framerate = framerate or 30
     loop = (loop == nil) and true or loop
@@ -146,12 +162,11 @@ function Sprite:addByIndices(animName, animPrefix, indices, framerate, loop)
     anim.framerate = framerate
     anim.looped = loop
 
-    for i, frame in ipairs(self.frames.frames) do
-        if frame.name:startsWith(animPrefix) then
-            for j, index in ipairs(indices) do
-                if i == index then
-                    table.insert(anim.frames, frame)
-                end
+    for _, i in ipairs(indices) do
+        for i2, frame in ipairs(self.frames.frames) do
+            if frame.name:startsWith(animPrefix) and tonumber(string.sub(frame.name, #animPrefix + 1)) == i then
+                table.insert(anim.frames, frame)
+                break
             end
         end
     end
@@ -247,6 +262,7 @@ end
 
 function Sprite:draw()
     if self.exists and self.alive and self.visible and self.graphic then
+        local cam = self.camera
         local frame = self.curAnim and self.curAnim.frames[math.floor(self.curFrame)] or nil
         if self.shader then
             love.graphics.setShader(self.shader)
@@ -257,7 +273,7 @@ function Sprite:draw()
             love.graphics.setStencilTest("greater", 0)
         end
 
-        local x, y = self.x, self.y
+        local x, y = self:getScreenPosition(cam)
         local angle = math.rad(self.angle)
         local sx, sy = self.scale.x, self.scale.y
         local ox, oy = self.origin.x, self.origin.y

@@ -8,6 +8,7 @@ function Camera:new(x, y, w, h)
 
     self.x = x
     self.y = y
+    self.angle = 0
     self.target = nil
     self.width = w
     self.height = h
@@ -15,7 +16,7 @@ function Camera:new(x, y, w, h)
 end
 
 function Camera:getPosition(x, y)
-    return x - (not self.target and 0 or self.target.x) + self.width / 2, y (not self.target and 0 or self.target.y) + self.height / 2
+    return x - (not self.target and 0 or self.target.x) + self.width / 2, y - (not self.target and 0 or self.target.y) + self.height / 2
 end
 
 function Camera:attach()
