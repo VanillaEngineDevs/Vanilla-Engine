@@ -59,7 +59,7 @@ function BaseStage:add(object) self.game:add(object) end
 function BaseStage:remove(object) self.game:remove(object) end
 function BaseStage:insert(position, object) self.game:insert(position, object) end
 
-function BaseStage:addBehindGf(object)
+function BaseStage:addBehindGF(object)
     -- get index of gf
     local gfIndex = 0
     for i, member in ipairs(self.game.members) do

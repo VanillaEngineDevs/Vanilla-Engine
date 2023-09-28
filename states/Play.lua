@@ -183,7 +183,7 @@ function PlayState:enter()
     self.camOther = Camera()
 
     if not self.SONG then
-        self.SONG = Song:loadFromJson("blammed")
+        self.SONG = Song:loadFromJson("milf")
     end
     Conductor.mapBPMChanges(self.SONG)
     Conductor.changeBPM(self.SONG.bpm)
@@ -248,10 +248,18 @@ function PlayState:enter()
         stage = Stages.Spooky()
     elseif self.curStage == "philly" then
         stage = Stages.Philly()
+    elseif self.curStage == "limo" then
+        stage = Stages.Limo()
     end
 
     if not stageData.hide_girlfriend then
-        if not self.SONG.gfVersion or #self.SONG.gfVersion < 1 then self.SONG.gfVersion = "gf" end
+        if not self.SONG.gfVersion or #self.SONG.gfVersion < 1 then 
+            if self.curStage ~= "limo" then
+                self.SONG.gfVersion = "gf" 
+            else
+                self.SONG.gfVersion = "gf-car"
+            end
+        end
         self.gf = Character(self.GF_X, self.GF_Y, self.SONG.gfVersion, false)
         self:add(self.gf)
 
@@ -276,7 +284,7 @@ function PlayState:enter()
 
     self.camFollow.x, self.camFollow.y = camPos.x, camPos.y
 
-    stage.createPost()
+    stage:createPost()
     Conductor.songPosition = -5000 / Conductor.songPosition
 
     strumLineNotes = Group()
@@ -396,7 +404,6 @@ function PlayState:update(dt)
         self.camGame.zoom = math.lerp(self.defaultCamZoom, self.camGame.zoom, math.bound(1 - (dt * 3.125), 0, 1))
         self.camHUD.zoom = math.lerp(1, self.camHUD.zoom, math.bound(1 - (dt * 3.125), 0, 1))
     end
-    print(self.defaultCamZoom)
 
     if self.generatedMusic then
         if not self.cpuControlled then
@@ -612,7 +619,7 @@ function PlayState:generateSong(dataPath)
             -- holdnote shits
             local floorSus = math.floor(susLength)
             if floorSus > 0 then
-                for susNote = 0, floorSus+1 do
+                for susNote = 0, floorSus do
                     local oldNote = self.unspawnNotes[#self.unspawnNotes]
                     --print(daStrumTime + (Conductor.stepCrochet * susNote))
 

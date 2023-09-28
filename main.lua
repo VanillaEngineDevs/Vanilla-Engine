@@ -42,6 +42,7 @@ function love.load()
         Stage = require "states.stages.Stage",
         Spooky = require "states.stages.Spooky",
         Philly = require "states.stages.Philly",
+        Limo = require "states.stages.Limo",
     }
 
     push.setupScreen(1280, 720, {upscale = "normal"})

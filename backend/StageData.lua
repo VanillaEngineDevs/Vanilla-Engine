@@ -91,6 +91,7 @@ function StageData:getStageFile(stage)
 end
 
 function StageData:vanillaSongStage(songName)
+    local songNmae = songName:lower():gsub(" ", "-")
     if songName then
         if songName == "spookeez" or songName == "south" or songName == "monster" then
             return "spooky"
