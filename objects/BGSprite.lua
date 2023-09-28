@@ -3,6 +3,7 @@ local BGSprite = Sprite:extend()
 BGSprite.idleAnim = ""
 
 function BGSprite:new(image, x, y, scrollX, scrollY, animArray, loop)
+    self.idleAnim = ""
     local x = x or 0
     local y = y or 0
     local scrollX = scrollX or 1
@@ -11,8 +12,16 @@ function BGSprite:new(image, x, y, scrollX, scrollY, animArray, loop)
 
     self.super.new(self, x, y)
 
-    if self.animArray then
-
+    if animArray then
+        self:setFrames(Paths.getSparrowAtlas(image, love.filesystem.read("assets/images/png/" .. image .. ".xml")))
+        for i = 1, #animArray do
+            local anim = animArray[i]
+            self:addByPrefix(anim, anim, 24, loop)
+            if self.idleAnim == "" then
+                self.idleAnim = anim
+                self:play(anim)
+            end
+        end
     else
         self:load(image)
     end

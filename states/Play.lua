@@ -183,14 +183,15 @@ function PlayState:enter()
     self.camOther = Camera()
 
     if not self.SONG then
-        self.SONG = Song:loadFromJson("bopeebo")
+        self.SONG = Song:loadFromJson("spookeez")
     end
     Conductor.mapBPMChanges(self.SONG)
     Conductor.changeBPM(self.SONG.bpm)
     self.songName = Paths.formatToSongPath(self.SONG.song)
     
-    if self.SONG.stage or (self.SONG.stage and #self.SONG.stage < 1) then
-        self.SONG.stage = StageData.vanillaSongStage(songName)
+    if not self.SONG.stage or (self.SONG.stage and #self.SONG.stage < 1) then
+        self.SONG.stage = StageData:vanillaSongStage(self.songName)
+        print("Stage: " .. self.SONG.stage)
     end
     self.curStage = self.SONG.stage or "stage"
 
@@ -244,6 +245,8 @@ function PlayState:enter()
 
     if self.curStage == "stage" then
         stage = Stages.Stage()
+    elseif self.curStage == "spooky" then
+        stage = Stages.Spooky()
     end
 
     self.boyfriend = Character(self.BF_X, self.BF_Y, self.SONG.player1, true)
@@ -264,6 +267,7 @@ function PlayState:enter()
 
     self.camFollow.x, self.camFollow.y = camPos.x, camPos.y
 
+    stage.createPost()
     Conductor.songPosition = -5000 / Conductor.songPosition
 
     strumLineNotes = Group()
@@ -286,6 +290,9 @@ function PlayState:enter()
     Conductor.safeZoneOffset = (10 / 60) * 1000
 
     self:moveCameraSection()
+
+    self.camGame.zoom = self.defaultCamZoom
+    self.camHUD.zoom = 1
 
     MusicBeatState:fadeIn(0.4, function()
         PlayState:startCountdown()
@@ -332,6 +339,11 @@ function PlayState:sectionHit()
         if self.generatedMusic and not self.endingSong and not self.isCameraOnForcedPos then
             self:moveCameraSection()
         end
+
+        if self.camZooming and self.camGame.zoom < 1.35 then
+            self.camGame.zoom = self.camGame.zoom + 0.015
+            self.camHUD.zoom = self.camHUD.zoom + 0.03
+        end
     end
 end
 
@@ -341,7 +353,9 @@ function PlayState:update(dt)
         Conductor.songPosition = Conductor.songPosition + 1000 * dt
     end
     for i, member in ipairs(self.members) do
-        if member.update then member:update(dt) end
+        if member.update then 
+            member:update(dt) 
+        end
     end
 
     if self.unspawnNotes[1] ~= nil then
@@ -358,6 +372,7 @@ function PlayState:update(dt)
                 self.sustainNotes:add(note)
             end
             note.spawned = true
+            note.camera = self.camHUD
             --print(#self.notes.members)
         end
     end
@@ -366,6 +381,11 @@ function PlayState:update(dt)
     self.camGame.x, self.camGame.y = self.camFollow.x, self.camFollow.y
     self.camGame.target.x, self.camGame.target.y = self.camFollow.x, self.camFollow.y
     --print(self.camGame.x, self.camGame.y, self.camFollow.x, self.camFollow.y)
+
+    if self.camZooming then
+        self.camGame.zoom = math.lerp(self.defaultCamZoom, self.camGame.zoom, math.bound(1 - (dt * 3.125), 0, 1))
+        self.camHUD.zoom = math.lerp(1, self.camHUD.zoom, math.bound(1 - (dt * 3.125), 0, 1))
+    end
 
     if self.generatedMusic then
         if not self.cpuControlled then
@@ -665,6 +685,7 @@ function PlayState:generateStaticArrows(player)
 
         local babyArrow = StrumNote(strumLineX, strumLineY, i-1, player)
         babyArrow.downscroll = false
+        babyArrow.camera = self.camHUD
 
         if player == 1 then
             self.playerStrums:add(babyArrow)
@@ -797,6 +818,7 @@ function PlayState:keyReleased(key)
 end
 
 function PlayState:beatHit()
+    stage:beatHit()
     self.curBeat = self.curBeat + 1
     if self.curBeat % self.boyfriend.danceEveryNumBeats == 0 and self.boyfriend.curAnim ~= nil and not self.boyfriend.curAnim.name:startsWith("sing") then
         self.boyfriend:dance()
@@ -804,6 +826,13 @@ function PlayState:beatHit()
     if self.curBeat % self.dad.danceEveryNumBeats == 0 and self.dad.curAnim ~= nil and not self.dad.curAnim.name:startsWith("sing") then
         self.dad:dance()
     end
+
+    self.super.beatHit(self)
+end
+
+function PlayState:stepHit()
+    stage:stepHit()
+    self.super.stepHit(self)
 end
 
 function PlayState:keysCheck()

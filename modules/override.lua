@@ -12,3 +12,11 @@ end
 function math.round(x)
     return x >= 0 and math.floor(x + 0.5) or math.ceil(x - 0.5)
 end
+
+function math.lerp(a, b, t)
+    return a + (b - a) * t
+end
+
+function math.bound(x, min, max)
+    return math.min(math.max(x, min), max)
+end

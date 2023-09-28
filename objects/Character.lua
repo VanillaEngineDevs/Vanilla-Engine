@@ -73,16 +73,16 @@ function Character:new(x, y, character, isPlayer)
     self.isPlayer = isPlayer
     local library, rawJson = nil, nil
     
-    local characterPath = "characters/" .. character .. ".json"
+    local characterPath = character .. ".json"
 
-    if love.filesystem.getInfo("assets/data/" .. characterPath) then
-        rawJson = json.decode(love.filesystem.read("assets/data/" .. characterPath))
+    if love.filesystem.getInfo("assets/data/characters/" .. characterPath) then
+        rawJson = json.decode(love.filesystem.read("assets/data/characters/" .. characterPath))
     else
         rawJson = json.decode(love.filesystem.read("assets/data/characters/bf.json"))
     end
 
     self.imageFile = rawJson.image
-    self:setFrames(Paths.getSparrowAtlas("characters/" .. self.imageFile, love.filesystem.read("assets/images/png/characters/" .. self.imageFile .. ".xml")))
+    self:setFrames(Paths.getSparrowAtlas(self.imageFile, love.filesystem.read("assets/images/png/" .. self.imageFile .. ".xml")))
     if json.scale ~= 1 then
         self.jsonScale = rawJson.scale
         self:setGraphicSize(math.floor(self.width * self.jsonScale))

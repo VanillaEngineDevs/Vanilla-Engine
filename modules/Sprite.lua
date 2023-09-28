@@ -181,16 +181,26 @@ function Sprite:update(dt)
         if self.curFrame >= #self.curAnim.frames then
             if self.curAnim.looped then
                 self.curFrame = 1
+                if self.curAnim.callback then
+                    self.curAnim.callback(self)
+                end
             else
                 self.curFrame = #self.curAnim.frames
                 self.animFinished = true
+                if self.curAnim.callback then
+                    self.curAnim.callback(self)
+                end
             end
         end
     end
 end
 
 function Sprite:play(anim, force)
-    if self.curAnim and self.curAnim.name == anim and not self.animFinished and not force then return end
+    if not force and self.curAnim and self.curAnim.name == anim and not self.animFinished then
+        self.animFinished = false
+        self.animPaused = false
+        return
+    end
     if self.animations and self.animations[anim] then
         self.curAnim = self.animations[anim]
         self.curFrame = 1
@@ -272,8 +282,12 @@ function Sprite:draw()
         if self.clipRect then
             love.graphics.setStencilTest("greater", 0)
         end
-
-        local x, y = self:getScreenPosition(cam)
+        local x, y
+        if cam ~= PlayState.camHUD then
+            x, y = self:getScreenPosition(cam)
+        else
+            x, y = self.x, self.y
+        end
         local angle = math.rad(self.angle)
         local sx, sy = self.scale.x, self.scale.y
         local ox, oy = self.origin.x, self.origin.y
@@ -301,12 +315,19 @@ function Sprite:draw()
             love.graphics.stencil(Sprite.Stencil.func, "replace", 1, false)
         end
 
-        if not frame then
-            love.graphics.draw(self.graphic, x, y, angle, sx, sy, ox, oy, self.shear.x, self.shear.y)
-        else
-            --print('its over /b/ros....')
-            love.graphics.draw(self.graphic, frame.quad, x, y, angle, sx, sy, ox, oy, self.shear.x, self.shear.y)
-        end
+        love.graphics.push()
+            if cam then
+                love.graphics.translate(cam.width / 2, cam.height / 2)
+                love.graphics.scale(cam.zoom)
+                love.graphics.translate(-cam.width / 2, -cam.height / 2)
+            end
+            if not frame then
+                love.graphics.draw(self.graphic, x, y, angle, sx, sy, ox, oy, self.shear.x, self.shear.y)
+            else
+                --print('its over /b/ros....')
+                love.graphics.draw(self.graphic, frame.quad, x, y, angle, sx, sy, ox, oy, self.shear.x, self.shear.y)
+            end
+        love.graphics.pop()
 
         if self.clipRect then
             love.graphics.setStencilTest()
