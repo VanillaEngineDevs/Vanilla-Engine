@@ -65,7 +65,8 @@ function Song:loadFromJson(jsonInput, folder)
     local rawJson = nil
     --local formattedSong = Paths.formatToSongPath(jsonInput)
     --print("Loading song " .. jsonInput)
-    formattedSong = jsonInput
+    local formattedSong = Paths.formatToSongPath(jsonInput)
+    local folder = Paths.formatToSongPath(folder)
 
     if not rawJson then
         if not jsonInput:find("events") then
@@ -73,7 +74,7 @@ function Song:loadFromJson(jsonInput, folder)
                 function()
                     --rawJson = love.filesystem.read("assets/data/" .. formattedSong)
                     -- check if file exists
-                    print("assets/data/" .. formattedSong .. ".json")
+                    print("assets/data/" .. folder .. "/" .. formattedSong .. ".json")
                     if love.filesystem.getInfo("assets/data/" .. folder .. "/" .. formattedSong .. ".json") then
                         rawJson = love.filesystem.read("assets/data/" .. folder .. "/" .. formattedSong .. ".json")
                     else

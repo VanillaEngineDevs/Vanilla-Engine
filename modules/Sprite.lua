@@ -336,22 +336,21 @@ function Sprite:draw()
             ox, oy = ox + frame.offset.x, oy + frame.offset.y
         end
 
-        if self.clipRect then
-            Sprite.Stencil = {
-                sprite = self,
-                x = x,
-                y = y,
-                clipRect = self.clipRect,
-                func = Sprite.Stencil.func
-            }
-            love.graphics.stencil(Sprite.Stencil.func, "replace", 1, false)
-        end
-
         love.graphics.push()
             if cam then
                 love.graphics.translate(cam.width / 2, cam.height / 2)
                 love.graphics.scale(cam.zoom)
                 love.graphics.translate(-cam.width / 2, -cam.height / 2)
+            end
+            if self.clipRect then
+                Sprite.Stencil = {
+                    sprite = self,
+                    x = x,
+                    y = y,
+                    clipRect = self.clipRect,
+                    func = Sprite.Stencil.func
+                }
+                love.graphics.stencil(Sprite.Stencil.func, "replace", 1, false)
             end
             if self.isMakeGraphic then
                 local w, h = self.width, self.height

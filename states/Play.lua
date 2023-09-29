@@ -140,7 +140,121 @@ PlayState.endCallback = nil
 
 PlayState.keysArray = nil
 
+PlayState.updateTime = false
+PlayState.transitioning = false
+
 PlayState.members = {}
+
+function PlayState:resetValues()
+    -- call everything defined to the default
+    self.isCameraOnForcedPos = false 
+
+    -- wtf are maps 💀
+    self.boyfriendMap = {}
+    self.dadMap = {}
+    self.gfMap = {}
+    self.variables = {}
+
+    self.songSpeed = 1
+    self.songSpeedTween = nil -- Timer.tween
+    self.songSpeedType = "multiplicative"
+    self.noteKillOffset = 350
+    self.playbackRate = 1
+
+    self.spawnTime = 2000
+
+    self.vocals = nil
+    self.inst = nil
+
+    self.dad = nil
+    self.gf = nil
+    self.boyfriend = nil
+
+    self.notes = Group()
+    self.unspawnNotes = {}
+    self.eventNotes = {}
+
+    self.camFollow = {x=0,y=0}
+    self.prevCamFollow = {x=0,y=0}
+
+    self.strumLineNotes = Group()
+    self.opponentStrums = Group()
+    self.playerStrums = Group()
+    self.grpNoteSplashes = Group()
+
+    self.camZooming = false
+    self.camZoomingMult = 1
+    self.camZoomingDecay = 1
+    self.curSong = ""
+
+    self.gfSpeed = 1
+    self.health = 1
+    self.combo = 0
+
+    self.healthBar = nil
+    self.timeBar = nil
+    self.songPercent = 0
+
+    self.ratingsData = nil
+    self.fullComboFunction = nil
+
+    self.generatedMusic = false
+    self.endingSong = false
+    self.startingFalse = false
+    self.updateTime = true
+    self.changedDifficulty = false
+    self.chartingMode = false
+
+    self.healthGain = 1
+    self.healthloss = 1
+    self.instaKillOnMiss = false
+    self.cpuControlled = false
+    self.practiceMode = false
+
+    self.botplaySine = 0
+    self.botplayTxt = ""
+
+    self.iconP1 = nil
+    self.iconP2 = nil
+    self.camHUD = Camera()
+    self.camGame = Camera()
+    self.camOther = Camera()
+    self.camSpeed = 1
+
+    self.songScore = 0
+    self.songHites = 0
+    self.songMisses = 0
+    self.scoreTxt = ""
+    self.timeTxt = ""
+    self.scoreTxtTween = nil
+
+    self.campaignScore = 0
+    self.campaignMisses = 0
+    self.seenCutscene = false
+    self.deathCounter = 0
+
+    self.defaultCamZoom = 1.05
+
+    self.daPixelZoom =  6
+    self.singAnimations = {"singLEFT", "singDOWN", "singUP", "singRIGHT"}
+
+    self.inCutscene = false
+    self.skipCountdown = false
+    self.songLength = 0
+
+    self.precacheList = {}
+    
+    self.startCallback = nil
+    self.endCallback = nil
+
+    self.keysArray = nil
+
+    self.updateTime = false
+    self.transitioning = false
+
+    self.members = {}
+    self.startingSong = true
+end
 
 function PlayState:add(member)
     table.insert(self.members, member)
@@ -164,6 +278,7 @@ function PlayState:clear()
 end
 
 function PlayState:enter()
+    self:resetValues()
     self.super.enter(self)
 
     self.startCallback = startCountdown
@@ -183,7 +298,7 @@ function PlayState:enter()
     self.camOther = Camera()
 
     if not self.SONG then
-        self.SONG = Song:loadFromJson("milf")
+        self.SONG = Song:loadFromJson("test", "test")
     end
     Conductor.mapBPMChanges(self.SONG)
     Conductor.changeBPM(self.SONG.bpm)
@@ -315,6 +430,7 @@ function PlayState:enter()
     MusicBeatState:fadeIn(0.4, function()
         PlayState:startCountdown()
         PlayState.generatedMusic = true
+        PlayState.updateTime = true
     end)
 end
 
@@ -368,13 +484,17 @@ end
 function PlayState:update(dt)
     stage:update(dt)
     self.super.update(self, dt)
-    if self.generatedMusic then
+    if self.generatedMusic and self.updateTime then
         Conductor.songPosition = Conductor.songPosition + 1000 * dt
     end
     for i, member in ipairs(self.members) do
         if member.update then 
             member:update(dt) 
         end
+    end
+
+    if self.inst and (not self.inst:isPlaying() and self.startedCountdown and not self.transitioning and not self.endingSong) then
+        self:finishSong()
     end
 
     if self.unspawnNotes[1] ~= nil then
@@ -564,7 +684,61 @@ function PlayState:strumPlayAnim(isDad, id, time)
     end
 end
 
+function PlayState:endSong()
+    if not self.startingSong then
+        for i, note in ipairs(self.notes.members) do
+            if note.strumTime < self.inst:tell("seconds") - Conductor.safeZoneOffset then
+                health = health - 0.05 * self.healthloss
+            end
+        end
+        for i, note in ipairs(self.sustainNotes.members) do
+            if note.strumTime < self.inst:tell("seconds") - Conductor.safeZoneOffset then
+                health = health - 0.05 * self.healthloss
+            end
+        end
+        for i, note in ipairs(self.unspawnNotes) do
+            if note.strumTime < self.inst:tell("seconds") - Conductor.safeZoneOffset then
+                health = health - 0.05 * self.healthloss
+            end
+        end
+
+        self.endingSong = true
+
+        if not self.transitioning then
+            if self.isStoryMode then
+                self.campaignScore = self.campaignScore + self.songScore
+                self.campaignMisses = self.campaignMisses + self.songMisses
+
+                table.remove(self.storyPlaylist, 1)
+
+                if #self.storyPlaylist <= 0 then
+                    MusicBeatState:fadeOut(0.3, function() MusicBeatState:switchState(StoryMenuState) end)
+                else
+                    local difficulty = Difficulty:getFilePath()
+                    local songName = PlayState.storyPlaylist[1]
+                    PlayState.SONG = Song:loadFromJson(songName .. difficulty, songName)
+                    if self.inst:isPlaying() then
+                        self.inst:stop()
+                    end
+                    if self.vocals and self.vocals:isPlaying() then
+                        self.vocals:stop()
+                    end
+
+                    MusicBeatState:fadeOut(0.3, function() MusicBeatState:switchState(PlayState) end)
+                end
+            end
+            self.transitioning = true
+        end
+    end
+end
+
+function PlayState:finishSong(ignoreNoteOffset)
+    self.updateTime = false
+    self:endSong()
+end
+
 function PlayState:generateSong(dataPath)
+    local dataPath = Paths.formatToSongPath(dataPath)
     self.songSpeed = self.SONG.speed
     
     local songData = self.SONG
@@ -584,7 +758,7 @@ function PlayState:generateSong(dataPath)
 
     local file = "assets/data/" .. dataPath .. "/events"
     if love.filesystem.getInfo(file) then
-        local eventsData = Song:loadFromJson("events", songName).events
+        local eventsData = Song:loadFromJson("events", self.songName).events
         for i, event in ipairs(eventsData) do
             for i = 1, #event[1] do
                 --self:makeEvent(event, i)
@@ -680,6 +854,8 @@ function PlayState:startCountdown()
         self.vocals:play()
     end
     self.inst:play()
+
+    self.startingSong = false
 
     return true
 end
