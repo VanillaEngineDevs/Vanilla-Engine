@@ -48,10 +48,12 @@ function love.load()
     --HealthBar = require "objects.HealthBar"
 
     Stages = {
-        Stage = require "states.stages.Stage",
-        Spooky = require "states.stages.Spooky",
-        Philly = require "states.stages.Philly",
-        Limo = require "states.stages.Limo",
+        Stage = require "states.stages.stage",
+        Spooky = require "states.stages.spooky",
+        Philly = require "states.stages.philly",
+        Limo = require "states.stages.limo",
+        Mall = require "states.stages.mall",
+        MallEvil = require "states.stages.mallEvil",
     }
 
     push.setupScreen(1280, 720, {upscale = "normal"})

@@ -287,8 +287,8 @@ function StoryMenuState:selectWeek()
                 if not diffic then diffic = "" end
                 PlayState.storyDifficulty = self.curDifficulty
 
-                --PlayState.SONG = Song:loadFromJson(PlayState.storyPlaylist[1]:lower() .. diffic, PlayState.storyPlaylist[1]:lower())
-                PlayState.SONG = Song:loadFromJson("dad-battle-hard", "dad-battle")
+                PlayState.SONG = Song:loadFromJson(PlayState.storyPlaylist[1]:lower() .. diffic, PlayState.storyPlaylist[1]:lower())
+                --PlayState.SONG = Song:loadFromJson("dad-battle-hard", "dad-battle")
                 PlayState.campaignScore = 0
                 PlayState.campaignMisses = 0
             end,

@@ -1,7 +1,5 @@
 local BGSprite = Sprite:extend()
 
-BGSprite.idleAnim = ""
-
 function BGSprite:new(image, x, y, scrollX, scrollY, animArray, loop)
     self.idleAnim = ""
     local x = x or 0
@@ -11,6 +9,8 @@ function BGSprite:new(image, x, y, scrollX, scrollY, animArray, loop)
     local loop = (loop == nil) and true or loop
 
     self.super.new(self, x, y)
+
+    self.idleAnim = ""
 
     if animArray then
         self:setFrames(Paths.getAtlas(image, "assets/images/png/" .. image .. ".xml"))

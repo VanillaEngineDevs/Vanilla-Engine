@@ -287,8 +287,8 @@ function PlayState:enter()
     self:resetValues()
     self.super.enter(self)
 
-    self.startCallback = startCountdown
-    self.endCallback = endSong
+    self.startCallback = self.startCountdown
+    self.endCallback = self.endSong
 
     self.keysArray = {
         "g_left",
@@ -371,6 +371,10 @@ function PlayState:enter()
         stage = Stages.Philly()
     elseif self.curStage == "limo" then
         stage = Stages.Limo()
+    elseif self.curStage == "mall" then
+        stage = Stages.Mall()
+    elseif self.curStage == "mallEvil" then
+        stage = Stages.MallEvil()
     end
 
     if not stageData.hide_girlfriend then
@@ -493,7 +497,7 @@ function PlayState:enter()
 
     TitleState.music:stop()
     MusicBeatState:fadeIn(0.4, function()
-        PlayState:startCountdown()
+        PlayState:startCallback()
         PlayState.generatedMusic = true
         PlayState.updateTime = true
     end)
@@ -572,7 +576,7 @@ function PlayState:update(dt)
     end
     stage:update(dt)
     self.super.update(self, dt)
-    if self.generatedMusic and self.updateTime then
+    if self.generatedMusic and self.updateTime and not self.inCutscene then
         Conductor.songPosition = Conductor.songPosition + 1000 * dt
     end
     for i, member in ipairs(self.members) do
@@ -581,7 +585,7 @@ function PlayState:update(dt)
         end
     end
 
-    if self.inst and (not self.inst:isPlaying() and self.startedCountdown and not self.transitioning and not self.endingSong) then
+    if self.inst and (not self.inst:isPlaying() and self.startedCountdown and not self.transitioning and not self.endingSong) and not self.inCutscene then
         self:finishSong()
     end
 
@@ -892,7 +896,7 @@ end
 
 function PlayState:finishSong(ignoreNoteOffset)
     self.updateTime = false
-    self:endSong()
+    self:endCallback()
 end
 
 function PlayState:noteMissCommon(direction, note)

@@ -91,23 +91,23 @@ function StageData:getStageFile(stage)
 end
 
 function StageData:vanillaSongStage(songName)
-    local songNmae = songName:lower():gsub(" ", "-")
+    local songName = songName:lower():gsub(" ", "-")
     if songName then
         if songName == "spookeez" or songName == "south" or songName == "monster" then
             return "spooky"
         elseif songName == "pico" or songName == "blammed" or songName == "philly" or songName == "philly-nice" then
             return "philly"
-        elseif songNmae == "milf" or songName == "satin-panties" or songname == "high" then
+        elseif songName == "milf" or songName == "satin-panties" or songName == "high" then
             return "limo"
-        elseif songname == "cocoa" or songname == "eggnog" then
+        elseif songName == "cocoa" or songName == "eggnog" then
             return "mall"
-        elseif songname == "winter-horrorland" then
+        elseif songName == "winter-horrorland" then
             return "mallEvil"
-        elseif songname == "senpai" or songname == "roses" then
+        elseif songName == "senpai" or songName == "roses" then
             return "school"
-        elseif songname == "thorns" then
+        elseif songName == "thorns" then
             return "schoolEvil"
-        elseif songname == "ugh" or songname == "guns" or songname == "stress" then
+        elseif songName == "ugh" or songName == "guns" or songName == "stress" then
             return "tank"
         end
     end

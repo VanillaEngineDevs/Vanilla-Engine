@@ -308,8 +308,13 @@ function Sprite:screenCenter(axis)
 end
 
 function Sprite:draw()
-    if self.exists and self.alive and self.visible and (self.graphic or self.isMakeGraphic) then
-        local cam = self.camera
+    local cam = self.camera
+    if cam then
+        visible = self.visible and cam.visible
+    else
+        visible = self.visible
+    end
+    if self.exists and self.alive and visible and (self.graphic or self.isMakeGraphic) then
         local frame = self.curAnim and self.curAnim.frames[math.floor(self.curFrame)] or nil
         if self.shader then
             love.graphics.setShader(self.shader)

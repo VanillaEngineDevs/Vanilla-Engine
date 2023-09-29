@@ -13,6 +13,7 @@ function Camera:new(x, y, w, h)
     self.width = w
     self.height = h
     self.zoom = 1
+    self.visible = true
 end
 
 function Camera:getPosition(x, y)

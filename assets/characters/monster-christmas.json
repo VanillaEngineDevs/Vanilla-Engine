@@ -31,7 +31,7 @@
 			"fps": 24,
 			"anim": "singLEFT",
 			"indices": [],
-			"name": "Monster left note"
+			"name": "Monster Right note"
 		},
 		{
 			"offsets": [
@@ -42,7 +42,7 @@
 			"fps": 24,
 			"anim": "singRIGHT",
 			"indices": [],
-			"name": "Monster Right note"
+			"name": "Monster left note"
 		},
 		{
 			"offsets": [
