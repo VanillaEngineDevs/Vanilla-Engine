@@ -57,6 +57,42 @@ function StoryMenuState:clear()
 end
 --
 
+function StoryMenuState:resetValues()
+    self.scoreText = ""
+    self.lastDifficultyName = ""
+    self.curDifficulty = 2
+    self.txtWeekTitle = ""
+    self.bgSprite = nil
+    self.curWeek = 1
+    self.txtTracklist = ""
+    self.grpWeekText = nil
+    self.grpWeekCharacters = nil
+
+    self.grpLocks = nil
+
+    self.difficultySelectors = nil
+    self.sprDifficulty = nil
+    self.leftArrow = nil
+    self.rightArrow = nil
+
+    self.loadedWeeks = {}
+
+    self.selectedWeek = false
+    self.stopspamming = false
+
+    self.movedBack = false
+    self.selectedWeek = false
+
+    self.tweenDifficulty = nil
+
+    self.intendedScore = 0
+    self.lerpScore = 0
+
+    self.weekCompleted = {}
+    
+    self.members = {}
+end
+
 function StoryMenuState:enter()
     Paths.preloadDirectoryImages("menu/menucharacters")
     Paths.preloadDirectoryImages("menu/storymenu")
@@ -260,7 +296,9 @@ function StoryMenuState:selectWeek()
 
             for i, char in ipairs(self.grpWeekCharacters.members) do
                 if char.character ~= "" and char.hasConfirmAnimation then
-                    char:play("confirm")
+                    if char.animations["confirm"] then
+                        char:play("confirm")
+                    end
                 end
             end
             self.stopspamming = true

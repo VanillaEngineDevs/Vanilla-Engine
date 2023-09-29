@@ -23,6 +23,8 @@ function MenuCharacter:new(x, character)
     self.super.new(self, x, 0)
     
     self:changeCharacter(character)
+
+    return self
 end
 
 function MenuCharacter:changeCharacter(character)
