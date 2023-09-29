@@ -200,14 +200,14 @@ function Sprite:update(dt)
         if self.curFrame >= #self.curAnim.frames then
             if self.curAnim.looped then
                 self.curFrame = 1
-                if self.curAnim.callback then
-                    self.curAnim.callback(self)
+                if self.callback then
+                    self.callback(self, self.curAnim.name)
                 end
             else
                 self.curFrame = #self.curAnim.frames
                 self.animFinished = true
-                if self.curAnim.callback then
-                    self.curAnim.callback(self)
+                if self.callback then
+                    self.callback(self, self.curAnim.name)
                 end
             end
         end

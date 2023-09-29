@@ -117,7 +117,7 @@ function Stage:eventCalled(eventName, v1, v2, fv1, fv2, strumTime)
                 PlayState.camHUD.zoom = PlayState.camHUD.zoom + 0.1
 
                 self.blammedLightsBlack.visible = true
-                self.blammedLightsBlack.alpha = 1
+                --self.blammedLightsBlack.alpha = 1
                 self.phillyWindowEvent.visible = true
                 self.phillyGlowGradient.visible = true
                 self.phillyGlowParticles.visible = true

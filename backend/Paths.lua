@@ -51,7 +51,34 @@ function Paths.shader(path)
     end
 end
 
+function Paths.getPathFromGraphic(graphic)
+    -- returns the full path of the graphic (without extension)
+    -- look through Cache.members.image
+    for path, image in pairs(Cache.members.image) do
+        if image == graphic then
+            return path
+        end
+    end
+    
+    -- look through Cache.members.preload.image
+    for path, image in pairs(Cache.members.preload.image) do
+        if image == graphic then
+            return path
+        end
+    end
+    
+    return nil
+
+end
+
 function Paths.getAtlas(graphic, data) -- either packer or sparrow
+    if not data then 
+        if type(graphic) == "string" then
+            data = graphic
+        else
+            data = Paths.getPathFromGraphic(graphic)
+        end
+    end
     -- is extensions included?
     if not data:find(".xml") and not data:find(".txt") then
         -- check if xml exists

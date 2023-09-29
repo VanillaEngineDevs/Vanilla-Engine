@@ -373,6 +373,10 @@ function PlayState:enter()
         stage = Stages.Mall()
     elseif self.curStage == "mallEvil" then
         stage = Stages.MallEvil()
+    elseif self.curStage == "school" then
+        stage = Stages.School()
+    elseif self.curStage == "schoolEvil" then
+        stage = Stages.SchoolEvil()
     else -- Always default to stage
         stage = Stages.Stage()
     end

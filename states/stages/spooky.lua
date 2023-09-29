@@ -19,7 +19,7 @@ end
 
 function Stage:lightningStrikeShit()
     self.bg:play("halloweem bg lightning strike", true)
-    self.bg.curAnim.callback = function() 
+    self.bg.callback = function() 
         self.bg:dance(true)
         print("ohhohohhhhhh SHITTTTTTTT")
     end

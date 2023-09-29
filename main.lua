@@ -55,6 +55,8 @@ function love.load()
         Limo = require "states.stages.limo",
         Mall = require "states.stages.mall",
         MallEvil = require "states.stages.mallEvil",
+        School = require "states.stages.school",
+        SchoolEvil = require "states.stages.schoolEvil",
     }
 
     push.setupScreen(1280, 720, {upscale = "normal"})

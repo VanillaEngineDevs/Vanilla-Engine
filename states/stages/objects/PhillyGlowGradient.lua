@@ -18,10 +18,12 @@ end
 
 function PhillyGlowGradient:update(dt)
     local newHeight = math.round(self.height - 1000 * dt)
+    --print(newHeight)
     if newHeight > 0 then
         self.alpha = self.intendedAlpha
         self:setGraphicSize(2000, newHeight)
         self:updateHitbox()
+        self.y = self.originalY + (self.originalHeight - newHeight)
     else
         self.alpha = 0
         self.y = -5000
