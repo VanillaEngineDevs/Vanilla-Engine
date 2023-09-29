@@ -19,7 +19,7 @@ function StrumNote:new(x, y, leData, player)
     if PlayState.isPixelStage then
 
     else
-        self:setFrames(Paths.getSparrowAtlas(self.skin, love.filesystem.read("assets/images/png/" .. self.skin .. ".xml")))
+        self:setFrames(Paths.getAtlas(self.skin, "assets/images/png/" .. self.skin .. ".xml"))
 
         local c = math.abs(self.noteData) % 4
 

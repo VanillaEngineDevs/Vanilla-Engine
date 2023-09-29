@@ -82,7 +82,7 @@ function Character:new(x, y, character, isPlayer)
     end
 
     self.imageFile = rawJson.image
-    self:setFrames(Paths.getSparrowAtlas(self.imageFile, love.filesystem.read("assets/images/png/" .. self.imageFile .. ".xml")))
+    self:setFrames(Paths.getAtlas(self.imageFile, "assets/images/png/" .. self.imageFile))
     if json.scale ~= 1 then
         self.jsonScale = rawJson.scale
         self:setGraphicSize(math.floor(self.width * self.jsonScale))
@@ -94,7 +94,7 @@ function Character:new(x, y, character, isPlayer)
     self.flipX = (rawJson.flip_x == true)
 
     self.noAntialiasing = (rawJson.no_antialiasing == true)
-    self.antialiasing = not noAntialiasing
+    self.antialiasing = not self.noAntialiasing
 
     self.animationsArray = rawJson.animations
 

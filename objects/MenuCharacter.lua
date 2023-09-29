@@ -56,7 +56,7 @@ function MenuCharacter:changeCharacter(character)
         local charFile = json.decode(rawJson)
         self.frames = {}
         self.animations = {}
-        self:setFrames(Paths.getSparrowAtlas("menu/menucharacters/" .. charFile.image, love.filesystem.read("assets/images/png/menu/menucharacters/" .. charFile.image .. ".xml")))
+        self:setFrames(Paths.getAtlas("menu/menucharacters/" .. charFile.image, "assets/images/png/menu/menucharacters/" .. charFile.image .. ".xml"))
         self:addByPrefix("idle", charFile.idle_anim, 24)
 
         local confirmAnim = charFile.confirm_anim

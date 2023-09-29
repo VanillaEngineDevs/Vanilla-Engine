@@ -79,7 +79,7 @@ function MainMenuState:enter()
         local offset = 108 - (math.max(#self.optionShit, 4) - 4) * 80
         local menuItem = Sprite(0, ((i-1) * 140) + offset)
         menuItem.scale.x, menuItem.scale.y = scale, scale
-        menuItem:setFrames(Paths.getSparrowAtlas("menu/menu_" .. self.optionShit[i], love.filesystem.read("assets/images/png/menu/menu_" .. self.optionShit[i] .. ".xml")))
+        menuItem:setFrames(Paths.getAtlas("menu/menu_" .. self.optionShit[i], "assets/images/png/menu/menu_" .. self.optionShit[i] .. ".xml"))
         menuItem:addByPrefix("idle", self.optionShit[i] .. " basic", 24)
         menuItem:addByPrefix("selected", self.optionShit[i] .. " white", 24)
         menuItem:play("idle")

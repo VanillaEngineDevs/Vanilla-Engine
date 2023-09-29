@@ -16,6 +16,7 @@ Sprite.origin = {x = 0, y = 0}
 Sprite.offset = {x = 0, y = 0}
 Sprite.scale = {x = 1, y = 1}
 Sprite.shear = {x = 0, y = 0}
+Sprite.velocity = {x = 0, y = 0}
 
 Sprite.blend = "alpha"
 
@@ -75,6 +76,7 @@ function Sprite:new(x, y, graphic)
     self.offset = {x=0,y=0}
     self.scale = {x=1,y=1}
     self.shear = {x=0,y=0}
+    self.velocity = {x=0,y=0}
 
     self.scrollFactor = {x=1,y=1}
 
@@ -208,6 +210,9 @@ function Sprite:update(dt)
             end
         end
     end
+
+    self.x = self.x + self.velocity.x * dt
+    self.y = self.y + self.velocity.y * dt
 end
 
 function Sprite:makeGraphic(width, height, color)
@@ -309,7 +314,16 @@ function Sprite:draw()
         if self.shader then
             love.graphics.setShader(self.shader)
         end
+        local blendmode = "" -- the second argument for setBlendMode
+        -- e.g. premultiplied, alphamultiply, subtract, add, etc.
+        
         love.graphics.setBlendMode(self.blend)
+        local min, mag, anisotropy, mode
+        if self.graphic then
+            min, mag, anisotropy = self.graphic:getFilter()
+            mode = self.antialiasing and "linear" or "nearest"
+            self.graphic:setFilter(mode, mode, anisotropy)
+        end
 
         if self.clipRect then
             love.graphics.setStencilTest("greater", 0)
@@ -368,6 +382,9 @@ function Sprite:draw()
             end
         love.graphics.pop()
 
+        if self.graphic then
+            self.graphic:setFilter(min, mag, anisotropy)
+        end
         if self.clipRect then
             love.graphics.setStencilTest()
         end

@@ -98,7 +98,7 @@ function Note:new(strumTime, noteData, prevNote, sustainNote, inEditor, createdF
     self.noteData = noteData
 
     if noteData > -1 then
-        self:setFrames(Paths.getSparrowAtlas(PlayState.noteSkin or Note.defaultNoteSkin, love.filesystem.read("assets/images/png/" .. (PlayState.noteSkin or Note.defaultNoteSkin) .. ".xml")))
+        self:setFrames(Paths.getAtlas(PlayState.noteSkin or Note.defaultNoteSkin, "assets/images/png/" .. (PlayState.noteSkin or Note.defaultNoteSkin) .. ".xml"))
         self.x = self.x + Note.swagWidth * noteData
         if not self.isSustainNote and noteData < #Note.colArray then
             local animToPlay = ""

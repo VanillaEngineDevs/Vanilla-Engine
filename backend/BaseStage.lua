@@ -97,6 +97,18 @@ function BaseStage:addBehindDad(obj)
     self:insert(dadIndex, obj)
 end
 
+function BaseStage:addInfrontBF(obj)
+    local bfIndex = 0
+    for i, member in ipairs(self.game.members) do
+        if member == PlayState.boyfriend then
+            bfIndex = i
+            break
+        end
+    end
+
+    self:insert(bfIndex + 1, obj)
+end
+
 function BaseStage:setDefaultGF(name)
     local gfVersion = PlayState.SONG.gfVersion
     if not gfVersion or #gfVersion < 1 then

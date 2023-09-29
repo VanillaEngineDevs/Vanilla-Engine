@@ -29,7 +29,9 @@ function Song.onLoadJson(songJson, name)
         songJson.player3 = nil
     end
 
-    songJson.events = {}
+    if not songJson.events then
+        songJson.events = {}
+    end
 
     for secNum = 1, #songJson.notes do
         local sec = songJson.notes[secNum]
@@ -66,7 +68,6 @@ function Song:loadFromJson(jsonInput, folder)
     if not rawJson then
         TryExcept(
             function()
-                    --rawJson = love.filesystem.read("assets/data/" .. formattedSong)
                 -- check if file exists
                 print("assets/data/" .. folder .. "/" .. formattedSong .. ".json")
                 if love.filesystem.getInfo("assets/data/" .. folder .. "/" .. formattedSong .. ".json") then

@@ -13,7 +13,7 @@ function BGSprite:new(image, x, y, scrollX, scrollY, animArray, loop)
     self.super.new(self, x, y)
 
     if animArray then
-        self:setFrames(Paths.getSparrowAtlas(image, love.filesystem.read("assets/images/png/" .. image .. ".xml")))
+        self:setFrames(Paths.getAtlas(image, "assets/images/png/" .. image .. ".xml"))
         for i = 1, #animArray do
             local anim = animArray[i]
             self:addByPrefix(anim, anim, 24, loop)
@@ -22,7 +22,7 @@ function BGSprite:new(image, x, y, scrollX, scrollY, animArray, loop)
                 self:play(anim)
             end
         end
-    else
+    elseif image then -- CAN BE NIL!
         self:load(image)
     end
     self.scrollFactor.x, self.scrollFactor.y = scrollX, scrollY

@@ -725,8 +725,7 @@ end
 
 function PlayState:triggerEvent(eventName, value1, value2, strumTime)
     -- remove trailing spaces
-    print(eventName, value1, value2, strumTime)
-    local eventName = eventName:gsub("%s+", "")
+    local eventName = eventName
     local f1 = tonumber(value1)
     local f2 = tonumber(value2)
     local f1 = f1 or nil 
@@ -763,7 +762,7 @@ function PlayState:triggerEvent(eventName, value1, value2, strumTime)
         if not f1 or f1 < 1 then f1 = 1 end
         self.gfSpeed = math.round(f1)
     elseif eventName == "Add Camera Zoom" then
-        if self.camGame < 1.35 then
+        if self.camGame.zoom < 1.35 then
             if not f1 then f1 = 0.015 end
             if not f2 then f2 = 0.03 end
 
@@ -772,6 +771,7 @@ function PlayState:triggerEvent(eventName, value1, value2, strumTime)
         end
     end
 
+    --print("Event: " .. eventName .. " | " .. value1 .. " | " .. value2 .. " | " .. strumTime)
     stage:eventCalled(eventName, value1, value2, f1, f2, strumTime)
 end
 
@@ -979,7 +979,25 @@ function PlayState:generateSong(dataPath)
         local eventsData = Song:loadFromJson("events", self.songName).events
         for _, event in ipairs(eventsData) do
             for i = 1, #event[2] do
-                self:makeEvent(event, i)
+                -- avoid duplicate events
+
+                local found = false
+                for i2, event2 in ipairs(self.eventNotes) do
+                    if event2[1] == event[1] and event2[2][1] == event[2][1] and event2[2][2] == event[2][2] and event2[2][3] == event[2][3] then
+                        found = true
+                    end
+                end
+
+                if not found then -- why does psytch have 2 formats
+                    if type(event[2][1]) ~= "table" then
+                        self:makeEvent(event, i)
+                    else
+                        local new_event = {}
+                        new_event[1] = event[1]
+                        new_event[2] = event[2][1]
+                        self:makeEvent(new_event, i)
+                    end
+                end
             end
         end
     end

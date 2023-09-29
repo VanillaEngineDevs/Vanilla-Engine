@@ -15,9 +15,20 @@ function string.split(self, sep)
     return fields
 end
 
-function string:trim(str)
-    -- remove extra whitespace from beginning and end.
-    return string.gsub(str, "^%s*(.-)%s*$", "%1")
+function string.ltrim(self)
+    local i, r = #self, 1
+    while r <= i and self:find("^%s", r) do r = r + 1 end
+    return self:sub(r, i)
+end
+
+function string.rtrim(self)
+    local i, r = #self, 1
+    while i >= r and self:find("^%s", i) do i = i - 1 end
+    return self:sub(r, i)
+end
+
+function string.trim(self)
+    return self:ltrim():rtrim()
 end
 
 -- Math functions

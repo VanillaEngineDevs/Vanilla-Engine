@@ -119,7 +119,7 @@ function StoryMenuState:enter()
     self.txtWeekTitle.alignment = "left"
     self.txtWeekTitle.alpha = 0.7
 
-    local ui_tex = Paths.getSparrowAtlas("menu/campaign_menu_ui_assets", love.filesystem.read("assets/images/png/menu/campaign_menu_ui_assets.xml"))
+    local ui_tex = Paths.getAtlas("menu/campaign_menu_ui_assets", "assets/images/png/menu/campaign_menu_ui_assets.xml")
     local bgYellow = Sprite(0, 56)
     bgYellow:makeGraphic(push:getWidth(), 386, 0xFFF9CF51)
     self.bgSprite = Sprite(0, 56)
@@ -287,7 +287,8 @@ function StoryMenuState:selectWeek()
                 if not diffic then diffic = "" end
                 PlayState.storyDifficulty = self.curDifficulty
 
-                PlayState.SONG = Song:loadFromJson(PlayState.storyPlaylist[1]:lower() .. diffic, PlayState.storyPlaylist[1]:lower())
+                --PlayState.SONG = Song:loadFromJson(PlayState.storyPlaylist[1]:lower() .. diffic, PlayState.storyPlaylist[1]:lower())
+                PlayState.SONG = Song:loadFromJson("dad-battle-hard", "dad-battle")
                 PlayState.campaignScore = 0
                 PlayState.campaignMisses = 0
             end,

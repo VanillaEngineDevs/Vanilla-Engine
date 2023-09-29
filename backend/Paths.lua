@@ -51,6 +51,25 @@ function Paths.shader(path)
     end
 end
 
+function Paths.getAtlas(graphic, data) -- either packer or sparrow
+    -- is extensions included?
+    if not data:find(".xml") and not data:find(".txt") then
+        -- check if xml exists
+        if love.filesystem.getInfo(data .. ".xml") then
+            return Paths.getSparrowAtlas(graphic, love.filesystem.read(data .. ".xml"))
+        elseif love.filesystem.getInfo(data .. ".txt") then
+            return Paths.getPackerAtlas(graphic, data .. ".txt")
+        else
+            return nil
+        end
+    end
+    if data:find(".xml") then
+        return Paths.getSparrowAtlas(graphic, love.filesystem.read(data))
+    else
+        return Paths.getPackerAtlas(graphic, data)
+    end
+end
+
 function Paths.getSparrowAtlas(graphic, xmldata)
     if type(graphic) == "string" then
         graphic = Paths.image(graphic)
@@ -70,6 +89,30 @@ function Paths.getSparrowAtlas(graphic, xmldata)
                 tonumber(child.attr.frameWidth), tonumber(child.attr.frameHeight)
             ))
         end
+    end
+
+    return frames
+end
+
+function Paths.getPackerAtlas(graphic, data)
+    if type(graphic) == "string" then
+        graphic = Paths.image(graphic)
+    end
+
+    local frames = {graphic = graphic, frames = {}}
+    local sw, sh = graphic:getDimensions()
+
+    local pack = data:trim() -- remove all extra whitespace
+    for line in love.filesystem.lines(data) do
+        local frameData = line:split("=")
+        local name = frameData[1]:trim()
+        local frameDimensions = frameData[2]:split(" ")
+
+        table.insert(frames.frames, Sprite.NewFrame(
+            name, tonumber(frameDimensions[1]), tonumber(frameDimensions[2]),
+            tonumber(frameDimensions[3]), tonumber(frameDimensions[4]),
+            sw, sh
+        ))
     end
 
     return frames
