@@ -23,31 +23,26 @@ Song.player1 = "bf"
 Song.player2 = "dad"
 Song.gfVersion = "gf"
 
-function Song.onLoadJson(songJson)
+function Song.onLoadJson(songJson, name)
     if not songJson.gfVersion then
         songJson.gfVersion = songJson.player3
         songJson.player3 = nil
     end
 
-    if not songJson.events then
-        songJson.events = {}
+    songJson.events = {}
 
-        for secNum = 1, #songJson.notes do
-            local sec = songJson.notes[secNum]
+    for secNum = 1, #songJson.notes do
+        local sec = songJson.notes[secNum]
 
-            local i = 1
-            local notes = sec.sectionNotes
-            local len = #notes
+        local i = 1
+        local notes = sec.sectionNotes
+        local len = #notes
 
-            while i < len do
-                local note = notes[i]
-                if note[1] < 0 then
-                    table.insert(songJson.events, {note[1], {note[3], note[4], note[5]}})
-                    table.remove(notes, i)
-                    len = #notes
-                else
-                    i = i + 1
-                end
+        for i = 1, #notes do
+            local note = notes[i]
+            if note and note[2] < 0 then
+                table.insert(songJson.events, {note[1], {note[3], note[4], note[5]}})
+                table.remove(notes, i)
             end
         end
     end
@@ -69,31 +64,24 @@ function Song:loadFromJson(jsonInput, folder)
     local folder = Paths.formatToSongPath(folder)
 
     if not rawJson then
-        if not jsonInput:find("events") then
-            TryExcept(
-                function()
+        TryExcept(
+            function()
                     --rawJson = love.filesystem.read("assets/data/" .. formattedSong)
-                    -- check if file exists
-                    print("assets/data/" .. folder .. "/" .. formattedSong .. ".json")
-                    if love.filesystem.getInfo("assets/data/" .. folder .. "/" .. formattedSong .. ".json") then
-                        rawJson = love.filesystem.read("assets/data/" .. folder .. "/" .. formattedSong .. ".json")
-                    else
-                        Break()
-                    end
-                end,
-                function()
+                -- check if file exists
+                print("assets/data/" .. folder .. "/" .. formattedSong .. ".json")
+                if love.filesystem.getInfo("assets/data/" .. folder .. "/" .. formattedSong .. ".json") then
                     rawJson = love.filesystem.read("assets/data/" .. folder .. "/" .. formattedSong .. ".json")
+                else
+                    Break()
                 end
-            )
-        else
-            rawJson = love.filesystem.read("assets/data/" .. formattedSong .. ".json")
-        end
+            end,
+            function()
+                rawJson = love.filesystem.read("assets/data/" .. folder .. "/" .. formattedSong .. ".json")
+            end
+        )
     end
     songJson = json.decode(rawJson)
-    if self.jsonInput ~= "events" then
-        -- bleh
-    end
-    songJson = Song.onLoadJson(songJson.song)
+    songJson = Song.onLoadJson(songJson.song, jsonInput)
     return songJson
 end
 

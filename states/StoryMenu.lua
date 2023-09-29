@@ -100,6 +100,10 @@ function StoryMenuState:enter()
     Paths.preloadDirectoryImages("menu/menubackgrounds")
     Paths.preloadDirectoryImages("menu/menudifficulties")
 
+    if not TitleState.music:isPlaying() then
+        TitleState.music:play()
+    end
+
     self.loadedWeeks = {}
     WeekData:reloadWeekFiles()
 
@@ -208,6 +212,8 @@ function StoryMenuState:enter()
     self:add(self.txtTracklist)
     self:add(self.scoreText)
     self:add(self.txtWeekTitle)
+
+    MusicBeatState:fadeIn(0.3)
 end
 
 function StoryMenuState:changeWeek(change)
@@ -281,7 +287,6 @@ function StoryMenuState:selectWeek()
                 if not diffic then diffic = "" end
                 PlayState.storyDifficulty = self.curDifficulty
 
-                -- i am... NOT sorry!
                 PlayState.SONG = Song:loadFromJson(PlayState.storyPlaylist[1]:lower() .. diffic, PlayState.storyPlaylist[1]:lower())
                 PlayState.campaignScore = 0
                 PlayState.campaignMisses = 0
@@ -383,6 +388,14 @@ function StoryMenuState:update(dt)
         
         if input:pressed("m_confirm") then
             self:selectWeek()
+        elseif input:pressed("m_back") then
+            self.movedBack = true
+
+            MusicBeatState:fadeOut(0.3,
+                function()
+                    MusicBeatState:switchState(MainMenuState)
+                end
+            )
         end
     end
 

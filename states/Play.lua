@@ -143,6 +143,9 @@ PlayState.keysArray = nil
 PlayState.updateTime = false
 PlayState.transitioning = false
 
+PlayState.noteTypes = {}
+PlayState.eventsPushed = {}
+
 PlayState.members = {}
 
 function PlayState:resetValues()
@@ -243,7 +246,7 @@ function PlayState:resetValues()
     self.songLength = 0
 
     self.precacheList = {}
-    
+
     self.startCallback = nil
     self.endCallback = nil
 
@@ -251,6 +254,9 @@ function PlayState:resetValues()
 
     self.updateTime = false
     self.transitioning = false
+
+    self.noteTypes = {}
+    self.eventsPushed = {}
 
     self.members = {}
     self.startingSong = true
@@ -396,11 +402,70 @@ function PlayState:enter()
         camPos.x = camPos.x + self.gf:getMidpoint().x + self.gf.cameraPosition[1]
         camPos.y = camPos.y + self.gf:getMidpoint().y + self.gf.cameraPosition[2]
     end
+    if self.dad.curCharacter:startsWith("gf") then
+        self.dad.x, self.dad.y = self.GF_X, self.GF_Y
+        if self.gf then
+            self.gf.visible = false
+        end
+    end
 
     self.camFollow.x, self.camFollow.y = camPos.x, camPos.y
 
     stage:createPost()
     Conductor.songPosition = -5000 / Conductor.songPosition
+
+    --[[ self.healthBar = HealthBar(0, push:getHeight() * 0.89, 'healthBar', function() return self.health end, 0, 2)
+    self.healthBar:screenCenter("X")
+    self.healthBar.leftToRight = false
+    self.healthBar.scrollFactor = {x=0, y=0}
+    self:add(self.healthBar) ]]
+    self.healthBar = {
+        img = Paths.image("healthBar"),
+        x = 0,
+        y = push:getHeight() * 0.89,
+        width = 0,
+        height = 0,
+        boundX = 0,
+        boundY = 2,
+        scrollFactor = {x=0, y=0},
+        leftToRight = false,
+        barLeftColor = hexToColor(0xFFFFFFFF),
+        barRightColor = hexToColor(0x00000000),
+        alpha = 1,
+        valueFunction = function() 
+            return self.health < 0 and 0 or self.health > 2 and 2 or self.health
+        end,
+        percent = 0,
+
+        screenCenter = function(self, axis)
+            local axis = axis or "XY"
+            if axis:find("X") then
+                self.x = (push:getWidth() / 2) - (self.img:getWidth() / 2)
+            end
+            if axis:find("Y") then
+                self.y = (push:getHeight() / 2) - (self.img:getHeight() / 2)
+            end
+        end
+    }
+    self.healthBar.width = self.healthBar.img:getWidth()
+    self.healthBar.height = self.healthBar.img:getHeight()
+
+    function self.healthBar:draw()
+        if self.leftToRight then
+            self.percent = self.valueFunction() / self.boundY
+        else
+            self.percent = 1 - (self.valueFunction() / self.boundY)
+        end
+        -- use NORMAL rectangles from love.graphics
+        love.graphics.setColor(self.barLeftColor[1] / 255, self.barLeftColor[2] / 255, self.barLeftColor[3] / 255, self.alpha)
+        love.graphics.rectangle("fill", self.x + 3, self.y + 3, self.width - 6, self.height - 6)
+        love.graphics.setColor(self.barRightColor[1] / 255, self.barRightColor[2] / 255, self.barRightColor[3] / 255, self.alpha)
+        love.graphics.rectangle("fill", self.x + 3, self.y + 3, (self.width-6) * self.percent, self.height - 3)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.draw(self.img, self.x, self.y)
+    end
+    self.healthBar:screenCenter("X")
+    self:add(self.healthBar)
 
     strumLineNotes = Group()
     self:add(strumLineNotes)
@@ -432,6 +497,13 @@ function PlayState:enter()
         PlayState.generatedMusic = true
         PlayState.updateTime = true
     end)
+
+    self:reloadHealthbarColours()
+end
+
+function PlayState:reloadHealthbarColours()
+    self.healthBar.barRightColor = self.dad.healthColorArray
+    self.healthBar.barLeftColor = self.boyfriend.healthColorArray
 end
 
 function PlayState:moveCameraSection(sec)
@@ -439,12 +511,20 @@ function PlayState:moveCameraSection(sec)
     if sec < 1 then sec = 1 end
 
     if not self.SONG.notes[sec] then return end
+    local isDad = not self.SONG.notes[sec].mustHitSection
 
-    if self.gf and self.SONG.notes[sec].gfSection then
+    if self.gf and self.SONG.notes[sec].gfSection or (isDad and self.dad.curCharacter:startsWith("gf")) then
+        self.camTwn = Timer.tween(self.cameraSpeed, self.camFollow, 
+            {
+                x = self.gf:getMidpoint().x + self.gf.cameraPosition[1] + self.girlfriendCameraOffset[1], 
+                y = self.gf:getMidpoint().y + self.gf.cameraPosition[2] + self.girlfriendCameraOffset[2] - 50
+            }, "out-quad"
+        )
+        self:tweenCamIn()
+        return;
     end
 
-    local isBF = self.SONG.notes[sec].mustHitSection
-    self:moveCamera(not isBF)
+    self:moveCamera(isDad)
 end
 
 function PlayState:moveCamera(isDad)
@@ -465,6 +545,9 @@ function PlayState:moveCamera(isDad)
                 y = self.boyfriend:getMidpoint().y - 100 + self.boyfriend.cameraPosition[2] + self.boyfriendCameraOffset[2]
             }, "out-quad"
         )
+        if Paths.formatToSongPath(self.SONG.song) == "tutorial" and not self.cameraTwn and self.camGame.zoom ~= 1 then
+            self.cameraTwn = Timer.tween(Conductor.stepCrochet*4/1000, self.camGame, {zoom = 1}, "in-bounce", function() self.cameraTwn = nil end)
+        end
     end
 end
 
@@ -482,6 +565,11 @@ function PlayState:sectionHit()
 end
 
 function PlayState:update(dt)
+    if self.health <= 0 then
+        self.health = 0
+    elseif self.health > 2 then
+        self.health = 2
+    end
     stage:update(dt)
     self.super.update(self, dt)
     if self.generatedMusic and self.updateTime then
@@ -554,7 +642,7 @@ function PlayState:update(dt)
 
                     if Conductor.songPosition - note.strumTime > self.noteKillOffset then
                         if note.mustPress and not self.cpuControlled and not note.ignoreNote and not self.endingSong and (note.tooLate or not note.wasGoodHit) then
-                            --self:noteMiss(note)
+                            self:noteMiss(note)
                         end
 
                         note.active = false
@@ -590,7 +678,7 @@ function PlayState:update(dt)
     
                     if Conductor.songPosition - note.strumTime > self.noteKillOffset then
                         if note.mustPress and not self.cpuControlled and not note.ignoreNote and not self.endingSong and (note.tooLate or not note.wasGoodHit) then
-                            --self:noteMiss(note)
+                            self:noteMiss(note)
                         end
     
                         note.active = false
@@ -601,6 +689,7 @@ function PlayState:update(dt)
                 end
             end
         end
+        self:checkEventNote()
     end
 
     for i = 1, 4 do
@@ -615,6 +704,75 @@ function PlayState:update(dt)
             self:keyReleased(i)
         end
     end
+end
+
+function PlayState:checkEventNote()
+    while #self.eventNotes > 0 do
+        local leStrumTime = self.eventNotes[1].strumTime
+        if Conductor.songPosition < leStrumTime then return end 
+
+        local v1 = ""
+        if self.eventNotes[1].value1 then v1 = self.eventNotes[1].value1 end
+
+        local v2 = ""
+        if self.eventNotes[1].value2 then v2 = self.eventNotes[1].value2 end
+
+        self:triggerEvent(self.eventNotes[1].event, v1, v2, leStrumTime)
+
+        table.remove(self.eventNotes, 1)
+    end
+end
+
+function PlayState:triggerEvent(eventName, value1, value2, strumTime)
+    -- remove trailing spaces
+    print(eventName, value1, value2, strumTime)
+    local eventName = eventName:gsub("%s+", "")
+    local f1 = tonumber(value1)
+    local f2 = tonumber(value2)
+    local f1 = f1 or nil 
+    local f2 = f2 or nil
+
+    if eventName == "Hey!" then
+        local value = 2
+        local v1 = tostring(v1):lower()
+        if v1 == "bf" or v1 == "boyfriend" or v1 == "0" then
+            value = 0
+        elseif v1 == "gf" or v1 == "girlfriend" or v1 == "1" then
+            value = 1
+        end
+
+        if not f2 or f2 <= 0 then f2 = 0.6 end 
+
+        if value ~= 0 then
+            if self.dad.curCharacter:startsWith("gf") then
+                self.dad:playAnim("cheer", true)
+                self.dad.specialAnim = true
+                self.dad.heyTimer = f2
+            elseif self.gf then 
+                self.gf:playAnim("cheer", true)
+                self.gf.specialAnim = true
+                self.gf.heyTimer = f2
+            end
+        end
+        if value ~= 1 then
+            self.boyfriend:playAnim("hey", true)
+            self.boyfriend.specialAnim = true
+            self.boyfriend.heyTimer = f2
+        end
+    elseif eventName == "Set Gf Speed" then
+        if not f1 or f1 < 1 then f1 = 1 end
+        self.gfSpeed = math.round(f1)
+    elseif eventName == "Add Camera Zoom" then
+        if self.camGame < 1.35 then
+            if not f1 then f1 = 0.015 end
+            if not f2 then f2 = 0.03 end
+
+            self.camGame.zoom = self.camGame.zoom + f1
+            self.camHUD.zoom = self.camHUD.zoom + f2
+        end
+    end
+
+    stage:eventCalled(eventName, value1, value2, f1, f2, strumTime)
 end
 
 function PlayState:keyDown(key)
@@ -658,7 +816,7 @@ function PlayState:opponentNoteHit(note)
         end
     end
 
-    if self.SONG.needsVoices then
+    if self.vocals then
         self.vocals:setVolume(1)
     end
 
@@ -737,6 +895,66 @@ function PlayState:finishSong(ignoreNoteOffset)
     self:endSong()
 end
 
+function PlayState:noteMissCommon(direction, note)
+    local subtract = 0.05
+    if note then subtract = note.missHealth end
+    self.health = self.health - subtract * self.healthloss
+
+    self.combo = 0
+
+    self.songScore = self.songScore - 10
+    if not self.endingSong then
+        self.songMisses = self.songMisses + 1
+    end
+
+    local char = self.boyfriend
+
+    if (note and note.gfNote) or (self.SONG.notes[self.curSection] and self.SONG.notes[self.curSection].gfSection) then
+        char = self.gf
+    end
+    
+    if char and char.hasMissAnimations then
+        local suffix = ""
+        if note then
+            suffix = note.animSuffix
+        end
+
+        local animToPlay = self.singAnimations[math.floor(math.abs(math.min(#self.singAnimations, direction+1)))] .. "miss" .. suffix
+        char:playAnim(animToPlay, true)
+
+        if char ~= self.gf and self.combo > 5 and self.gf and self.animOffsets["sad"] then
+            self.gf:playAnim("sad", true)
+            self.gf.specialAnim = true
+        end
+    end
+    if self.vocals then
+        self.vocals:setVolume(0)
+    end
+end
+
+function PlayState:noteMiss(note)
+    for i, note2 in ipairs(self.notes.members) do
+        -- remove dupe note
+        if note ~= note2 and note2.mustPress and note2.noteData == note.noteData and note2.isSustainNote == note.isSustainNote and math.abs(note2.strumTime - note.strumTime) < 1 then
+            self.notes:remove(note2)
+        end
+    end
+    -- same in sustain notes
+    for i, note2 in ipairs(self.sustainNotes.members) do
+        -- remove dupe note
+        if note ~= note2 and note2.mustPress and note2.noteData == note.noteData and note2.isSustainNote == note.isSustainNote and math.abs(note2.strumTime - note.strumTime) < 1 then
+            self.sustainNotes:remove(note2)
+        end
+    end
+
+    if note.isSustainNote then
+        self.sustainNotes:remove(note)
+    else
+        self.notes:remove(note)
+    end
+    self:noteMissCommon(note.noteData, note)
+end
+
 function PlayState:generateSong(dataPath)
     local dataPath = Paths.formatToSongPath(dataPath)
     self.songSpeed = self.SONG.speed
@@ -756,12 +974,12 @@ function PlayState:generateSong(dataPath)
 
     noteData = songData.notes
 
-    local file = "assets/data/" .. dataPath .. "/events"
+    local file = "assets/data/" .. dataPath .. "/events.json"
     if love.filesystem.getInfo(file) then
         local eventsData = Song:loadFromJson("events", self.songName).events
-        for i, event in ipairs(eventsData) do
-            for i = 1, #event[1] do
-                --self:makeEvent(event, i)
+        for _, event in ipairs(eventsData) do
+            for i = 1, #event[2] do
+                self:makeEvent(event, i)
             end
         end
     end
@@ -830,6 +1048,55 @@ function PlayState:generateSong(dataPath)
 
     -- sort unspawnNotes by strumTime
     table.sort(self.unspawnNotes, function(a, b) return a.strumTime < b.strumTime end)
+end
+
+function PlayState:eventPushed(event)
+    self:eventPushedUnique(event)
+    if self.eventsPushed[event.event] then
+        return
+    end
+
+    stage:eventPushed(event)
+    table.insert(self.eventsPushed, event.event)
+end
+
+function PlayState:eventPushedUnique(event)
+    if event.event == "Change Character" then -- BEST TO PRELOAD!!!!
+        local charType = 0
+        local v1 = tostring(event.value1):lower() -- safe guard
+        if v1 == "gf" or v1 == "girlfriend" or v1 == "1" then
+            charType = 2
+        elseif v1 == "dad" or v1 == "opponent" or v1 == "0" then
+            charType = 1
+        else
+            v1 = tonumber(v1)
+            if v1 then
+                charType = v1
+            else
+                charType = 0
+            end
+        end
+
+        local newCharacter = event.value2
+        --self:addCharacterToList(newCharacter, charType)
+    elseif event.event == "Play Sound" then
+        Paths.sound(event.value1):play()
+    end
+end
+
+function PlayState:eventEarlyTrigger(event)
+    -- event.event if
+end
+
+function PlayState:makeEvent(event, i)
+    SubEvent = EventNote(
+        event[1],
+        event[2][1],
+        event[2][2],
+        event[2][3]
+    )
+    table.insert(self.eventNotes, SubEvent)
+    self:eventPushed(SubEvent)
 end
 
 function PlayState:startCountdown()
@@ -930,8 +1197,6 @@ function PlayState:keyPressed(key)
                     end
                     table.insert(pressNotes, epicNote)
                 end
-            else 
-
             end
         end
     end
@@ -945,6 +1210,7 @@ end
 
 function PlayState:goodNoteHit(note)
     if not note.wasGoodHit then
+        if self.vocals then self.vocals:setVolume(1) end
         if self.cpuControlled and (note.ignoreNote or note.hitCausesMiss) then return end
 
         note.wasGoodHit = true
@@ -1010,6 +1276,13 @@ function PlayState:keyReleased(key)
     end
 
     self.inputsArray[key] = false
+end
+
+function PlayState:tweenCamIn()
+    print(Paths.formatToSongPath(self.SONG.song), self.cameraTwn, self.camGame.zoom)
+    if Paths.formatToSongPath(self.SONG.song) == "tutorial" and not self.cameraTwn and self.camGame.zoom ~= 1.3 then
+        self.cameraTwn = Timer.tween(Conductor.stepCrochet*4/1000, self.camGame, {zoom = 1.3}, "in-bounce", function() self.cameraTwn = nil end)
+    end
 end
 
 function PlayState:beatHit()

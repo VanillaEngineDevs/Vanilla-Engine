@@ -42,8 +42,10 @@ function love.load()
 
     StrumNote = require "objects.StrumNote"
     Note = require "objects.Note"
+    EventNote = require "objects.EventNote"
     Character = require "objects.Character"
     BGSprite = require "objects.BGSprite"
+    --HealthBar = require "objects.HealthBar"
 
     Stages = {
         Stage = require "states.stages.Stage",
@@ -54,6 +56,7 @@ function love.load()
 
     push.setupScreen(1280, 720, {upscale = "normal"})
 
+    firstStartup = true
 
     -- States
     TitleState = require "states.Title"
@@ -62,6 +65,8 @@ function love.load()
     PlayState = require "states.Play"
 
     Gamestate.switch(TitleState)
+
+    firstStartup = false
 end
 
 function love.update(dt)

@@ -1,10 +1,13 @@
 local TitleState = MusicBeatState:extend()
 TitleState.music = nil
-
+TitleState.music = love.audio.newSource("assets/music/freakyMenu.ogg", "stream")
+TitleState.music:setLooping(true)
+    
 function TitleState:enter()
-    self.music = love.audio.newSource("assets/music/freakyMenu.ogg", "stream")
-    self.music:setLooping(true)
-    self.music:play()
+    
+    if not TitleState.music:isPlaying() then
+        TitleState.music:play()
+    end
     self.danceLeft = true
     Conductor.changeBPM(102)
     self.logo = Sprite(-150, -100)
@@ -23,6 +26,10 @@ function TitleState:enter()
     self.enterText:addByPrefix("idle", "Press Enter to Begin", 24, true)
     self.enterText:addByPrefix("flash", "ENTER PRESSED", 24, false)
     self.enterText:play("idle")
+
+    if not firstStartup then
+        MusicBeatState:fadeIn(0.3)
+    end
 end
 
 function TitleState:update(dt)

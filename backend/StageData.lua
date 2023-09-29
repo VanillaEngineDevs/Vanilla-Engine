@@ -52,7 +52,7 @@ function StageData:loadDirectory(SONG)
             stage = "spooky"
         elseif songname == "pico" or songname == "blammed" or songname == "philly" or songname == "philly-nice" then
             stage = "philly"
-        elseif songname == "milf" or songname == "satin-panties" or songname == "high" then
+        elseif songname == "milf" or songname == "satin-panties" or songname == "high" or songname == "satinpanties" then
             stage = "limo"
         elseif songname == "cocoa" or songname == "eggnog" then
             stage = "mall"

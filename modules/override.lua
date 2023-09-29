@@ -15,8 +15,9 @@ function string.split(self, sep)
     return fields
 end
 
-function string:trim()
-    return self:match("^%s*(.-)%s*$")
+function string:trim(str)
+    -- remove extra whitespace from beginning and end.
+    return string.gsub(str, "^%s*(.-)%s*$", "%1")
 end
 
 -- Math functions
@@ -30,6 +31,10 @@ end
 
 function math.bound(x, min, max)
     return math.min(math.max(x, min), max)
+end
+
+function math.remapToRange(x, inMin, inMax, outMin, outMax)
+    return outMin + (x - inMin) * ((outMax - outMin) / (inMax - inMin))
 end
 
 -- Table overrides
