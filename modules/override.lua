@@ -68,6 +68,10 @@ function love.math.randomIgnore(min, max, ignore)
     end
 end
 
+function love.math.randomFloat(min, max)
+    return min + love.math.random() * (max - min)
+end
+
 -- Misc functions
 
 -- function to try a function, and if it fails, run another function

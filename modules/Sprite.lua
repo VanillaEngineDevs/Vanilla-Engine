@@ -17,6 +17,7 @@ Sprite.offset = {x = 0, y = 0}
 Sprite.scale = {x = 1, y = 1}
 Sprite.shear = {x = 0, y = 0}
 Sprite.velocity = {x = 0, y = 0}
+Sprite.acceleration = {x = 0, y = 0}
 
 Sprite.blend = "alpha"
 
@@ -77,6 +78,7 @@ function Sprite:new(x, y, graphic)
     self.scale = {x=1,y=1}
     self.shear = {x=0,y=0}
     self.velocity = {x=0,y=0}
+    self.acceleration = {x=0,y=0}
 
     self.scrollFactor = {x=1,y=1}
 
@@ -210,6 +212,9 @@ function Sprite:update(dt)
             end
         end
     end
+
+    self.velocity.x = self.velocity.x + self.acceleration.x * dt
+    self.velocity.y = self.velocity.y + self.acceleration.y * dt
 
     self.x = self.x + self.velocity.x * dt
     self.y = self.y + self.velocity.y * dt
