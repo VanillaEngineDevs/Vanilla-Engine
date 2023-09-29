@@ -39,6 +39,7 @@ function love.load()
     StageData = require "backend.StageData"
     WeekData = require "backend.WeekData"
     Difficulty = require "backend.Difficulty"
+    Sound = require "modules.Sound"
 
     StrumNote = require "objects.StrumNote"
     Note = require "objects.Note"
@@ -59,6 +60,11 @@ function love.load()
     push.setupScreen(1280, 720, {upscale = "normal"})
 
     firstStartup = true
+
+    -- Preloaded sounds
+    Paths.sound("assets/sounds/cancelMenu.ogg")
+    Paths.sound("assets/sounds/confirmMenu.ogg")
+    Paths.sound("assets/sounds/scrollMenu.ogg")
 
     -- States
     TitleState = require "states.Title"

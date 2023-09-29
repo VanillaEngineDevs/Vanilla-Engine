@@ -104,6 +104,8 @@ end
 function MainMenuState:changeItem(huh)
     local huh = huh or 0
 
+    Sound.play(Paths.sound("assets/sounds/scrollMenu.ogg"))
+
     self.curSelected = self.curSelected + huh
 
     if self.curSelected > #self.menuItems.members then
@@ -148,6 +150,7 @@ function MainMenuState:update(dt)
         end
 
         if input:pressed("m_back") then
+            Sound.play(Paths.sound("assets/sounds/cancelMenu.ogg"))
             self.selectedSomethin = true
             MusicBeatState:fadeOut(0.3,
                 function()
@@ -155,6 +158,7 @@ function MainMenuState:update(dt)
                 end
             )
         elseif input:pressed("m_confirm") then
+            Sound.play(Paths.sound("assets/sounds/confirmMenu.ogg"))
             if self.optionShit[self.curSelected] == "donate" then
                 love.system.openURL("https://ninja-muffin24.itch.io/funkin")
             else

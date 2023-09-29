@@ -363,9 +363,7 @@ function PlayState:enter()
         self.girlfriendCameraOffset = {0, 0}
     end
 
-    if self.curStage == "stage" then
-        stage = Stages.Stage()
-    elseif self.curStage == "spooky" then
+    if self.curStage == "spooky" then
         stage = Stages.Spooky()
     elseif self.curStage == "philly" then
         stage = Stages.Philly()
@@ -375,6 +373,8 @@ function PlayState:enter()
         stage = Stages.Mall()
     elseif self.curStage == "mallEvil" then
         stage = Stages.MallEvil()
+    else -- Always default to stage
+        stage = Stages.Stage()
     end
 
     if not stageData.hide_girlfriend then

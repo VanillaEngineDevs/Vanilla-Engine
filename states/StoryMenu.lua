@@ -219,6 +219,8 @@ end
 function StoryMenuState:changeWeek(change)
     local change = change or 0
 
+    Sound.play(Paths.sound("assets/sounds/scrollMenu.ogg"))
+
     self.curWeek = self.curWeek + change
 
     if self.curWeek > #self.loadedWeeks then
@@ -271,6 +273,7 @@ end
 
 function StoryMenuState:selectWeek()
     if not self:weekIsLocked(self.loadedWeeks[self.curWeek].fileName) then
+        Sound.play(Paths.sound("assets/sounds/confirmMenu.ogg"))
         local songArray = {}
         local leWeek = self.loadedWeeks[self.curWeek].songs
         for i = 1, #leWeek do
@@ -318,11 +321,14 @@ function StoryMenuState:selectWeek()
         end)
     else
         -- bleh
+        Sound.play(Paths.sound("assets/sounds/cancelMenu.ogg"))
     end
 end
 
 function StoryMenuState:changeDifficulty(change)
     local change = change or 0
+
+    Sound.play(Paths.sound("assets/sounds/scrollMenu.ogg"))
 
     self.curDifficulty = self.curDifficulty + change
 
@@ -331,6 +337,7 @@ function StoryMenuState:changeDifficulty(change)
     elseif self.curDifficulty < 1 then
         self.curDifficulty = #Difficulty.list
     end
+
 
     local diff = Difficulty:getString(self.curDifficulty)
     local newImage = Paths.image("menu/menudifficulties/" .. Paths.formatToSongPath(diff))
@@ -390,6 +397,7 @@ function StoryMenuState:update(dt)
         if input:pressed("m_confirm") then
             self:selectWeek()
         elseif input:pressed("m_back") then
+            Sound.play(Paths.sound("assets/sounds/cancelMenu.ogg"))
             self.movedBack = true
 
             MusicBeatState:fadeOut(0.3,

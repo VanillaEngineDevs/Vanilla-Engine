@@ -43,11 +43,13 @@ function TitleState:update(dt)
         self.enterText:play("flash")
         self.enterText.offset.x = -9
         self.enterText.offset.y = -4
-        MusicBeatState:fadeOut(0.3,
+        Sound.play(Paths.sound("assets/sounds/confirmMenu.ogg"))
+        Timer.after(0.7, function()
+            MusicBeatState:fadeOut(0.3,
             function()
                 MusicBeatState:switchState(MainMenuState)
-            end
-        )
+            end)
+        end)
     end
 end
 

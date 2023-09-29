@@ -13,7 +13,6 @@ typedef MenuCharacterFile = {
 ]]
 
 MenuCharacter.character = ""
-MenuCharacter.hasConfirmAnimation = false
 MenuCharacter.DEFAULT_CHARACTER = "bf"
 
 function MenuCharacter:new(x, character)
@@ -62,7 +61,7 @@ function MenuCharacter:changeCharacter(character)
         local confirmAnim = charFile.confirm_anim
         if confirmAnim and #confirmAnim > 0 and confirmAnim ~= charFile.idle_anim then
             self:addByPrefix("confirm", confirmAnim, 24)
-            if self.animations["confirm"] then
+            if self.animations["confirm"] and charFile.confirm_anim ~= "M Dad Idle" then -- literally why
                 self.hasConfirmAnimation = true
             end
         end
