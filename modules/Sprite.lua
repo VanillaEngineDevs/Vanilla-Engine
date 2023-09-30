@@ -103,15 +103,31 @@ function Sprite:new(x, y, graphic)
     if graphic then self:load(graphic) end
 end
 
-function Sprite:load(graphic)
+function Sprite:load(graphic, animated, frameWidth, frameHeight)
+    local animated = animated or false
+    local framewidth = frameWidth or 0
+    local frameheight = frameHeight or 0
     
     if type(graphic) == "string" then
         graphic = Paths.image(graphic)
     end
     self.graphic = graphic
 
-    self.width = graphic:getWidth()
-    self.height = graphic:getHeight()
+    if framewidth == 0 then
+        framewidth = animated and self.graphic:getHeight() or self.graphic:getWidth()
+        framewidth = (framewidth > self.graphic:getWidth()) or self.graphic:getWidth() or framewidth
+    end
+    self.width = framewidth
+
+    if frameheight == 0 then
+        frameheight = animated and framewidth or self.graphic:getHeight()
+        frameheight = (frameheight > self.graphic:getHeight()) or self.graphic:getHeight() or frameheight
+    end
+    self.height = frameheight
+
+    if animated then
+        self.frames = Paths.getTilesFromGraphic(graphic, {x = frameWidth, y = frameHeight})
+    end
 
     return self
 end
@@ -189,6 +205,24 @@ function Sprite:addByIndices(animName, animPrefix, indices, framerate, loop)
                 break
             end
         end
+    end
+
+    if not self.animations then self.animations = {} end
+    self.animations[animName] = anim
+end
+
+function Sprite:addByTiles(animName, frames, framerate, loops)
+    local framerate = framerate or 30
+    local loops = (loops == nil) and true or loops
+
+    local anim = {}
+    anim.name = animName
+    anim.frames = {}
+    anim.framerate = framerate
+    anim.looped = loops
+
+    for _, frame in ipairs(frames) do
+        table.insert(anim.frames, self.frames.frames[frame])
     end
 
     if not self.animations then self.animations = {} end

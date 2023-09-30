@@ -37,6 +37,7 @@ Note.lowPriority = false
 Note.SUSTAIN_SIZE = 44
 Note.swagWidth = 160 * 0.7
 Note.colArray = {"purple", "blue", "green", "red"}
+
 Note.defaultNoteSkin = "noteSkins/NOTE_assets"
 
 Note.offsetX = 0
@@ -98,15 +99,53 @@ function Note:new(strumTime, noteData, prevNote, sustainNote, inEditor, createdF
     self.noteData = noteData
 
     if noteData > -1 then
-        self:setFrames(Paths.getAtlas(PlayState.noteSkin or Note.defaultNoteSkin, "assets/images/png/" .. (PlayState.noteSkin or Note.defaultNoteSkin) .. ".xml"))
-        self.x = self.x + Note.swagWidth * noteData
-        if not self.isSustainNote and noteData < #Note.colArray then
-            local animToPlay = ""
-            animToPlay = Note.colArray[noteData % #Note.colArray + 1]
-            self:addByPrefix(animToPlay .. "Scroll", animToPlay .. " instance", 24, true)
-            self:play(animToPlay .. "Scroll")
+        if not PlayState.isPixelStage then
+            self:setFrames(Paths.getAtlas(PlayState.noteSkin or Note.defaultNoteSkin, "assets/images/png/" .. (PlayState.noteSkin or Note.defaultNoteSkin) .. ".xml"))
+            self.x = self.x + Note.swagWidth * noteData
+            if not self.isSustainNote and noteData < #Note.colArray then
+                local animToPlay = ""
+                animToPlay = Note.colArray[noteData % #Note.colArray + 1]
+                self:addByPrefix(animToPlay .. "Scroll", animToPlay .. " instance", 24, true)
+                self:addByPrefix(Note.colArray[self.noteData % #Note.colArray + 1] .. "hold", Note.colArray[self.noteData % #Note.colArray + 1] .. " hold piece instance 1", 24, true)
+                self:addByPrefix(Note.colArray[self.noteData % #Note.colArray + 1] .. "holdend", Note.colArray[self.noteData % #Note.colArray + 1] .. " hold end instance 1", 24, true)
+                self:play(animToPlay .. "Scroll")
+            end
+            self:setGraphicSize(math.floor(self.width * 0.7))
+        else
+            local ox = self.x
+            -- since pixel notes are wacky, we gotta get the animation from "tiles"
+            if self.isSustainNote then
+                local graphic = Paths.image("pixel/pixelUI/NOTE_assetsENDS")
+                self:load(graphic, true, math.floor(graphic:getWidth() / 4), math.floor(graphic:getHeight() / 2)) -- 4 columns, 2 rows
+                self.originalHeight = graphic:getHeight()/2
+
+                local animToPlay = ""
+                animToPlay = Note.colArray[noteData % #Note.colArray + 1]
+
+                self:addByTiles(animToPlay .. "holdend", {self.noteData+5}, 24, true)
+                self:addByTiles(animToPlay .. "hold", {self.noteData+1}, 24, true)
+                self:play(animToPlay .. "holdend")
+            else
+                local graphic = Paths.image("pixel/pixelUI/NOTE_assets")
+                self:load(graphic, true, math.floor(graphic:getWidth() / 4), math.floor(graphic:getHeight() / 5)) -- 4 columns, 5 rows
+                
+                local animToPlay = ""
+                animToPlay = Note.colArray[noteData % #Note.colArray + 1]
+
+                self:addByTiles(animToPlay .. "Scroll", {self.noteData+5}, 24, true)
+                self:play(animToPlay .. "Scroll")
+            end
+
+            self:setGraphicSize(math.floor(self.width * PlayState.daPixelZoom))
+            self:updateHitbox()
+            self.antialiasing = false
+
+            if self.isSustainNote then
+                self.offset.x = self.offset.x + (self._lastNoteOffX or 0)
+                self._lastNoteOffX = (self.width - 7) * (PlayState.daPixelZoom / 2)
+                self.offsetX = self.offsetX - self._lastNoteOffX
+            end
         end
-        self:setGraphicSize(math.floor(self.width * 0.7))
     end
 
     if self.prevNote ~= nil then
@@ -120,7 +159,6 @@ function Note:new(strumTime, noteData, prevNote, sustainNote, inEditor, createdF
         self.offsetX = self.offsetX + self.width / 2
         self.copyAngle = false
 
-        self:addByPrefix(Note.colArray[self.noteData % #Note.colArray + 1] .. "holdend", Note.colArray[self.noteData % #Note.colArray + 1] .. " hold end instance 1", 24, true)
         self:play(Note.colArray[self.noteData % #Note.colArray + 1] .. "holdend")
 
         self:updateHitbox()
@@ -128,11 +166,10 @@ function Note:new(strumTime, noteData, prevNote, sustainNote, inEditor, createdF
         self.offsetX = self.offsetX - self.width / 2
 
         if PlayState.isPixelStage then
-            self.offsetX = self.offsetX + 30
+            self.offsetX = self.offsetX + 0
         end
 
         if self.prevNote.isSustainNote then
-            self.prevNote:addByPrefix(Note.colArray[self.noteData % #Note.colArray + 1] .. "hold", Note.colArray[self.noteData % #Note.colArray + 1] .. " hold piece instance 1", 24, true)
             self.prevNote:play(Note.colArray[self.noteData % #Note.colArray + 1] .. "hold")
             --print(Note.colArray[self.noteData % #Note.colArray + 1] .. "hold", Note.colArray[self.noteData % #Note.colArray + 1] .. " hold piece instance 1")
             --self.prevNote.scale.y = self.prevNote.scale.y * Conductor.stepCrochet / 100 * 1.05
@@ -141,14 +178,13 @@ function Note:new(strumTime, noteData, prevNote, sustainNote, inEditor, createdF
             self.prevNote.scale.y = (prevNote.width / prevNote:getFrameWidth()) * ((Conductor.stepCrochet/100) * (1.05 / 0.7)) * PlayState.songSpeed
 
             if PlayState.isPixelStage then
-                self.prevNote.scale.y = self.prevNote.scale.y * 1.19
+                self.prevNote.scale.y = self.prevNote.scale.y * 5
                 self.prevNote.scale.y = self.prevNote.scale.y * (6 / self.height)
             end
             self.prevNote:updateHitbox()
         end
 
         if PlayState.isPixelStage then
-            self.scale.y = self.scale.y * PlayState.daPixelZoom 
             self:updateHitbox()
         end
         self.earlyHitMult = 0
@@ -211,6 +247,8 @@ function Note:followStrumNote(myStrum, fakeCrochet, songSpeed)
 
     if copyX then
         self.x = strumX + self.offsetX + math.cos(angleDir) * self.distance
+    else
+        self.x = strumX + self.offsetX + ((PlayState.isPixelStage and self.isSustainNote) and 135 or 0)
     end
 
     if self.copyY then

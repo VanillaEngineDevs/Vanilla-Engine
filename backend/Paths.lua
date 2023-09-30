@@ -145,6 +145,55 @@ function Paths.getPackerAtlas(graphic, data)
     return frames
 end
 
+function Paths.getTilesFromGraphic(graphic, tileSize, region, tileSpacing)
+    local region = region
+    local tileSpacing = tileSpacing or {x = 0, y = 0}
+    local tiles = {}
+    local tileSize = tileSize
+    if not region then
+        region = {x = 0, y = 0, width = graphic:getWidth(), height = graphic:getHeight()}
+    else
+        if region.width == 0 then region.width = graphic:getWidth() - region.x end
+        if region.height == 0 then region.height = graphic:getHeight() - region.y end
+    end
+
+    region = {
+        x = region.x,
+        y = region.y,
+        width = region.width,
+        height = region.height
+    }
+
+    tileSpacing = {x = tileSpacing.x, y = tileSpacing.y}
+    tileSize = {x = tileSize.x, y = tileSize.y}
+
+    local spacedWidth = tileSize.x + tileSpacing.x
+    local spacedHeight = tileSize.y + tileSpacing.y
+
+    local rows = (tileSize.y ==0) and 1 or math.floor((region.height - tileSpacing.y) / spacedHeight)
+    local columns = (tileSize.x == 0) and 1 or math.floor((region.width - tileSpacing.x) / spacedWidth)
+
+    local sw, sh = graphic:getDimensions()
+    local tf = 0
+
+    local tiles = {graphic = graphic, frames = {}}
+
+    for y = 0, rows - 1 do 
+        for x = 0, columns -1 do
+            table.insert(tiles.frames, Sprite.NewFrame(
+                tostring(tf),
+                region.x + x * spacedWidth, 
+                region.y + y * spacedHeight,
+                tileSize.x, tileSize.y,
+                sw, sh
+            ))
+            tf = tf + 1
+        end
+    end
+
+    return tiles
+end
+
 function Paths.preloadDirectoryImages(path)
     local path_ = "assets/images/" .. Paths.imageType .. "/" .. path
     local imgType = Paths.imageType

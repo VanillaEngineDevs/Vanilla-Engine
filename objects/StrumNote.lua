@@ -17,7 +17,38 @@ function StrumNote:new(x, y, leData, player)
     self.skin = PlayState.currentNoteSkin or Note.defaultNoteSkin
 
     if PlayState.isPixelStage then
+        local graphic = Paths.image("pixel/pixelUI/NOTE_assets")
+        self:load(graphic, true, graphic:getWidth() / 4, graphic:getHeight() / 5) -- 4 rows, 5 columns
 
+        self.antialiasing = false
+        self:setGraphicSize(math.floor(self.width * PlayState.daPixelZoom))
+
+        self:addByTiles("green", {7})
+        self:addByTiles("red", {8})
+        self:addByTiles("blue", {6})
+        self:addByTiles("purple", {5})
+
+        local c = math.abs(self.noteData) % 4
+
+        if c == 0 then
+            self:addByTiles("static", {1})
+            self:addByTiles("pressed", {5, 9}, 12, false)
+            self:addByTiles("confirm", {13, 17}, 24, false)
+        elseif c == 1 then
+            self:addByTiles("static", {2})
+            self:addByTiles("pressed", {6, 10}, 12, false)
+            self:addByTiles("confirm", {14, 18}, 24, false)
+        elseif c == 2 then
+            self:addByTiles("static", {3})
+            self:addByTiles("pressed", {7, 11}, 12, false)
+            self:addByTiles("confirm", {15, 19}, 24, false)
+        elseif c == 3 then
+            self:addByTiles("static", {4})
+            self:addByTiles("pressed", {8, 12}, 12, false)
+            self:addByTiles("confirm", {16, 20}, 24, false)
+        end
+
+        self:updateHitbox()
     else
         self:setFrames(Paths.getAtlas(self.skin, "assets/images/png/" .. self.skin .. ".xml"))
 
@@ -41,9 +72,9 @@ function StrumNote:new(x, y, leData, player)
             self:addByPrefix("confirm", "right confirm instance 1", 24, false)
         end
         self:updateHitbox()
-    end
 
-    self:setGraphicSize(math.floor(self.width * 0.7))
+        self:setGraphicSize(math.floor(self.width * 0.7))
+    end
 end
 
 function StrumNote:update(dt)
