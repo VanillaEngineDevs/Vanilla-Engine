@@ -106,8 +106,6 @@ function Note:new(strumTime, noteData, prevNote, sustainNote, inEditor, createdF
                 local animToPlay = ""
                 animToPlay = Note.colArray[noteData % #Note.colArray + 1]
                 self:addByPrefix(animToPlay .. "Scroll", animToPlay .. " instance", 24, true)
-                self:addByPrefix(Note.colArray[self.noteData % #Note.colArray + 1] .. "hold", Note.colArray[self.noteData % #Note.colArray + 1] .. " hold piece instance 1", 24, true)
-                self:addByPrefix(Note.colArray[self.noteData % #Note.colArray + 1] .. "holdend", Note.colArray[self.noteData % #Note.colArray + 1] .. " hold end instance 1", 24, true)
                 self:play(animToPlay .. "Scroll")
             end
             self:setGraphicSize(math.floor(self.width * 0.7))
@@ -159,6 +157,10 @@ function Note:new(strumTime, noteData, prevNote, sustainNote, inEditor, createdF
         self.offsetX = self.offsetX + self.width / 2
         self.copyAngle = false
 
+        if not PlayState.isPixelStage then
+            self:addByPrefix(Note.colArray[self.noteData % #Note.colArray + 1] .. "holdend", Note.colArray[self.noteData % #Note.colArray + 1] .. " hold end instance 1", 24, true)
+            self:addByPrefix(Note.colArray[self.noteData % #Note.colArray + 1] .. "hold", Note.colArray[self.noteData % #Note.colArray + 1] .. " hold piece instance 1", 24, true)
+        end
         self:play(Note.colArray[self.noteData % #Note.colArray + 1] .. "holdend")
 
         self:updateHitbox()
@@ -170,9 +172,10 @@ function Note:new(strumTime, noteData, prevNote, sustainNote, inEditor, createdF
         end
 
         if self.prevNote.isSustainNote then
+            if not PlayState.isPixelStage then
+                
+            end
             self.prevNote:play(Note.colArray[self.noteData % #Note.colArray + 1] .. "hold")
-            --print(Note.colArray[self.noteData % #Note.colArray + 1] .. "hold", Note.colArray[self.noteData % #Note.colArray + 1] .. " hold piece instance 1")
-            --self.prevNote.scale.y = self.prevNote.scale.y * Conductor.stepCrochet / 100 * 1.05
             if createdFrom ~= nil and createdFrom.songSpeed ~= nil then self.prevNote.scale.y = self.prevNote.scale.y * createdFrom.songSpeed end
             
             self.prevNote.scale.y = (prevNote.width / prevNote:getFrameWidth()) * ((Conductor.stepCrochet/100) * (1.05 / 0.7)) * PlayState.songSpeed
