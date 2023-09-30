@@ -269,12 +269,8 @@ function PlayState:add(member)
 end
 
 function PlayState:remove(member)
-    for i, member in ipairs(self.members) do
-        if member == member and self.members[i] == member then
-            table.remove(self.members, i)
-            return
-        end
-    end
+    local index = table.indexOf(self.members, member)
+    if index then self.members[index] = nil end
 end
 
 function PlayState:insert(position, member)
@@ -605,7 +601,7 @@ function PlayState:update(dt)
         end
     end
 
-    if self.inst and (not self.inst:isPlaying() and self.startedCountdown and not self.transitioning and not self.endingSong) and not self.inCutscene and self.inst:tell("seconds") * 1000 > 1000 then
+    if self.inst and (not self.inst:isPlaying() and self.startedCountdown and not self.transitioning and not self.endingSong) and not self.inCutscene and not self.startingSong then
         self:finishSong()
     end
 
@@ -638,7 +634,7 @@ function PlayState:update(dt)
         self.camHUD.zoom = math.lerp(1, self.camHUD.zoom, math.bound(1 - (dt * 3.125), 0, 1))
     end
 
-    if self.generatedMusic and not self.inCutscene then
+    if self.generatedMusic and not self.inCutscene and self.startedCountdown and not self.startingSong then
         if not self.cpuControlled then
             self:keysCheck()
         end
@@ -1243,6 +1239,7 @@ function PlayState:createCountdownSprite(image, antialias)
     self:add(spr)
     Timer.tween(Conductor.crochet / 1000, spr, {alpha = 0}, "in-out-cubic", function()
         spr.alpha = 0
+        spr.visible = false
     end)
 
     return spr
