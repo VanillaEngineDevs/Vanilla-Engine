@@ -31,6 +31,7 @@ function love.load()
     Conductor = require "backend.Conductor"
     Camera = require "backend.Camera"
     Sprite = require "modules.Sprite"
+    AtlasSprite = require "animateatlas.Sprite"
     Text = require "modules.Text"
     Group = require "modules.flixel.Group"
     Song = require "backend.Song"

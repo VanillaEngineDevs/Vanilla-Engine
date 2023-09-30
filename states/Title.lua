@@ -30,6 +30,9 @@ function TitleState:enter()
     if not firstStartup then
         MusicBeatState:fadeIn(0.3)
     end
+
+    --TestSpr = AtlasSprite()
+    --TestSpr:construct("stages/tank/cutscenes/stressPico")
 end
 
 function TitleState:update(dt)

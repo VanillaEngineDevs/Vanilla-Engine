@@ -50,6 +50,15 @@ function string.substr(self, str)
     end
 end
 
+function string.replace(self, str, rep)
+    -- replaces str with rep in self
+    local i = self:indexOf(str)
+    if i == -1 then
+        return self
+    else
+        return self:sub(1, i - 1) .. rep .. self:sub(i + #str)
+    end
+end
 -- Math functions
 function math.round(x)
     return x >= 0 and math.floor(x + 0.5) or math.ceil(x - 0.5)
@@ -75,6 +84,15 @@ function table.indexOf(t, object)
         end
     end
     return nil
+end
+
+function table.reverse(t)
+    local reversedTable = {}
+    local itemCount = #t
+    for k, v in ipairs(t) do
+        reversedTable[itemCount + 1 - k] = v
+    end
+    return reversedTable
 end
 
 -- Love functions
