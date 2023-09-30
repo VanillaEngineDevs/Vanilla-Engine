@@ -42,7 +42,18 @@ MainMenuState.camFollow = {x = 0, y = 0}
 
 MainMenuState.selectedSomethin = false
 
+function MainMenuState:resetValues()
+    self.curSelected = 1
+    self.camGame = nil
+    self.menuItems = nil
+    self.magenta = nil
+    self.camFollow = {x = 0, y = 0}
+    self.selectedSomethin = false
+    self.members = {}
+end
+
 function MainMenuState:enter()
+    self:resetValues()
     self.camGame = Camera()
 
     if not TitleState.music:isPlaying() then

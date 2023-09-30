@@ -94,6 +94,7 @@ function StoryMenuState:resetValues()
 end
 
 function StoryMenuState:enter()
+    Paths.clearFullCache()
     self:resetValues()
     Paths.preloadDirectoryImages("menu/menucharacters")
     Paths.preloadDirectoryImages("menu/storymenu")

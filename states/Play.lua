@@ -284,6 +284,7 @@ function PlayState:clear()
 end
 
 function PlayState:enter()
+    Paths.clearFullCache() -- reccomended for nintendo switch, will be setting in the future
     self:resetValues()
     self.super.enter(self)
 

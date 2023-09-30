@@ -168,13 +168,70 @@ function Paths.preloadDirectoryImages(path)
 end
 
 function Paths.clearPreload()
-    Cache.members.preload = {
+    -- go through and release all caches, then reset the table
+    for path, image in pairs(Cache.members.preload.image) do
+        image:release()
+    end
+    Cache.members.preload.image = {}
+    
+    for path, sound in pairs(Cache.members.preload.sound) do
+        sound:release()
+    end
+    Cache.members.preload.sound = {}
+
+    for path, font in pairs(Cache.members.preload.font) do
+        font:release()
+    end
+    Cache.members.preload.font = {}
+
+    for path, shader in pairs(Cache.members.preload.shader) do
+        shader:release()
+    end
+    Cache.members.preload.shader = {}
+
+    collectgarbage()
+end
+
+function Paths.clearFullCache()
+    -- wipe everything
+    for path, image in pairs(Cache.members.image) do
+        image:release()
+    end
+    Cache.members.image = {}
+
+    for path, sound in pairs(Cache.members.sound) do
+        sound:release()
+    end
+    Cache.members.sound = {}
+
+    for path, font in pairs(Cache.members.font) do
+        font:release()
+    end
+    Cache.members.font = {}
+
+    for path, shader in pairs(Cache.members.shader) do
+        shader:release()
+    end
+    Cache.members.shader = {}
+
+    collectgarbage()
+
+    Paths.clearPreload()
+
+    Cache.members = {
         image = {},
         sound = {},
         font = {},
-        shader = {}
+        shader = {},
+        preload = {
+            image = {},
+            sound = {},
+            font = {},
+            shader = {}
+        }
     }
 end
+
 
 function Paths.formatToSongPath(path)
     local invalidChars = "[~&\\;:<>#]"
