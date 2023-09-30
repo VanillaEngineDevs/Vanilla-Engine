@@ -104,6 +104,7 @@ function Sprite:new(x, y, graphic)
 end
 
 function Sprite:load(graphic)
+    
     if type(graphic) == "string" then
         graphic = Paths.image(graphic)
     end

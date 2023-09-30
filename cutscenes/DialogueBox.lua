@@ -74,7 +74,7 @@ function DialogueBox:new(talkingRight, dialogueList)
     self.portraitLeft:updateHitbox()
     self.portraitLeft.scrollFactor = {x = 0, y = 0}
     self.portraitLeft.visible = false
-    self.portraitLeft.antialiasing = true
+    self.portraitLeft.antialiasing = false
     self:add(self.portraitLeft)
 
     self.portraitRight = Sprite(0, 40)
@@ -84,13 +84,13 @@ function DialogueBox:new(talkingRight, dialogueList)
     self.portraitRight:updateHitbox()
     self.portraitRight.scrollFactor = {x = 0, y = 0}
     self.portraitRight.visible = false
-    self.portraitRight.antialiasing = true
+    self.portraitRight.antialiasing = false
     self:add(self.portraitRight)
 
     self.box:play("normalOpen")
     self.box:setGraphicSize(math.floor(self.box.width * PlayState.daPixelZoom * 0.9))
     self.box:updateHitbox()
-    self.box.antialiasing = true
+    self.box.antialiasing = false
     self:add(self.box)
 
     self.box:screenCenter("X")
@@ -101,7 +101,7 @@ function DialogueBox:new(talkingRight, dialogueList)
     self.handSelect:setGraphicSize(math.floor(self.handSelect.width * PlayState.daPixelZoom * 0.9))
     self.handSelect:updateHitbox()
     self.handSelect.visible = false
-    self.handSelect.antialiasing = true
+    self.handSelect.antialiasing = false
     self:add(self.handSelect)
 
     self.dropText = Text(240, 500, math.floor(push:getWidth() * 0.6), "", Paths.font("assets/fonts/pixel.otf", 32))

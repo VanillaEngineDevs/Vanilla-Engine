@@ -92,7 +92,7 @@ function love.resize(w, h)
 end
 
 function love.draw()
-    push:start()
+    push:start()    
         Gamestate.draw()
 
         if MusicBeatState.fade.graphic then

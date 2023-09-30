@@ -260,6 +260,8 @@ function PlayState:resetValues()
 
     self.members = {}
     self.startingSong = true
+
+    self.antialiasing = false
 end
 
 function PlayState:add(member)
@@ -326,9 +328,11 @@ function PlayState:enter()
     self.stageUI = "normal"
     if stageData.stageUI and #stageData.stageUI > 0 then
         self.stageUI = stageData.stageUI
+        self.isPixelStage = self.stageUI == "pixel"
     else
         if stageData.isPixelStage then
             self.stageUI = "pixel"
+            self.isPixelStage = true
         end
     end
 
@@ -495,6 +499,17 @@ function PlayState:enter()
     self.camGame.zoom = self.defaultCamZoom
     self.camHUD.zoom = 1
 
+    -- intro preloads
+    if self.stageUI == "pixel" then
+        Paths.image("pixel/pixelUI/ready-pixel")
+        Paths.image("pixel/pixelUI/set-pixel")
+        Paths.image("pixel/pixelUI/date-pixel")
+    else
+        Paths.image("ui/ready")
+        Paths.image("ui/set")
+        Paths.image("ui/go")
+    end
+
     TitleState.music:stop()
     if self.startCallback ~= self.startCountdown then
         self.startCallback(stage)
@@ -590,7 +605,7 @@ function PlayState:update(dt)
         end
     end
 
-    if self.inst and (not self.inst:isPlaying() and self.startedCountdown and not self.transitioning and not self.endingSong) and not self.inCutscene then
+    if self.inst and (not self.inst:isPlaying() and self.startedCountdown and not self.transitioning and not self.endingSong) and not self.inCutscene and self.inst:tell("seconds") * 1000 > 1000 then
         self:finishSong()
     end
 
@@ -789,9 +804,9 @@ function PlayState:keyDown(key)
     self.inputsArray[key] = true
 end
 
-function PlayState:draw(dt)
+function PlayState:draw()
     for i, member in ipairs(self.members) do
-        member:draw(dt)
+        member:draw()
     end
 end
 
@@ -1141,20 +1156,96 @@ function PlayState:startCountdown()
     self:generateStaticArrows(1)
 
     self.startedCountdown = true
+    Conductor.songPosition = -Conductor.crochet * 5
 
-    --Conductor.songPosition = -Conductor.crochet * 5
-
-    local swagCounter = 0
-
-    -- play inst, and voices if it exists
-    if self.vocals then
-        self.vocals:play()
+    if self.skipCountdown then
+        Conductor.songPosition = 0
+        return true
     end
-    self.inst:play()
+    self:moveCameraSection()
+    self.updateTime = true
 
-    self.startingSong = false
+    self.loops = 5
+    function self:doCountdown()
+        local startTimer = Timer.after(Conductor.crochet / 1000 / self.playbackRate, function()
+            if self.gf and self.loops % math.round(self.gfSpeed * self.gf.danceEveryNumBeats) == 0 and self.gf.curAnim and not self.gf.curAnim.name:startsWith("sing") then
+                self.gf:dance()
+            end
+            if self.loops % self.boyfriend.danceEveryNumBeats == 0 and self.boyfriend.curAnim ~= nil and not self.boyfriend.curAnim.name:startsWith("sing") then
+                self.boyfriend:dance()
+            end
+            if self.loops % self.dad.danceEveryNumBeats == 0 and self.dad.curAnim ~= nil and not self.dad.curAnim.name:startsWith("sing") then
+                self.dad:dance()
+            end
 
-    return true
+            local introAssets = self.stageUI == "pixel" and {"pixel/pixelUI/ready-pixel", "pixel/pixelUI/set-pixel", "pixel/pixelUI/date-pixel"} or 
+                self.stageUI == "normal" and {"ui/ready", "ui/set", "ui/go"} or
+                {"ready", "set", "go"}
+            local antialias = not self.isPixelStage
+            local tick = "THREE"
+
+            local introSoundsSuffix = ""
+            if self.stageUI == "pixel" then
+                introSoundsSuffix = "-pixel"
+            end
+
+            if self.loops == 5 then
+                Sound.play(Paths.sound("assets/sounds/intro3" .. introSoundsSuffix .. ".ogg"))
+                tick = "THREE"
+            elseif self.loops == 4 then
+                self:createCountdownSprite(introAssets[1], antialias)
+                Sound.play(Paths.sound("assets/sounds/intro2" .. introSoundsSuffix .. ".ogg"))
+                tick = "TWO"
+            elseif self.loops == 3 then
+                self:createCountdownSprite(introAssets[2], antialias)
+                Sound.play(Paths.sound("assets/sounds/intro1" .. introSoundsSuffix .. ".ogg"))
+                tick = "ONE"
+            elseif self.loops == 2 then
+                self:createCountdownSprite(introAssets[3], antialias)
+                Sound.play(Paths.sound("assets/sounds/introGo" .. introSoundsSuffix .. ".ogg"))
+                tick = "GO"
+            elseif self.loops == 1 then
+                tick = "START"
+
+                -- play inst, and voices if it exists
+                if self.vocals then
+                    self.vocals:play()
+                end
+                self.inst:play()
+
+                self.startingSong = false
+
+                return true
+            end
+
+            self.loops = self.loops - 1
+            if self.loops > 0 then
+                self:doCountdown()
+            end
+        end)
+    end
+    self:doCountdown()
+end
+
+function PlayState:createCountdownSprite(image, antialias)
+    local spr = Sprite(0, 0, image)
+    spr.scrollFactor = {x=0, y=0}
+    spr.camera = self.camHUD
+    spr:screenCenter()
+
+    if self.isPixelStage then
+        spr:setGraphicSize(math.floor(spr.width * self.daPixelZoom))
+        spr.x, spr.y = spr.x - 200, spr.y - 100
+    end
+
+    
+    spr.antialiasing = antialias
+    self:add(spr)
+    Timer.tween(Conductor.crochet / 1000, spr, {alpha = 0}, "in-out-cubic", function()
+        spr.alpha = 0
+    end)
+
+    return spr
 end
 
 function PlayState:StartAndEnd()
@@ -1232,7 +1323,7 @@ function PlayState:keyPressed(key)
     end
 
     local spr = self.playerStrums.members[key]
-    if spr and spr.curAnim.name ~= "confirm" then
+    if spr and spr.curAnim and spr.curAnim.name ~= "confirm" then
         spr:playAnim("pressed")
         spr.resetAnim = 0
     end
@@ -1309,7 +1400,6 @@ function PlayState:keyReleased(key)
 end
 
 function PlayState:tweenCamIn()
-    print(Paths.formatToSongPath(self.SONG.song), self.cameraTwn, self.camGame.zoom)
     if Paths.formatToSongPath(self.SONG.song) == "tutorial" and not self.cameraTwn and self.camGame.zoom ~= 1.3 then
         self.cameraTwn = Timer.tween(Conductor.stepCrochet*4/1000, self.camGame, {zoom = 1.3}, "in-bounce", function() self.cameraTwn = nil end)
     end
