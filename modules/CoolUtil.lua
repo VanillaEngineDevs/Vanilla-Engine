@@ -36,7 +36,7 @@ end
 
 function CoolUtil.coolLerp(a, b, t, dt)
     local dt = dt or love.timer.getDelta()
-    return a + (b - a) * math.min(t * dt, 1)
+    return math.lerp(a, b, 1 - 1 / math.exp(t * 60 * dt))
 end
 
 function CoolUtil.coolTextFile(file)

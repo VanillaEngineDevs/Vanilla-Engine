@@ -39,6 +39,7 @@ local function updateTimerHandle(handle, dt)
 		--   count = <number>,
 		-- }
 		handle.time = handle.time + dt
+		if not handle.limit then return end
 		handle.during(dt, math.max(handle.limit - handle.time, 0))
 
 		while handle.time >= handle.limit and handle.count > 0 do
@@ -62,7 +63,7 @@ function Timer:update(dt)
 	for handle in pairs(to_update) do
 		if self.functions[handle] then
 			updateTimerHandle(handle, dt)
-			if handle.count == 0 then
+			if handle.count == 0 and handle.limit ~= nil then
 				self.functions[handle] = nil
 			end
 		end

@@ -100,6 +100,8 @@ function Sprite:new(x, y, graphic)
     self.animFinished = nil
     self.isMakeGraphic = false
 
+    self.indexFrame = 1 -- start at frame 1 
+
     if graphic then self:load(graphic) end
 
     return self
@@ -236,7 +238,7 @@ function Sprite:update(dt)
         self.curFrame = self.curFrame + dt * self.curAnim.framerate
         if self.curFrame >= #self.curAnim.frames then
             if self.curAnim.looped then
-                self.curFrame = 1
+                self.curFrame = self.indexFrame
                 if self.callback then
                     self.callback(self, self.curAnim.name)
                 end
@@ -269,7 +271,7 @@ function Sprite:makeGraphic(width, height, color)
     self:updateHitbox()
 end
 
-function Sprite:play(anim, force)
+function Sprite:play(anim, force, frame)
     if not force and self.curAnim and self.curAnim.name == anim and not self.animFinished then
         self.animFinished = false
         self.animPaused = false
@@ -277,7 +279,8 @@ function Sprite:play(anim, force)
     end
     if self.animations and self.animations[anim] then
         self.curAnim = self.animations[anim]
-        self.curFrame = 1
+        self.curFrame = frame or 1
+        self.indexFrame = frame or 1
         self.animFinished = false
     end 
 end

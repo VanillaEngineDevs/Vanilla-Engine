@@ -134,7 +134,24 @@ function Character:new(x, y, character, isPlayer)
 
     self:dance()
 
+    if self.curCharacter == "pico-speaker" == true then
+        self.skipDance = true
+        self:loadMappedAnims()
+        self:playAnim("shoot1")
+    end
+
     return self
+end
+
+function Character:loadMappedAnims()
+    local noteData = Song:loadFromJson("picospeaker", Paths.formatToSongPath(PlayState.SONG.song)).notes
+    for _, section in ipairs(noteData) do
+        for _, songNotes in ipairs(section.sectionNotes) do
+            table.insert(self.animationNotes, songNotes)
+        end
+    end
+    -- sort by time
+    table.sort(self.animationNotes, function(a, b) return a[1] < b[1] end)
 end
 
 function Character:update(dt)
@@ -153,6 +170,17 @@ function Character:update(dt)
             self:dance()
         elseif self.curAnim.name:endsWith("miss") and self.animFinished then
             self:dance()
+        end
+
+        if self.curCharacter == "pico-speaker" then
+            if #self.animationNotes > 0 and Conductor.songPosition > self.animationNotes[1][1] then
+                local noteData = 1
+                if self.animationNotes[1][2] > 2 then noteData = 3 end
+                noteData = noteData + love.math.random(0, 1)
+                self:playAnim("shoot" .. noteData, true)
+                table.remove(self.animationNotes, 1)
+            end
+            if self.animFinished then self:playAnim(self.curAnim.name, false, false, #self.curAnim.frames-2) end
         end
 
         if self.curAnim.name:startsWith("sing") then
@@ -189,9 +217,9 @@ function Character:dance()
     end
 end 
 
-function Character:playAnim(animName, force)
+function Character:playAnim(animName, force, frame)
     self.specialAnim = false
-    self:play(animName, force)
+    self:play(animName, force, frame)
 
     local daOffset = self.animOffsets[animName]
     if daOffset then

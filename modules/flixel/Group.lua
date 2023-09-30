@@ -22,6 +22,25 @@ function Group:remove(object)
     return
 end
 
+function Group:recycle(obj)
+    local recycled 
+    for _, member in ipairs(self.members) do
+        if member and not member.exists and member:is(class) then
+            recycled = member
+            break
+        end
+    end
+
+    if recycled then
+        self:remove(recycled)
+    else
+        recycled = obj()
+    end
+
+    self:add(recycled)
+    return recycled
+end
+
 function Group:clear()
     self.members = {}
 end

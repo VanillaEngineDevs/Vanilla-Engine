@@ -350,6 +350,8 @@ function PlayState:enter()
 
     if stageData.camera_speed ~= nil then
         self.cameraSpeed = stageData.camera_speed
+    else
+        self.cameraSpeed = 1
     end
 
     self.boyfriendCameraOffset = stageData.camera_boyfriend
@@ -381,6 +383,8 @@ function PlayState:enter()
         stage = Stages.School()
     elseif self.curStage == "schoolEvil" then
         stage = Stages.SchoolEvil()
+    elseif self.curStage == "tank" then
+        stage = Stages.Tank()
     else -- Always default to stage
         stage = Stages.Stage()
     end
@@ -552,23 +556,24 @@ function PlayState:moveCameraSection(sec)
 end
 
 function PlayState:moveCamera(isDad)
-    if self.camTween then
-        Timer.cancel(self.camTween)
-    end
+    if self.camTween then Timer.cancel(self.camTween) end
     if isDad then
+        --print( self.dad:getMidpoint().x + 150 + self.dad.cameraPosition[1] + self.opponentCameraOffset[1], self.dad:getMidpoint().y - 100 + self.dad.cameraPosition[2] + self.opponentCameraOffset[2])
         self.camTween = Timer.tween(self.cameraSpeed, self.camFollow, 
             {
                 x = self.dad:getMidpoint().x + 150 + self.dad.cameraPosition[1] + self.opponentCameraOffset[1], 
                 y = self.dad:getMidpoint().y - 100 + self.dad.cameraPosition[2] + self.opponentCameraOffset[2]
             }, "out-quad"
-        )
+        ) 
     else
+        --print( self.boyfriend:getMidpoint().x - 100 - self.boyfriend.cameraPosition[1] - self.boyfriendCameraOffset[1], self.boyfriend:getMidpoint().y - 100 + self.boyfriend.cameraPosition[2] + self.boyfriendCameraOffset[2])
         self.camTween = Timer.tween(self.cameraSpeed, self.camFollow, 
             {
                 x = self.boyfriend:getMidpoint().x - 100 - self.boyfriend.cameraPosition[1] - self.boyfriendCameraOffset[1], 
                 y = self.boyfriend:getMidpoint().y - 100 + self.boyfriend.cameraPosition[2] + self.boyfriendCameraOffset[2]
             }, "out-quad"
-        )
+        ) 
+        
         if Paths.formatToSongPath(self.SONG.song) == "tutorial" and not self.cameraTwn and self.camGame.zoom ~= 1 then
             self.cameraTwn = Timer.tween(Conductor.stepCrochet*4/1000, self.camGame, {zoom = 1}, "in-bounce", function() self.cameraTwn = nil end)
         end
@@ -629,6 +634,8 @@ function PlayState:update(dt)
     end
 
     -- set camGame to camFollow
+    --self.camGame.x = CoolUtil.coolLerp(self.camGame.x, self.camFollow.x, 0.04 * self.cameraSpeed)
+    --self.camGame.y = CoolUtil.coolLerp(self.camGame.y, self.camFollow.y, 0.04 * self.cameraSpeed)
     self.camGame.x, self.camGame.y = self.camFollow.x, self.camFollow.y
     self.camGame.target.x, self.camGame.target.y = self.camFollow.x, self.camFollow.y
     --print(self.camGame.x, self.camGame.y, self.camFollow.x, self.camFollow.y)
@@ -793,6 +800,43 @@ function PlayState:triggerEvent(eventName, value1, value2, strumTime)
             self.camGame.zoom = self.camGame.zoom + f1
             self.camHUD.zoom = self.camHUD.zoom + f2
         end
+    elseif eventName == "Play Animation" then
+        local char = self.dad
+        local v_2 = value2:lower()
+        if v_2 == "bf" or v_2 == "boyfriend" then
+            char = self.boyfriend
+        elseif v_2 == "gf" or v_2 == "girlfriend" then
+            char = self.gf
+        else
+            if not fv2 then fv2 = 0 end
+            if fv2 == 1 then
+                char = self.boyfriend
+            elseif fv2 == 2 then
+                char = self.gf
+            end
+        end
+
+        if char then
+            char:playAnim(value1, true)
+            char.specialAnim = true
+        end
+    elseif eventName == "Set Property" then
+        TryExcept(
+            function()
+                local split = value1:split(".")
+                local obj = self
+                for i = 1, #split do
+                    if i == #split then
+                        obj[split[i]] = f1
+                    else
+                        obj = obj[split[i]]
+                    end
+                end
+            end,
+            function(e)
+                print("ERROR ('Set Property' Event) - " .. e)
+            end
+        )
     end
 
     --print("Event: " .. eventName .. " | " .. value1 .. " | " .. value2 .. " | " .. strumTime)
@@ -1332,6 +1376,8 @@ function PlayState:startCountdown()
 
                 return true
             end
+
+            stage:countdownTick(tick, self.loops)
 
             self.loops = self.loops - 1
             if self.loops > 0 then

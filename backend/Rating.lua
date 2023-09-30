@@ -19,7 +19,6 @@ function Rating:new(name)
     self.image = name
     self.hitWindow = 0
 
-    print(name, RatingWindows[name])
     if RatingWindows[name] then
         self.hitWindow = RatingWindows[name]
     end

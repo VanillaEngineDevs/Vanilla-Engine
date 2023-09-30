@@ -61,6 +61,7 @@ function love.load()
         MallEvil = require "states.stages.mallEvil",
         School = require "states.stages.school",
         SchoolEvil = require "states.stages.schoolEvil",
+        Tank = require "states.stages.tank",
     }
 
     push.setupScreen(1280, 720, {upscale = "normal"})
@@ -95,6 +96,10 @@ end
 
 function love.draw()
     push:start()    
+        -- for testing why things aren't on screen
+        --love.graphics.translate(love.graphics.getWidth() / 3, love.graphics.getHeight() /3)
+        --love.graphics.scale(0.25, 0.25)
+        -- 
         Gamestate.draw()
 
         if MusicBeatState.fade.graphic then
