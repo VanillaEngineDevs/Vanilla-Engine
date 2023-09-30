@@ -31,6 +31,25 @@ function string.trim(self)
     return self:ltrim():rtrim()
 end
 
+function string.indexOf(self, str)
+    local i = self:find(str)
+    if i == nil then
+        return -1
+    else
+        return i
+    end
+end
+
+function string.substr(self, str)
+    -- removes str from self
+    local i = self:indexOf(str)
+    if i == -1 then
+        return self
+    else
+        return self:sub(1, i - 1) .. self:sub(i + #str)
+    end
+end
+
 -- Math functions
 function math.round(x)
     return x >= 0 and math.floor(x + 0.5) or math.ceil(x - 0.5)

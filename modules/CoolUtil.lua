@@ -39,4 +39,31 @@ function CoolUtil.coolLerp(a, b, t, dt)
     return a + (b - a) * math.min(t * dt, 1)
 end
 
+function CoolUtil.coolTextFile(file)
+    local daList = nil
+    local formatted = nil 
+    if file:find(":") then
+        formatted = file:split(":")[2]
+    else
+        formatted = {"", file}
+    end
+
+    if love.filesystem.getInfo(formatted[2]) then
+        daList = CoolUtil.listFromString(love.filesystem.read(formatted[2]))
+    end
+
+    return daList
+end
+
+function CoolUtil.listFromString(string)
+    local daList = {}
+    daList = string:trim():split("\n")
+
+    for i = 1, #daList do
+        daList[i] = daList[i]:trim()
+    end
+
+    return daList
+end
+
 return CoolUtil

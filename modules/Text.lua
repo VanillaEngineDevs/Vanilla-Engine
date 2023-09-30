@@ -14,6 +14,7 @@ Text.x = 0
 Text.y = 0
 Text.scrollFactor = {x=1,y=1}
 Text.limit = 0
+Text.fullText = ""
 
 function Text:new(x, y, limit, text, font)
     local x = x or 0
@@ -24,6 +25,7 @@ function Text:new(x, y, limit, text, font)
     self.borderColor = hexToColor(0x000000)
     self.font = font
     self.text = text
+    self.fullText = text -- for dialogue
     self.color = hexToColor(0xFFFFFFFF)
     self.alpha = 1
     self.camera = nil

@@ -46,6 +46,8 @@ function love.load()
     EventNote = require "objects.EventNote"
     Character = require "objects.Character"
     BGSprite = require "objects.BGSprite"
+
+    DialogueBox = require "cutscenes.DialogueBox"
     --HealthBar = require "objects.HealthBar"
 
     Stages = {

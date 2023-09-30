@@ -195,7 +195,7 @@ function Sprite:addByIndices(animName, animPrefix, indices, framerate, loop)
 end
 
 function Sprite:update(dt)
-    if self.alive and self.exists and self.curAnim then
+    if self.alive and self.exists and self.curAnim and not self.animPaused then
         self.curFrame = self.curFrame + dt * self.curAnim.framerate
         if self.curFrame >= #self.curAnim.frames then
             if self.curAnim.looped then

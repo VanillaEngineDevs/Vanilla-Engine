@@ -33,6 +33,7 @@ end
 
 function Group:draw()
     for i, member in ipairs(self.members) do
+        if self.antialiasing ~= nil then member.antialiasing = self.antialiasing end
         if member.draw and self.visible then member:draw() end
     end
 end

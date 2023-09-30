@@ -268,7 +268,7 @@ end
 
 function PlayState:remove(member)
     for i, member in ipairs(self.members) do
-        if member == member then
+        if member == member and self.members[i] == member then
             table.remove(self.members, i)
             return
         end
@@ -422,11 +422,6 @@ function PlayState:enter()
     stage:createPost()
     Conductor.songPosition = -5000 / Conductor.songPosition
 
-    --[[ self.healthBar = HealthBar(0, push:getHeight() * 0.89, 'healthBar', function() return self.health end, 0, 2)
-    self.healthBar:screenCenter("X")
-    self.healthBar.leftToRight = false
-    self.healthBar.scrollFactor = {x=0, y=0}
-    self:add(self.healthBar) ]]
     self.healthBar = {
         img = Paths.image("healthBar"),
         x = 0,
@@ -475,8 +470,8 @@ function PlayState:enter()
     self.healthBar:screenCenter("X")
     self:add(self.healthBar)
 
-    strumLineNotes = Group()
-    self:add(strumLineNotes)
+    self.strumLineNotes = Group()
+    self:add(self.strumLineNotes)
 
     self.opponentStrums = Group()
     self.playerStrums = Group()
@@ -500,10 +495,15 @@ function PlayState:enter()
     self.camHUD.zoom = 1
 
     TitleState.music:stop()
-    MusicBeatState:fadeIn(0.4, function()
-        PlayState:startCallback()
+    if self.startCallback ~= self.startCountdown then
+        self.startCallback(stage)
+    end
+    MusicBeatState:fadeIn(0.8, function()
         PlayState.generatedMusic = true
         PlayState.updateTime = true
+        if self.startCallback == self.startCountdown then
+            self:startCallback()
+        end
     end)
 
     self:reloadHealthbarColours()
@@ -622,7 +622,7 @@ function PlayState:update(dt)
         self.camHUD.zoom = math.lerp(1, self.camHUD.zoom, math.bound(1 - (dt * 3.125), 0, 1))
     end
 
-    if self.generatedMusic then
+    if self.generatedMusic and not self.inCutscene then
         if not self.cpuControlled then
             self:keysCheck()
         end
@@ -1126,6 +1126,9 @@ function PlayState:makeEvent(event, i)
 end
 
 function PlayState:startCountdown()
+    if stage.music then
+        stage.music:stop()
+    end
     self.seenCutscene = true
     self.inCutscene = false
 
@@ -1181,7 +1184,7 @@ function PlayState:generateStaticArrows(player)
             self.opponentStrums:add(babyArrow)
         end
 
-        strumLineNotes:add(babyArrow)
+        self.strumLineNotes:add(babyArrow)
         babyArrow:postAddedToGroup()
     end
 end
