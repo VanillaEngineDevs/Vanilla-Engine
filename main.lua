@@ -41,6 +41,7 @@ function love.load()
     WeekData = require "backend.WeekData"
     Difficulty = require "backend.Difficulty"
     Sound = require "modules.Sound"
+    Rating = require "backend.Rating"
 
     StrumNote = require "objects.StrumNote"
     Note = require "objects.Note"

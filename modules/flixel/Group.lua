@@ -19,6 +19,7 @@ function Group:remove(object)
             return
         end
     end
+    return
 end
 
 function Group:clear()

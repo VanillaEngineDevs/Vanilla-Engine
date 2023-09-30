@@ -198,7 +198,7 @@ function PlayState:resetValues()
     self.timeBar = nil
     self.songPercent = 0
 
-    self.ratingsData = nil
+    self.ratingsData = Rating:loadDefault()
     self.fullComboFunction = nil
 
     self.generatedMusic = false
@@ -329,6 +329,9 @@ function PlayState:enter()
         if stageData.isPixelStage then
             self.stageUI = "pixel"
             self.isPixelStage = true
+        else
+            self.stageUI = "normal"
+            self.isPixelStage = false
         end
     end
 
@@ -505,6 +508,7 @@ function PlayState:enter()
         Paths.image("ui/set")
         Paths.image("ui/go")
     end
+    self:cachePopUpScore()
 
     TitleState.music:stop()
     if self.startCallback ~= self.startCountdown then
@@ -908,6 +912,121 @@ function PlayState:endSong()
             self.transitioning = true
         end
     end
+end
+
+function PlayState:cachePopUpScore()
+    if stageUI == "pixel" then
+        for i, rating in ipairs(self.ratingsData) do
+            Paths.image("pixel/pixelUI/" .. rating.image .. "-pixel")
+        end
+        for i = 1, 9 do
+            Paths.image("pixel/pixelUI/num" .. i)
+        end
+    else
+        for i, rating in ipairs(self.ratingsData) do
+            Paths.image("ui/" .. rating.image)
+        end
+        for i = 1, 9 do
+            Paths.image("ui/num" .. i)
+        end
+    end
+end
+
+function PlayState:popUpScore(note)
+    local noteDiff = math.abs(note.strumTime - Conductor.songPosition)
+    if self.vocals then self.vocals:setVolume(1) end
+
+    local placement = push:getWidth() * 0.35
+    local rating = Sprite()
+    local score = 350
+
+    local daRating = Conductor.judgeNote(self.ratingsData, noteDiff)
+
+    self.totalNotesHit = (self.totalNotesHit or 0) + daRating.ratingMod
+    note.ratingMod = daRating.ratingMod
+    if not note.ratingDisabled then daRating.hits = daRating.hits + 1 end
+    note.rating = daRating.name
+    score = daRating.score
+
+    if not self.practiceMode and not self.cpuControlled then
+        self.songScore = self.songScore + score
+        if not note.ratingDisabled then
+            self.songHits = (self.songHits or 0) + 1
+            self.totalPlayed = (self.totalPlayed or 0) + 1
+        end
+    end
+
+    if self.stageUI == "pixel" then
+        rating:load(Paths.image("pixel/pixelUI/" .. daRating.image .. "-pixel"))
+    else
+        rating:load(Paths.image("ui/" .. daRating.image))
+    end
+
+    rating:screenCenter()
+    rating.x = placement - 40
+    rating.y = rating.y - 60
+    rating.acceleration.y = 550 * self.playbackRate * self.playbackRate
+    rating.velocity.y = rating.velocity.y - love.math.random(140, 175) * self.playbackRate
+    rating.velocity.x = love.math.random(0, 10) * self.playbackRate
+
+    table.insert(self.members, table.indexOf(self.members, self.strumLineNotes), rating)
+
+    if not PlayState.isPixelStage then
+        rating:setGraphicSize(math.floor(rating.width * 0.7))
+    else
+        rating:setGraphicSize(math.floor(rating.width * self.daPixelZoom * 0.85))
+        rating.antialiasing = false
+    end
+
+    local seperatedScore = {}
+
+    if self.combo >= 1000 then
+        table.insert(seperatedScore, math.floor(self.combo / 1000) % 10)
+    end
+    table.insert(seperatedScore, math.floor(self.combo / 100) % 10)
+    table.insert(seperatedScore, math.floor(self.combo / 10) % 10)
+    table.insert(seperatedScore, math.floor(self.combo) % 10)
+
+    local daLoop = 0
+    local xThing = 0
+
+    for i, score in ipairs(seperatedScore) do
+        local numScore = Sprite()
+        if self.isPixelStage then
+            numScore:load(Paths.image("pixel/pixelUI/num" .. score .. "-pixel"))
+        else
+            numScore:load(Paths.image("ui/num" .. score))
+        end
+        numScore:screenCenter()
+        numScore.x = placement + (43 * daLoop) 
+        numScore.y = numScore.y + 80
+
+        if not PlayState.isPixelStage then
+            numScore:setGraphicSize(math.floor(numScore.width * 0.5))
+        else
+            numScore:setGraphicSize(math.floor(numScore.width * self.daPixelZoom))
+            numScore.antialiasing = false
+        end
+
+        numScore.acceleration.y = love.math.random(200, 300) * self.playbackRate * self.playbackRate
+        numScore.velocity.y = numScore.velocity.y - love.math.random(140, 160) * self.playbackRate
+        numScore.velocity.x = love.math.random(-5, -5) * self.playbackRate
+
+        table.insert(self.members, table.indexOf(self.members, self.strumLineNotes), numScore)
+
+        Timer.after(Conductor.crochet * 0.002 / self.playbackRate, function()
+            Timer.tween(0.2/self.playbackRate, numScore, {alpha = 0}, "linear", function() numScore = nil end)
+        end)
+
+        daLoop = daLoop + 1
+        if numScore.x > xThing then
+            xThing = numScore.x
+        end
+    end
+
+    Timer.after(Conductor.crochet * 0.002 / self.playbackRate, function()
+        Timer.tween(0.2/self.playbackRate, rating, {alpha = 0}, "linear", function() rating = nil end)
+    end)
 end
 
 function PlayState:finishSong(ignoreNoteOffset)
@@ -1336,6 +1455,7 @@ function PlayState:goodNoteHit(note)
         if not note.isSustainNote then
             self.combo = self.combo + 1
             if self.combo > 9999 then self.combo = 9999 end
+            self:popUpScore(note)
         end
         self.health = self.health + note.hitHealth * self.healthGain
 

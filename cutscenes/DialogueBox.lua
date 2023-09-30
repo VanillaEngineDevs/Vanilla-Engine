@@ -168,6 +168,15 @@ function DialogueBox:update(dt)
                     self:doFade()
 
                     Timer.after(1.5, function()
+                        self.dropText.visible = false
+                        self.swagDialogue.visible = false
+                        self.handSelect.visible = false
+                        self.box.visible = false
+                        self.bgFade.visible = false
+                        if self.face then self.face.visible = false end
+                        self.portraitLeft.visible = false
+                        self.portraitRight.visible = false
+                        
                         self.finishThing(PlayState)
                     end)
                 end

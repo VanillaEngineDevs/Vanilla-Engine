@@ -101,6 +101,8 @@ function Sprite:new(x, y, graphic)
     self.isMakeGraphic = false
 
     if graphic then self:load(graphic) end
+
+    return self
 end
 
 function Sprite:load(graphic, animated, frameWidth, frameHeight)
