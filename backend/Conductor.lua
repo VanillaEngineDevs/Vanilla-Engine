@@ -28,7 +28,7 @@ Conductor.bpmChangeMap = {}
 function Conductor.judgeNote(arr, diff)
     data = arr
     for i = 1, #data-1 do
-        print(diff, data[i].hitWindow)
+        --print(diff, data[i].hitWindow)
         if diff <= data[i].hitWindow then
             return data[i]
         end

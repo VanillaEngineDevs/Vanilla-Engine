@@ -61,7 +61,7 @@ function Camera:draw()
     end
 
     if self._fade > 0 then
-        print("bbg.... daddys home... hello princess")
+        --print("bbg.... daddys home... hello princess")
         love.graphics.setColor(self.fadeColour)
         love.graphics.rectangle("fill", -self.width, -self.height, self.width * 3, self.height * 3)
     end

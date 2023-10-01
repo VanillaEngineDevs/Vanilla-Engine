@@ -58,7 +58,7 @@ function Stage:eventCalled(eventName, v1, v2, fv1, fv2, strumTime)
     if eventName == "Dadbattle Spotlight" then
         if not fv1 then fv1 = 0 end
         local val = math.round(fv1)
-        print(val)
+        --print(val)
 
         if val == 1 or val == 2 or val == 3 then
             if val == 1 then -- enable

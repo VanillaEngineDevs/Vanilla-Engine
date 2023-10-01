@@ -42,6 +42,7 @@ function love.load()
     Difficulty = require "backend.Difficulty"
     Sound = require "modules.Sound"
     Rating = require "backend.Rating"
+    HealthIcon = require "objects.HealthIcon"
 
     StrumNote = require "objects.StrumNote"
     Note = require "objects.Note"

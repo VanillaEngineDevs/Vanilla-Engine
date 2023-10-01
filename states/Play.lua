@@ -12,9 +12,11 @@ PlayState.ratingStuff = {
     {"Nice", 0.7},
     {"Good", 0.8},
     {"Great", 0.9},
-    {"Sicl!", 1},
+    {"Sick!", 1},
     {"Perfect!!", 1} -- ermmm,,, 2nd var not used (why does psych do this? ig i gotta view the code lmao)
 }
+
+PlayState.ratingName = "?"
 
 PlayState.isCameraOnForcedPos = false 
 
@@ -247,6 +249,9 @@ function PlayState:resetValues()
 
     self.precacheList = {}
 
+    self.ratingName = "?"
+    self.totalPlayed = 0
+
     self.startCallback = nil
     self.endCallback = nil
 
@@ -288,6 +293,8 @@ function PlayState:enter()
 
     self.startCallback = self.startCountdown
     self.endCallback = self.endSong
+
+    self.fullComboFunction = self.fullComboUpdate
 
     self.keysArray = {
         "g_left",
@@ -443,6 +450,7 @@ function PlayState:enter()
         barLeftColor = hexToColor(0xFFFFFFFF),
         barRightColor = hexToColor(0x00000000),
         alpha = 1,
+        camera = self.camHUD,
         valueFunction = function() 
             return self.health < 0 and 0 or self.health > 2 and 2 or self.health
         end,
@@ -460,23 +468,53 @@ function PlayState:enter()
     }
     self.healthBar.width = self.healthBar.img:getWidth()
     self.healthBar.height = self.healthBar.img:getHeight()
+    self.healthBar.barCenter = 1
 
     function self.healthBar:draw()
-        if self.leftToRight then
-            self.percent = self.valueFunction() / self.boundY
-        else
-            self.percent = 1 - (self.valueFunction() / self.boundY)
-        end
-        -- use NORMAL rectangles from love.graphics
-        love.graphics.setColor(self.barLeftColor[1] / 255, self.barLeftColor[2] / 255, self.barLeftColor[3] / 255, self.alpha)
-        love.graphics.rectangle("fill", self.x + 3, self.y + 3, self.width - 6, self.height - 6)
-        love.graphics.setColor(self.barRightColor[1] / 255, self.barRightColor[2] / 255, self.barRightColor[3] / 255, self.alpha)
-        love.graphics.rectangle("fill", self.x + 3, self.y + 3, (self.width-6) * self.percent, self.height - 3)
-        love.graphics.setColor(1, 1, 1, 1)
-        love.graphics.draw(self.img, self.x, self.y)
+        love.graphics.push()
+            if self.camera then
+                love.graphics.translate(push:getWidth()/2, push:getHeight()/2)
+                love.graphics.scale(self.camera.zoom, self.camera.zoom)
+                love.graphics.translate(-push:getWidth()/2, -push:getHeight()/2)
+            end
+            if self.leftToRight then
+                self.percent = self.valueFunction() / self.boundY
+            else
+                self.percent = 1 - (self.valueFunction() / self.boundY)
+            end
+            -- use NORMAL rectangles from love.graphics
+            love.graphics.setColor(self.barLeftColor[1] / 255, self.barLeftColor[2] / 255, self.barLeftColor[3] / 255, self.alpha)
+            love.graphics.rectangle("fill", self.x + 3, self.y + 3, self.width - 6, self.height - 6)
+            love.graphics.setColor(self.barRightColor[1] / 255, self.barRightColor[2] / 255, self.barRightColor[3] / 255, self.alpha)
+            love.graphics.rectangle("fill", self.x + 3, self.y + 3, (self.width-6) * self.percent, self.height - 3)
+            love.graphics.setColor(1, 1, 1, 1)
+            love.graphics.draw(self.img, self.x, self.y)
+
+            -- set self.barCenter to the percent rects position
+            self.barCenter = self.x + (self.width * self.percent)
+        love.graphics.pop()
     end
     self.healthBar:screenCenter("X")
     self:add(self.healthBar)
+
+    self.iconP1 = HealthIcon(self.boyfriend.healthIcon, true)
+    self.iconP1.y = self.healthBar.y - 75
+    self.iconP1.camera = self.camHUD
+    self:add(self.iconP1)
+
+    self.iconP2 = HealthIcon(self.dad.healthIcon, false)
+    self.iconP2.y = self.healthBar.y - 75
+    self.iconP2.camera = self.camHUD
+    self:add(self.iconP2)
+
+    self.songScore = 0
+    self.songHites = 0
+    self.songMisses = 0
+    self.scoreTxt = Text(0, self.healthBar.y + 40, push:getWidth(), "", Paths.font("assets/fonts/vcr.ttf", 20))
+    self.scoreTxt.camera = self.camHUD
+    self.scoreTxt.scrollFactor = {x = 0, y = 0}
+    self.scoreTxt.borderSize = 1.25
+    self:add(self.scoreTxt)
 
     self.strumLineNotes = Group()
     self:add(self.strumLineNotes)
@@ -527,6 +565,7 @@ function PlayState:enter()
     end)
 
     self:reloadHealthbarColours()
+    self:recalculateRating()
 end
 
 function PlayState:reloadHealthbarColours()
@@ -555,6 +594,69 @@ function PlayState:moveCameraSection(sec)
     self:moveCamera(isDad)
 end
 
+function PlayState:updateScore(miss)
+    local str = self.ratingName or "miss"
+    if self.totalPlayed ~= 0 then
+        local percent = CoolUtil.floorDecimal(self.ratingPercent * 100, 2)
+        --str += ' ($percent%) - $ratingFC';
+        str = str .. " (" .. percent .. "%) - " .. self.ratingFC
+    end
+
+    self.scoreTxt.text = "Score: " .. self.songScore ..
+        " | Misses: " .. self.songMisses ..
+        " | Rating: " .. str
+
+    if not miss and not self.cpuControlled then
+        if self.scoreTxtTween then
+            Timer.cancel(self.scoreTxtTween)
+        end
+        self.scoreTxt.scale = {x = 1.075, y = 1.075}
+        self.scoreTxtTween = Timer.tween(0.2, self.scoreTxt.scale, {x = 1, y = 1}, "linear", function() self.scoreTxtTween = nil end)
+    end
+end
+
+function PlayState:recalculateRating(badHit)
+    self.ratingName = "?"
+
+    if self.totalPlayed ~= 0 then
+        -- determine ratingPercent from 350 times 
+        -- max 1, lowest 0
+        --self.ratingPercent = self.songScore / (350 * self.totalPlayed)
+        self.ratingPercent = math.bound(self.songScore / (350 * self.totalPlayed), 0, 1)
+        -- 
+
+        self.ratingName = self.ratingStuff[#self.ratingStuff][1]
+        if self.ratingPercent < 1 then
+            for i = 1, #self.ratingStuff do
+                if self.ratingPercent < self.ratingStuff[i][2] then
+                    self.ratingName = self.ratingStuff[i][1]
+                    break
+                end
+            end
+        end
+    end
+    if self.fullComboFunction then self:fullComboFunction() end
+
+    self:updateScore(badHit)
+end
+
+function PlayState:fullComboUpdate()
+    local sicks = self.ratingsData[1].hits
+    local goods = self.ratingsData[2].hits
+    local bads = self.ratingsData[3].hits
+    local shits = self.ratingsData[4].hits
+
+    self.ratingFC = "Clear"
+    if self.songMisses < 1 then
+        if bads > 0 or shits > 0 then self.ratingFC = "FC"
+        elseif goods > 0 then self.ratingFC = "GFC"
+        elseif sicks > 0 then self.ratingFC = "SFC"
+        end
+    elseif self.songMisses < 10 then
+        self.ratingFC = "SDCB"
+    end
+end
+
 function PlayState:moveCamera(isDad)
     if self.camTween then Timer.cancel(self.camTween) end
     if isDad then
@@ -573,7 +675,7 @@ function PlayState:moveCamera(isDad)
                 y = self.boyfriend:getMidpoint().y - 100 + self.boyfriend.cameraPosition[2] + self.boyfriendCameraOffset[2]
             }, "out-quad"
         ) 
-        
+
         if Paths.formatToSongPath(self.SONG.song) == "tutorial" and not self.cameraTwn and self.camGame.zoom ~= 1 then
             self.cameraTwn = Timer.tween(Conductor.stepCrochet*4/1000, self.camGame, {zoom = 1}, "in-bounce", function() self.cameraTwn = nil end)
         end
@@ -610,6 +712,24 @@ function PlayState:update(dt)
         end
     end
 
+    local mult = math.lerp(1, self.iconP1.scale.x, math.bound(1 - (dt * 9 * self.playbackRate), 0, 1))
+    self.iconP1.scale = {x = mult, y = mult}
+    self.iconP1:updateHitbox()
+
+    mult = math.lerp(1, self.iconP2.scale.x, math.bound(1 - (dt * 9 * self.playbackRate), 0, 1))
+    self.iconP2.scale = {x = mult, y = mult}
+    self.iconP2:updateHitbox()
+
+    local iconOffset = 26
+    self.iconP1.x = self.healthBar.barCenter + (150 * self.iconP1.scale.x - 150) / 2 - iconOffset
+    self.iconP2.x = self.healthBar.barCenter - (150 * self.iconP2.scale.x) / 2 - (iconOffset*2)
+
+    -- convert from 0-2 to 0-100
+    local newPercent = self.health * 50
+    self.iconP1.curFrame = (newPercent < 20) and 2 or 1
+    self.iconP2.curFrame = (newPercent > 80) and 2 or 1
+
+
     if self.inst and (not self.inst:isPlaying() and self.startedCountdown and not self.transitioning and not self.endingSong) and not self.inCutscene and not self.startingSong then
         self:finishSong()
     end
@@ -645,7 +765,7 @@ function PlayState:update(dt)
         self.camHUD.zoom = math.lerp(1, self.camHUD.zoom, math.bound(1 - (dt * 3.125), 0, 1))
     end
 
-    if self.generatedMusic and not self.inCutscene and self.startedCountdown and not self.startingSong then
+    if self.generatedMusic and not self.inCutscene and self.startedCountdown then
         if not self.cpuControlled then
             self:keysCheck()
         end
@@ -663,7 +783,7 @@ function PlayState:update(dt)
                         if self.cpuControlled and not note.blockHit and note.canBeHit and (note.isSustainNote or note.strumTime <= Conductor.songPosition) then
                             self:goodNoteHit(note)
                         end
-                    elseif note.wasGoodHit and not note.hitByOpponent and not note.ignoreNote then
+                    elseif note.wasGoodHit and not note.hitByOpponent and not note.ignoreNote and not (Conductor.songPosition <= 10) then
                         self:opponentNoteHit(note)
                     end
 
@@ -997,6 +1117,7 @@ function PlayState:popUpScore(note)
         if not note.ratingDisabled then
             self.songHits = (self.songHits or 0) + 1
             self.totalPlayed = (self.totalPlayed or 0) + 1
+            self:recalculateRating(false)
         end
     end
 
@@ -1089,6 +1210,8 @@ function PlayState:noteMissCommon(direction, note)
     if not self.endingSong then
         self.songMisses = self.songMisses + 1
     end
+    self.totalPlayed = (self.totalPlayed or 0) + 1
+    self:recalculateRating(true)
 
     local char = self.boyfriend
 
@@ -1570,6 +1693,10 @@ end
 
 function PlayState:beatHit()
     stage:beatHit()
+    self.iconP1.scale = {x=1.2, y=1.2}
+    self.iconP2.scale = {x=1.2, y=1.2}
+    self.iconP1:updateHitbox()
+    self.iconP2:updateHitbox()
     self.curBeat = self.curBeat + 1
     if self.gf and self.curBeat % math.round(self.gfSpeed * self.gf.danceEveryNumBeats) == 0 and self.gf.curAnim and not self.gf.curAnim.name:startsWith("sing") then
         self.gf:dance()

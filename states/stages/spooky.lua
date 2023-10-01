@@ -21,7 +21,7 @@ function Stage:lightningStrikeShit()
     self.bg:play("halloweem bg lightning strike", true)
     self.bg.callback = function() 
         self.bg:dance(true)
-        print("ohhohohhhhhh SHITTTTTTTT")
+        --print("ohhohohhhhhh SHITTTTTTTT")
     end
     -- todo. thunder sound
 

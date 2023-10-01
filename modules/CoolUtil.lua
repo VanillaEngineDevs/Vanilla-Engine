@@ -36,7 +36,7 @@ end
 
 function CoolUtil.coolLerp(a, b, t, dt)
     local dt = dt or love.timer.getDelta()
-    return math.lerp(a, b, 1 - 1 / math.exp(t * 60 * dt))
+    return a + (b - a) * math.min(t * dt, 1)
 end
 
 function CoolUtil.coolTextFile(file)
@@ -64,6 +64,20 @@ function CoolUtil.listFromString(string)
     end
 
     return daList
+end
+
+function CoolUtil.floorDecimal(value, decimals)
+    if decimals < 1 then
+        return math.floor(value)
+    end
+
+    local tempMult = 1
+    for i = 1, decimals do
+        tempMult = tempMult * 10
+    end
+
+    local newValue = math.floor(value * tempMult)
+    return newValue / tempMult
 end
 
 return CoolUtil

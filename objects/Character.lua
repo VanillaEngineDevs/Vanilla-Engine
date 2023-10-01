@@ -99,6 +99,7 @@ function Character:new(x, y, character, isPlayer)
     self.animationsArray = rawJson.animations
 
     self.healthColorArray = rawJson.healthbar_colors
+    self.healthIcon = rawJson.healthicon
 
     if self.animationsArray ~= nil and #self.animationsArray > 0 then
         for i, anim in ipairs(self.animationsArray) do

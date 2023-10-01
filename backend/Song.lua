@@ -69,7 +69,7 @@ function Song:loadFromJson(jsonInput, folder)
         TryExcept(
             function()
                 -- check if file exists
-                print("assets/data/" .. folder .. "/" .. formattedSong .. ".json")
+                --print("assets/data/" .. folder .. "/" .. formattedSong .. ".json")
                 if love.filesystem.getInfo("assets/data/" .. folder .. "/" .. formattedSong .. ".json") then
                     rawJson = love.filesystem.read("assets/data/" .. folder .. "/" .. formattedSong .. ".json")
                 else
