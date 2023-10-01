@@ -1,4 +1,4 @@
-# This project has been moved to a seperate engine. This is an archived branch. Check out the new engine [here](
+# This project has been moved to a seperate engine. This is an archived branch. Check out the new engine [here](https://github.com/GuglioIsStupid/MintEngine)
 
 # Vanilla Engine (Dev Branch)
 
