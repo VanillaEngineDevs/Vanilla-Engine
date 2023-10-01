@@ -376,10 +376,10 @@ function StoryMenuState:update(dt)
     self.super.update(self, dt)
 
     if not self.movedBack and not self.selectedWeek then
-        local upP = input:pressed("m_up")
-        local downP = input:pressed("m_down")
-        local leftP = input:pressed("m_left")
-        local rightP = input:pressed("m_right")
+        local upP = input:pressed("ui_up")
+        local downP = input:pressed("ui_down")
+        local leftP = input:pressed("ui_left")
+        local rightP = input:pressed("ui_right")
 
         if upP then
             self:changeWeek(-1)
@@ -395,9 +395,9 @@ function StoryMenuState:update(dt)
             self:changeWeek()
         end
         
-        if input:pressed("m_confirm") then
+        if input:pressed("accept") then
             self:selectWeek()
-        elseif input:pressed("m_back") then
+        elseif input:pressed("back") then
             Sound.play(Paths.sound("assets/sounds/cancelMenu.ogg"))
             self.movedBack = true
 

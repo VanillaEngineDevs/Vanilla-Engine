@@ -2,17 +2,17 @@ function love.load()
     -- Libraries
     input = (require "libs.baton").new {
         controls = {
-            g_left = {"key:left", "key:a", "axis:leftx-", "button:dpleft"},
-            g_right = {"key:right", "key:d", "axis:leftx+", "button:dpright"},
-            g_up = {"key:up", "key:w", "axis:lefty-", "button:dpup"},
-            g_down = {"key:down", "key:s", "axis:lefty+", "button:dpdown"},
+            note_left = {"key:left", "key:a", "axis:leftx-", "button:dpleft"},
+            note_right = {"key:right", "key:d", "axis:leftx+", "button:dpright"},
+            note_up = {"key:up", "key:w", "axis:lefty-", "button:dpup"},
+            note_down = {"key:down", "key:s", "axis:lefty+", "button:dpdown"},
 
-            m_confirm = {"key:return", "button:a"},
-            m_down = {"key:down", "button:dpdown"},
-            m_up = {"key:up", "button:dpup"},
-            m_left = {"key:left", "button:dpleft"},
-            m_right = {"key:right", "button:dpright"},
-            m_back = {"key:escape", "button:b"},
+            accept = {"key:return", "button:a"},
+            ui_down = {"key:down", "button:dpdown"},
+            ui_up = {"key:up", "button:dpup"},
+            ui_left = {"key:left", "button:dpleft"},
+            ui_right = {"key:right", "button:dpright"},
+            back = {"key:escape", "button:b"},
         },
         joystick = love.joystick.getJoysticks()[1],
     }
@@ -34,6 +34,7 @@ function love.load()
     AtlasSprite = require "animateatlas.Sprite"
     Text = require "modules.Text"
     Group = require "modules.flixel.Group"
+    Flicker = require "modules.flixel.Flicker"
     Song = require "backend.Song"
     MusicBeatState = require "backend.MusicBeatState"
     BaseStage = require "backend.BaseStage"
@@ -87,6 +88,7 @@ end
 
 function love.update(dt)
     Gamestate.update(dt)
+    Flicker:update(dt)
     Timer.update(dt)
     input:update()
 end

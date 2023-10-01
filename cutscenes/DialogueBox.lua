@@ -140,7 +140,7 @@ function DialogueBox:update(dt)
         self.dialogueStarted = true
     end
 
-    if input:pressed("m_confirm") then
+    if input:pressed("accept") then
         if self.dialogueEnded then
             if not self.dialogueList[2] and self.dialogueList[1] then
                 if not self.isEnding then

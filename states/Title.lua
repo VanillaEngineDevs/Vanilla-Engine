@@ -42,7 +42,7 @@ function TitleState:update(dt)
     self.gfTitle:update(dt)
     self.enterText:update(dt)
 
-    if input:pressed("m_confirm") then
+    if input:pressed("accept") then
         self.enterText:play("flash")
         self.enterText.offset.x = -9
         self.enterText.offset.y = -4

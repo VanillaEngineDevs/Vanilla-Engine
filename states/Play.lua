@@ -297,10 +297,10 @@ function PlayState:enter()
     self.fullComboFunction = self.fullComboUpdate
 
     self.keysArray = {
-        "g_left",
-        "g_down",
-        "g_up",
-        "g_right"
+        "note_left",
+        "note_down",
+        "note_up",
+        "note_right"
     }
     self.inputsArray = {false, false, false, false}
 

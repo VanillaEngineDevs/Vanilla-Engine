@@ -154,13 +154,13 @@ function MainMenuState:update(dt)
     self.camGame.y = CoolUtil.coolLerp(self.camGame.y, self.camFollow.y, 10, dt)
 
     if not self.selectedSomethin then
-        if input:pressed("m_down") then
+        if input:pressed("ui_down") then
             self:changeItem(1)
-        elseif input:pressed("m_up") then
+        elseif input:pressed("ui_up") then
             self:changeItem(-1)
         end
 
-        if input:pressed("m_back") then
+        if input:pressed("back") then
             Sound.play(Paths.sound("assets/sounds/cancelMenu.ogg"))
             self.selectedSomethin = true
             MusicBeatState:fadeOut(0.3,
@@ -168,20 +168,20 @@ function MainMenuState:update(dt)
                     MusicBeatState:switchState(TitleState)
                 end
             )
-        elseif input:pressed("m_confirm") then
+        elseif input:pressed("accept") then
             Sound.play(Paths.sound("assets/sounds/confirmMenu.ogg"))
             if self.optionShit[self.curSelected] == "donate" then
                 love.system.openURL("https://ninja-muffin24.itch.io/funkin")
             else
                 self.selectedSomethin = true
 
-                -- todo. flicker
+                Flicker:flicker(self.magenta, 1.1, 0.15, false)
 
                 for i, item in ipairs(self.menuItems.members) do
                     if item.ID ~= self.curSelected then
                         Timer.tween(0.4, item, {alpha = 0}, "out-quad")
                     else
-                        Timer.after(1, function()
+                        Flicker:flicker(item, 1, 0.06, false, function()
                             -- todo. flicker
                             local daChoice = self.optionShit[self.curSelected]
 
