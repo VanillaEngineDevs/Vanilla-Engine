@@ -58,6 +58,23 @@ local noteCamTweens = {
 	end
 }
 
+local eventFuncs = {
+	["Add Camera Zoom"] = function(size, sizeHud)
+		local size = tonumber(size) or 0.015
+		local sizeHud = tonumber(sizeHud) or 0.03
+		camera.zoom = camera.zoom + (size or 0.015)
+		uiScale.zoom = uiScale.zoom + (sizeHud or 0.03)
+	end,
+	["Alter Camera Bop"] = function(_intensity, _interveral)
+		local _intensity, _interveral
+		_intensity = tonumber(_intensity) or 1
+		_interveral = tonumber(_interveral) or 4
+
+		camBopIntensity = _intensity
+		camBopInterval = _interveral
+	end,
+}
+
 local ratingTimers = {}
 
 local useAltAnims
@@ -324,6 +341,7 @@ return {
 
 	initUI = function(self, option)
 		events = {}
+		songEvents = {}
 		enemyNotes = {}
 		boyfriendNotes = {}
 		gfNotes = {}
@@ -332,8 +350,6 @@ return {
 		misses = 0
 		ratingPercent = 0.0
 		noteCounter = 0
-
-		songEvents = {}
 
 		if not pixel then
 			sprites.leftArrow = love.filesystem.load("sprites/left-arrow.lua")
@@ -856,10 +872,10 @@ return {
 				charte = json.decode(love.filesystem.read(charte)).song
 				-- for all in charte.events, add it to songEvents
 				for i = 1, #charte.events do
-					local eventTime = charte.events[i][1]
-					local event = charte.events[i][2][1][1]
-					local eventArgs = charte.events[i][2][1][2]
-					local eventArgs2 = charte.events[i][2][1][3]
+					local eventTime = charte.events[i][1] or 0
+					local event = charte.events[i][2][1][1] or "Hey!"
+					local eventArgs = charte.events[i][2][1][2] or ""
+					local eventArgs2 = charte.events[i][2][1][3] or ""
 
 					table.insert(songEvents, {time = eventTime, event = event, n=event, args = eventArgs, args2 = eventArgs2})
 				end
@@ -1061,6 +1077,19 @@ return {
 
 				table.remove(events, i)
 
+				break
+			end
+		end
+
+		for i = 1, #songEvents do
+			if songEvents[i].time <= absMusicTime then
+				if eventFuncs[songEvents[i].event] then
+					eventFuncs[songEvents[i].event](songEvents[i].args, songEvents[i].args2)
+				else
+					print(songEvents[i].event .. " is not implemented!")
+				end
+
+				table.remove(songEvents, i)
 				break
 			end
 		end

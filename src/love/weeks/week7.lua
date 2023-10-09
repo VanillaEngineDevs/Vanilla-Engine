@@ -94,6 +94,7 @@ return {
 			weeks:generateNotes("data/guns/guns" .. difficulty .. ".json")
 		else
 			weeks:generateNotes("data/ugh/ugh" .. difficulty .. ".json")
+			weeks:generateEvents("data/ugh/events.json")
 		end
 	end,
 
@@ -112,30 +113,22 @@ return {
 		if song == 1 then
 			if musicTime >= 5620 then
 				if musicTime <= 5720 then
-					if enemy:getAnimName() == "up" then
-						enemy:animate("ugh", false)
-					end
+					enemy:animate("ugh", false)
 				end
 			end
 			if musicTime >= 14620 then
 				if musicTime <= 14720 then
-					if enemy:getAnimName() == "up" then
-						enemy:animate("ugh", false)
-					end
+					enemy:animate("ugh", false)
 				end
 			end
 			if musicTime >= 49120 then
 				if musicTime <= 49220 then
-					if enemy:getAnimName() == "up" then
-						enemy:animate("ugh", false)
-					end
+					enemy:animate("ugh", false)
 				end
 			end
 			if musicTime >= 77620 then
 				if musicTime <= 77720 then
-					if enemy:getAnimName() == "up" then
-						enemy:animate("ugh", false)
-					end
+					enemy:animate("ugh", false)
 				end
 			end
 		end
