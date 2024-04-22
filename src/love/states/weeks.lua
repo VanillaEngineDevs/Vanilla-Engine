@@ -315,7 +315,9 @@ return {
 	end,
 
 	checkSongOver = function(self)
-		if not (countingDown or graphics.isFading()) and not (inst:isPlaying()) and not paused and not inCutscene then
+		--if not (countingDown or graphics.isFading()) and not (inst and inst:isPlaying()) and not paused and not inCutscene then
+		-- use inst, if inst doesn't exist, use voices, else dont use anything
+		if not (countingDown or graphics.isFading()) and not ((inst and inst:isPlaying()) or (voices and voices:isPlaying())) and not paused and not inCutscene then
 			if storyMode and song < #weekMeta[weekNum][2] then
 				self:saveData()
 				song = song + 1
