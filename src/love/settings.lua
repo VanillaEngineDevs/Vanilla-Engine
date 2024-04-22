@@ -31,10 +31,6 @@ hardwareCompression=true
 ; Possible values: 0.0-1.0
 volume=1.0
 
-[Game]
-; Sets your arrow keybinds to DFJK
-dfjk=false
-
 ; "Downscroll" makes arrows scroll down instead of up, and also moves some aspects of the UI around
 downscroll=false
 
@@ -73,10 +69,6 @@ hardwareCompression=true
 ; Master volume
 ; Possible values: 0.0-1.0
 volume=1.0
-
-[Game]
-; Sets your arrow keybinds to DFJK
-dfjk=false
 
 ; "Downscroll" makes arrows scroll down instead of up, and also moves some aspects of the UI around
 downscroll=false
@@ -125,12 +117,6 @@ if curOS == "NX" then
 
 	love.audio.setVolume(tonumber(ini.readKey(settingsIni, "Audio", "volume")))
 
-    if ini.readKey(settingsIni, "Game", "dfjk") == "true" then
-		settings.dfjk = true
-	else
-		settings.dfjk = false
-	end
-
 	if ini.readKey(settingsIni, "Game", "downscroll") == "true" then
 		settings.downscroll = true
 	else
@@ -152,7 +138,6 @@ elseif curOS == "Web" then -- For love.js, we won't bother creating and reading 
 
 	settings.hardwareCompression = false
 
-	settings.dfjk = false
 	settings.downscroll = false
 	settings.ghostTapping = false
 
@@ -215,12 +200,6 @@ else
 	end
 
 	love.audio.setVolume(tonumber(ini.readKey(settingsIni, "Audio", "volume")))
-
-	if ini.readKey(settingsIni, "Game", "dfjk") == "true" then
-		settings.dfjk = true
-	else
-		settings.dfjk = false
-	end
 
 	if ini.readKey(settingsIni, "Game", "downscroll") == "true" then
 		settings.downscroll = true
