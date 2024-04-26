@@ -34,6 +34,27 @@ function ini.load( filePath )
     return nil
 end
 
+function ini.loadString( iniString )
+    local iniTable = {}
+    local currentSection = "default"
+    for line in iniString:gmatch( "[^\r\n]+" ) do
+        local isComment = string.match( line, "^%s*;.*$")
+        if line ~= "" and isComment == nil then
+            local section = string.match( line, "%[%s*(.*)%s*%]" )
+            if section ~= nil then
+                currentSection = section
+                iniTable[section] = {}
+            else
+                local variableName, variableValue = string.match( line, "^%s*(.*[^%s])%s*=%s*(.*[^%s])%s*$" )
+                if variableName and variableValue then
+                    iniTable[currentSection][variableName] = variableValue
+                end
+            end
+        end
+    end
+    return iniTable
+end
+
 function ini.save( iniTable, file )
     if iniTable then
         local writeString = ""

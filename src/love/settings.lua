@@ -105,7 +105,7 @@ if curOS == "NX" then
 		love.filesystem.write("settings.ini", settingsStr)
 	end
 
-	settingsIni = ini.load("settings.ini")
+	settingsIni = ini.load("settings.ini") or ini.loadString(settingsStr)
 
 	if ini.readKey(settingsIni, "Video", "hardwareCompression") == "true" then
 		settings.hardwareCompression = true
