@@ -46,7 +46,7 @@ return {
 		stages["hauntedHouse"]:load()
 
 		if song == 3 then
-			enemy = love.filesystem.load("sprites/monster.lua")()
+			enemy = love.filesystem.load("sprites/week2/monster.lua")()
 
 			enemy.x, enemy.y = -610, 120
 

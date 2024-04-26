@@ -32,8 +32,8 @@ return {
 		camera.zoom = 0.7
 		camera.defaultZoom = 0.7
 
-		sounds.lightsOff = love.audio.newSource("sounds/lights-off.ogg", "static")
-		sounds.lightsOn = love.audio.newSource("sounds/lights-on.ogg", "static")
+		sounds.lightsOff = love.audio.newSource("sounds/week5/lights-off.ogg", "static")
+		sounds.lightsOn = love.audio.newSource("sounds/week5/lights-on.ogg", "static")
 
 		song = songNum
 		difficulty = songAppend

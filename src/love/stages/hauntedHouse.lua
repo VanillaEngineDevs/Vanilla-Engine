@@ -23,7 +23,7 @@ return {
 			audio.playSound(sounds["thunder"][love.math.random(2)])
 
 			stageImages["Haunted House"]:animate("lightning", false)
-			girlfriend:animate("fear", false)
+			girlfriend:animate("fear", false, function() girlfriend:animate("danceLeft", false) end)
 			boyfriend:animate("shaking", false)
 		end
     end,
