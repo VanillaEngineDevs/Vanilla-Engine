@@ -1158,9 +1158,9 @@ return {
 								local animName = enemyNotes[i][j]:getAnimName()
 								if animName ~= "on" then 
 									if settings.middleScroll then
-										graphics.setColor(1, 1, 1, 0.3 * enemyNotes[i][j].alpha)
+										graphics.setColor(1, 1, 1, enemyNotes[i][j].alpha * 0.8)
 									else
-										graphics.setColor(1, 1, 1, 0.5 * enemyNotes[i][j].alpha)
+										graphics.setColor(1, 1, 1, enemyNotes[i][j].alpha)
 									end
 	
 									if not pixel then
@@ -1185,7 +1185,7 @@ return {
 							if boyfriendNotes[i][j].y <= 560 then
 								local animName = boyfriendNotes[i][j]:getAnimName()
 								if animName ~= "on" then
-									graphics.setColor(1, 1, 1, math.min(0.5, (500 + (boyfriendNotes[i][j].y)) / 150) * boyfriendNotes[i][j].alpha)
+									graphics.setColor(1, 1, 1, boyfriendNotes[i][j].alpha)
 									if not pixel then
 										boyfriendNotes[i][j]:draw()
 									else
@@ -1212,7 +1212,7 @@ return {
 					if not settings.middleScroll then
 						graphics.setColor(0.6, 0.6, 0.6, enemyArrows[i].alpha)
 					else
-						graphics.setColor(0.6, 0.6, 0.6, 0.6 * enemyArrows[i].alpha)
+						graphics.setColor(0.6, 0.6, 0.6, enemyArrows[i].alpha)
 					end
 				else
 					graphics.setColor(1, 1, 1, enemyArrows[i].alpha)
@@ -1245,7 +1245,7 @@ return {
 								local animName = enemyNotes[i][j]:getAnimName()
 								if animName ~= "hold" and animName ~= "end" then
 									if settings.middleScroll then
-										graphics.setColor(1, 1, 1, 0.5 * enemyNotes[i][j].alpha)
+										graphics.setColor(1, 1, 1, 0.8 * enemyNotes[i][j].alpha)
 									else
 										graphics.setColor(1, 1, 1, 1 * enemyNotes[i][j].alpha)
 									end
