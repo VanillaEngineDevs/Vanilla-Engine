@@ -721,6 +721,7 @@ return {
 							camera:moveToPoint(1.25, "enemy")
 						end
 					elseif type(event.value) == "table" then
+						event.value.char = tonumber(event.value.char)
 						local point = camera:getPoint(event.value.char == 0 and "boyfriend" or "enemy")
 						event.value.ease = event.value.ease or "CLASSIC"
 						if event.value.ease ~= "INSTANT" then
