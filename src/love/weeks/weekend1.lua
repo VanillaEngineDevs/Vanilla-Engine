@@ -19,11 +19,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local stageBack, stageFront, curtains
 
+local gameCanvas, intensity
+
 return {
 	enter = function(self, from, songNum, songAppend, isErect)
 		weeks:enter()
 
-		stages["stage"]:enter()
+		stages["streets"]:enter()
 
 		song = songNum
 		difficulty = songAppend
@@ -31,25 +33,40 @@ return {
 
 		enemyIcon:animate("dad", false)
 
+		gameCanvas = love.graphics.newCanvas(1280, 720)
+
+		shaders["rain"]:send("uScale", 0.0075)
+		--[[ shaders["rain"]:send("uIntensity", 0.1) ]]
+		intensity = 0
+		
+
 		self:load()
 	end,
 
 	load = function(self)
 		weeks:load()
-		stages["stage"]:load()
+		stages["streets"]:load()
 
 		if song == 3 then
 			inst = love.audio.newSource("songs/2hot/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/2hot/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/2hot/Voices-dad" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/2hot/Voices-pico" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/2hot/Voices-darnell" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			rainShaderStartIntensity = 0.2
+			rainShaderEndIntensity = 0.4
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/lit-up/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/lit-up/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/lit-up/Voices-dad" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/lit-up/Voices-pico" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/lit-up/Voices-darnell" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+
+			rainShaderStartIntensity = 0.1
+			rainShaderEndIntensity = 0.2
 		else
 			inst = love.audio.newSource("songs/darnell/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/darnell/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/darnell/Voices-dad" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/darnell/Voices-pico" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/darnell/Voices-darnell" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+
+			rainShaderStartIntensity = 0
+			rainShaderEndIntensity = 0.1
 		end
 
 		self:initUI()
@@ -69,8 +86,11 @@ return {
 	end,
 
 	update = function(self, dt)
+		intensity = math.remapToRange(musicTime/1000, 0, inst:getDuration(), rainShaderStartIntensity, rainShaderEndIntensity)
+		shaders["rain"]:send("uTime", love.timer.getTime())
+		shaders["rain"]:send("uIntensity", intensity)
 		weeks:update(dt)
-		stages["stage"]:update(dt)
+		stages["streets"]:update(dt)
 
 		weeks:checkSongOver()
 
@@ -78,18 +98,20 @@ return {
 	end,
 
 	draw = function(self)
+		love.graphics.setShader(shaders["rain"])
 		love.graphics.push()
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
-			stages["stage"]:draw()
+			stages["streets"]:draw()
 		love.graphics.pop()
+		love.graphics.setShader()
 
 		weeks:drawUI()
 	end,
 
 	leave = function(self)
-		stages["stage"]:leave()
+		stages["streets"]:leave()
 
 		enemy = nil
 		boyfriend = nil

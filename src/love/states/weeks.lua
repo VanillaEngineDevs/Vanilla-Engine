@@ -423,7 +423,7 @@ return {
 
 		local events = {}
 		
-		for i, timeChange in ipairs(metadata.timeChanges) do
+		for _, timeChange in ipairs(metadata.timeChanges) do
 			local time = timeChange.t
 			local bpm_ = timeChange.bpm
 
@@ -450,7 +450,7 @@ return {
 
 		speed = _speed
 
-		for i, noteData in ipairs(chart) do
+		for _, noteData in ipairs(chart) do
 			local data = noteData.d % 4 + 1
 			local enemyNote = noteData.d > 3
 			local time = noteData.t
@@ -512,7 +512,7 @@ return {
 		end
 
 		-- Events !!!
-		for i, event in ipairs(chartData.events) do
+		for _, event in ipairs(chartData.events) do
 			local time = event.t
 			local eventName = event.e
 			local value = event.v
@@ -535,22 +535,12 @@ return {
 		-- Does not handle sprites and all that, just note timings and type
 		local chartG = json.decode(love.filesystem.read(chartG)).notes[diff]
 
-		for i, noteData in ipairs(chartG) do
+		for _, noteData in ipairs(chartG) do
 			local noteType = noteData.d % 4 + 1
 			local noteTime = noteData.t
 
 			table.insert(gfNotes[noteType], {time = noteTime})
 		end
-
-		--[[ for i = 1, #chartG.notes do
-			for j = 1, #chartG.notes[i].sectionNotes do
-				local sn = chartG.notes[i].sectionNotes
-				local noteType = sn[j][2] % 4 + 1
-				local noteTime = sn[j][1]
-
-				table.insert(gfNotes[noteType], {time = noteTime})
-			end
-		end ]]
 	end,
 
 	-- Gross countdown script

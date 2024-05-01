@@ -366,7 +366,12 @@ function love.load()
 		["mall"] = require "stages.mall",
 		["school"] = require "stages.school",
 		["evilSchool"] = require "stages.evilSchool",
-		["tank"] = require "stages.tank"
+		["tank"] = require "stages.tank",
+		["streets"] = require "stages.streets"
+	}
+
+	shaders = {
+		["rain"] = love.graphics.newShader("shaders/rain.glsl")
 	}
 
 	-- Load Menus
@@ -406,8 +411,10 @@ function love.load()
 		require "weeks.week4",
 		require "weeks.week5",
 		require "weeks.week6",
-		require "weeks.week7"
+		require "weeks.week7",
+		require "weeks.weekend1"
 	}
+
 	testData = require "weeks.test"
 	__VERSION__ = love.filesystem.getInfo("version.txt") and love.filesystem.read("version.txt") or "vUnknown"
 
@@ -419,19 +426,10 @@ function love.load()
 		"MOMMY MUST MURDER",
 		"RED SNOW",
 		"HATING SIMULATOR FT. MOAWLING",
-		"TANKMAN"
+		"TANKMAN",
+		"DUE DEBTS"
 	}
 
-	weekDesc = { -- Add your week description here
-		"LEARN TO FUNK",
-		"DADDY DEAREST",
-		"SPOOKY MONTH",
-		"PICO",
-		"MOMMY MUST MURDER",
-		"RED SNOW",
-		"HATING SIMULATOR FT. MOAWLING",
-		"TANKMAN"
-	}
 	weekMeta = { -- Add/remove weeks here
 		{
 			"Tutorial",
@@ -527,7 +525,7 @@ function love.load()
 				"Darnell",
 				"Lit Up",
 				"2hot",
-				"Blazin'"
+				"Blazin"
 			}
 		}
 	}
