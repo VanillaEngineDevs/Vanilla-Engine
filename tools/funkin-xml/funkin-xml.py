@@ -42,6 +42,7 @@ for SubTexture in sheetxml.findall('SubTexture'):
     offsety = SubTexture.get('frameY')
     offsetWidth = SubTexture.get('frameWidth')
     offsetHeight = SubTexture.get('frameHeight')
+    rotated = SubTexture.get('rotated')
 
     if offsetx is None:
         offsetx = '0'
@@ -51,8 +52,10 @@ for SubTexture in sheetxml.findall('SubTexture'):
         offsetWidth = '0'
     if offsetHeight is None:
         offsetHeight = '0'
+    if rotated is None:
+        rotated = 'false'
 
-    lua += '\t\t{x = ' + x + ', y = ' + y + ', width = ' + width + ', height = ' + height + ', offsetX = ' + offsetx + ', offsetY = ' + offsety + ', offsetWidth = ' + offsetWidth + ', offsetHeight = ' + offsetHeight + '}, -- ' + str(c) + ': ' + name + '\n'
+    lua += '\t\t{x = ' + x + ', y = ' + y + ', width = ' + width + ', height = ' + height + ', offsetX = ' + offsetx + ', offsetY = ' + offsety + ', offsetWidth = ' + offsetWidth + ', offsetHeight = ' + offsetHeight + ', rotated = ' + rotated + '}, -- ' + str(c) + ': ' + name + '\n'
 
 lua = lua[:len(lua) - (len(str(c)) + len(name) + 9)] + '} -- ' + str(c) + ': ' + name + '\n'
 lua += '\t},\n'
