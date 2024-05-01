@@ -321,7 +321,6 @@ return {
 			if storyMode and song < #weekMeta[weekNum][2] then
 				self:saveData()
 				song = song + 1
-				print(song)
 
 				curWeekData:load()
 			else
@@ -415,474 +414,120 @@ return {
 		end
 	end,
 
-	generateNotes = function(self, chart, psychweek, song, difficulty)
+	generateNotes = function(self, chart, metadata, difficulty)
 		local eventBpm
-		local chart = chart
-		if chart == nil and _psychmod then
-			-- its most likely a psych mod
-			chart = "mods/" .. weekMeta[psychweek][3]
-			CURSONGFULLPATH = chart .. "/data/" .. weekMeta[psychweek][2][song]:gsub(" ", "-")
-			chart = chart .. "/data/" .. weekMeta[psychweek][2][song]:gsub(" ", "-") .. "/" .. weekMeta[psychweek][2][song]:gsub(" ", "-"):lower() .. difficulty .. ".json"
-			chartpath = "mods/" .. weekMeta[psychweek][3]
-			chartpath = chartpath .. "/data/" .. weekMeta[psychweek][2][song]:gsub(" ", "-")
-			inst = "mods/" .. weekMeta[psychweek][3]
-			inst = inst .. "/songs/" .. weekMeta[psychweek][2][song]:gsub(" ", "-") .. "/Inst.ogg"
+		local chartData = json.decode(love.filesystem.read(chart))
+		local chart = chartData.notes[difficulty]
 
-			inst = love.audio.newSource(inst, "static")
-		end
-		if not love.filesystem.getInfo(chart) then
-			chart = chart:gsub("-hard", ""):gsub("-easy", "")
-		end
-		-- if it still doesn't exist, add -easy to the end
-		if not love.filesystem.getInfo(chart) then
-			chart = chart:gsub(".json", "-easy.json")
-		end
-		-- if it still errors, try hard
-		if not love.filesystem.getInfo(chart) then
-			chart = chart:gsub("-easy", "-hard")
+		local metadata = json.decode(love.filesystem.read(metadata))
+
+		local events = {}
+		
+		for i, timeChange in ipairs(metadata.timeChanges) do
+			local time = timeChange.t
+			local bpm_ = timeChange.bpm
+
+			table.insert(events, {time = time, bpm = bpm_, type="bpm"})
+
+			if not bpm then bpm = bpm_ end
+			if not crochet then crochet = ((60/bpm) * 1000) end
+			if not stepCrochet then stepCrochet = crochet / 4 end
 		end
 
-		-- if it still errors, then load the next json file that isn't "events.json"
-		if not love.filesystem.getInfo(chart) and _psychmod then
-			local files = love.filesystem.getDirectoryItems(chartpath)
-			for i = 1, #files do
-				if files[i] ~= "events.json" and files[i]:sub(-5) == ".json" then
-					chart = chartpath .. "/" .. files[i]
-					break
-				end
-			end
-		end
-		chart = love.filesystem.read(chart)
-		chart = json.decode(chart)
-		chart = chart["song"]
-		curSong = chart["song"]
+		local sprites = {
+			sprites.leftArrow,
+			sprites.downArrow,
+			sprites.upArrow,
+			sprites.rightArrow
+		}
 
-		if _psychmod then
-			psychenemy = chart.player2
-			psychboyfriend = chart.player1
-			psychgirlfriend = chart.gfVersion
-			psychstage = chart.stage
-
-			songName = weekMeta[psychweek][2][song]
+		local _speed = 1
+		if chartData.scrollSpeed[difficulty] then
+			_speed = chartData.scrollSpeed[difficulty]
+		elseif chartData.scrollSpeed["default"] then
+			_speed = chartData.scrollSpeed["default"]
 		end
 
-		needsVoices = chart.needsVoices
-		if needsVoices == true and _psychmod then
-			voices = "mods/" .. weekMeta[psychweek][3]
-			voices = voices .. "/songs/" .. weekMeta[psychweek][2][song]:gsub(" ", "-") .. "/Voices.ogg"
+		speed = _speed
 
-			voices = love.audio.newSource(voices, "static")
-		end
+		for i, noteData in ipairs(chart) do
+			local data = noteData.d % 4 + 1
+			local enemyNote = noteData.d > 3
+			local time = noteData.t
+			local holdTime = noteData.l or 0
 
-		for i = 1, #chart["notes"] do
-			bpm = chart["notes"][i]["bpm"]
+			local noteObject = sprites[data]()
+			
+			noteObject.col = data
+			noteObject.y = -400 + time * 0.6 * speed
+			noteObject.ver = "normal"
+			noteObject.time = time
+			noteObject:animate("on")
 
-			if bpm then
-				break
-			end
-		end
-		if not bpm then
-			bpm = chart["bpm"]
-		end
-		if not bpm then
-			bpm = 100
-		end
-		beatHandler.setBPM(bpm)
+			if settings.downscroll then noteObject.sizeY = -1 end
 
-		if settings.customScrollSpeed == 1 then
-			speed = chart["speed"] or 1
-		else
-			speed = settings.customScrollSpeed
-		end
+			if enemyNote then
+				noteObject.x = enemyArrows[data].x
+				table.insert(enemyNotes[data], noteObject)
 
-		for i = 1, #chart["notes"] do
-			for j = 1, #chart["notes"][i]["sectionNotes"] do
-				local sprite
-				local sectionNotes = chart["notes"][i]["sectionNotes"]
+				if holdTime > 0 then
+					for k = 71 / speed, holdTime, 71 / speed do
+						local holdNote = sprites[data]()
+						holdNote.col = data
+						holdNote.y = -400 + (time + k) * 0.6 * speed
+						holdNote.ver = "normal"
+						holdNote.time = time + k
+						holdNote:animate("hold")
 
-				local mustHitSection = chart["notes"][i]["mustHitSection"]
-				local altAnim = chart["notes"][i]["altAnim"] or false
-				local noteType = sectionNotes[j][2]
-				local noteTime = sectionNotes[j][1]
-				local noteVer = sectionNotes[j][4] or "normal"
+						if settings.downscroll then holdNote.sizeY = -1 end
 
-				if j == 1 then
-					table.insert(events, {eventTime = sectionNotes[1][1], mustHitSection = mustHitSection, bpm = bpm, altAnim = altAnim})
-				end
-
-				if noteType == 0 or noteType == 4 then
-					sprite = sprites.leftArrow
-				elseif noteType == 1 or noteType == 5 then
-					sprite = sprites.downArrow
-				elseif noteType == 2 or noteType == 6 then
-					sprite = sprites.upArrow
-				elseif noteType == 3 or noteType == 7 then
-					sprite = sprites.rightArrow
-				end
-
-				if mustHitSection and noteVer ~= "Hurt Note" then
-					if noteType >= 4 then
-					   	local id = noteType - 3
-					   	local c = #enemyNotes[id] + 1
-					   	local x = enemyArrows[id].x
-
-						local beatRow = util.round(((noteTime / 1000) * (bpm / 60)) * 48)
-				 
-						if settings.colourByQuantization then
-							if (beatRow % (192 / 4) == 0) then 
-								col = 1
-								sprite = sprites.leftArrow
-							elseif (beatRow % (192 / 8) == 0) then
-								col = 2
-								sprite = sprites.downArrow
-							elseif (beatRow % (192 / 12) ==  0) then 
-								col = 3
-								sprite = sprites.upArrow
-							elseif (beatRow % (192 / 16) == 0) then
-								col = 4
-								sprite = sprites.rightArrow
-							elseif (beatRow % (192 / 24) == 0) then
-								col = 3
-								sprite = sprites.upArrow
-							elseif (beatRow % (192 / 32) == 0) then
-								col = 3
-								sprite = sprites.upArrow
-							else
-								col = id
-							end
-						else
-							col = id
-						end
-
-					   	table.insert(enemyNotes[id], sprite())
-						enemyNotes[id][c].col = col
-					   	enemyNotes[id][c].x = x
-					   	enemyNotes[id][c].y = -400 + noteTime * 0.6 * speed
-						enemyNotes[id][c].orientation = enemyNotes[id][c].orientation - arrowAngles[enemyNotes[id][c].col]
-						enemyNotes[id][c].orientation = enemyNotes[id][c].orientation + arrowAngles[id]
-						enemyNotes[id][c].ver = noteVer
-						enemyNotes[id][c].time = noteTime
-
-						if settings.downscroll then
-							enemyNotes[id][c].sizeY = -1
-						end
-				 
-					   	enemyNotes[id][c]:animate("on", false)
-				 
-					    if sectionNotes[j][3] > 0 then
-						  	local c
-				 
-						  	for k = 71 / speed, sectionNotes[j][3], 71 / speed do
-							 	local c = #enemyNotes[id] + 1
-				 
-							 	table.insert(enemyNotes[id], sprite())
-							 	enemyNotes[id][c].x = x
-							 	enemyNotes[id][c].y = -400 + (noteTime + k) * 0.6 * speed
-								enemyNotes[id][c].col = col
-								enemyNotes[id][c].ver = noteVer
-								enemyNotes[id][c].time = noteTime + k
-				 
-								enemyNotes[id][c]:animate("hold", false)
-							end
-				 
-							c = #enemyNotes[id]
-				 
-							enemyNotes[id][c].offsetY = not pixel and 10 or 2
-				 
-						  	enemyNotes[id][c]:animate("end", false)
-					    end
-					elseif noteType < 4 and noteType >= 0 then
-					   	local id = noteType + 1
-					   	local c = #boyfriendNotes[id] + 1
-					   	local x = boyfriendArrows[id].x
-
-						local beatRow = util.round(((noteTime / 1000) * (bpm / 60)) * 48)
-				 
-						if settings.colourByQuantization then
-							if (beatRow % (192 / 4) == 0) then 
-								col = 1
-								sprite = sprites.leftArrow
-							elseif (beatRow % (192 / 8) == 0) then
-								col = 2
-								sprite = sprites.downArrow
-							elseif (beatRow % (192 / 12) ==  0) then 
-								col = 3
-								sprite = sprites.upArrow
-							elseif (beatRow % (192 / 16) == 0) then
-								col = 4
-								sprite = sprites.rightArrow
-							elseif (beatRow % (192 / 24) == 0) then
-								col = 3
-								sprite = sprites.upArrow
-							elseif (beatRow % (192 / 32) == 0) then
-								col = 3
-								sprite = sprites.upArrow
-							else
-								col = id
-							end
-						else
-							col = id
-						end
-
-					   	table.insert(boyfriendNotes[id], sprite())
-						boyfriendNotes[id][c].col = col
-					   	boyfriendNotes[id][c].x = x
-					   	boyfriendNotes[id][c].y = -400 + noteTime * 0.6 * speed
-						boyfriendNotes[id][c].time = noteTime
-						boyfriendNotes[id][c].orientation = boyfriendNotes[id][c].orientation - arrowAngles[boyfriendNotes[id][c].col]
-						boyfriendNotes[id][c].orientation = boyfriendNotes[id][c].orientation + arrowAngles[id]
-						boyfriendNotes[id][c].ver = noteVer
-						
-						if settings.downscroll then
-							boyfriendNotes[id][c].sizeY = -1
-						end
-				 
-					   	boyfriendNotes[id][c]:animate("on", false)
-				 
-					   	if sectionNotes[j][3] > 0 then
-						  	local c
-				 
-						  	for k = 71 / speed, sectionNotes[j][3], 71 / speed do
-							 	local c = #boyfriendNotes[id] + 1
-				 
-							 	table.insert(boyfriendNotes[id], sprite())
-							 	boyfriendNotes[id][c].x = x
-							 	boyfriendNotes[id][c].y = -400 + (noteTime + k) * 0.6 * speed
-								boyfriendNotes[id][c].col = col
-								boyfriendNotes[id][c].ver = noteVer
-								boyfriendNotes[id][c].time = noteTime + k
-				 
-							 	boyfriendNotes[id][c]:animate("hold", false)
-						  	end
-				 
-						  	c = #boyfriendNotes[id]
-				 
-						  	boyfriendNotes[id][c].offsetY = not pixel and 10 or 2
-				 
-						  	boyfriendNotes[id][c]:animate("end", false)
-					   	end
+						holdNote.x = enemyArrows[data].x
+						table.insert(enemyNotes[data], holdNote)
 					end
-				elseif not mustHitSection and noteVer ~= "Hurt Note" then
-					if noteType >= 4 then
-					   	local id = noteType - 3
-					   	local c = #boyfriendNotes[id] + 1
-					   	local x = boyfriendArrows[id].x
 
-						local beatRow = util.round(((noteTime / 1000) * (bpm / 60)) * 48)
-				 
-						if settings.colourByQuantization then
-							if (beatRow % (192 / 4) == 0) then 
-								col = 1
-								sprite = sprites.leftArrow
-							elseif (beatRow % (192 / 8) == 0) then
-								col = 2
-								sprite = sprites.downArrow
-							elseif (beatRow % (192 / 12) ==  0) then 
-								col = 3
-								sprite = sprites.upArrow
-							elseif (beatRow % (192 / 16) == 0) then
-								col = 4
-								sprite = sprites.rightArrow
-							elseif (beatRow % (192 / 24) == 0) then
-								col = 3
-								sprite = sprites.upArrow
-							elseif (beatRow % (192 / 32) == 0) then
-								col = 3
-								sprite = sprites.upArrow
-							else
-								col = id
-							end
-						else
-							col = id
-						end
-				 
-					   	table.insert(boyfriendNotes[id], sprite())
-						boyfriendNotes[id][c].col = col
-					   	boyfriendNotes[id][c].x = x
-					   	boyfriendNotes[id][c].y = -400 + noteTime * 0.6 * speed
-						boyfriendNotes[id][c].time = noteTime
-						boyfriendNotes[id][c].orientation = boyfriendNotes[id][c].orientation - arrowAngles[boyfriendNotes[id][c].col]
-						boyfriendNotes[id][c].orientation = boyfriendNotes[id][c].orientation + arrowAngles[id]
-						boyfriendNotes[id][c].ver = noteVer
-						
-						if settings.downscroll then
-							boyfriendNotes[id][c].sizeY = -1
-						end
-				 
-					   	boyfriendNotes[id][c]:animate("on", false)
-				 
-					   	if sectionNotes[j][3] > 0 then
-						  	local c
-				 
-						  	for k = 71 / speed, sectionNotes[j][3], 71 / speed do
-							 	local c = #boyfriendNotes[id] + 1
-				 
-							 	table.insert(boyfriendNotes[id], sprite())
-							 	boyfriendNotes[id][c].x = x
-							 	boyfriendNotes[id][c].y = -400 + (noteTime + k) * 0.6 * speed
-								boyfriendNotes[id][c].col = col
-								boyfriendNotes[id][c].ver = noteVer
-								boyfriendNotes[id][c].time = noteTime + k
-				 
-							 	boyfriendNotes[id][c]:animate("hold", false)
-						  	end
-				 
-						  	c = #boyfriendNotes[id]
-				 
-						  	boyfriendNotes[id][c].offsetY = not pixel and 10 or 2
-				 
-						  	boyfriendNotes[id][c]:animate("end", false)
-					   	end
-					elseif noteType < 4 and noteType >= 0 then
-					   	local id = noteType + 1
-					   	local c = #enemyNotes[id] + 1
-					   	local x = enemyArrows[id].x
+					enemyNotes[data][#enemyNotes[data]]:animate("end")
+				end
+			else
+				noteObject.x = boyfriendArrows[data].x
+				table.insert(boyfriendNotes[data], noteObject)
 
-						local beatRow = util.round(((noteTime / 1000) * (bpm / 60)) * 48)
-				 
-						if settings.colourByQuantization then
-							if (beatRow % (192 / 4) == 0) then 
-								col = 1
-								sprite = sprites.leftArrow
-							elseif (beatRow % (192 / 8) == 0) then
-								col = 2
-								sprite = sprites.downArrow
-							elseif (beatRow % (192 / 12) ==  0) then 
-								col = 3
-								sprite = sprites.upArrow
-							elseif (beatRow % (192 / 16) == 0) then
-								col = 4
-								sprite = sprites.rightArrow
-							elseif (beatRow % (192 / 24) == 0) then
-								col = 3
-								sprite = sprites.upArrow
-							elseif (beatRow % (192 / 32) == 0) then
-								col = 3
-								sprite = sprites.upArrow
-							else
-								col = id
-							end
-						else
-							col = id
-						end
-				 
-					   	table.insert(enemyNotes[id], sprite())
-						enemyNotes[id][c].col = col
-					   	enemyNotes[id][c].x = x
-					   	enemyNotes[id][c].y = -400 + noteTime * 0.6 * speed
-						enemyNotes[id][c].orientation = enemyNotes[id][c].orientation - arrowAngles[enemyNotes[id][c].col]
-						enemyNotes[id][c].orientation = enemyNotes[id][c].orientation + arrowAngles[id]
-						enemyNotes[id][c].ver = noteVer
-						enemyNotes[id][c].time = noteTime
-						if settings.downscroll then
-							enemyNotes[id][c].sizeY = -1
-						end
-				 
-					   	enemyNotes[id][c]:animate("on", false)
-				 
-					   	if sectionNotes[j][3] > 0 then
-						  	local c
-				 
-						  	for k = 71 / speed, sectionNotes[j][3], 71 / speed do
-							 	local c = #enemyNotes[id] + 1
-				 
-							 	table.insert(enemyNotes[id], sprite())
-							 	enemyNotes[id][c].x = x
-							 	enemyNotes[id][c].y = -400 + (noteTime + k) * 0.6 * speed
-								enemyNotes[id][c].col = col
-								enemyNotes[id][c].ver = noteVer
-								enemyNotes[id][c].time = noteTime + k
-							 	if k > sectionNotes[j][3] - 71 / speed then
-									enemyNotes[id][c].offsetY = not pixel and 10 or 2
-				 
-									enemyNotes[id][c]:animate("end", false)
-							 	else
-									enemyNotes[id][c]:animate("hold", false)
-							 	end
-						  	end
-				 
-						  	c = #enemyNotes[id]
-				 
-						  	enemyNotes[id][c].offsetY = not pixel and 10 or 2
-				 
-						  	enemyNotes[id][c]:animate("end", false)
-					   	end
+				if holdTime > 0 then
+					for k = 71 / speed, holdTime, 71 / speed do
+						local holdNote = sprites[data]()
+						holdNote.col = data
+						holdNote.y = -400 + (time + k) * 0.6 * speed
+						holdNote.ver = "normal"
+						holdNote.time = time + k
+						holdNote:animate("hold")
+
+						if settings.downscroll then holdNote.sizeY = -1 end
+
+						holdNote.x = boyfriendArrows[data].x
+						table.insert(boyfriendNotes[data], holdNote)
 					end
+
+					boyfriendNotes[data][#boyfriendNotes[data]]:animate("end")
 				end
 			end
 		end
 
+		-- Events !!!
+		for i, event in ipairs(chartData.events) do
+			local time = event.t
+			local eventName = event.e
+			local value = event.v
+
+			table.insert(songEvents, {
+				time = time,
+				name = eventName,
+				value = value
+			})
+		end
+	
 		for i = 1, 4 do
 			table.sort(enemyNotes[i], function(a, b) return a.y < b.y end)
 			table.sort(boyfriendNotes[i], function(a, b) return a.y < b.y end)
 		end
-
-		-- Workarounds for bad charts that have multiple notes around the same place
-		for i = 1, 4 do
-			local offset = 0
-
-			for j = 2, #enemyNotes[i] do
-				local index = j - offset
-
-				if enemyNotes[i][index]:getAnimName() == "on" and enemyNotes[i][index - 1]:getAnimName() == "on" and ((enemyNotes[i][index].y - enemyNotes[i][index - 1].y <= 10)) then
-					table.remove(enemyNotes[i], index)
-
-					offset = offset + 1
-				end
-			end
-		end
-		for i = 1, 4 do
-			local offset = 0
-
-			for j = 2, #boyfriendNotes[i] do
-				local index = j - offset
-
-				if boyfriendNotes[i][index]:getAnimName() == "on" and boyfriendNotes[i][index - 1]:getAnimName() == "on" and ((boyfriendNotes[i][index].y - boyfriendNotes[i][index - 1].y <= 10)) then
-					table.remove(boyfriendNotes[i], index)
-
-					offset = offset + 1
-				end
-			end
-		end
-	end,
-
-	generateEvents = function(self, charte, psychweek, song, difficulty)
-		local charte = charte
-		if charte == nil and _psychmod then
-			-- its most likely a psych mod
-			charte = "mods/" .. weekMeta[psychweek][3]
-			charte = charte .. "/data/" .. weekMeta[psychweek][2][song] .. "/events.json"
-			-- if it exists, use it
-			if not love.filesystem.getInfo(charte) then
-				charte = "mods/" .. weekMeta[psychweek][3]
-				charte = charte .. "/data/" .. weekMeta[psychweek][2][song] .. "/" .. weekMeta[psychweek][2][song] .. difficulty .. ".json"
-			end
-		end
-		if not love.filesystem.getInfo(charte) then
-			charte = charte:gsub("-hard", ""):gsub("-easy", "")
-		end
-		-- if it still doesn't exist, add -easy to the end
-		if not love.filesystem.getInfo(charte) then
-			charte = charte:gsub(".json", "-easy.json")
-		end
-		-- if it still errors, try hard
-		if not love.filesystem.getInfo(charte) then
-			charte = charte:gsub("-easy", "-hard")
-		end
-		pcall(
-			function()
-				charte = json.decode(love.filesystem.read(charte)).song
-				-- for all in charte.events, add it to songEvents
-				for i = 1, #charte.events do
-					local eventTime = charte.events[i][1] or 0
-					local event = charte.events[i][2][1][1] or "Hey!"
-					local eventArgs = charte.events[i][2][1][2] or ""
-					local eventArgs2 = charte.events[i][2][1][3] or ""
-
-					table.insert(songEvents, {time = eventTime, event = event, n=event, args = eventArgs, args2 = eventArgs2})
-				end
-			end
-		)
 	end,
 
 	generateGFNotes = function(self, chartG)
@@ -1059,18 +704,6 @@ return {
 					beatHandler.setBPM(bpm)
 				end
 
-				if camera.mustHit then
-					if events[i].mustHitSection then
-						mustHitSection = true
-						--camTimer = Timer.tween(1.25, camera, {x = -boyfriend.x + 100, y = -boyfriend.y + 75}, "out-quad")
-						camera:moveToPoint(1.25, "boyfriend")
-					else
-						mustHitSection = false
-						--camTimer = Timer.tween(1.25, camera, {x = -enemy.x - 100, y = -enemy.y + 75}, "out-quad")
-						camera:moveToPoint(1.25, "enemy")
-					end
-				end
-
 				if events[i].altAnim then
 					useAltAnims = true
 				else
@@ -1083,12 +716,21 @@ return {
 			end
 		end
 
-		for i = 1, #songEvents do
-			if songEvents[i].time <= absMusicTime then
-				if eventFuncs[songEvents[i].event] then
-					eventFuncs[songEvents[i].event](songEvents[i].args, songEvents[i].args2)
-				else
-					print(songEvents[i].event .. " is not implemented!")
+		--[[ for i = 1, #songEvents do
+			
+		end ]]
+		for i, event in ipairs(songEvents) do
+			if event.time <= absMusicTime then
+				if event.name == "FocusCamera" then
+					if event.value == 0 then -- Boyfriend
+						camera:moveToPoint(1.25, "boyfriend")
+					elseif event.value == 1 then -- Enemy
+						camera:moveToPoint(1.25, "enemy")
+					end
+				elseif event.name == "PlayAnimation" then
+					if event.value.target == "bf" then
+						boyfriend:animate(event.value.anim, false)
+					end
 				end
 
 				table.remove(songEvents, i)
@@ -1177,10 +819,6 @@ return {
 
 					if whohit then whohit.lastHit = musicTime end
 
-					if not mustHitSection then 
-						noteCamTweens[i]()
-					end
-
 					table.remove(enemyNote, 1)
 				end
 			end
@@ -1248,10 +886,6 @@ return {
 							rating.y = 300 - 50 + (settings.downscroll and 0 or -490)
 							for i = 1, 3 do
 								numbers[i].y = 300 + 50 + (settings.downscroll and 0 or -490)
-							end
-
-							if mustHitSection then 
-								noteCamTweens[i]()
 							end
 
 							ratingVisibility[1] = 1
@@ -1332,10 +966,6 @@ return {
 								rating.y = 300 - 50 + (settings.downscroll and 0 or -490)
 								for i = 1, 3 do
 									numbers[i].y = 300 + 50 + (settings.downscroll and 0 or -490)
-								end
-
-								if mustHitSection then 
-									noteCamTweens[i]()
 								end
 
 								ratingVisibility[1] = 1

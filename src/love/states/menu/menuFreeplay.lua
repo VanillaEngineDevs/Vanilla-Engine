@@ -28,9 +28,9 @@ return {
         graphics:fadeInWipe(0.6)
 
         difficultyStrs = {
-            "-easy",
-            "",
-            "-hard"
+            "easy",
+            "normal",
+            "hard"
         }
         songBefore = ""
         songAfter = ""
@@ -418,12 +418,9 @@ return {
             love.graphics.setFont(weekFont)
             -- make the current dificulties first letter uppercase
             local difficultyStr = difficultyStrs[songDifficulty]
-            difficultyStr = difficultyStr:sub(1,1):upper() .. difficultyStr:sub(2)
             if difficultyStr == "" then 
                 difficultyStr = "Normal"
             else
-                -- remove the first letter from the difficulty string
-                difficultyStr = difficultyStr:sub(2)
                 -- make the first letter uppercase
                 difficultyStr = difficultyStr:sub(1,1):upper() .. difficultyStr:sub(2)
                 --difficultyStr:gsub("-", "")

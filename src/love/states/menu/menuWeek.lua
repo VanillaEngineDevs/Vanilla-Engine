@@ -13,9 +13,9 @@ local songNum, songAppend
 local songDifficulty = 2
 
 local difficultyStrs = {
-	"-easy",
-	"",
-	"-hard"
+	"easy",
+	"normal",
+	"hard"
 }
 
 return {
