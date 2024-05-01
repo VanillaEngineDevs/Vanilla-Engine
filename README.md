@@ -1,3 +1,5 @@
+# almost entire weeks.lua needs to be rewritten to support the new FNF charts.
+
 # DOWNLOAD NIGHTLY HERE: https://nightly.link/VanillaEngineDevs/Vanilla-Engine/workflows/build/main
 
 # ![Logo](images/logo.png)
