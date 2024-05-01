@@ -737,15 +737,20 @@ return {
 						end
 					elseif type(event.value) == "table" then
 						local point = camera:getPoint(event.value.char == 0 and "boyfriend" or "enemy")
-						Timer.tween(
-							(event.value.duration or 4)/10,
-							camera,
-							{
-								x = point.x + event.value.x,
-								y = point.y + event.value.y
-							},
-							easingTypes[event.value.ease or "CLASSIC"]
-						)
+						if event.value.ease ~= "INSTANT" then
+							Timer.tween(
+								(event.value.duration or 4)/10,
+								camera,
+								{
+									x = point.x + event.value.x,
+									y = point.y + event.value.y
+								},
+								easingTypes[event.value.ease or "CLASSIC"]
+							)
+						else
+							camera.x = point.x + event.value.x
+							camera.y = point.y + event.value.y
+						end
 					end
 				elseif event.name == "PlayAnimation" then
 					if event.value.target == "bf" then
@@ -757,12 +762,16 @@ return {
 						uiScale.zoom = event.value
 					elseif type(event.value) == "table" then
 						if event.value.mode == "stage" then
-							Timer.tween(
-								(event.value.duration or 4)/10,
-								camera,
-								{defaultZoom = event.value.zoom or 1},
-								easingTypes[event.value.ease or "CLASSIC"]
-							)
+							if evemt.value.ease ~= "INSTANT" then
+								Timer.tween(
+									(event.value.duration or 4)/10,
+									camera,
+									{defaultZoom = event.value.zoom or 1},
+									easingTypes[event.value.ease or "CLASSIC"]
+								)
+							else
+								camera.defaultZoom = event.value.zoom or 1
+							end
 						end
 					end
 				elseif event.name == "SetCameraBop" then
