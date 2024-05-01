@@ -52,8 +52,6 @@ return {
                 resetFastCar()
                 carTimer = nil
             end)
-
-            print("Porn balls")
         end
     end,
 

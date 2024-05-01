@@ -726,17 +726,17 @@ return {
 						event.value.ease = event.value.ease or "CLASSIC"
 						if event.value.ease ~= "INSTANT" then
 							Timer.tween(
-								(event.value.duration or 4)/10,
+								(tonumber(event.value.duration) or 4)/10,
 								camera,
 								{
-									x = point.x + (event.value.x or 0),
-									y = point.y + (event.value.y or 0)
+									x = point.x + (tonumber(event.value.x) or 0),
+									y = point.y + (tonumber(event.value.y) or 0)
 								},
 								easingTypes[event.value.ease or "CLASSIC"]
 							)
 						else
-							camera.x = point.x + event.value.x
-							camera.y = point.y + event.value.y
+							camera.x = point.x + tonumber(event.value.x)
+							camera.y = point.y + tonumber(event.value.y)
 						end
 					end
 				elseif event.name == "PlayAnimation" then
@@ -751,13 +751,13 @@ return {
 						if event.value.mode == "stage" then
 							if event.value.ease ~= "INSTANT" then
 								Timer.tween(
-									(event.value.duration or 4)/10,
+									(tonumber(event.value.duration) or 4)/10,
 									camera,
-									{defaultZoom = event.value.zoom or 1},
+									{defaultZoom = tonumber(event.value.zoom) or 1},
 									easingTypes[event.value.ease or "CLASSIC"]
 								)
 							else
-								camera.defaultZoom = event.value.zoom or 1
+								camera.defaultZoom = tonumber(event.value.zoom) or 1
 							end
 						end
 					end

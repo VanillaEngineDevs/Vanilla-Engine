@@ -36,7 +36,6 @@ local function CreateWeek(weekIndex, hasErect)
                 (hasErect and {"nightmare", true} or nil)
             }
         }
-        print(hasErect)
 
         table.insert(week.songs, song)
     end
@@ -141,7 +140,6 @@ return {
                 if weekNum < 1 then
                     weekNum = #weekMeta
                 end
-                print(songDifficulty, weekNum, songNum, tostring(allWeeks[weekNum].songs[songNum].diffs))
                 if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
                     songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
                 end
