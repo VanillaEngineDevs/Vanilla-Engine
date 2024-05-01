@@ -1,5 +1,5 @@
 return {
-    enter = function(self, from, songNum, songAppend)
+    enter = function(self, from, songNum, songAppend, isErect)
 		weeks:enter() 
 
 		stages["tank"]:enter()
@@ -14,6 +14,7 @@ return {
 
 		song = songNum
 		difficulty = songAppend
+		erectMode = isErect
 
 		enemyIcon:animate("tankman")
     
@@ -40,18 +41,21 @@ return {
 				video:play()
 			end
 
-			inst = love.audio.newSource("songs/stress/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/stress/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/stress/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/stress/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/stress/Voices-tankman" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/guns/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/guns/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/guns/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/guns/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/guns/Voices-tankman" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 			if storyMode and not died then
 				video = cutscene.video("videos/gunsCutscene.ogv")
 				video:play()
 			end
 		else
-			inst = love.audio.newSource("songs/ugh/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/ugh/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/ugh/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/ugh/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/ugh/Voices-tankman" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 			if storyMode and not died then
 				video = cutscene.video("videos/ughCutscene.ogv")
 				video:play()
@@ -69,8 +73,8 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/stress/stress" .. difficulty .. ".json")
-            weeks:generateGFNotes("data/stress/picospeaker.json")
+			weeks:generateNotes("data/songs/stress/stress-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/stress/stress-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateGFNotes("data/songs/stress/stress-chart" .. (erectMode and "-erect" or "") .. ".json", "picospeaker")
 
 			tankmanRunImg = love.graphics.newImage(graphics.imagePath("week7/tankmanKilled1"))
 
@@ -91,10 +95,9 @@ return {
 				end
 			end
 		elseif song == 2 then
-			weeks:generateNotes("data/guns/guns" .. difficulty .. ".json")
+			weeks:generateNotes("data/songs/guns/guns-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/guns/guns-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		else
-			weeks:generateNotes("data/ugh/ugh" .. difficulty .. ".json")
-			weeks:generateEvents("data/ugh/events.json")
+			weeks:generateNotes("data/songs/ugh/ugh-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/ugh/ugh-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		end
 	end,
 

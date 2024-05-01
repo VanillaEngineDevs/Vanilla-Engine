@@ -38,7 +38,8 @@ local noteList = {
 
 local easingTypes = {
 	["CLASSIC"] = "out-quad",
-	["expoOut"] = "out-expo"
+	["expoOut"] = "out-expo",
+	["sineOut"] = "out-sine",
 }
 
 local arrowAngles = {math.rad(180), math.rad(90), math.rad(270), math.rad(0)}
@@ -84,7 +85,6 @@ local eventFuncs = {
 local ratingTimers = {}
 
 local useAltAnims
-local notMissed = {}
 local option = "normal"
 
 return {
@@ -212,9 +212,6 @@ return {
 		boyPlayAlphaChange()
 		pauseBG = graphics.newImage(graphics.imagePath("pause/pause_box"))
 		pauseShadow = graphics.newImage(graphics.imagePath("pause/pause_shadow"))
-		for i = 1, 4 do
-			notMissed[i] = true
-		end
 		useAltAnims = false
 
 		if boyfriend then
@@ -466,7 +463,7 @@ return {
 			
 			noteObject.col = data
 			noteObject.y = -400 + time * 0.6 * speed
-			noteObject.ver = "normal"
+			noteObject.ver = noteData.k or "normal"
 			noteObject.time = time
 			noteObject:animate("on")
 
@@ -481,7 +478,7 @@ return {
 						local holdNote = sprites[data]()
 						holdNote.col = data
 						holdNote.y = -400 + (time + k) * 0.6 * speed
-						holdNote.ver = "normal"
+						holdNote.ver = noteData.k or "normal"
 						holdNote.time = time + k
 						holdNote:animate("hold")
 
@@ -502,7 +499,7 @@ return {
 						local holdNote = sprites[data]()
 						holdNote.col = data
 						holdNote.y = -400 + (time + k) * 0.6 * speed
-						holdNote.ver = "normal"
+						holdNote.ver = noteData.k or "normal"
 						holdNote.time = time + k
 						holdNote:animate("hold")
 
@@ -536,12 +533,19 @@ return {
 		end
 	end,
 
-	generateGFNotes = function(self, chartG)
+	generateGFNotes = function(self, chartG, diff)
 		-- very bare-bones chart generation
 		-- Does not handle sprites and all that, just note timings and type
-		local chartG = json.decode(love.filesystem.read(chartG)).song
+		local chartG = json.decode(love.filesystem.read(chartG)).notes[diff]
 
-		for i = 1, #chartG.notes do
+		for i, noteData in ipairs(chartG) do
+			local noteType = noteData.d % 4 + 1
+			local noteTime = noteData.t
+
+			table.insert(gfNotes[noteType], {time = noteTime})
+		end
+
+		--[[ for i = 1, #chartG.notes do
 			for j = 1, #chartG.notes[i].sectionNotes do
 				local sn = chartG.notes[i].sectionNotes
 				local noteType = sn[j][2] % 4 + 1
@@ -549,23 +553,7 @@ return {
 
 				table.insert(gfNotes[noteType], {time = noteTime})
 			end
-		end
-
-		for i = 1, 4 do
-			local offset = 0
-
-			for j = 2, #gfNotes[i] do
-				local index = j - offset
-
-				if gfNotes[i][index].time == gfNotes[i][index - 1].time then
-					table.remove(gfNotes[i], index)
-
-					offset = offset + 1
-				end
-			end
-
-			table.sort(gfNotes[i], function(a, b) return a.time < b.time end)
-		end
+		end ]]
 	end,
 
 	-- Gross countdown script
@@ -737,13 +725,14 @@ return {
 						end
 					elseif type(event.value) == "table" then
 						local point = camera:getPoint(event.value.char == 0 and "boyfriend" or "enemy")
+						event.value.ease = event.value.ease or "CLASSIC"
 						if event.value.ease ~= "INSTANT" then
 							Timer.tween(
 								(event.value.duration or 4)/10,
 								camera,
 								{
-									x = point.x + event.value.x,
-									y = point.y + event.value.y
+									x = point.x + (event.value.x or 0),
+									y = point.y + (event.value.y or 0)
 								},
 								easingTypes[event.value.ease or "CLASSIC"]
 							)
@@ -883,8 +872,6 @@ return {
 				if (boyfriendNote[1].time - musicTime <= -200) then
 					if voicesBF then voicesBF:setVolume(0) end
 
-					notMissed[noteNum] = false
-
 					if boyfriendNote[1]:getAnimName() ~= "hold" and boyfriendNote[1]:getAnimName() ~= "end" then 
 						health = health - 0.095
 						misses = misses + 1
@@ -975,8 +962,6 @@ return {
 								local notePos
 								local ratingAnim
 
-								notMissed[noteNum] = true
-
 								notePos = math.abs(boyfriendNote[j].time - musicTime)
 
 								if voicesBF then voicesBF:setVolume(1) end
@@ -1053,14 +1038,9 @@ return {
 				if not success then
 					audio.playSound(sounds.miss[love.math.random(3)])
 
-					notMissed[noteNum] = false
-
-					if combo >= 5 and girlfriend then girlfriend:animate("sad", false) end
-
 					if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
 
-					score = score - 10
-					combo = 0
+					score = math.max(0, score - 10)
 					health = health - 0.135
 					misses = misses + 1
 				end

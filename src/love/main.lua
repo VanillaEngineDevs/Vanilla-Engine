@@ -525,6 +525,15 @@ function love.load()
 				"Guns",
 				"Stress"
 			}
+		},
+		{
+			"Weekend 1",
+			{
+				"Darnell",
+				"Lit Up",
+				"2hot",
+				"Blazin'"
+			}
 		}
 	}
 

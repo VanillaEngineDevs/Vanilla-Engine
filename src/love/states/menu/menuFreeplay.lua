@@ -36,6 +36,7 @@ local function CreateWeek(weekIndex, hasErect)
                 (hasErect and {"nightmare", true} or nil)
             }
         }
+        print(hasErect)
 
         table.insert(week.songs, song)
     end
@@ -184,14 +185,14 @@ return {
                     0.7,
                     function()
                         songAppend = allWeeks[weekNum].songs[songNum].diffs[songDifficulty][1]
-                        isErect = allWeeks[weekNum].songs[songNum].diffs[songDifficulty][2]
+                        isErect = songDifficulty > 3 and allWeeks[weekNum].songs[songNum].diffs[songDifficulty][2] or false
                         _psychmod = false
     
                         storyMode = false
     
                         music:stop()
     
-                        Gamestate.switch(weekData[weekNum], songNum, songAppend, weekNum, isErect)
+                        Gamestate.switch(weekData[weekNum], songNum, songAppend, isErect)
     
                         status.setLoading(false)
                     end
