@@ -325,7 +325,7 @@ return {
 				if anim and anims then
 					return frameData[anims[anim].stop].width
 				else
-					return frameData[curFrame or 1].width
+					return frameData[self.curFrame or 1].width
 				end
 			end,
 
@@ -333,7 +333,7 @@ return {
 				if anim and anims then
 					return frameData[anims[anim].stop].height
 				else
-					return frameData[curFrame or 1].height
+					return frameData[self.curFrame or 1].height
 				end
 			end,
 
@@ -432,25 +432,19 @@ return {
 
 					local ox, oy = 0, 0
 
-					-- tbh idk why anyone would use this but its here
-					if self.align == "center" then
-						ox = width + anim.offsetX + self.offsetX
-						oy = height + anim.offsetY + self.offsetY
-					elseif self.align == "top left" then
-						ox = anim.offsetX + self.offsetX
-						oy = anim.offsetY + self.offsetY
-					elseif self.align == "top right" then
-						ox = frameData[self.curFrame].width - width + anim.offsetX + self.offsetX
-						oy = anim.offsetY + self.offsetY
-					elseif self.align == "bottom left" then
-						ox = anim.offsetX + self.offsetX
-						oy = frameData[self.curFrame].height - height + anim.offsetY + self.offsetY
-					elseif self.align == "bottom right" then
-						ox = frameData[self.curFrame].width - width + anim.offsetX + self.offsetX
-						oy = frameData[self.curFrame].height - height + anim.offsetY + self.offsetY
+					ox = width + anim.offsetX + self.offsetX
+					oy = height + anim.offsetY + self.offsetY
+
+					local frameHeight = self:getFrameWidth()
+					local frameWidth = self:getFrameHeight()
+
+					if frameData[self.curFrame].rotated then
+						x = x + frameHeight / 2
+						y = y + frameWidth / 2
 					end
 
 					if self.visible then
+						love.graphics.rotate((frameData[self.curFrame].rotated and -math.rad(90) or 0))
 						love.graphics.draw(
 							sheet,
 							frames[self.curFrame],
@@ -464,6 +458,7 @@ return {
 							self.shearX,
 							self.shearY
 						)
+						love.graphics.rotate((frameData[self.curFrame].rotated and math.rad(90) or 0))
 					end
 
 					if self.clipRect then 
