@@ -20,13 +20,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 local stageBack, stageFront, curtains
 
 return {
-	enter = function(self, from, songNum, songAppend)
+	enter = function(self, from, songNum, songAppend, isErect)
 		weeks:enter()
 
 		stages["stage"]:enter()
 
 		song = songNum
 		difficulty = songAppend
+		erectMode = isErect
 
 		enemyIcon:animate("dad", false)
 
@@ -38,14 +39,17 @@ return {
 		stages["stage"]:load()
 
 		if song == 3 then
-			inst = love.audio.newSource("songs/dadbattle/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/dadbattle/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/dadbattle/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/dadbattle/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/dadbattle/Voices-dad" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/fresh/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/fresh/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/fresh/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/fresh/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/fresh/Voices-dad" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 		else
-			inst = love.audio.newSource("songs/bopeebo/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/bopeebo/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/bopeebo/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/bopeebo/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/bopeebo/Voices-dad" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 		end
 
 		self:initUI()
@@ -55,23 +59,18 @@ return {
 
 	initUI = function(self)
 		weeks:initUI()
-
 		if song == 3 then
-			weeks:generateNotes("data/songs/dadbattle/dadbattle-chart.json", "data/songs/dadbattle/dadbattle-metadata.json", difficulty)
+			weeks:generateNotes("data/songs/dadbattle/dadbattle-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/dadbattle/dadbattle-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/fresh/fresh-chart.json", "data/songs/fresh/fresh-metadata.json", difficulty)
+			weeks:generateNotes("data/songs/fresh/fresh-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/fresh/fresh-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		else
-			weeks:generateNotes("data/songs/bopeebo/bopeebo-chart.json", "data/songs/bopeebo/bopeebo-metadata.json", difficulty)
+			weeks:generateNotes("data/songs/bopeebo/bopeebo-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/bopeebo/bopeebo-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		end
 	end,
 
 	update = function(self, dt)
 		weeks:update(dt)
 		stages["stage"]:update(dt)
-
-		if song == 1 and musicThres ~= oldMusicThres and math.fmod(absMusicTime + 500, 480000 / bpm) < 100 then
-			boyfriend:animate("hey", false)
-		end
 
 		weeks:checkSongOver()
 

@@ -450,6 +450,12 @@ function love.load()
 				"Bopeebo",
 				"Fresh",
 				"Dadbattle"
+			},
+			-- Erect remix's
+			{
+				"Bopeebo",
+				"Fresh",
+				"Dadbattle"
 			}
 		},
 		{
@@ -458,10 +464,18 @@ function love.load()
 				"Spookeez",
 				"South",
 				"Monster"
+			},
+			{
+				"Spookeez"
 			}
 		},
 		{
 			"Week 3",
+			{
+				"Pico",
+				"Philly Nice",
+				"Blammed"
+			},
 			{
 				"Pico",
 				"Philly Nice",
@@ -474,6 +488,9 @@ function love.load()
 				"Satin Panties",
 				"High",
 				"M.I.L.F"
+			},
+			{
+				"High"
 			}
 		},
 		{
@@ -482,6 +499,10 @@ function love.load()
 				"Cocoa",
 				"Eggnog",
 				"Winter Horrorland"
+			},
+			{
+				"Cocoa",
+				"Eggnog"
 			}
 		},
 		{
@@ -491,6 +512,11 @@ function love.load()
 				"Roses",
 				"Thorns"
 			},
+			{
+				"Senpai",
+				"Roses",
+				"Thorns"
+			}
 		},
 		{
 			"Week 7",

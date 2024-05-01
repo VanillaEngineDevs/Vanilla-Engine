@@ -12,8 +12,68 @@ local songNum
 local songNum, songAppend
 local songDifficulty = 2
 
-local difficultyStrs
 local ratingText
+
+local function CreateWeek(weekIndex, hasErect)
+    local week = {
+        name = weekMeta[weekIndex][1],
+        songs = {}
+    }
+
+    for i, songName in ipairs(weekMeta[weekIndex][2]) do
+        local hasErect = false
+        if weekMeta[weekIndex][3] then
+            hasErect = table.contains(weekMeta[weekIndex][3], songName)
+        end
+        local song = {
+            name = songName,
+            diffs = {
+                -- diffname, isErect
+                {"easy", false},
+                {"normal", false},
+                {"hard", false},
+                (hasErect and {"erect", true} or nil),
+                (hasErect and {"nightmare", true} or nil)
+            }
+        }
+
+        table.insert(week.songs, song)
+    end
+
+    return week
+end
+
+local allWeeks = {}
+
+local function calculateRatingText(accuracy)
+    if averageAccuracy >= 101 then
+        return "what"
+    elseif averageAccuracy >= 100 then
+        return "Perfect!"
+    elseif averageAccuracy >= 90 then
+        return "Marvelous!"
+    elseif averageAccuracy >= 70 then
+        return "Good!"
+    elseif averageAccuracy >= 69 then
+        return "Nice!"
+    elseif averageAccuracy >= 60 then
+        return "Okay"
+    elseif averageAccuracy >= 50 then
+        return "Meh..."
+    elseif averageAccuracy >= 40 then
+        return "Could be better..."
+    elseif averageAccuracy >= 30 then
+        return "It's an issue of skill."
+    elseif averageAccuracy >= 20 then
+        return "Bad."
+    elseif averageAccuracy >= 10 then
+        return "How."
+    elseif averageAccuracy >= 1 then
+        return "Bruh."
+    elseif averageAccuracy >= 0 then
+        return "???"
+    end
+end
 
 return {
     enter = function(self)
@@ -27,11 +87,6 @@ return {
 
         graphics:fadeInWipe(0.6)
 
-        difficultyStrs = {
-            "easy",
-            "normal",
-            "hard"
-        }
         songBefore = ""
         songAfter = ""
 
@@ -46,40 +101,13 @@ return {
         curSongScore = 0
         curSongAccuracy = 0
 
-        for i = 1, #weekMeta[weekNum][2] do
-            curWeekScore = 0
-            averageAccuracy = 0
-        end
         averageAccuracy = 0
-        if averageAccuracy >= 101 then
-            ratingText = "what"
-        elseif averageAccuracy >= 100 then
-            ratingText = "Perfect!!!"
-        elseif averageAccuracy >= 90 then
-            ratingText = "Marvelous!"
-        elseif averageAccuracy >= 70 then
-            ratingText = "Good!"
-        elseif averageAccuracy >= 69 then
-            ratingText = "Nice!"
-        elseif averageAccuracy >= 60 then
-            ratingText = "Okay"
-        elseif averageAccuracy >= 50 then
-            ratingText = "Meh..."
-        elseif averageAccuracy >= 40 then
-            ratingText = "Could be better..."
-        elseif averageAccuracy >= 30 then
-            ratingText = "It's an issue of skill."
-        elseif averageAccuracy >= 20 then
-            ratingText = "Bad."
-        elseif averageAccuracy >= 10 then
-            ratingText = "How."
-        elseif averageAccuracy >= 1 then
-            ratingText = "Bruh."
-        elseif averageAccuracy >= 0 then
-            ratingText = "???"
-        end
+        
         averageAccuracy = string.format("%.2f%%", averageAccuracy)
 
+        for i = 1, #weekMeta do
+            allWeeks[i] = CreateWeek(i)
+        end
     end,
     
     update = function(self, dt)
@@ -89,65 +117,17 @@ return {
                 if weekNum > #weekMeta then
                     weekNum = 1
                 end
-                curWeekScore = 0
-                averageAccuracy = 0
-                for i = 1, #weekMeta[weekNum][2] do
-                    if savedata[weekNum] then
-                        if savedata[weekNum][i] then
-                            local diff = difficultyStrs[songDifficulty] ~= "" and difficultyStrs[songDifficulty] or "normal"
-                            if savedata[weekNum][i][diff] then
-                                curWeekScore = curWeekScore + savedata[weekNum][i][diff]["score"]
-                                averageAccuracy = averageAccuracy + savedata[weekNum][i][diff]["accuracy"]
-                            end
-                        end
-                    end
+                if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
+                    songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
                 end
-                if averageAccuracy >= 101 then
-                    ratingText = "what"
-                elseif averageAccuracy >= 100 then
-                    ratingText = "Perfect!!!"
-                elseif averageAccuracy >= 90 then
-                    ratingText = "Marvelous!"
-                elseif averageAccuracy >= 70 then
-                    ratingText = "Good!"
-                elseif averageAccuracy >= 69 then
-                    ratingText = "Nice!"
-                elseif averageAccuracy >= 60 then
-                    ratingText = "Okay"
-                elseif averageAccuracy >= 50 then
-                    ratingText = "Meh..."
-                elseif averageAccuracy >= 40 then
-                    ratingText = "Could be better..."
-                elseif averageAccuracy >= 30 then
-                    ratingText = "It's an issue of skill."
-                elseif averageAccuracy >= 20 then
-                    ratingText = "Bad."
-                elseif averageAccuracy >= 10 then
-                    ratingText = "How."
-                elseif averageAccuracy >= 1 then
-                    ratingText = "Bruh."
-                elseif averageAccuracy >= 0 then
-                    ratingText = "???"
-                end
-                averageAccuracy = string.format("%.2f%%", averageAccuracy)
             elseif menuNum == 2 then
                 songNum = songNum + 1
-                if songNum > #weekMeta[weekNum][2] then
+                if songNum > #allWeeks[weekNum].songs then
                     songNum = 1
                 end
-                curSongAccuracy = 0
-                curSongScore = 0
-                if savedata[weekNum] then
-                    if savedata[weekNum][songNum] then
-                        local diff = difficultyStrs[songDifficulty] ~= "" and difficultyStrs[songDifficulty] or "normal"
-                        if savedata[weekNum][songNum][diff] then
-                            curSongScore = savedata[weekNum][songNum][diff]["score"]
-                            curSongAccuracy = savedata[weekNum][songNum][diff]["accuracy"]
-                        end
-                    end
+                if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
+                    songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
                 end
-
-                curSongAccuracy = string.format("%.2f%%", curSongAccuracy)
             end
             if menuNum ~= 1 then
                 songBefore = weekMeta[weekNum][2][songNum-1] or ""
@@ -160,70 +140,22 @@ return {
                 if weekNum < 1 then
                     weekNum = #weekMeta
                 end
-                curWeekScore = 0
-                averageAccuracy = 0
-                for i = 1, #weekMeta[weekNum][2] do
-                    if savedata[weekNum] then
-                        if savedata[weekNum][i] then
-                            local diff = difficultyStrs[songDifficulty] ~= "" and difficultyStrs[songDifficulty] or "normal"
-                            if savedata[weekNum][i][diff] then
-                                curWeekScore = curWeekScore + savedata[weekNum][i][diff]["score"]
-                                averageAccuracy = averageAccuracy + savedata[weekNum][i][diff]["accuracy"]
-                            end
-                        end
-                    end
+                print(songDifficulty, weekNum, songNum, tostring(allWeeks[weekNum].songs[songNum].diffs))
+                if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
+                    songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
                 end
-                if averageAccuracy >= 101 then
-                    ratingText = "what"
-                elseif averageAccuracy >= 100 then
-                    ratingText = "Perfect!!!"
-                elseif averageAccuracy >= 90 then
-                    ratingText = "Marvolous!"
-                elseif averageAccuracy >= 70 then
-                    ratingText = "Good!"
-                elseif averageAccuracy >= 69 then
-                    ratingText = "Nice!"
-                elseif averageAccuracy >= 60 then
-                    ratingText = "Okay"
-                elseif averageAccuracy >= 50 then
-                    ratingText = "Meh..."
-                elseif averageAccuracy >= 40 then
-                    ratingText = "Could be better..."
-                elseif averageAccuracy >= 30 then
-                    ratingText = "It's an issue of skill."
-                elseif averageAccuracy >= 20 then
-                    ratingText = "Bad."
-                elseif averageAccuracy >= 10 then
-                    ratingText = "How."
-                elseif averageAccuracy >= 1 then
-                    ratingText = "Bruh."
-                elseif averageAccuracy >= 0 then
-                    ratingText = "???"
-                end
-                averageAccuracy = string.format("%.2f%%", averageAccuracy)
             elseif menuNum == 2 then
                 songNum = songNum - 1
                 if songNum < 1 then
-                    songNum = #weekMeta[weekNum][2]
+                    songNum = #allWeeks[weekNum].songs
                 end
-
-                curSongAccuracy = 0
-                curSongScore = 0
-                if savedata[weekNum] then
-                    if savedata[weekNum][songNum] then
-                        local diff = difficultyStrs[songDifficulty] ~= "" and difficultyStrs[songDifficulty] or "normal"
-                        if savedata[weekNum][songNum][diff] then
-                            curSongScore = curSongScore + savedata[weekNum][songNum][diff]["score"]
-                            curSongAccuracy = curSongAccuracy + savedata[weekNum][songNum][diff]["accuracy"]
-                        end
-                    end
+                if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
+                    songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
                 end
-
-                curSongAccuracy = string.format("%.2f%%", curSongAccuracy)
             elseif menuNum == 3 then
                 songDifficulty = songDifficulty - 1
                 if songDifficulty < 1 then
-                    songDifficulty = 3
+                    songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
                 end
             end
             if menuNum ~= 1 then
@@ -234,87 +166,15 @@ return {
         elseif input:pressed("left") then
             songDifficulty = songDifficulty - 1 
             if songDifficulty < 1 then
-                songDifficulty = 3
+                songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
             end
             audio.playSound(selectSound)
-            curWeekScore = 0
-            averageAccuracy = 0
-            ratingText = "???"
-            for i = 1, #weekMeta[weekNum][2] do
-                curWeekScore = 0
-                averageAccuracy = 0
-            end
-            averageAccuracy = 0
-            if averageAccuracy >= 101 then
-                ratingText = "what"
-            elseif averageAccuracy >= 100 then
-                ratingText = "Perfect!!!"
-            elseif averageAccuracy >= 90 then
-                ratingText = "Marvelous!"
-            elseif averageAccuracy >= 70 then
-                ratingText = "Good!"
-            elseif averageAccuracy >= 69 then
-                ratingText = "Nice!"
-            elseif averageAccuracy >= 60 then
-                ratingText = "Okay"
-            elseif averageAccuracy >= 50 then
-                ratingText = "Meh..."
-            elseif averageAccuracy >= 40 then
-                ratingText = "Could be better..."
-            elseif averageAccuracy >= 30 then
-                ratingText = "It's an issue of skill."
-            elseif averageAccuracy >= 20 then
-                ratingText = "Bad."
-            elseif averageAccuracy >= 10 then
-                ratingText = "How."
-            elseif averageAccuracy >= 1 then
-                ratingText = "Bruh."
-            elseif averageAccuracy >= 0 then
-                ratingText = "???"
-            end
-            averageAccuracy = string.format("%.2f%%", averageAccuracy)
         elseif input:pressed("right") then
             songDifficulty = songDifficulty + 1
-            if songDifficulty > 3 then
+            if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
                 songDifficulty = 1
             end
             audio.playSound(selectSound)
-            curWeekScore = 0
-            averageAccuracy = 0
-            ratingText = "???"
-            for i = 1, #weekMeta[weekNum][2] do
-                curWeekScore = 0
-                averageAccuracy = 0
-            end
-            averageAccuracy = 0
-            if averageAccuracy >= 101 then
-                ratingText = "what"
-            elseif averageAccuracy >= 100 then
-                ratingText = "Perfect!!!"
-            elseif averageAccuracy >= 90 then
-                ratingText = "Marvelous!"
-            elseif averageAccuracy >= 70 then
-                ratingText = "Good!"
-            elseif averageAccuracy >= 69 then
-                ratingText = "Nice!"
-            elseif averageAccuracy >= 60 then
-                ratingText = "Okay"
-            elseif averageAccuracy >= 50 then
-                ratingText = "Meh..."
-            elseif averageAccuracy >= 40 then
-                ratingText = "Could be better..."
-            elseif averageAccuracy >= 30 then
-                ratingText = "It's an issue of skill."
-            elseif averageAccuracy >= 20 then
-                ratingText = "Bad."
-            elseif averageAccuracy >= 10 then
-                ratingText = "How."
-            elseif averageAccuracy >= 1 then
-                ratingText = "Bruh."
-            elseif averageAccuracy >= 0 then
-                ratingText = "???"
-            end
-            averageAccuracy = string.format("%.2f%%", averageAccuracy)
         elseif input:pressed("confirm") then
             if menuNum == 1 then songNum = 1 end
             if menuNum == 2 then
@@ -323,14 +183,15 @@ return {
                 graphics:fadeOutWipe(
                     0.7,
                     function()
-                        songAppend = difficultyStrs[songDifficulty]
+                        songAppend = allWeeks[weekNum].songs[songNum].diffs[songDifficulty][1]
+                        isErect = allWeeks[weekNum].songs[songNum].diffs[songDifficulty][2]
                         _psychmod = false
     
                         storyMode = false
     
                         music:stop()
     
-                        Gamestate.switch(weekData[weekNum], songNum, songAppend, weekNum)
+                        Gamestate.switch(weekData[weekNum], songNum, songAppend, weekNum, isErect)
     
                         status.setLoading(false)
                     end
@@ -341,16 +202,6 @@ return {
 
                 curSongAccuracy = 0
                 curSongScore = 0
-
-                if savedata[weekNum] then
-                    if savedata[weekNum][songNum] then
-                        local diff = difficultyStrs[songDifficulty] ~= "" and difficultyStrs[songDifficulty] or "normal"
-                        if savedata[weekNum][songNum][diff] then
-                            curSongScore = savedata[weekNum][songNum][diff].score
-                            curSongAccuracy = savedata[weekNum][songNum][diff].accuracy
-                        end
-                    end
-                end
 
                 curSongAccuracy = string.format("%.2f%%", curSongAccuracy)
             end
@@ -390,34 +241,19 @@ return {
                 love.graphics.setFont(weekFont)
                 graphics.setColor(1,1,1,1)
                 uitextf(weekMeta[weekNum][1] or "", -55, -18, 600, "center")
-                love.graphics.setFont(weekFontSmall)
-                uitextf(curWeekScore, -545, 50, 600, "center")
-                uitextf(averageAccuracy, -825, 50, 600, "center")
-                uitextf(ratingText, -675, 195, 600, "center")
             else
                 songStats:draw()
-                graphics.setColor(141/255, 130/255, 123/255)
-                love.graphics.setFont(weekFontSmall)
-                love.graphics.printf(songBefore, 60, -72, 600, "center")
-
+                
                 graphics.setColor(1,1,1,1)
                 love.graphics.setFont(weekFont)
-                love.graphics.printf(weekMeta[weekNum][2][songNum], 65, -18, 600, "center")
-
-                graphics.setColor(141/255, 130/255, 123/255)
-                love.graphics.setFont(weekFontSmall)
-                love.graphics.printf(songAfter, 60, 72, 600, "center")
-
-                love.graphics.setFont(weekFontSmall)
-                uitextf(curSongScore, -545, 50, 600, "center")
-                uitextf(curSongAccuracy, -825, 50, 600, "center")
+                love.graphics.printf(allWeeks[weekNum].songs[songNum].name, 65, -18, 600, "center")
 
                 graphics.setColor(1,1,1,1)
             end
             --if menuNum == 1 then weekStats:draw() else songStats:draw() end
             love.graphics.setFont(weekFont)
             -- make the current dificulties first letter uppercase
-            local difficultyStr = difficultyStrs[songDifficulty]
+            local difficultyStr = allWeeks[weekNum].songs[songNum].diffs[songDifficulty][1]
             if difficultyStr == "" then 
                 difficultyStr = "Normal"
             else

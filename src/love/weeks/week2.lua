@@ -20,13 +20,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 local hauntedHouse
 
 return {
-	enter = function(self, from, songNum, songAppend)
+	enter = function(self, from, songNum, songAppend, isErect)
 		weeks:enter()
 
 		stages["hauntedHouse"]:enter()
 
 		song = songNum
 		difficulty = songAppend
+		erectMode = isErect
 
 		camera.zoom = 1.1
 		camera.defaultZoom = 1.1
@@ -52,14 +53,17 @@ return {
 
 			enemyIcon:animate("monster", false)
 
-			inst = love.audio.newSource("songs/monster/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/monster/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/monster/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/monster/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/monster/Voices-monster" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/south/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/south/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/south/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/south/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/south/Voices-spooky" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 		else
-			inst = love.audio.newSource("songs/spookeez/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/spookeez/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/spookeez/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/spookeez/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/spookeez/Voices-spooky" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 		end
 
 		self:initUI()
@@ -71,11 +75,11 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/monster/monster" .. difficulty .. ".json")
+			weeks:generateNotes("data/songs/monster/monster-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/monster/monster-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		elseif song == 2 then
-			weeks:generateNotes("data/south/south" .. difficulty .. ".json")
+			weeks:generateNotes("data/songs/south/south-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/south/south-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		else
-			weeks:generateNotes("data/spookeez/spookeez" .. difficulty .. ".json")
+			weeks:generateNotes("data/songs/spookeez/spookeez-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/spookeez/spookeez-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		end
 	end,
 

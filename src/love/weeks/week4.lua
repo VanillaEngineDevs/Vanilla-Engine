@@ -22,13 +22,14 @@ local sunset
 local bgLimo, limoDancer, limo
 
 return {
-	enter = function(self, from, songNum, songAppend)
+	enter = function(self, from, songNum, songAppend, isErect)
 		weeks:enter()
 
 		stages["sunset"]:enter()
 
 		song = songNum
 		difficulty = songAppend
+		erectMode = isErect
 
 		enemyIcon:animate("mommy mearest", false)
 
@@ -40,14 +41,17 @@ return {
 		stages["sunset"]:load()
 
 		if song == 3 then
-			inst = love.audio.newSource("songs/milf/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/milf/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/milf/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/milf/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/milf/Voices-mom" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/high/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/high/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/high/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/high/Voices-bf" .. (erectMode and "-car-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/high/Voices-mom" .. (erectMode and "-car-erect" or "") .. ".ogg", "stream")
 		else
-			inst = love.audio.newSource("songs/satin-panties/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/satin-panties/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/satin-panties/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/satin-panties/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/satin-panties/Voices-mom" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 		end
 
 		self:initUI()
@@ -59,11 +63,11 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/milf/milf" .. difficulty .. ".json")
+			weeks:generateNotes("data/songs/milf/milf-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/milf/milf-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		elseif song == 2 then
-			weeks:generateNotes("data/high/high" .. difficulty .. ".json")
+			weeks:generateNotes("data/songs/high/high-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/high/high-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		else
-			weeks:generateNotes("data/satin-panties/satin-panties" .. difficulty .. ".json")
+			weeks:generateNotes("data/songs/satin-panties/satin-panties-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/satin-panties/satin-panties-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		end
 	end,
 

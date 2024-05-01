@@ -28,14 +28,6 @@ return {
 			end
 		end
 
-		function logoRotate()
-			Timer.tween(2, logo, {orientation = 0.15}, "in-out-back", function()
-				Timer.tween(2, logo, {orientation = -0.15}, "in-out-back", function()
-					logoRotate()
-				end)
-			end)
-		end
-
 		transparency = {0}
 		Timer.tween(
 			1,
@@ -70,7 +62,6 @@ return {
 		logo.x, logo.y = -350, -300
 
 		tweenMenu()
-		logoRotate()
 
 		songNum = 0
 

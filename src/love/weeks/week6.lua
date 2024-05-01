@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return {
-	enter = function(self, from, songNum, songAppend)
+	enter = function(self, from, songNum, songAppend, isErect)
 		love.graphics.setDefaultFilter("nearest")
 		weeks:enter("pixel")
 
@@ -38,6 +38,7 @@ return {
 
 		song = songNum
 		difficulty = songAppend
+		hasErect = isErect
 
 		self:load()
 
@@ -63,14 +64,17 @@ return {
 		end
 
 		if song == 3 then
-			inst = love.audio.newSource("songs/thorns/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/thorns/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/thorns/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/thorns/Voices-bf" .. (hasErect and "-pixel-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/thorns/Voices-spirit" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/roses/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/roses/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/roses/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/roses/Voices-bf" .. (hasErect and "-pixel-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/roses/Voices-senpai-angry" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
 		else
-			inst = love.audio.newSource("songs/senpai/Inst.ogg", "stream")
-			voices = love.audio.newSource("songs/senpai/Voices.ogg", "stream")
+			inst = love.audio.newSource("songs/senpai/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/senpai/Voices-bf" .. (hasErect and "-pixel-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/senpai/Voices-senpai" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
 		end
 		enemy.x, enemy.y = -340, -20
 
@@ -81,9 +85,9 @@ return {
 		weeks:initUI("pixel")
 
 		if song == 3 then
-			weeks:generateNotes("data/thorns/thorns" .. difficulty .. ".json")
+			weeks:generateNotes("data/songs/thorns/thorns-chart" .. (hasErect and "-erect" or "") .. ".json", "data/songs/thorns/thorns-metadata" .. (hasErect and "-erect" or "") .. ".json", difficulty)
 			if storyMode and not died then
-				dialogue.set("data/thorns/thornsDialogue.txt")
+				dialogue.set("data/songs/thorns/thornsDialogue.txt")
 				dialogue.addSpeaker("dad", graphics.newImage(graphics.imagePath("week6/spiritFaceForward")), 400, 250, 6, 6, false)
 				dialogue.setSpeakerBox("dad", love.filesystem.load("sprites/week6/scaryDialogueBox.lua")(), 650, 375, 6, 6, true, false)
 
@@ -101,9 +105,9 @@ return {
 				weeks:setupCountdown()
 			end
 		elseif song == 2 then
-			weeks:generateNotes("data/roses/roses" .. difficulty .. ".json")
+			weeks:generateNotes("data/songs/roses/roses-chart" .. (hasErect and "-erect" or "") .. ".json", "data/songs/roses/roses-metadata" .. (hasErect and "-erect" or "") .. ".json", difficulty)
 			if storyMode and not died then
-				dialogue.set("data/roses/rosesDialogue.txt")
+				dialogue.set("data/songs/roses/rosesDialogue.txt")
 				dialogue.addSpeaker("dad", love.filesystem.load("sprites/week6/angrySenpaiBox.lua")(), 650, 375, 6, 6, true, false)
 				dialogue.removeSpeakerBox("dad")
 
@@ -121,9 +125,9 @@ return {
 				weeks:setupCountdown()
 			end
 		else
-			weeks:generateNotes("data/senpai/senpai" .. difficulty .. ".json")
+			weeks:generateNotes("data/songs/senpai/senpai-chart" .. (hasErect and "-erect" or "") .. ".json", "data/songs/senpai/senpai-metadata" .. (hasErect and "-erect" or "") .. ".json", difficulty)
 			if storyMode and not died then
-				dialogue.set("data/senpai/senpaiDialogue.txt")
+				dialogue.set("data/songs/senpai/senpaiDialogue.txt")
 
 				dialogue.addSpeaker("dad", love.filesystem.load("sprites/week6/senpaiPortrait.lua")(), 650, 375, 6, 6, true)
 				dialogue.setSpeakerBox("dad", love.filesystem.load("sprites/week6/dialogueBox.lua")(), 650, 375, 6, 6, true)

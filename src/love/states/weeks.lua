@@ -35,6 +35,12 @@ local noteList = {
 	"up",
 	"right"
 }
+
+local easingTypes = {
+	["CLASSIC"] = "out-quad",
+	["expoOut"] = "out-expo"
+}
+
 local arrowAngles = {math.rad(180), math.rad(90), math.rad(270), math.rad(0)}
 if settings.downscroll then
 	-- ezezezezezezezezezezezezez workaround lol
@@ -317,7 +323,7 @@ return {
 	checkSongOver = function(self)
 		--if not (countingDown or graphics.isFading()) and not (inst and inst:isPlaying()) and not paused and not inCutscene then
 		-- use inst, if inst doesn't exist, use voices, else dont use anything
-		if not (countingDown or graphics.isFading()) and not ((inst and inst:isPlaying()) or (voices and voices:isPlaying())) and not paused and not inCutscene then
+		if not (countingDown or graphics.isFading()) and not ((inst and inst:isPlaying()) or (voicesBF and voicesBF:isPlaying())) and not paused and not inCutscene then
 			if storyMode and song < #weekMeta[weekNum][2] then
 				self:saveData()
 				song = song + 1
@@ -609,7 +615,8 @@ return {
 										beatHandler.reset(0)
 
 										if inst then inst:play() end
-										if voices then voices:play() end
+										if voicesBF then voicesBF:play() end
+										if voicesEnemy then voicesEnemy:play() end
 									end
 								)
 							end
@@ -627,7 +634,8 @@ return {
 				pauseTime = musicTime
 				if paused then 
 					if inst then inst:pause() end
-					if voices then voices:pause() end
+					if voicesBF then voicesBF:pause() end
+					if voicesEnemy then voicesEnemy:pause() end
 					love.audio.play(sounds.breakfast)
 					sounds.breakfast:setLooping(true) 
 				end
@@ -656,7 +664,8 @@ return {
 				love.audio.stop(sounds.breakfast) -- since theres only 3 options, we can make the sound stop without an else statement
 				if pauseMenuSelection == 1 then
 					if inst then inst:play() end
-					if voices then voices:play() end
+					if voicesBF then voicesBF:play() end
+					if voicesEnemy then voicesEnemy:play() end
 					paused = false 
 				elseif pauseMenuSelection == 2 then
 					pauseRestart = true
@@ -664,7 +673,8 @@ return {
 				elseif pauseMenuSelection == 3 then
 					paused = false
 					if inst then inst:stop() end
-					if voices then voices:play() end
+					if voicesBF then voicesBF:play() end
+					if voicesEnemy then voicesEnemy:play() end
 					storyMode = false
 					quitPressed = true
 				end
@@ -680,7 +690,7 @@ return {
 		else
 			if not graphics.isFading() then
 				local time = love.timer.getTime()
-				local seconds = voices and voices:tell("seconds") or inst:tell("seconds")
+				local seconds = voicesBF and voicesBF:tell("seconds") or inst:tell("seconds")
 
 				musicTime = musicTime + (time * 1000) - previousFrameTime
 				previousFrameTime = time * 1000
@@ -716,20 +726,51 @@ return {
 			end
 		end
 
-		--[[ for i = 1, #songEvents do
-			
-		end ]]
 		for i, event in ipairs(songEvents) do
 			if event.time <= absMusicTime then
 				if event.name == "FocusCamera" then
-					if event.value == 0 then -- Boyfriend
-						camera:moveToPoint(1.25, "boyfriend")
-					elseif event.value == 1 then -- Enemy
-						camera:moveToPoint(1.25, "enemy")
+					if type(event.value) == "number" then
+						if event.value == 0 then -- Boyfriend
+							camera:moveToPoint(1.25, "boyfriend")
+						elseif event.value == 1 then -- Enemy
+							camera:moveToPoint(1.25, "enemy")
+						end
+					elseif type(event.value) == "table" then
+						local point = camera:getPoint(event.value.char == 0 and "boyfriend" or "enemy")
+						Timer.tween(
+							(event.value.duration or 4)/10,
+							camera,
+							{
+								x = point.x + event.value.x,
+								y = point.y + event.value.y
+							},
+							easingTypes[event.value.ease or "CLASSIC"]
+						)
 					end
 				elseif event.name == "PlayAnimation" then
 					if event.value.target == "bf" then
 						boyfriend:animate(event.value.anim, false)
+					end
+				elseif event.name == "ZoomCamera" then
+					if type(event.value) == "number" then
+						camera.zoom = event.value
+						uiScale.zoom = event.value
+					elseif type(event.value) == "table" then
+						if event.value.mode == "stage" then
+							Timer.tween(
+								(event.value.duration or 4)/10,
+								camera,
+								{defaultZoom = event.value.zoom or 1},
+								easingTypes[event.value.ease or "CLASSIC"]
+							)
+						end
+					end
+				elseif event.name == "SetCameraBop" then
+					if type(event.value) == "number" then
+						camera.camBopIntensity = event.value
+					elseif type(event.value) == "table" then
+						camera.camBopIntensity = event.value.intensity or 1
+						camera.camBopInterval = event.value.rate or 4
 					end
 				end
 
@@ -790,8 +831,6 @@ return {
 
 			if #enemyNote > 0 then
 				if (enemyNote[1].time - musicTime <= 0) then
-					if voices then voices:setVolume(1) end
-
 					enemyArrow:animate(noteList[enemyNote[1].col] .. " confirm", false)
 					if enemyNote[1]:getAnimName() ~= "hold" and enemyNote[1]:getAnimName() ~= "end" then
 						enemyArrow.orientation = enemyArrow.orientation - arrowAngles[enemyNote[1].col]
@@ -833,7 +872,7 @@ return {
 
 			if #boyfriendNote > 0 then
 				if (boyfriendNote[1].time - musicTime <= -200) then
-					if voices then voices:setVolume(0) end
+					if voicesBF then voicesBF:setVolume(0) end
 
 					notMissed[noteNum] = false
 
@@ -857,7 +896,7 @@ return {
 			if settings.botPlay then 
 				if #boyfriendNote > 0 then
 					if (boyfriendNote[1].time - musicTime <= 0) then
-						if voices then voices:setVolume(1) end
+						if voicesBF then voicesBF:setVolume(1) end
 
 						boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
 						boyfriendArrow.orientation = boyfriendArrow.orientation - arrowAngles[boyfriendNote[1].col]
@@ -931,7 +970,7 @@ return {
 
 								notePos = math.abs(boyfriendNote[j].time - musicTime)
 
-								if voices then voices:setVolume(1) end
+								if voicesBF then voicesBF:setVolume(1) end
 
 								if boyfriend then boyfriend.lastHit = musicTime end
 
@@ -1019,7 +1058,7 @@ return {
 			end
 
 			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].y <= boyfriendArrow.y)) and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
-				if voices then voices:setVolume(1) end
+				if voicesBF then voicesBF:setVolume(1) end
 
 				boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
 
@@ -1367,7 +1406,8 @@ return {
 
 	leave = function(self)
 		if inst then inst:stop() end
-		if voices then voices:stop() end
+		if voicesBF then voicesBF:stop() end
+		if voicesEnemy then voicesEnemy:stop() end
 
 		playMenuMusic = true
 

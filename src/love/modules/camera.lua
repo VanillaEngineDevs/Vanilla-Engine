@@ -85,4 +85,8 @@ function camera:drawPoint(name)
     love.graphics.print(name, -camera.points[name].x, -camera.points[name].y + 10)
 end
 
+function camera:getPoint(name)
+    return camera.points[name]
+end
+
 return camera
