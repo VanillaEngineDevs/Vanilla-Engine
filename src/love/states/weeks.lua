@@ -400,9 +400,6 @@ return {
 			enemyArrows[i].y = -400
 			boyfriendArrows[i].y = -400
 
-			boyfriendArrows[i].orientation = 0
-			enemyArrows[i].orientation = 0
-
 			boyfriendArrows[i]:animate(noteList[i])
 			enemyArrows[i]:animate(noteList[i])
 
@@ -751,7 +748,7 @@ return {
 						uiScale.zoom = event.value
 					elseif type(event.value) == "table" then
 						if event.value.mode == "stage" then
-							if evemt.value.ease ~= "INSTANT" then
+							if event.value.ease ~= "INSTANT" then
 								Timer.tween(
 									(event.value.duration or 4)/10,
 									camera,
@@ -818,22 +815,16 @@ return {
 
 			if not enemyArrow:isAnimated() then
 				enemyArrow:animate(noteList[i], false)
-				enemyArrow.orientation = 0
 			end
 			if settings.botPlay then
 				if not boyfriendArrow:isAnimated() then
 					boyfriendArrow:animate(noteList[i], false)
-					boyfriendArrow.orientation = 0
 				end
 			end
 
 			if #enemyNote > 0 then
 				if (enemyNote[1].time - musicTime <= 0) then
-					enemyArrow:animate(noteList[enemyNote[1].col] .. " confirm", false)
-					if enemyNote[1]:getAnimName() ~= "hold" and enemyNote[1]:getAnimName() ~= "end" then
-						enemyArrow.orientation = enemyArrow.orientation - arrowAngles[enemyNote[1].col]
-						enemyArrow.orientation = enemyArrow.orientation + arrowAngles[i]
-					end
+					enemyArrow:animate(noteList[i] .. " confirm", false)
 
 					local whohit = enemy
 					if enemyNote[1].ver == "GF Sing" then
@@ -894,9 +885,7 @@ return {
 					if (boyfriendNote[1].time - musicTime <= 0) then
 						if voicesBF then voicesBF:setVolume(1) end
 
-						boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
-						boyfriendArrow.orientation = boyfriendArrow.orientation - arrowAngles[boyfriendNote[1].col]
-						boyfriendArrow.orientation = boyfriendArrow.orientation + arrowAngles[i]
+						boyfriendArrow:animate(noteList[i] .. " confirm", false)
 
 						if boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end" then
 							if boyfriend and boyfriend.holdTimer >= boyfriend.maxHoldTimer then boyfriend:animate(curAnim, false) end
@@ -953,7 +942,6 @@ return {
 				end
 
 				boyfriendArrow:animate(noteList[i] .. " press", false)
-				boyfriendArrow.orientation = 0
 
 				if #boyfriendNote > 0 then
 					for j = 1, #boyfriendNote do
@@ -1010,9 +998,7 @@ return {
 								ratingTimers[5] = Timer.tween(2, numbers[3], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
 
 								if not settings.ghostTapping or success then
-									boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
-									boyfriendArrow.orientation = boyfriendArrow.orientation - arrowAngles[boyfriendNote[1].col]
-									boyfriendArrow.orientation = boyfriendArrow.orientation + arrowAngles[i]
+									boyfriendArrow:animate(noteList[i] .. " confirm", false)
 
 									if boyfriend then boyfriend:animate(curAnim, false) end
 
@@ -1049,13 +1035,7 @@ return {
 			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].y <= boyfriendArrow.y)) and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
 				if voicesBF then voicesBF:setVolume(1) end
 
-				boyfriendArrow:animate(noteList[boyfriendNote[1].col] .. " confirm", false)
-
-				if boyfriendArrow.orientation == 0 then 
-					boyfriendArrow.orientation = boyfriendArrow.orientation - arrowAngles[boyfriendNote[1].col]
-					boyfriendArrow.orientation = boyfriendArrow.orientation + arrowAngles[i]
-				end
-
+				boyfriendArrow:animate(noteList[i] .. " confirm", false)
 				health = health + 0.0125
 
 				if boyfriend and boyfriend.holdTimer > boyfriend.maxHoldTimer then
@@ -1067,7 +1047,6 @@ return {
 
 			if input:released(curInput) then
 				boyfriendArrow:animate(noteList[i], false)
-				boyfriendArrow.orientation = 0
 			end
 		end
 

@@ -46,9 +46,9 @@ return {
 			voicesBF = love.audio.newSource("songs/blammed/Voices-bf" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/blammed/Voices-pico" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/philly/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/philly/Voices-bf" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/philly/Voices-pico" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/philly-nice/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/philly-nice/Voices-bf" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/philly-nice/Voices-pico" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
 		else
 			inst = love.audio.newSource("songs/pico/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
 			voicesBF = love.audio.newSource("songs/pico/Voices-bf" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
@@ -66,7 +66,7 @@ return {
 		if song == 3 then
 			weeks:generateNotes("data/songs/blammed/blammed-chart" .. (hasErect and "-erect" or "") .. ".json", "data/songs/blammed/blammed-metadata" .. (hasErect and "-erect" or "") .. ".json", difficulty)
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/philly/philly-chart" .. (hasErect and "-erect" or "") .. ".json", "data/songs/philly/philly-metadata" .. (hasErect and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/philly-nice/philly-nice-chart" .. (hasErect and "-erect" or "") .. ".json", "data/songs/philly-nice/philly-nice-metadata" .. (hasErect and "-erect" or "") .. ".json", difficulty)
 		else
 			weeks:generateNotes("data/songs/pico/pico-chart" .. (hasErect and "-erect" or "") .. ".json", "data/songs/pico/pico-metadata" .. (hasErect and "-erect" or "") .. ".json", difficulty)
 		end

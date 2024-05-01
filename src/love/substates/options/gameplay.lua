@@ -39,15 +39,6 @@ function gameplay:enter()
         )
     )
 
-    self:addOption(
-        Option:new(
-            "Colour by Quantization",
-            "If checked, the notes will be coloured by quantization",
-            settings.colourByQuantization,
-            "bool"
-        )
-    )
-
     local o = Option:new(
         "Scrollspeed",
         "How fast the notes scroll, 1 is the default song speed",
@@ -84,7 +75,6 @@ function gameplay:leave()
     settings.middleScroll = self.optionsArray[2]:getValue()
     settings.ghostTapping = self.optionsArray[3]:getValue()
     settings.botPlay = self.optionsArray[4]:getValue()
-    settings.colourByQuantization = self.optionsArray[5]:getValue()
     settings.customScrollSpeed = self.optionsArray[6]:getValue()
     settings.scrollUnderlayTrans = self.optionsArray[7]:getValue()
     

@@ -131,7 +131,6 @@ function saveSettings(menu)
             hitsoundVol = settings.hitsoundVol,
             noteSkins = settings.noteSkins,
             flashinglights = settings.flashinglights,
-			colourByQuantization = settings.colourByQuantization,
             window = settings.window,
 			fpsCap = settings.fpsCap,
             customBindDown = customBindDown,
@@ -172,7 +171,6 @@ function saveSettings(menu)
             hitsoundVol = settings.hitsoundVol,
             noteSkins = settings.noteSkins,
             flashinglights = settings.flashinglights,
-			colourByQuantization = settings.colourByQuantization,
 			window = settings.window,
 			fpsCap = settings.fpsCap,
 
@@ -273,7 +271,6 @@ function love.load()
 			customBindUp = customBindUp,
 			customBindLeft = customBindLeft,
 			customBindRight = customBindRight,
-			colourByQuantization = settings.colourByQuantization,
 			window = settings.window,
 			fpsCap = settings.fpsCap,
 			settingsVer = settingsVer
@@ -300,7 +297,6 @@ function love.load()
 		settings.customScrollSpeed = 1
 		settings.keystrokes = false
 		settings.scrollUnderlayTrans = 0
-		settings.colourByQuantization = false
 		settings.window = false
 		settings.fpsCap = 60
 		--settings.noteSkins = 1
@@ -326,7 +322,6 @@ function love.load()
 			customScrollSpeed = settings.customScrollSpeed,
 			keystrokes = settings.keystrokes,
 			scrollUnderlayTrans = settings.scrollUnderlayTrans,
-			colourByQuantization = settings.colourByQuantization,
 			fpsCap = settings.fpsCap,
 
 			customBindLeft = "a",
