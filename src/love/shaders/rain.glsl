@@ -1,3 +1,6 @@
+// ORIGINAL SHADER BY @shr_id ON TWITTER !! PORTED TO LOVE2D
+// https://twitter.com/ninja_muffin99/status/1786153051776041325 :3
+
 vec3 mod289(vec3 x) {
 	return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -218,12 +221,12 @@ vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords 
 		}
     }
 
-    vec4 color_ = Texel(texture, texture_coords).rgba;
+    vec4 color_ = Texel(texture, wpos * 0.5 + 0.5);
 
     vec3 rainColor = vec3(0.4, 0.5, 0.8);
     color_ += vec4(add, 0.0);
     /* color_ = mix(color_, rainColor, 0.1 * rainSum); */
-    color_ = mix(color_, vec4(rainColor, 1.0), 0.1 * rainSum);
+    color_ = mix(color_, vec4(rainColor, 0.0), 0.1 * rainSum);
 
     return vec4(color_);
 }

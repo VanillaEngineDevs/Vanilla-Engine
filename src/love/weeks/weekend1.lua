@@ -35,7 +35,7 @@ return {
 
 		enemyIcon:animate("dad", false)
 
-		gameCanvas = love.graphics.newCanvas(1280, 720)
+		gameCanvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
 
 		shaders["rain"]:send("uScale", 0.0075)
 		--[[ shaders["rain"]:send("uIntensity", 0.1) ]]
@@ -105,16 +105,24 @@ return {
 	end,
 
 	draw = function(self)
-		love.graphics.setShader(shaders["rain"])
+		
+		love.graphics.setCanvas(gameCanvas)
 		love.graphics.push()
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
 			stages["streets"]:draw()
 		love.graphics.pop()
-		love.graphics.setShader()
+		love.graphics.setCanvas()
 
-		weeks:drawUI()
+		love.graphics.setShader(shaders["rain"])
+		love.graphics.draw(gameCanvas, 0, 0, 0, love.graphics.getWidth() / 1280, love.graphics.getHeight() / 720)
+		love.graphics.setShader()
+		
+		love.graphics.push() -- canvas' fuck with the game so we need to do this lol
+			love.graphics.scale(love.graphics.getWidth() / 1280, love.graphics.getHeight() / 720)
+			weeks:drawUI()
+		love.graphics.pop()
 	end,
 
 	leave = function(self)
