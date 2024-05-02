@@ -1,25 +1,27 @@
---[[----------------------------------------------------------------------------
-This file is part of Friday Night Funkin' Rewritten
-
-Copyright (C) 2021  HTV04
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-------------------------------------------------------------------------------]]
-
 local stageBack, stageFront, curtains
 
 local gameCanvas, intensity
+
+--[[ 
+-- unable to add due to sprite atlas not being implemented :(
+WEEKEND1_STATE_ARCING = 2
+WEEKEND1_STATE_SHOT = 3
+WEEKEND1_STATE_IMPACTED = 4
+WEEKEND1_spawnedCans = {}
+WEEKEND1_currentState = 1
+
+WEEKEND1_LOSS = 0.5
+
+function WEEKEND1_getNextCanWithState(state)
+	for i = 1, #WEEKEND1_spawnedCans do
+		local can = WEEKEND1_spawnedCans[i]
+		local canState = WEEKEND1_currentState
+
+		if canState == state then
+			return can
+		end
+	end
+end ]]
 
 return {
 	enter = function(self, from, songNum, songAppend, isErect)
@@ -38,7 +40,6 @@ return {
 		shaders["rain"]:send("uScale", 0.0075)
 		--[[ shaders["rain"]:send("uIntensity", 0.1) ]]
 		intensity = 0
-		
 
 		self:load()
 	end,
@@ -47,7 +48,13 @@ return {
 		weeks:load()
 		stages["streets"]:load()
 
-		if song == 3 then
+		if song == 4 then
+			inst = love.audio.newSource("songs/blazin/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = nil
+			voicesEnemy = nil
+			rainShaderStartIntensity = 0.2
+			rainShaderEndIntensity = 0.4
+		elseif song == 3 then
 			inst = love.audio.newSource("songs/2hot/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 			voicesBF = love.audio.newSource("songs/2hot/Voices-pico" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/2hot/Voices-darnell" .. (erectMode and "-erect" or "") .. ".ogg", "stream")

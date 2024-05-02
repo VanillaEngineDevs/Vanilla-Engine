@@ -200,6 +200,7 @@ return {
 
 					love.graphics.print("X: " .. tostring(sprite.x - overlaySprite.x), 0, (#spriteAnims + 1) * 20)
 					love.graphics.print("Y: " .. tostring(sprite.y - overlaySprite.y), 0, (#spriteAnims + 2) * 20)
+					love.graphics.print("Frame: " .. tostring(overlaySprite:getFrameFromCurrentAnim()), 0, (#spriteAnims + 3) * 20)
 				end
 			else
 				for i = 1, #dirTable do

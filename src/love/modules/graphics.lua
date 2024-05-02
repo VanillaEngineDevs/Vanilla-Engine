@@ -337,6 +337,22 @@ return {
 				end
 			end,
 
+			getFrameNumber = function(self)
+				return math.floor(frame)
+			end,
+
+			getAnimStart = function(self)
+				return anim.start
+			end,
+
+			getAnimStop = function(self)
+				return anim.stop
+			end,
+
+			getFrameFromCurrentAnim = function(self)
+				return math.floor(frame - anim.start + 1)
+			end,
+
 			beat = function(self, beat)
 				local beat = math.floor(beat) or 0
 				if self.isCharacter then
@@ -379,7 +395,7 @@ return {
 			end,
 			
 			draw = function(self)
-				self.curFrame = math.floor(frame)
+				self.curFrame = math.floor(frame or 1)
 
 				if self.curFrame <= anim.stop then
 					local x = self.x
@@ -390,26 +406,6 @@ return {
 					if options and options.floored then
 						x = math.floor(x)
 						y = math.floor(y)
-					end
-
-					if options and options.noOffset then
-						if frameData[self.curFrame].offsetWidth ~= 0 then
-							width = frameData[self.curFrame].offsetX
-						end
-						if frameData[self.curFrame].offsetHeight ~= 0 then
-							height = frameData[self.curFrame].offsetY
-						end
-					else
-						if frameData[self.curFrame].offsetWidth == 0 then
-							width = math.floor(frameData[self.curFrame].width / 2)
-						else
-							width = math.floor(frameData[self.curFrame].offsetWidth / 2) + frameData[self.curFrame].offsetX
-						end
-						if frameData[self.curFrame].offsetHeight == 0 then
-							height = math.floor(frameData[self.curFrame].height / 2)
-						else
-							height = math.floor(frameData[self.curFrame].offsetHeight / 2) + frameData[self.curFrame].offsetY
-						end
 					end
 
 					if self.clipRect then 
@@ -432,33 +428,77 @@ return {
 
 					local ox, oy = 0, 0
 
-					ox = width + anim.offsetX + self.offsetX
-					oy = height + anim.offsetY + self.offsetY
+					if options and options.noOffset then
+						if frameData[self.curFrame].offsetWidth ~= 0 then
+							width = frameData[self.curFrame].offsetX
+						end
+						if frameData[self.curFrame].offsetHeight ~= 0 then
+							height = frameData[self.curFrame].offsetY
+						end
+					else
+						--[[ if frameData[self.curFrame].offsetWidth == 0 then
+							width = math.floor(frameData[self.curFrame].width / 2)
+						else
+							width = math.floor(frameData[self.curFrame].offsetWidth / 2) + frameData[self.curFrame].offsetX
+						end
+						if frameData[self.curFrame].offsetHeight == 0 then
+							height = math.floor(frameData[self.curFrame].height / 2)
+						else
+							height = math.floor(frameData[self.curFrame].offsetHeight / 2) + frameData[self.curFrame].offsetY
+						end ]]
+						if not frameData[self.curFrame].rotated then
+							if frameData[self.curFrame].offsetWidth == 0 then
+								width = math.floor(frameData[self.curFrame].width / 2)
+							else
+								width = math.floor(frameData[self.curFrame].offsetWidth / 2) + frameData[self.curFrame].offsetX
+							end
+							if frameData[self.curFrame].offsetHeight == 0 then
+								height = math.floor(frameData[self.curFrame].height / 2)
+							else
+								height = math.floor(frameData[self.curFrame].offsetHeight / 2) + frameData[self.curFrame].offsetY
+							end
+						else
+							if frameData[self.curFrame].offsetHeight == 0 then
+								width = math.floor(frameData[self.curFrame].height / 2)
+							else
+								width = math.floor(frameData[self.curFrame].offsetHeight / 2) + frameData[self.curFrame].offsetY
+							end
+							if frameData[self.curFrame].offsetWidth == 0 then
+								height = math.floor(frameData[self.curFrame].width / 2)
+							else
+								height = math.floor(frameData[self.curFrame].offsetWidth / 2) + frameData[self.curFrame].offsetX
+							end
+						end
+					end
 
-					local frameHeight = self:getFrameWidth()
-					local frameWidth = self:getFrameHeight()
-
-					if frameData[self.curFrame].rotated then
-						x = x + frameHeight / 2
-						y = y + frameWidth / 2
+					if not frameData[self.curFrame].rotated then
+						ox = width + anim.offsetX + self.offsetX
+						oy = height + anim.offsetY + self.offsetY
+					else
+						ox = width + anim.offsetY + self.offsetY
+						oy = height + anim.offsetX + self.offsetX
 					end
 
 					if self.visible then
-						love.graphics.rotate((frameData[self.curFrame].rotated and -math.rad(90) or 0))
+						--love.graphics.rotate((frameData[self.curFrame].rotated and -math.rad(90) or 0))
 						love.graphics.draw(
 							sheet,
 							frames[self.curFrame],
+							--[[ (frameData[self.curFrame].rotated and y or x),
+							(frameData[self.curFrame].rotated and x or y), ]]
 							x,
 							y,
-							self.orientation,
+							self.orientation + (frameData[self.curFrame].rotated and -math.rad(90) or 0),
 							self.sizeX * (self.flipX and -1 or 1),
 							self.sizeY,
+							--[[ (frameData[self.curFrame].rotated and oy or ox),
+							(frameData[self.curFrame].rotated and ox or oy), ]]
 							ox,
 							oy,
 							self.shearX,
 							self.shearY
 						)
-						love.graphics.rotate((frameData[self.curFrame].rotated and math.rad(90) or 0))
+						--love.graphics.rotate((frameData[self.curFrame].rotated and math.rad(90) or 0))
 					end
 
 					if self.clipRect then 

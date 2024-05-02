@@ -40,6 +40,15 @@ local easingTypes = {
 	["CLASSIC"] = "out-quad",
 	["expoOut"] = "out-expo",
 	["sineOut"] = "out-sine",
+	["elasticInOut"] = "in-out-elastic",
+	["bounceOut"] = "out-bounce",
+	["backOut"] = "out-back",
+	["quartOut"] = "out-quart",
+	["quintOut"] = "out-quint",
+	["circOut"] = "out-circ",
+	["quadOut"] = "out-quad",
+	["cubicOut"] = "out-cubic",
+	["linear"] = "linear",
 }
 
 local arrowAngles = {math.rad(180), math.rad(90), math.rad(270), math.rad(0)}
@@ -517,6 +526,8 @@ return {
 			local eventName = event.e
 			local value = event.v
 
+			print(eventName, value)
+
 			table.insert(songEvents, {
 				time = time,
 				name = eventName,
@@ -816,23 +827,38 @@ return {
 			if #enemyNote > 0 then
 				if (enemyNote[1].time - musicTime <= 0) then
 					enemyArrow:animate(noteList[i] .. " confirm", false)
+					useAltAnims = false
+					local finishFunc = true
 
 					local whohit = enemy
 					if enemyNote[1].ver == "GF Sing" then
 						whohit = girlfriend
+					elseif enemyNote[1].ver == "mom" then
+						useAltAnims = true
+					elseif enemyNote[1].ver == "weekend-1-lightcan" then
+						if whohit then whohit:animate("light-can", false) end
+						finishFunc = false
+					elseif enemyNote[1].ver == "weekend-1-kickcan" then
+						if whohit then whohit:animate("kick-can", false) end
+						finishFunc = false
+					elseif enemyNote[1].ver == "weekend-1-kneecan" then
+						if whohit then whohit:animate("knee-forward", false) end
+						finishFunc = false
 					end
 
-					if enemyNote[1]:getAnimName() == "hold" or enemyNote[1]:getAnimName() == "end" then
-						if useAltAnims then
-							if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim .. " alt", _psychmod and true or false) end
+					if finishFunc then
+						if enemyNote[1]:getAnimName() == "hold" or enemyNote[1]:getAnimName() == "end" then
+							if useAltAnims then
+								if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim .. " alt", _psychmod and true or false) end
+							else
+								if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim, (_psychmod and true or false)) end
+							end
 						else
-							if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim, (_psychmod and true or false)) end
-						end
-					else
-						if useAltAnims then
-							if whohit then whohit:animate(curAnim .. " alt", false) end
-						else
-							if whohit then whohit:animate(curAnim, false) end
+							if useAltAnims then
+								if whohit then whohit:animate(curAnim .. " alt", false) end
+							else
+								if whohit then whohit:animate(curAnim, false) end
+							end
 						end
 					end
 

@@ -97,6 +97,7 @@ return {
         curWeekScore = 0
         averageAccuracy = 0
         ratingText = "???"
+        songDifficulty = 2
 
         curSongScore = 0
         curSongAccuracy = 0
