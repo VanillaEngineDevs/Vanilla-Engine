@@ -460,7 +460,8 @@ function love.load()
 				"Monster"
 			},
 			{
-				"Spookeez"
+				"Spookeez",
+				"South"
 			}
 		},
 		{
