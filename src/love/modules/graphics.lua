@@ -235,7 +235,10 @@ return {
 				return anims[name] ~= nil
 			end,
 
-			animate = function(self, animName, loopAnim, func)
+			animate = function(self, animName, loopAnim, func, forceSpecial)
+				-- defaults forceSpecial to true
+				forceSpecial = forceSpecial == nil and true or forceSpecial
+				print(animName)
 				self.holdTimer = 0
 				if not self:isAnimName(animName) then
 					return
@@ -254,7 +257,7 @@ return {
 				anim.offsetX = anims[animName].offsetX
 				anim.offsetY = anims[animName].offsetY
 
-				if not (util.startsWith(animName, "sing") or self:getAnimName() == "idle") then -- its a special anim
+				if not (util.startsWith(animName, "sing") or self:getAnimName() == "idle") and forceSpecial then -- its a special anim
 					self.heyTimer = 0.6
 					self.specialAnim = true
 				else
@@ -341,6 +344,35 @@ return {
 				return math.floor(frame)
 			end,
 
+			getAllFrames = function(self)
+				return frames
+			end,
+
+			animateFromFrame = function(self, frame_, loopAnim)
+				if frame_ < 1 or frame_ > #frames then
+					return
+				end
+
+				self.holdTimer = 0
+				anim.name = table.getKey(anims, frame_)
+				anim.start = 1
+				anim.stop = #frames
+				anim.speed = 1
+				anim.offsetX = 0
+				anim.offsetY = 0
+
+				frame = frame_
+				isLooped = loopAnim
+
+				isAnimated = true
+			end,
+
+			getFrameData = function(self, curFrame)
+				curFrame = curFrame or self.curFrame
+
+				return frameData[curFrame]
+			end,
+
 			getAnimStart = function(self)
 				return anim.start
 			end,
@@ -351,6 +383,10 @@ return {
 
 			getFrameFromCurrentAnim = function(self)
 				return math.floor(frame - anim.start + 1)
+			end,
+
+			getCurrentAnim = function(self)
+				return anim
 			end,
 
 			beat = function(self, beat)

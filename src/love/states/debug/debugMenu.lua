@@ -27,7 +27,7 @@ return {
             elseif choice == 2 then
                 Gamestate.switch(stageDebug)
             elseif choice == 3 then
-                Gamestate.switch(chartDebug)
+                Gamestate.switch(frameDebug)
             end
         end
     end,
@@ -52,6 +52,6 @@ return {
         else
             graphics.setColor(1, 1, 1)
         end
-        love.graphics.print("3. Chart Editor", 10, 70)
+        love.graphics.print("3. Frame Offset Viewer", 10, 70)
     end
 }

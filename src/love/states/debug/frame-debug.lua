@@ -34,6 +34,8 @@ return {
 		end
 		selection = 1
 		dirTable = love.filesystem.getDirectoryItems(curDir)
+		curFrameOverlaySpr = 1
+		curFrameSpr = 1
 	end,
 
 	enter = function(self, previous)
@@ -47,7 +49,7 @@ return {
 				1,
 				"Really Bad Debug Menu",
 				{
-					"Sprite Viewer",
+					"Frame Offseter", -- really just used to fixed rotated sprites offsets lmao
 					function()
 						menuID = 2
 
@@ -73,6 +75,34 @@ return {
 					overlaySprite.y = overlaySprite.y + 1
 				elseif key == "d" then
 					overlaySprite.x = overlaySprite.x + 1
+				elseif key == "q" then
+					curFrameOverlaySpr = curFrameOverlaySpr - 1
+					if curFrameOverlaySpr < 1 then
+						curFrameOverlaySpr = #overlaySprite:getAllFrames()
+					end
+					overlaySprite:animateFromFrame(curFrameOverlaySpr, false)
+					overlaySprite:update(0)
+				elseif key == "e" then
+					curFrameOverlaySpr = curFrameOverlaySpr + 1
+					if curFrameOverlaySpr > #overlaySprite:getAllFrames() then
+						curFrameOverlaySpr = 1
+					end
+					overlaySprite:animateFromFrame(curFrameOverlaySpr, false)
+					overlaySprite:update(0)
+				elseif key == "z" then
+					curFrameSpr = curFrameSpr - 1
+					if curFrameSpr < 1 then
+						curFrameSpr = #sprite:getAllFrames()
+					end
+					sprite:animateFromFrame(curFrameSpr, false)
+					sprite:update(0)
+				elseif key == "c" then
+					curFrameSpr = curFrameSpr + 1
+					if curFrameSpr > #sprite:getAllFrames() then
+						curFrameSpr = 1
+					end
+					sprite:animateFromFrame(curFrameSpr, false)
+					sprite:update(0)
 				end
 			end
 		end
@@ -91,17 +121,14 @@ return {
 			table.insert(spriteAnims, i)
 		end
 
-		sprite:animate(spriteAnims[1], false, nil, false)
-		overlaySprite:animate(spriteAnims[1], false, nil, false)
+		sprite:animate(spriteAnims[1], false)
+		overlaySprite:animate(spriteAnims[1], false)
 	end,
 
 	update = function(self, dt)
 		-- I wasn't kidding when I said this was a really bad debug menu
 		if menus[menuID][1] == 2 then -- Sprite viewer
 			if svMode == 2 then
-				sprite:update(dt)
-				overlaySprite:update(dt)
-
 				if input:pressed("up") then
 					selection = selection - 1
 
@@ -109,7 +136,7 @@ return {
 						selection = #spriteAnims
 					end
 
-					sprite:animate(spriteAnims[selection], false, nil, false)
+					sprite:animate(spriteAnims[selection], false)
 				end
 				if input:pressed("down") then
 					selection = selection + 1
@@ -118,10 +145,11 @@ return {
 						selection = 1
 					end
 
-					sprite:animate(spriteAnims[selection], false, nil, false)
+					sprite:animate(spriteAnims[selection], false)
 				end
 				if input:pressed("confirm") then
-					overlaySprite:animate(spriteAnims[selection], false, nil, false)
+					overlaySprite:animate(spriteAnims[selection], false)
+					curFrameOverlaySpr = overlaySprite:getFrameFromCurrentAnim()
 				end
 			else
 				if input:pressed("up") then
@@ -200,9 +228,12 @@ return {
 					love.graphics.print(spriteAnims[i], 0, (i - 1) * 20)
 					graphics.setColor(1, 1, 1)
 
-					love.graphics.print("X: " .. tostring(overlaySprite:getCurrentAnim().offsetX + (sprite.x - overlaySprite.x)), 0, (#spriteAnims + 1) * 20)
-					love.graphics.print("Y: " .. tostring(overlaySprite:getCurrentAnim().offsetY - (sprite.y - overlaySprite.y)), 0, (#spriteAnims + 2) * 20)
-					love.graphics.print("Frame: " .. tostring(overlaySprite:getFrameFromCurrentAnim()), 0, (#spriteAnims + 3) * 20)
+					love.graphics.print("Frame (overlay): " .. tostring(curFrameOverlaySpr), 0, (#spriteAnims + 1) * 20)
+					love.graphics.print("Frame (sprite): " .. tostring(curFrameSpr), 0, (#spriteAnims + 2) * 20)
+					local frameData = overlaySprite:getFrameData(curFrameOverlaySpr)
+					love.graphics.print("Frame Data (overlay): " .. frameData.offsetX + overlaySprite.x .. ", " .. frameData.offsetY + overlaySprite.y .. ", " .. tostring(frameData.rotated), 0, (#spriteAnims + 3) * 20)
+					local frameData = sprite:getFrameData(curFrameSpr)
+					love.graphics.print("Frame Data (sprite): " .. frameData.offsetX .. ", " .. frameData.offsetY .. ", " .. tostring(frameData.rotated), 0, (#spriteAnims + 4) * 20)
 				end
 			else
 				for i = 1, #dirTable do

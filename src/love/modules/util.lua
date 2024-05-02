@@ -81,6 +81,15 @@ function table.contains(table, element)
     return false
 end
 
+function table.getKey(table, value)
+    for k, v in pairs(table) do
+        if v == value then
+            return k
+        end
+    end
+    return nil
+end
+
 function math.remapToRange(value, from1, to1, from2, to2)
     return (value - from1) / (to1 - from1) * (to2 - from2) + from2
 end

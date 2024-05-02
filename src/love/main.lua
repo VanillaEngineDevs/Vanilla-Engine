@@ -351,6 +351,7 @@ function love.load()
 	debugMenu = require "states.debug.debugMenu"
 	spriteDebug = require "states.debug.sprite-debug"
 	stageDebug = require "states.debug.stage-debug"
+	frameDebug = require "states.debug.frame-debug"
 	chartDebug = require "states.debug.charter"
 
 	-- Sounds

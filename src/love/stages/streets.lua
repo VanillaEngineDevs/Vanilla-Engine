@@ -51,7 +51,7 @@ return {
 
         enemy.x, enemy.y = -449, 45
         boyfriend.x, boyfriend.y = 646, 106
-        girlfriend.x, girlfriend.y = -12, -286
+        girlfriend.x, girlfriend.y = -12, -270
 
         camera:addPoint("boyfriend", -boyfriend.x + 400, -boyfriend.y + 75)
         camera:addPoint("enemy", -enemy.x - 450, -enemy.y + 75)

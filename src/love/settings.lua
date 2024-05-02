@@ -117,22 +117,6 @@ if curOS == "NX" then
 
 	love.audio.setVolume(tonumber(ini.readKey(settingsIni, "Audio", "volume")))
 
-	if ini.readKey(settingsIni, "Game", "downscroll") == "true" then
-		settings.downscroll = true
-	else
-		settings.downscroll = false
-	end
-	if ini.readKey(settingsIni, "Game", "ghostTapping") == "true" then
-		settings.ghostTapping = true
-	else
-		settings.ghostTapping = false
-	end
-
-	if ini.readKey(settingsIni, "Advanced", "showDebug") == "fps" or ini.readKey(settingsIni, "Advanced", "showDebug") == "detailed" then
-		settings.showDebug = ini.readKey(settingsIni, "Advanced", "showDebug")
-	else
-		settings.showDebug = false
-	end
 elseif curOS == "Web" then -- For love.js, we won't bother creating and reading a settings file that can't be edited, we'll just preset some settings
 	love.window.setMode(1280, 720) -- Due to shared code, push will be used even though the resolution will never change :/
 
@@ -200,18 +184,6 @@ else
 	end
 
 	love.audio.setVolume(tonumber(ini.readKey(settingsIni, "Audio", "volume")))
-
-	if ini.readKey(settingsIni, "Game", "downscroll") == "true" then
-		settings.downscroll = true
-	else
-		settings.downscroll = false
-	end
-
-	if ini.readKey(settingsIni, "Game", "ghostTapping") == "true" then
-		settings.ghostTapping = true
-	else
-		settings.ghostTapping = false
-	end
 
 	if ini.readKey(settingsIni, "Advanced", "showDebug") == "fps" or ini.readKey(settingsIni, "Advanced", "showDebug") == "detailed" then
 		settings.showDebug = ini.readKey(settingsIni, "Advanced", "showDebug")
