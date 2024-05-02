@@ -31,7 +31,70 @@ return {
 
         selectBGOverlay = graphics.newImage(graphics.imagePath("menu/selectBGOverlay"))
 
-        options = love.filesystem.load("sprites/menu/menuButtons.lua")()
+        buttons = {
+            {
+                sprite = love.filesystem.load("sprites/menu/storymode.lua")(),
+                confirm = function()
+                    status.setLoading(true)
+                    graphics:fadeOutWipe(
+                        0.7,
+                        function()
+                            Gamestate.switch(menuFreeplay)
+                            status.setLoading(false)
+                        end
+                    )
+                end
+            }, 
+            {
+                sprite = love.filesystem.load("sprites/menu/freeplay.lua")(),
+                confirm = function()
+                    status.setLoading(true)
+                    graphics:fadeOutWipe(
+                        0.7,
+                        function()
+                            Gamestate.switch(menuFreeplay)
+                            status.setLoading(false)
+                        end
+                    )
+                end
+            },
+            -- erm,,, whar the scallop
+            --[[ love.system.getOS() == "NX" and {
+                sprite = love.filesystem.load("sprites/menu/merch.lua")(),
+                confirm = function()
+                    love.system.openURL("https://needlejuicerecords.com/en-ca/pages/friday-night-funkin")
+                end
+            } or nil,   ]]
+            {
+                sprite = love.filesystem.load("sprites/menu/options.lua")(),
+                confirm = function()
+                    status.setLoading(true)
+                    graphics:fadeOutWipe(
+                        0.7,
+                        function()
+                            Gamestate.push(menuSettings)
+                            status.setLoading(false)
+                        end
+                    )
+                end
+            },
+            {
+                sprite = love.filesystem.load("sprites/menu/credits.lua")(),
+                confirm = function()
+                    status.setLoading(true)
+                    graphics:fadeOutWipe(
+                        0.7,
+                        function()
+                            Gamestate.switch(menuCredits)
+                            status.setLoading(false)
+                        end
+                    )
+                end
+            }
+        }
+        print(#buttons)
+
+        --[[ options = love.filesystem.load("sprites/menu/menuButtons.lua")()
         story = love.filesystem.load("sprites/menu/menuButtons.lua")()
         freeplay = love.filesystem.load("sprites/menu/menuButtons.lua")()
         credits = love.filesystem.load("sprites/menu/credits.lua")()
@@ -43,96 +106,43 @@ return {
         story.sizeX, story.sizeY = 0.75, 0.75
         freeplay.sizeX, freeplay.sizeY = 0.75, 0.75
         options.sizeX, options.sizeY = 0.75, 0.75
-        credits.sizeX, credits.sizeY = 0.75, 0.75
+        credits.sizeX, credits.sizeY = 0.75, 0.75 ]]
 
-        story.x, freeplay.x, options.x, credits.x = -500, -500, -500, -500
+        --[[ story.x, freeplay.x, options.x, credits.x = -500, -500, -500, -500
         Timer.tween(1, story, {x = -295}, "out-expo")
         Timer.tween(1, freeplay, {x = -320}, "out-expo")
         Timer.tween(1, options, {x = -345}, "out-expo")
-        Timer.tween(1, credits, {x = -370}, "out-expo")
+        Timer.tween(1, credits, {x = -370}, "out-expo") ]]
         --Timer.tween(0.88, cam, {y = 35, sizeX = 1.1, sizeY = 1.1}, "out-quad")
 
+        for _, button in ipairs(buttons) do
+            button.sprite:animate("idle", true)
+        end
+
+        -- set all positions, more buttons there are, the y is closer to the center
+        for i, button in ipairs(buttons) do
+            button.sprite.x = -500
+            button.sprite.sizeX = 0.75
+            button.sprite.sizeY = 0.75
+
+            button.sprite.y = -200 + (i - 1) * 100
+            print(button.sprite.y)
+
+            Timer.tween(1, button.sprite, {x = -295 - (i - 1) * 25}, "out-expo")
+        end
+
         function changeSelect()
-            if menuButton == 1 then
-                story:animate("story hover", true)
-                freeplay:animate("freeplay", true)
-                options:animate("options", true)
-                credits:animate("credits", true)
-
-            elseif menuButton == 2 then
-                story:animate("story", true)
-                freeplay:animate("freeplay hover", true)
-                options:animate("options", true)
-                credits:animate("credits", true)
-
-            elseif menuButton == 3 then
-                story:animate("story", true)
-                freeplay:animate("freeplay", true)
-                options:animate("options hover", true)
-                credits:animate("credits", true)
-
-            elseif menuButton == 4 then
-                story:animate("story", true)
-                freeplay:animate("freeplay", true)
-                options:animate("options", true)
-                credits:animate("credits hover", true)
+            for i, button in ipairs(buttons) do
+                if i == menuButton then
+                    button.sprite:animate("hover", true)
+                else
+                    button.sprite:animate("idle", true)
+                end
             end
         end
 
         function confirmFunc()
-            if menuButton == 1 then
-                status.setLoading(true)
-                graphics:fadeOutWipe(
-                    0.7,
-                    function()
-                        Gamestate.switch(menuWeek)
-                        status.setLoading(false)
-                    end
-                )
-                Timer.tween(0.9, story, {x = 0}, "out-expo")
-                Timer.tween(0.9, freeplay, {y = 700}, "out-expo")
-                Timer.tween(0.9, options, {y = 700}, "out-expo")
-                Timer.tween(0.9, credits, {y = 700}, "out-expo")
-            elseif menuButton == 2 then
-                status.setLoading(true)
-                graphics:fadeOutWipe(
-                    0.7,
-                    function()
-                        Gamestate.switch(menuFreeplay)
-                        status.setLoading(false)
-                    end
-                )
-                Timer.tween(0.9, freeplay, {y = 0}, "out-expo")
-                Timer.tween(0.9, story, {y = -700}, "out-expo")
-                Timer.tween(0.9, options, {y = 700}, "out-expo")
-                Timer.tween(0.9, credits, {y = 700}, "out-expo")
-            elseif menuButton == 3 then
-                status.setLoading(true)
-                graphics:fadeOutWipe(
-                    0.7,
-                    function()
-                        Gamestate.push(menuSettings)
-                        status.setLoading(false)
-                    end
-                )
-                Timer.tween(0.9, freeplay, {y = -700}, "out-expo")
-                Timer.tween(0.9, options, {y = 0}, "out-expo")
-                Timer.tween(0.9, story, {y = -700}, "out-expo")
-                Timer.tween(0.9, credits, {y = 700}, "out-expo")
-            elseif menuButton == 4 then
-                status.setLoading(true)
-                graphics:fadeOutWipe(
-                    0.7,
-                    function()
-                        Gamestate.switch(menuCredits)
-                        status.setLoading(false)
-                    end
-                )
-                Timer.tween(0.9, credits, {y = 0}, "out-expo")
-                Timer.tween(0.9, options, {y = -700}, "out-expo")
-                Timer.tween(0.9, freeplay, {y = -700}, "out-expo")
-                Timer.tween(0.9, story, {y = -700}, "out-expo")
-            end
+            buttons[menuButton].confirm()
         end
 
 		switchMenu(1)
@@ -142,10 +152,9 @@ return {
 	end,
 
 	update = function(self, dt)
-        options:update(dt)
-        story:update(dt)
-        freeplay:update(dt)
-        credits:update(dt)
+        for _, button in ipairs(buttons) do
+            button.sprite:update(dt)
+        end
 
         selectBG.y = 20 + math.sin(love.timer.getTime() * 1.5) * 2
 
@@ -153,14 +162,14 @@ return {
 			if input:pressed("up") then
 				audio.playSound(selectSound)
 
-                menuButton = menuButton ~= 1 and menuButton - 1 or 4
+                menuButton = menuButton ~= 1 and menuButton - 1 or #buttons
 
                 changeSelect()
 
 			elseif input:pressed("down") then
 				audio.playSound(selectSound)
 
-                menuButton = menuButton ~= 4 and menuButton + 1 or 1
+                menuButton = menuButton ~= #buttons and menuButton + 1 or 1
 
                 changeSelect()
 
@@ -190,10 +199,9 @@ return {
                 graphics.setColor(0,0,0)
                 love.graphics.print("Vanilla Engine " .. (__VERSION__ or "???") .. "\nBuilt on: Funkin Rewritten v1.1.0 Beta 2", -635, -360)
                 graphics.setColor(1,1,1)
-                story:draw()
-                freeplay:draw()
-                options:draw()
-                credits:draw()
+                for _, button in ipairs(buttons) do
+                    button.sprite:draw()
+                end
             love.graphics.pop()
             love.graphics.setFont(font)
 		love.graphics.pop()
@@ -202,10 +210,7 @@ return {
 
 	leave = function(self)
         titleBG = nil
-        story = nil
-        freeplay = nil
-        options = nil
-        credits = nil
+        buttons = nil
 		Timer.clear()
 	end
 }
