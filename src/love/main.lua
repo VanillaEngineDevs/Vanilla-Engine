@@ -371,9 +371,11 @@ function love.load()
 		["streets"] = require "stages.streets"
 	}
 
-	shaders = {
-		["rain"] = love.graphics.newShader("shaders/rain.glsl")
-	}
+	if love.system.getOS() ~= "NX" then 
+		shaders = {
+			["rain"] = love.graphics.newShader("shaders/rain.glsl")
+		}
+	end
 
 	-- Load Menus
 	clickStart = require "states.click-start"

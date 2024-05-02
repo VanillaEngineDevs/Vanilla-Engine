@@ -35,11 +35,13 @@ return {
 
 		enemyIcon:animate("dad", false)
 
-		gameCanvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
+		if love.system.getOS() ~= "NX" then 
+			gameCanvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
 
-		shaders["rain"]:send("uScale", 0.0075)
-		--[[ shaders["rain"]:send("uIntensity", 0.1) ]]
-		intensity = 0
+			shaders["rain"]:send("uScale", 0.0075)
+			--[[ shaders["rain"]:send("uIntensity", 0.1) ]]
+			intensity = 0
+		end
 
 		self:load()
 	end,
@@ -93,9 +95,11 @@ return {
 	end,
 
 	update = function(self, dt)
-		intensity = math.remapToRange(musicTime/1000, 0, inst:getDuration(), rainShaderStartIntensity, rainShaderEndIntensity)
-		shaders["rain"]:send("uTime", love.timer.getTime())
-		shaders["rain"]:send("uIntensity", intensity)
+		if love.system.getOS() ~= "NX" then 
+			intensity = math.remapToRange(musicTime/1000, 0, inst:getDuration(), rainShaderStartIntensity, rainShaderEndIntensity)
+			shaders["rain"]:send("uTime", love.timer.getTime())
+			shaders["rain"]:send("uIntensity", intensity)
+		end
 		weeks:update(dt)
 		stages["streets"]:update(dt)
 
@@ -105,24 +109,30 @@ return {
 	end,
 
 	draw = function(self)
-		
-		love.graphics.setCanvas(gameCanvas)
+		-- The switch is too weak for shaders :(
+		if love.system.getOS() ~= "NX" then love.graphics.setCanvas(gameCanvas) end
 		love.graphics.push()
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
 			stages["streets"]:draw()
 		love.graphics.pop()
-		love.graphics.setCanvas()
+		if love.system.getOS() ~= "NX" then love.graphics.setCanvas() end
 
-		love.graphics.setShader(shaders["rain"])
-		love.graphics.draw(gameCanvas, 0, 0, 0, love.graphics.getWidth() / 1280, love.graphics.getHeight() / 720)
-		love.graphics.setShader()
-		
-		love.graphics.push() -- canvas' fuck with the game so we need to do this lol
-			love.graphics.scale(love.graphics.getWidth() / 1280, love.graphics.getHeight() / 720)
+		if love.system.getOS() ~= "NX" then 
+			love.graphics.setShader(shaders["rain"])
+			love.graphics.draw(gameCanvas, 0, 0, 0, love.graphics.getWidth() / 1280, love.graphics.getHeight() / 720)
+			love.graphics.setShader()
+		end
+		 
+		if love.system.getOS() ~= "NX" then 
+			love.graphics.push() -- canvas' fuck with the game so we need to do this lol
+				love.graphics.scale(love.graphics.getWidth() / 1280, love.graphics.getHeight() / 720)
+		end
 			weeks:drawUI()
-		love.graphics.pop()
+		if love.system.getOS() ~= "NX" then 
+			love.graphics.pop()
+		end
 	end,
 
 	leave = function(self)
