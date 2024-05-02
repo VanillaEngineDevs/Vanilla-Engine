@@ -4,9 +4,9 @@ return graphics.newSprite(
 	{
 		{x = 0, y = 0, width = 433, height = 294, offsetX = 42, offsetY = -45, offsetWidth = 312, offsetHeight = 496, rotated = true}, -- 1: ComboCheer0001
 		{x = 433, y = 0, width = 447, height = 294, offsetX = 42, offsetY = -45, offsetWidth = 312, offsetHeight = 496, rotated = true}, -- 2: ComboCheer0002
-		{x = 880, y = 0, width = 453, height = 312, offsetX = 57, offsetY = -43, offsetWidth = 312, offsetHeight = 496, rotated = true}, -- 3: ComboCheer0003
-		{x = 1333, y = 0, width = 476, height = 312, offsetX = 57, offsetY = -43, offsetWidth = 312, offsetHeight = 496, rotated = true}, -- 4: ComboCheer0004
-		{x = 1333, y = 0, width = 476, height = 312, offsetX = 57, offsetY = -43, offsetWidth = 312, offsetHeight = 496, rotated = true}, -- 5: ComboCheer0005
+		{x = 880, y = 0, width = 453, height = 312, offsetX = 57, offsetY = -42, offsetWidth = 312, offsetHeight = 496, rotated = true}, -- 3: ComboCheer0003
+		{x = 1333, y = 0, width = 476, height = 312, offsetX = 57, offsetY = -42, offsetWidth = 312, offsetHeight = 496, rotated = true}, -- 4: ComboCheer0004
+		{x = 1333, y = 0, width = 476, height = 312, offsetX = 57, offsetY = -42, offsetWidth = 312, offsetHeight = 496, rotated = true}, -- 5: ComboCheer0005
 		{x = 1809, y = 0, width = 479, height = 312, offsetX = 57, offsetY = -42, offsetWidth = 312, offsetHeight = 496, rotated = true}, -- 6: ComboCheer0006
 		{x = 1809, y = 0, width = 479, height = 312, offsetX = 57, offsetY = -42, offsetWidth = 312, offsetHeight = 496, rotated = true}, -- 7: ComboCheer0007
 		{x = 2288, y = 0, width = 489, height = 312, offsetX = 57, offsetY = -42, offsetWidth = 312, offsetHeight = 496, rotated = true}, -- 8: ComboCheer0008
@@ -28,10 +28,10 @@ return graphics.newSprite(
 		{x = 3767, y = 0, width = 312, height = 437, offsetX = 57, offsetY = -101, offsetWidth = 312, offsetHeight = 496, rotated = false}, -- 24: ComboCheer0024
 		{x = 3767, y = 0, width = 312, height = 437, offsetX = 57, offsetY = -101, offsetWidth = 312, offsetHeight = 496, rotated = false}, -- 25: ComboCheer0025
 
-		{x = 1860, y = 1740, width = 456, height = 417, offsetX = 77, offsetY = -10, offsetWidth = 417, offsetHeight = 460, rotated = true}, -- 26: ComboFawn0001
-		{x = 1860, y = 1740, width = 456, height = 417, offsetX = 77, offsetY = -10, offsetWidth = 417, offsetHeight = 460, rotated = true}, -- 27: ComboFawn0002
-		{x = 0, y = 1680, width = 451, height = 411, offsetX = 66, offsetY = -1, offsetWidth = 417, offsetHeight = 460, rotated = true}, -- 28: ComboFawn0003
-		{x = 0, y = 1680, width = 451, height = 411, offsetX = 66, offsetY = -1, offsetWidth = 417, offsetHeight = 460, rotated = true}, -- 29: ComboFawn0004
+		{x = 1860, y = 1740, width = 456, height = 417, offsetX = 65, offsetY = 10, offsetWidth = 417, offsetHeight = 460, rotated = true}, -- 26: ComboFawn0001
+		{x = 1860, y = 1740, width = 456, height = 417, offsetX = 65, offsetY = 10, offsetWidth = 417, offsetHeight = 460, rotated = true}, -- 27: ComboFawn0002
+		{x = 0, y = 1680, width = 451, height = 411, offsetX = 65, offsetY = 2, offsetWidth = 417, offsetHeight = 460, rotated = true}, -- 28: ComboFawn0003
+		{x = 0, y = 1680, width = 451, height = 411, offsetX = 65, offsetY = 2, offsetWidth = 417, offsetHeight = 460, rotated = true}, -- 29: ComboFawn0004
 		{x = 3397, y = 1475, width = 451, height = 408, offsetX = 62, offsetY = 1, offsetWidth = 417, offsetHeight = 460, rotated = true}, -- 30: ComboFawn0005
 		{x = 3397, y = 1475, width = 451, height = 408, offsetX = 62, offsetY = 1, offsetWidth = 417, offsetHeight = 460, rotated = true}, -- 31: ComboFawn0006
 		{x = 3397, y = 1475, width = 451, height = 408, offsetX = 62, offsetY = 1, offsetWidth = 417, offsetHeight = 460, rotated = true}, -- 32: ComboFawn0007
@@ -78,61 +78,62 @@ return graphics.newSprite(
 		{x = 376, y = 633, width = 525, height = 342, offsetX = -0, offsetY = -0, offsetWidth = 342, offsetHeight = 525, rotated = true}, -- 71: KnifeIdle0009
 		{x = 954, y = 312, width = 525, height = 342, offsetX = -0, offsetY = -0, offsetWidth = 342, offsetHeight = 525, rotated = true}, -- 72: KnifeIdle0010
 
-		{x = 3521, y = 779, width = 525, height = 344, offsetX = -232, offsetY = -0, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 73: KnifeLower0001
-		{x = 882, y = 997, width = 525, height = 345, offsetX = -232, offsetY = -0, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 74: KnifeLower0002
-		{x = 882, y = 997, width = 525, height = 345, offsetX = -232, offsetY = -0, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 75: KnifeLower0003
-		{x = 368, y = 975, width = 514, height = 344, offsetX = -232, offsetY = -11, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 76: KnifeLower0004
-		{x = 368, y = 975, width = 514, height = 344, offsetX = -232, offsetY = -11, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 77: KnifeLower0005
-		{x = 3579, y = 437, width = 488, height = 342, offsetX = -232, offsetY = -37, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 78: KnifeLower0006
-		{x = 3579, y = 437, width = 488, height = 342, offsetX = -232, offsetY = -37, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 79: KnifeLower0007
-		{x = 451, y = 1714, width = 467, height = 411, offsetX = -172, offsetY = -55, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 80: KnifeLower0008
-		{x = 451, y = 1714, width = 467, height = 411, offsetX = -172, offsetY = -55, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 81: KnifeLower0009
+		{x = 3521, y = 779, width = 525, height = 344, offsetX = -190, offsetY = 124, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 73: KnifeLower0001
+		{x = 882, y = 997, width = 525, height = 345, offsetX = -190, offsetY = 124, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 74: KnifeLower0002
+		{x = 882, y = 997, width = 525, height = 345, offsetX = -190, offsetY = 124, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 75: KnifeLower0003
+		{x = 368, y = 975, width = 514, height = 344, offsetX = -190, offsetY = 124, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 76: KnifeLower0004
+		{x = 368, y = 975, width = 514, height = 344, offsetX = -190, offsetY = 124, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 77: KnifeLower0005
+		{x = 3579, y = 437, width = 488, height = 342, offsetX = -190, offsetY = 124, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 78: KnifeLower0006
+		{x = 3579, y = 437, width = 488, height = 342, offsetX = -190, offsetY = 124, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 79: KnifeLower0007
+		{x = 451, y = 1714, width = 467, height = 411, offsetX = -130, offsetY = 127, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 80: KnifeLower0008
+		{x = 451, y = 1714, width = 467, height = 411, offsetX = -130, offsetY = 127, offsetWidth = 815, offsetHeight = 720, rotated = true}, -- 81: KnifeLower0009
+
 		{x = 479, y = 2577, width = 813, height = 651, offsetX = -2, offsetY = -68, offsetWidth = 815, offsetHeight = 720, rotated = false}, -- 82: KnifeLower0010
 		{x = 1292, y = 2610, width = 813, height = 651, offsetX = -2, offsetY = -68, offsetWidth = 815, offsetHeight = 720, rotated = false}, -- 83: KnifeLower0011
 		{x = 2105, y = 2761, width = 815, height = 651, offsetX = -0, offsetY = -69, offsetWidth = 815, offsetHeight = 720, rotated = false}, -- 84: KnifeLower0012
 
-		{x = 3259, y = 2320, width = 476, height = 444, offsetX = -0, offsetY = -50, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 85: KnifeRaise0001
-		{x = 3259, y = 2320, width = 476, height = 444, offsetX = -0, offsetY = -50, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 86: KnifeRaise0002
-		{x = 2448, y = 1346, width = 479, height = 398, offsetX = -43, offsetY = -47, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 87: KnifeRaise0003
-		{x = 2448, y = 1346, width = 479, height = 398, offsetX = -43, offsetY = -47, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 88: KnifeRaise0004
-		{x = 901, y = 654, width = 519, height = 343, offsetX = -98, offsetY = -7, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 89: KnifeRaise0005
-		{x = 901, y = 654, width = 519, height = 343, offsetX = -98, offsetY = -7, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 90: KnifeRaise0006
-		{x = 1420, y = 654, width = 523, height = 343, offsetX = -98, offsetY = -3, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 91: KnifeRaise0007
-		{x = 1420, y = 654, width = 523, height = 343, offsetX = -98, offsetY = -3, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 92: KnifeRaise0008
-		{x = 1943, y = 654, width = 526, height = 343, offsetX = -98, offsetY = -0, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 93: KnifeRaise0009
-		{x = 1943, y = 654, width = 526, height = 343, offsetX = -98, offsetY = -0, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 94: KnifeRaise0010
-		{x = 2469, y = 654, width = 526, height = 343, offsetX = -98, offsetY = -0, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 95: KnifeRaise0011
-		{x = 2469, y = 654, width = 526, height = 343, offsetX = -98, offsetY = -0, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 96: KnifeRaise0012
-		{x = 2995, y = 654, width = 526, height = 343, offsetX = -98, offsetY = -0, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 97: KnifeRaise0013
-		{x = 2995, y = 654, width = 526, height = 343, offsetX = -98, offsetY = -0, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 98: KnifeRaise0014
-		{x = 2995, y = 654, width = 526, height = 343, offsetX = -98, offsetY = -0, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 99: KnifeRaise0015
-		{x = 2995, y = 654, width = 526, height = 343, offsetX = -98, offsetY = -0, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 100: KnifeRaise0016
-		{x = 2995, y = 654, width = 526, height = 343, offsetX = -98, offsetY = -0, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 101: KnifeRaise0017
-		{x = 2995, y = 654, width = 526, height = 343, offsetX = -98, offsetY = -0, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 102: KnifeRaise0018
-		{x = 2995, y = 654, width = 526, height = 343, offsetX = -98, offsetY = -0, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 103: KnifeRaise0019
-		{x = 2995, y = 654, width = 526, height = 343, offsetX = -98, offsetY = -0, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 104: KnifeRaise0020
+		{x = 3259, y = 2320, width = 476, height = 444, offsetX = -8, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 85: KnifeRaise0001
+		{x = 3259, y = 2320, width = 476, height = 444, offsetX = -8, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 86: KnifeRaise0002
+		{x = 2448, y = 1346, width = 479, height = 398, offsetX = -51, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 87: KnifeRaise0003
+		{x = 2448, y = 1346, width = 479, height = 398, offsetX = -51, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 88: KnifeRaise0004
+		{x = 901, y = 654, width = 519, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 89: KnifeRaise0005
+		{x = 901, y = 654, width = 519, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 90: KnifeRaise0006
+		{x = 1420, y = 654, width = 523, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 91: KnifeRaise0007
+		{x = 1420, y = 654, width = 523, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 92: KnifeRaise0008
+		{x = 1943, y = 654, width = 526, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 93: KnifeRaise0009
+		{x = 1943, y = 654, width = 526, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 94: KnifeRaise0010
+		{x = 2469, y = 654, width = 526, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 95: KnifeRaise0011
+		{x = 2469, y = 654, width = 526, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 96: KnifeRaise0012
+		{x = 2995, y = 654, width = 526, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 97: KnifeRaise0013
+		{x = 2995, y = 654, width = 526, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 98: KnifeRaise0014
+		{x = 2995, y = 654, width = 526, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 99: KnifeRaise0015
+		{x = 2995, y = 654, width = 526, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 100: KnifeRaise0016
+		{x = 2995, y = 654, width = 526, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 101: KnifeRaise0017
+		{x = 2995, y = 654, width = 526, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 102: KnifeRaise0018
+		{x = 2995, y = 654, width = 526, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 103: KnifeRaise0019
+		{x = 2995, y = 654, width = 526, height = 343, offsetX = -106, offsetY = 27, offsetWidth = 444, offsetHeight = 526, rotated = true}, -- 104: KnifeRaise0020
 
-		{x = 0, y = 2572, width = 479, height = 453, offsetX = -1, offsetY = -40, offsetWidth = 480, offsetHeight = 493, rotated = false}, -- 105: Laugh0001
-		{x = 0, y = 2572, width = 479, height = 453, offsetX = -1, offsetY = -40, offsetWidth = 480, offsetHeight = 493, rotated = false}, -- 106: Laugh0002
-		{x = 0, y = 2091, width = 449, height = 459, offsetX = -0, offsetY = -34, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 107: Laugh0003
-		{x = 0, y = 2091, width = 449, height = 459, offsetX = -0, offsetY = -34, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 108: Laugh0004
-		{x = 2788, y = 1881, width = 449, height = 436, offsetX = -10, offsetY = -36, offsetWidth = 480, offsetHeight = 493, rotated = false}, -- 109: Laugh0005
-		{x = 2788, y = 1881, width = 449, height = 436, offsetX = -10, offsetY = -36, offsetWidth = 480, offsetHeight = 493, rotated = false}, -- 110: Laugh0006
-		{x = 723, y = 1342, width = 440, height = 372, offsetX = -43, offsetY = -4, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 111: Laugh0007
-		{x = 723, y = 1342, width = 440, height = 372, offsetX = -43, offsetY = -4, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 112: Laugh0008
-		{x = 1163, y = 1343, width = 445, height = 377, offsetX = -39, offsetY = -0, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 113: Laugh0009
-		{x = 1163, y = 1343, width = 445, height = 377, offsetX = -39, offsetY = -0, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 114: Laugh0010
-		{x = 1608, y = 1345, width = 446, height = 377, offsetX = -39, offsetY = -0, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 115: Laugh0011
-		{x = 1608, y = 1345, width = 446, height = 377, offsetX = -39, offsetY = -0, offsetWidth = 480, offsetHeight = 493, rotated = true} -- 116: Laugh0012
+		{x = 0, y = 2572, width = 479, height = 453, offsetX = -4, offsetY = -57, offsetWidth = 480, offsetHeight = 493, rotated = false}, -- 105: Laugh0001
+		{x = 0, y = 2572, width = 479, height = 453, offsetX = -4, offsetY = -57, offsetWidth = 480, offsetHeight = 493, rotated = false}, -- 106: Laugh0002
+		{x = 0, y = 2091, width = 449, height = 459, offsetX = -9, offsetY = 12, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 107: Laugh0003
+		{x = 0, y = 2091, width = 449, height = 459, offsetX = -9, offsetY = 12, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 108: Laugh0004
+		{x = 2788, y = 1881, width = 449, height = 436, offsetX = -4, offsetY = -20, offsetWidth = 480, offsetHeight = 493, rotated = false}, -- 109: Laugh0005
+		{x = 2788, y = 1881, width = 449, height = 436, offsetX = -4, offsetY = -20, offsetWidth = 480, offsetHeight = 493, rotated = false}, -- 110: Laugh0006
+		{x = 723, y = 1342, width = 440, height = 372, offsetX = -38, offsetY = -5, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 111: Laugh0007
+		{x = 723, y = 1342, width = 440, height = 372, offsetX = -38, offsetY = -5, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 112: Laugh0008
+		{x = 1163, y = 1343, width = 445, height = 377, offsetX = -34, offsetY = 4, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 113: Laugh0009
+		{x = 1163, y = 1343, width = 445, height = 377, offsetX = -34, offsetY = 4, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 114: Laugh0010
+		{x = 1608, y = 1345, width = 446, height = 377, offsetX = -34, offsetY = 4, offsetWidth = 480, offsetHeight = 493, rotated = true}, -- 115: Laugh0011
+		{x = 1608, y = 1345, width = 446, height = 377, offsetX = -34, offsetY = 4, offsetWidth = 480, offsetHeight = 493, rotated = true} -- 116: Laugh0012
 	},
 	{
 		["idle"] = {start = 33, stop = 62, speed = 24, offsetX = 0, offsetY = 0},
-		["knifeRaise"] = {start = 85, stop = 104, speed = 24, offsetX = 0, offsetY = 0},
-		["knifeLower"] = {start = 73, stop = 81, speed = 24, offsetX = 0, offsetY = 0},
+		["knifeRaise"] = {start = 85, stop = 104, speed = 24, offsetX = 16, offsetY = -53},
+		["knifeLower"] = {start = 73, stop = 81, speed = 24, offsetX = -84, offsetY = -254},
 		["laugh"] = {start = 105, stop = 116, speed = 24, offsetX = 0, offsetY = 0},
 		["comboCheer"] = {start = 1, stop = 13, speed = 24, offsetX = -107, offsetY = 0},
 		["comboFawn"] = {start = 26, stop = 31, speed = 24, offsetX = -91, offsetY = -10},
-		["knifeIdle"] = {start = 63, stop = 72, speed = 24, offsetX = 0, offsetY = 0}
+		["knifeIdle"] = {start = 63, stop = 72, speed = 24, offsetX = -40, offsetY = -26}
 	},
 	"idle",
 	false,
