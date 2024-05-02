@@ -1,7 +1,3 @@
---[[
-	File created for Vanilla Engine
-]]
-
 local menuBG = graphics.newImage(graphics.imagePath("menu/title-bg"))
 
 newlinesMoment = {

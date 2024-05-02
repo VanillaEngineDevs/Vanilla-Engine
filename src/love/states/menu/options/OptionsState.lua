@@ -1,7 +1,3 @@
---[[
-	File created for Vanilla Engine
-]]
-
 local OptionsState = {}
 
 OptionsState.options = {"Gamemodes", "Gameplay", "Graphics", "Controls", "Miscillaneous"}

@@ -1,7 +1,3 @@
---[[
-	File created for Vanilla Engine
-]]
-
 return {
     enter = function(self)
         headingOrder = {"Vanilla Engine", "Funkin Rewritten", "Friday Night Funkin", "Miscellaneous"}
@@ -23,7 +19,7 @@ return {
                 }
             },
             ["Friday Night Funkin"] = {
-                heading = CreateText("Friday Night Funkin", true),
+                heading = CreateText("Friday Night Funkin'", true),
                 selected = false,
                 members = {
                     {name = CreateText("ninjamuffin99"), desc = "Programmer", selected = false, callback = function() love.system.openURL("https://twitter.com/ninja_muffin99") end},
@@ -43,7 +39,7 @@ return {
                     {name = CreateText("P-sam"), desc = "Developing LOVE-NX (The framework the Switch port uses)", selected = false, callback = function() love.system.openURL("https://github.com/retronx-team/love-nx") end},
                     {name = CreateText("TurtleP"), desc = "Developing LovePotion (The framework the depracted Switch port uses)", selected = false, callback = function() love.system.openURL("https://github.com/lovebrew/lovepotion") end},
                     {name = CreateText("The developers of the LOVE framework"), desc = "LÖVE", selected = false, callback = function() love.system.openURL("https://love2d.org") end},
-                    {name = CreateText("RiverOaken"), desc = "Psych Engine credits button", selected = false, callback = function() love.system.openURL("https://twitter.com/RiverOaken") end}
+                    {name = CreateText("Psych Engine Contributers"), desc = "Helping create Psych Engine, which some parts of this engine is based off of.", selected = false, callback = function() love.system.openURL("https://github.com/ShadowMario/FNF-PsychEngine/graphs/contributors") end},
                 }
             }
         }

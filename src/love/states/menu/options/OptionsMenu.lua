@@ -1,7 +1,3 @@
---[[
-	File created for Vanilla Engine
-]]
-
 local OptionsMenu = Object:extend()
 
 OptionsMenu.curOption = nil

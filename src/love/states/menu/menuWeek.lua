@@ -1,7 +1,3 @@
---[[
-	File created for Vanilla Engine
-]]
-
 local downFunc, confirmFunc, backFunc, drawFunc, menuFunc, menuDesc
 
 local menuState
