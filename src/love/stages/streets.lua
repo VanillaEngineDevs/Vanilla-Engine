@@ -46,8 +46,101 @@ return {
 
         enemy = love.filesystem.load("sprites/weekend1/darnell.lua")()
         boyfriend = love.filesystem.load("sprites/pico-player.lua")()
-        -- TODO: Figure out rotated frames offsets.
         girlfriend = love.filesystem.load("sprites/weekend1/nene.lua")()
+
+        girlfriend.STATE_DEFAULT = 0
+        girlfriend.STATE_PRE_RAISE = 1
+        girlfriend.STATE_RAISE = 2
+        girlfriend.STATE_READY = 3
+        girlfriend.STATE_LOWER = 4
+        girlfriend.currentState = girlfriend.STATE_DEFAULT
+
+        girlfriend.MIN_BLINK_DELAY = 3
+        girlfriend.MAX_BLINK_DELAY = 7
+        girlfriend.blinkCountdown = girlfriend.MIN_BLINK_DELAY
+
+        girlfriend.animationFinished = false
+
+        function girlfriend:transitionState()
+            if self.currentState == self.STATE_DEFAULT then
+                if health <= 0.5 then
+                    self.currentState = self.STATE_PRE_RAISE
+                else
+                    self.currentState = self.STATE_DEFAULT
+                end
+            elseif self.currentState == self.STATE_PRE_RAISE then
+                if health > 0.5 then
+                    self.currentState = self.STATE_DEFAULT
+                elseif self.animationFinished then
+                    self.currentState = self.STATE_RAISE
+                    self:animate("knifeRaise", false, function()
+                        self:transitionState()
+                        self.animationFinished = true
+                    end)
+                    self.animationFinished = false
+                end
+            elseif self.currentState == self.STATE_RAISE then
+                if self.animationFinished then
+                    self.currentState = self.STATE_READY
+                    self.animationFinished = false
+                end
+            elseif self.currentState == self.STATE_READY then
+                if health > 0.5 then
+                    self.currentState = self.STATE_LOWER
+                    self:animate("knifeLower", false, function()
+                        self:transitionState()
+                        self.animationFinished = true
+                    end)
+                end
+            elseif self.currentState == self.STATE_LOWER then
+                if self.animationFinished then
+                    self.currentState = self.STATE_DEFAULT
+                    self.animationFinished = false
+                end
+            else 
+                self.currentState = self.STATE_DEFAULT
+            end
+        end
+
+        function girlfriend:updateOverride(dt)
+            self:transitionState()
+
+            if self.currentState == self.STATE_PRE_RAISE then
+                if self:getAnimName() == "danceLeft" and self:getFrameFromCurrentAnim() == self:getFrameCountFromCurrentAnim()-2 then
+                    self.animationFinished = true
+                    self:transitionState()
+                end
+            end
+        end
+
+        function girlfriend:beat(beat)
+            local beat = math.floor(beat) or 0
+            if self.isCharacter then
+                if beatHandler.onBeat() then
+                    if beat % self.danceSpeed == 0 then 
+                        self.danced = not self.danced
+                        
+                        if self.currentState == self.STATE_DEFAULT then
+                            if self.danced then
+                                self:animate("danceLeft", false)
+                            else
+                                self:animate("danceRight", false)
+                            end	
+                        elseif self.currentState == self.STATE_PRE_RAISE then
+                            self:animate("danceLeft")
+                            self.danced = true
+                        elseif self.currentState == self.STATE_READY then
+                            if self.blinkCountdown == 0 then
+                                self:animate("knifeIdle", false)
+                                self.blinkCountdown = love.math.random(self.MIN_BLINK_DELAY, self.MAX_BLINK_DELAY)
+                            else
+                                self.blinkCountdown = self.blinkCountdown - 1
+                            end
+                        end
+                    end
+                end
+            end
+        end
 
         enemy.x, enemy.y = -449, 45
         boyfriend.x, boyfriend.y = 646, 106

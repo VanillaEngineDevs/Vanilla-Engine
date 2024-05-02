@@ -127,7 +127,8 @@ return graphics.newSprite(
 		{x = 1608, y = 1345, width = 446, height = 377, offsetX = -34, offsetY = 4, offsetWidth = 480, offsetHeight = 493, rotated = true} -- 116: Laugh0012
 	},
 	{
-		["idle"] = {start = 33, stop = 62, speed = 24, offsetX = 0, offsetY = 0},
+		["danceLeft"] = {start = 33, stop = 48, speed = 24, offsetX = 0, offsetY = 0},
+		["danceRight"] = {start = 49, stop = 62, speed = 24, offsetX = 0, offsetY = 0},
 		["knifeRaise"] = {start = 85, stop = 104, speed = 24, offsetX = 16, offsetY = -53},
 		["knifeLower"] = {start = 73, stop = 81, speed = 24, offsetX = -84, offsetY = -254},
 		["laugh"] = {start = 105, stop = 116, speed = 24, offsetX = 0, offsetY = 0},
@@ -135,11 +136,12 @@ return graphics.newSprite(
 		["comboFawn"] = {start = 26, stop = 31, speed = 24, offsetX = -91, offsetY = -10},
 		["knifeIdle"] = {start = 63, stop = 72, speed = 24, offsetX = -40, offsetY = -26}
 	},
-	"idle",
+	"danceLeft",
 	false,
 	{
 		isCharacter = true,
-		danceSpeed = 2,
+		danceSpeed = 1,
+		danceIdle = true,
 		icon = "girlfriend"
 	}
 )

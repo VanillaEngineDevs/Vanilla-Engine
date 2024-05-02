@@ -238,7 +238,6 @@ return {
 			animate = function(self, animName, loopAnim, func, forceSpecial)
 				-- defaults forceSpecial to true
 				forceSpecial = forceSpecial == nil and true or forceSpecial
-				print(animName)
 				self.holdTimer = 0
 				if not self:isAnimName(animName) then
 					return
@@ -296,6 +295,9 @@ return {
 			end,
 
 			update = function(self, dt)
+				if self.updateOverride then 
+					self:updateOverride(dt)
+				end
 				if isAnimated then
 					frame = frame + anim.speed * dt
 				end
@@ -383,6 +385,10 @@ return {
 
 			getFrameFromCurrentAnim = function(self)
 				return math.floor(frame - anim.start + 1)
+			end,
+
+			getFrameCountFromCurrentAnim = function(self)
+				return anim.stop - anim.start + 1
 			end,
 
 			getCurrentAnim = function(self)
@@ -497,7 +503,7 @@ return {
 							if frameData[self.curFrame].offsetHeight == 0 then
 								width = math.floor(frameData[self.curFrame].height / 2)
 							else
-								width = math.floor(frameData[self.curFrame].offsetHeight / 2) + frameData[self.curFrame].offsetY
+								width = math.floor(frameData[self.curFrame].offsetHeight / 2) +  frameData[self.curFrame].offsetY
 							end
 							if frameData[self.curFrame].offsetWidth == 0 then
 								height = math.floor(frameData[self.curFrame].width / 2)
