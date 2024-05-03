@@ -82,6 +82,16 @@ function uitext(text,x,y,r,sx,sy,ox,oy,kx,ky,alpha)
     love.graphics.print(text,x,y,r,sx,sy,a,ox,oy,kx,ky)
 end
 
+local capturedScreenshot = {
+	x = 0,
+	y = 0,
+	flash = 0,
+	alpha = 0,
+	img = nil,
+	hovered = false,
+	timers = {}
+}
+
 function borderedText(text,x,y,r,sx,sy,ox,oy,kx,ky,alpha)
 	local x = x or 0
 	local y = y or 0
@@ -565,7 +575,7 @@ function love.load()
 	font = love.graphics.newFont("fonts/vcr.ttf", 24)
 	optionsFont = love.graphics.newFont("fonts/vcr.ttf", 32)
 	FNFFont = love.graphics.newFont("fonts/fnFont.ttf", 24)
-	credFont = love.graphics.newFont("fonts/fnFont.ttf", 32)   -- guglio is a bitch 
+	credFont = love.graphics.newFont("fonts/fnFont.ttf", 32)   -- guglio is a bitch -- fuck you calling a bitch????
 	uiFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 32)
 	pauseFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 96)
 	weekFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 84)
@@ -600,10 +610,47 @@ function love.resize(width, height)
 end
 
 function love.keypressed(key)
-	if key == "6" then
+	if key == "f3" then
+		--[[ love.filesystem.createDirectory("screenshots")
+
+		love.graphics.captureScreenshot("screenshots/" .. os.time() .. ".png") ]]
 		love.filesystem.createDirectory("screenshots")
 
-		love.graphics.captureScreenshot("screenshots/" .. os.time() .. ".png")
+		love.graphics.captureScreenshot(function(capture)
+			local screenshotName = "screenshot-"
+			local date = os.date("*t", os.time())
+			screenshotName = screenshotName .. string.format("%d-%02d-%02d-%02d-%02d-%02d", date.year, date.month, date.day, date.hour, date.min, date.sec) .. ".png"
+			capture:encode("png", string.format("screenshots/" .. screenshotName))
+			capturedScreenshot.img = love.graphics.newImage(capture)
+			capturedScreenshot.y = -160 / 4
+			capturedScreenshot.alpha = 0
+			for i = 1, #capturedScreenshot.timers do
+				Timer.cancel(capturedScreenshot.timers[i])
+			end
+
+			capturedScreenshot.timers[1] = Timer.tween(
+				0.25,
+				capturedScreenshot,
+				{alpha = 1, y = 0},
+				"out-quad",
+				function()
+					capturedScreenshot.timers[2] = Timer.after(
+						1.5,
+						function()
+							Timer.tween(
+								0.25,
+								capturedScreenshot,
+								{alpha = 0, y = 160 / 4},
+								"in-quad",
+								function()
+									capturedScreenshot.img = nil
+								end
+							)
+						end
+					)
+				end
+			)
+		end)
 	elseif key == "7" and not love.keyboard.isDown("lalt") then
 		Gamestate.switch(debugMenu)
 	elseif key == "7" and love.keyboard.isDown("lalt") then
@@ -660,10 +707,20 @@ end
 
 function love.mousepressed(x, y, button, istouch, presses)
 	Gamestate.mousepressed(x, y, button, istouch, presses)
+
+	if capturedScreenshot.img then
+		if capturedScreenshot.hovered then
+			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/screenshots")
+		end
+	end
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)
 	Gamestate.mousemoved(x, y, dx, dy, istouch)
+
+	if capturedScreenshot.img then
+		capturedScreenshot.hovered = x > capturedScreenshot.x and x < capturedScreenshot.x + 320 and y > capturedScreenshot.y and y < capturedScreenshot.y + 180
+	end
 end
 
 function love.touchpressed(id, x, y, dx, dy, pressure)
@@ -738,6 +795,15 @@ function love.draw()
 				love.graphics.draw(fade.mesh, 0, fade.y, 0, push:getWidth(), fade.height)
 			end
 		push:finish()
+
+		graphics.setColor(1,1,1,capturedScreenshot.flash)
+		love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+		graphics.setColor(1,1,1,1)
+
+		if capturedScreenshot.img and capturedScreenshot.alpha > 0 then
+			graphics.setColor(1, 1, 1, capturedScreenshot.alpha * (capturedScreenshot.hovered and 0.45 or 1))
+			love.graphics.draw(capturedScreenshot.img, capturedScreenshot.x, capturedScreenshot.y, 0, (320 / capturedScreenshot.img:getWidth()), (180 / capturedScreenshot.img:getHeight()))
+		end
 	end
 
 	graphics.screenBase(love.graphics.getWidth(), love.graphics.getHeight())
