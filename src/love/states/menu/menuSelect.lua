@@ -86,7 +86,7 @@ return {
             button.sprite:animate("idle", true)
         end
 
-=        for i, button in ipairs(buttons) do
+        for i, button in ipairs(buttons) do
             button.sprite.x = -500
             button.sprite.sizeX = 0.75
             button.sprite.sizeY = 0.75
