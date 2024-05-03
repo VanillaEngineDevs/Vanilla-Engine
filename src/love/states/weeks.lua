@@ -51,6 +51,11 @@ local easingTypes = {
 	["linear"] = "linear",
 }
 
+-- Nabbed from the JS source of FNF v0.3.0 (PBOT Scoring)
+local MaxScore, ScoringOffset, ScoringSlope = 500, 54.00, 0.080
+local MinScore, MissScore = 9, 0
+local PerfectThres, MissThres, KillerThres, SickThres, GoodThres, BadThres, ShitThres = 5, 160, 12.5, 45, 90, 135, 160
+
 local arrowAngles = {math.rad(180), math.rad(90), math.rad(270), math.rad(0)}
 if settings.downscroll then
 	-- ezezezezezezezezezezezezez workaround lol
@@ -283,7 +288,7 @@ return {
 	end,
 
 	calculateRating = function(self)
-		ratingPercent = score / ((noteCounter + misses) * 350)
+		ratingPercent = score / ((noteCounter + misses) * 500)
 		if ratingPercent == nil or ratingPercent < 0 then 
 			ratingPercent = 0
 		elseif ratingPercent > 1 then
@@ -795,6 +800,35 @@ return {
 		if girlfriend then girlfriend:beat(beatHandler.getBeat()) end
 	end,
 
+	judgeNote = function(self, msTiming)
+		if msTiming <= SickThres then
+			return "sick"
+		elseif msTiming < GoodThres then
+			return "good"
+		elseif msTiming < BadThres then
+			return "bad"
+		elseif msTiming < ShitThres then
+			return "shit"
+		else
+			return miss
+		end
+	end,
+
+	scoreNote = function(self, msTiming)
+		if msTiming > MissThres then
+			return MissScore
+		else
+			if msTiming < PerfectThres then
+				return MaxScore
+			else
+				local factor = 1 - 1 / (1 + math.exp(-ScoringSlope * (msTiming - ScoringOffset)))
+				--var score = funkin_play_scoring_Scoring.PBOT1_MAX_SCORE * factor + funkin_play_scoring_Scoring.PBOT1_MIN_SCORE | 0;
+				local score = bit.bxor(MaxScore * factor + MinScore, 0)
+				return score
+			end
+		end
+	end,
+
 	updateUI = function(self, dt)
 		if inCutscene then return end
 		if paused then return end
@@ -963,7 +997,7 @@ return {
 				if #boyfriendNote > 0 then
 					for j = 1, #boyfriendNote do
 						if boyfriendNote[j] and boyfriendNote[j]:getAnimName() == "on" then
-							if (boyfriendNote[j].time - musicTime <= 150) then
+							if (boyfriendNote[j].time - musicTime <= MissThres) then
 								local notePos
 								local ratingAnim
 
@@ -973,21 +1007,9 @@ return {
 
 								if boyfriend then boyfriend.lastHit = musicTime end
 
-								if notePos <= 55 then -- "Sick"
-									score = score + 350
-									ratingAnim = "sick"
-								elseif notePos <= 90 then -- "Good"
-									score = score + 200
-									ratingAnim = "good"
-								elseif notePos <= 120 then -- "Bad"
-									score = score + 100
-									ratingAnim = "bad"
-								else -- "Shit"
-									if settings.ghostTapping then
-										success = false
-									end
-									ratingAnim = "shit"
-								end
+								ratingAnim = self:judgeNote(notePos)
+								score = score + self:scoreNote(notePos)
+
 								combo = combo + 1
 								noteCounter = noteCounter + 1
 
