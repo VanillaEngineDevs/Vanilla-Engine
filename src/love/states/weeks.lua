@@ -747,14 +747,14 @@ return {
 								time,
 								camera,
 								{
-									x = point.x + -(tonumber(event.value.x) or 0),
-									y = point.y + -(tonumber(event.value.y) or 0)
+									x = point.x + (tonumber(event.value.x) or 0),
+									y = point.y + (tonumber(event.value.y) or 0)
 								},
 								easingTypes[event.value.ease or "CLASSIC"]
 							)
 						else
-							camera.x = point.x + -tonumber(event.value.x or 0)
-							camera.y = point.y + -tonumber(event.value.y or 0)
+							camera.x = point.x + tonumber(event.value.x or 0)
+							camera.y = point.y + tonumber(event.value.y or 0)
 						end
 					end
 				elseif event.name == "PlayAnimation" then

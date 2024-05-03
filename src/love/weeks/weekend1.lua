@@ -79,8 +79,6 @@ return {
 		end
 
 		self:initUI()
-
-		weeks:setupCountdown()
 	end,
 
 	initUI = function(self)
@@ -106,14 +104,35 @@ return {
 			end
 		elseif song == 3 then
 			weeks:generateNotes("data/songs/2hot/2hot-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/2hot/2hot-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+
+			if storyMode and not died then
+				video = cutscene.video("videos/2hot.ogv")
+				video:play()
+			end
 		elseif song == 2 then
 			weeks:generateNotes("data/songs/lit-up/lit-up-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/lit-up/lit-up-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		else
 			weeks:generateNotes("data/songs/darnell/darnell-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/darnell/darnell-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+
+			if storyMode and not died then
+				video = cutscene.video("videos/darnellCutscene.ogv")
+				video:play()
+			end
+		end
+
+		if not inCutscene then
+			weeks:setupCountdown()
 		end
 	end,
 
 	update = function(self, dt)
+		if inCutscene then
+			if not video:isPlaying() then 
+				inCutscene = false
+				video:destroy()
+				weeks:setupCountdown()
+			end
+		end
 		if love.system.getOS() ~= "NX" then 
 			intensity = math.remapToRange(musicTime/1000, 0, inst:getDuration(), rainShaderStartIntensity, rainShaderEndIntensity)
 			shaders["rain"]:send("uTime", love.timer.getTime())
@@ -128,6 +147,10 @@ return {
 	end,
 
 	draw = function(self)
+		if inCutscene then 
+            video:draw()
+            return
+        end
 		-- The switch is too weak for shaders :(
 		if love.system.getOS() ~= "NX" then love.graphics.setCanvas(gameCanvas) end
 		love.graphics.push()

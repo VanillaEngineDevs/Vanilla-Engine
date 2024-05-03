@@ -35,7 +35,7 @@ return {
                     graphics:fadeOutWipe(
                         0.7,
                         function()
-                            Gamestate.switch(menuFreeplay)
+                            Gamestate.switch(menuWeek)
                             status.setLoading(false)
                         end
                     )
