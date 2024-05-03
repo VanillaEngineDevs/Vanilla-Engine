@@ -56,29 +56,6 @@ local MaxScore, ScoringOffset, ScoringSlope = 500, 54.00, 0.080
 local MinScore, MissScore = 9, 0
 local PerfectThres, MissThres, KillerThres, SickThres, GoodThres, BadThres, ShitThres = 5, 160, 12.5, 45, 90, 135, 160
 
-local arrowAngles = {math.rad(180), math.rad(90), math.rad(270), math.rad(0)}
-if settings.downscroll then
-	-- ezezezezezezezezezezezezez workaround lol
-	arrowAngles = {math.rad(180), math.rad(270), math.rad(90), math.rad(0)}
-end
-local noteCamTweens = {
-	function()
-		camera:moveToExtra((60/bpm), 15, 0)
-	end,
-
-	function()
-		camera:moveToExtra((60/bpm), 0, -15)
-	end,
-
-	function()
-		camera:moveToExtra((60/bpm), 0, 15)
-	end,
-
-	function()
-		camera:moveToExtra((60/bpm), -15, 0)
-	end
-}
-
 local eventFuncs = {
 	["Add Camera Zoom"] = function(size, sizeHud)
 		local size = tonumber(size) or 0.015

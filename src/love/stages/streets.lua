@@ -163,33 +163,28 @@ return {
         stageImages["skybox"]:draw()
         love.graphics.push()
 			love.graphics.translate(camera.x * 0.2, camera.y * 0.2)
-            love.graphics.translate(camera.ex * 0.2, camera.ey * 0.2)
 
             stageImages["skyline"]:draw()
 		love.graphics.pop()
         love.graphics.push()
 			love.graphics.translate(camera.x * 0.35, camera.y * 0.35)
-            love.graphics.translate(camera.ex * 0.35, camera.ey * 0.35)
 
             stageImages["foregroundCity"]:draw()
 		love.graphics.pop()
         love.graphics.push()
 			love.graphics.translate(camera.x * 0.65, camera.y * 0.65)
-            love.graphics.translate(camera.ex * 0.65, camera.ey * 0.65)
 
             stageImages["construction"]:draw()
             stageImages["smog"]:draw()
 		love.graphics.pop()
 		love.graphics.push()
 			love.graphics.translate(camera.x, camera.y)
-            love.graphics.translate(camera.ex, camera.ey)
 			
             stageImages["highwayLights"]:draw()
             stageImages["highway"]:draw()
 		love.graphics.pop()
 		love.graphics.push()
 			love.graphics.translate(camera.x * 1.1, camera.y * 1.1)
-            love.graphics.translate(camera.ex * 1.1, camera.ey * 1.1)
 
             stageImages["foreground"]:draw()
             stageImages["abotBack"]:draw()

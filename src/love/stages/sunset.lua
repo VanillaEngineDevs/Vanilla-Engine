@@ -80,7 +80,6 @@ return {
     draw = function()
         love.graphics.push()
 			love.graphics.translate(camera.x * 0.5, camera.y * 0.5)
-            love.graphics.translate(camera.ex * 0.5, camera.ey * 0.5)
 
 			stageImages["Sunset"]:draw()
 
@@ -93,7 +92,6 @@ return {
 		love.graphics.pop()
 		love.graphics.push()
 			love.graphics.translate(camera.x, camera.y)
-            love.graphics.translate(camera.ex, camera.ey)
 
             stageImages["Fast Car"]:draw()
 			girlfriend:draw()

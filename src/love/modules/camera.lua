@@ -9,8 +9,6 @@ camera.locked = false
 camera.camBopIntensity = 1
 camera.camBopInterval = 4
 
-camera.ex = 0
-camera.ey = 0
 camera.esizeX = 1
 camera.esizeY = 1
 
@@ -40,8 +38,6 @@ function camera:reset()
     camera.x = 0
     camera.y = 0
     camera.zoom = 1
-    camera.ex = 0
-    camera.ey = 0
     camera.esizeX = 1
     camera.esizeY = 1
 end
