@@ -69,23 +69,6 @@ local function getStepLengthsMS(bpm)
 	return getBeatLengthsMS(bpm) * (timeSignatureNum/4)
 end
 
-local eventFuncs = {
-	["Add Camera Zoom"] = function(size, sizeHud)
-		local size = tonumber(size) or 0.015
-		local sizeHud = tonumber(sizeHud) or 0.03
-		camera.zoom = camera.zoom + (size or 0.015)
-		uiScale.zoom = uiScale.zoom + (sizeHud or 0.03)
-	end,
-	["Alter Camera Bop"] = function(_intensity, _interveral)
-		local _intensity, _interveral
-		_intensity = tonumber(_intensity) or 1
-		_interveral = tonumber(_interveral) or 4
-
-		camBopIntensity = _intensity
-		camBopInterval = _interveral
-	end,
-}
-
 local ratingTimers = {}
 
 local useAltAnims
