@@ -27,7 +27,8 @@ return {
 		fromState = from
 
 		if inst then inst:stop() end
-		voices:stop()
+		if voicesBF then voicesBF:stop() end
+		if voicesEnemy then voicesEnemy:stop() end
 
 		audio.playSound(sounds["death"])
 
@@ -133,6 +134,7 @@ return {
 		Timer.clear()
 		graphics.setFade(1)
 		if inst then inst:stop() end
-		if voices then voices:stop() end
+		if voicesBF then voicesBF:stop() end
+		if voicesEnemy then voicesEnemy:stop() end
 	end
 }

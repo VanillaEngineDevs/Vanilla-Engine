@@ -664,8 +664,8 @@ return {
 				elseif pauseMenuSelection == 3 then
 					paused = false
 					if inst then inst:stop() end
-					if voicesBF then voicesBF:play() end
-					if voicesEnemy then voicesEnemy:play() end
+					if voicesBF then voicesBF:stop() end
+					if voicesEnemy then voicesEnemy:stop() end
 					storyMode = false
 					quitPressed = true
 				end
@@ -747,14 +747,14 @@ return {
 								time,
 								camera,
 								{
-									x = point.x + (tonumber(event.value.x) or 0),
-									y = point.y + (tonumber(event.value.y) or 0)
+									x = point.x + -(tonumber(event.value.x) or 0),
+									y = point.y + -(tonumber(event.value.y) or 0)
 								},
 								easingTypes[event.value.ease or "CLASSIC"]
 							)
 						else
-							camera.x = point.x + tonumber(event.value.x)
-							camera.y = point.y + tonumber(event.value.y)
+							camera.x = point.x + -tonumber(event.value.x or 0)
+							camera.y = point.y + -tonumber(event.value.y or 0)
 						end
 					end
 				elseif event.name == "PlayAnimation" then

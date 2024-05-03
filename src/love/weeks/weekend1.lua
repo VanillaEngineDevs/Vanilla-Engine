@@ -85,7 +85,26 @@ return {
 
 	initUI = function(self)
 		weeks:initUI()
-		if song == 3 then
+		if song == 4 then
+			weeks:generateNotes("data/songs/blazin/blazin-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/blazin/blazin-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+
+			for i = 1, 4 do
+				enemyArrows[i].visible = false
+				for j = 1, #enemyNotes[i] do
+					enemyNotes[i][j].visible = false
+				end
+
+				boyfriendArrows[i].x = -410 + 165  * i
+				for j = 1, #boyfriendNotes[i] do
+					boyfriendNotes[i][j].x = boyfriendArrows[i].x
+				end
+			end
+
+			rating.x = rating.x + 525
+			for i = 1, 3 do
+				numbers[i].x = numbers[i].x + 525
+			end
+		elseif song == 3 then
 			weeks:generateNotes("data/songs/2hot/2hot-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/2hot/2hot-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		elseif song == 2 then
 			weeks:generateNotes("data/songs/lit-up/lit-up-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/lit-up/lit-up-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
