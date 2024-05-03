@@ -378,7 +378,6 @@ function love.load()
 	end
 
 	-- Load Menus
-	clickStart = require "states.click-start"
 	menu = require "states.menu.menu"
 	menuWeek = require "states.menu.menuWeek"
 	menuFreeplay = require "states.menu.menuFreeplay"
@@ -596,11 +595,7 @@ function love.load()
 	modweek = require "mods.week"
 	modfolder = require "mods.folder"
 
-	if curOS == "Web" then
-		Gamestate.switch(clickStart)
-	else
-		Gamestate.switch(menu)
-	end
+	Gamestate.switch(menu)
 
 	love.setFpsCap(settings.fpsCap)
 end
