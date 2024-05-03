@@ -56,6 +56,19 @@ local MaxScore, ScoringOffset, ScoringSlope = 500, 54.00, 0.080
 local MinScore, MissScore = 9, 0
 local PerfectThres, MissThres, KillerThres, SickThres, GoodThres, BadThres, ShitThres = 5, 160, 12.5, 45, 90, 135, 160
 
+local DefaultTimeSignatureNum = 4
+local timeSignatureNum = DefaultTimeSignatureNum
+
+local camTween, bumpTween
+
+local function getBeatLengthsMS(bpm)
+	return 60 / bpm * 1000
+end
+
+local function getStepLengthsMS(bpm)
+	return getBeatLengthsMS(bpm) * (timeSignatureNum/4)
+end
+
 local eventFuncs = {
 	["Add Camera Zoom"] = function(size, sizeHud)
 		local size = tonumber(size) or 0.015
@@ -242,6 +255,13 @@ return {
 				camera:addPoint("enemy", -enemy.x - 100, -enemy.y + 75) 
 			else
 				camera:addPoint("enemy", 0, 0)
+			end
+		end
+		if not camera.points["girlfriend"] then
+			if girlfriend then
+				camera:addPoint("girlfriend", -girlfriend.x + 100, -girlfriend.y + 75)
+			else
+				camera:addPoint("girlfriend", 0, 0)
 			end
 		end
 
@@ -705,11 +725,23 @@ return {
 						end
 					elseif type(event.value) == "table" then
 						event.value.char = tonumber(event.value.char)
-						local point = camera:getPoint(event.value.char == 0 and "boyfriend" or "enemy")
+						local point = 0
+						if event.value.char == 0 then
+							point = camera:getPoint("boyfriend")
+						elseif event.value.char == 1 then
+							point = camera:getPoint("enemy")
+						elseif event.value.char == 2 then
+							point = camera:getPoint("girlfriend")
+						end
 						event.value.ease = event.value.ease or "CLASSIC"
 						if event.value.ease ~= "INSTANT" then
-							Timer.tween(
-								(tonumber(event.value.duration) or 4)/10,
+							local time = (getStepLengthsMS(bpm) * (tonumber(event.value.duration) or 4)) / 1000
+							if camTween then 
+								Timer.cancel(camTween)
+							end
+
+							camTween = Timer.tween(
+								time,
 								camera,
 								{
 									x = point.x + (tonumber(event.value.x) or 0),
@@ -733,8 +765,12 @@ return {
 					elseif type(event.value) == "table" then
 						if event.value.mode == "stage" then
 							if event.value.ease ~= "INSTANT" then
-								Timer.tween(
-									(tonumber(event.value.duration) or 4)/10,
+								local time = getStepLengthsMS(bpm) * (tonumber(event.value.duration) or 4) / 1000
+								if bumpTween then 
+									Timer.cancel(bumpTween)
+								end
+								bumpTween = Timer.tween(
+									time,
 									camera,
 									{defaultZoom = tonumber(event.value.zoom) or 1},
 									easingTypes[event.value.ease or "CLASSIC"]
