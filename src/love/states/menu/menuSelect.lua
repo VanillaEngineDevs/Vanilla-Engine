@@ -54,13 +54,6 @@ return {
                     )
                 end
             },
-            -- erm,,, whar the scallop
-            --[[ love.system.getOS() == "NX" and {
-                sprite = love.filesystem.load("sprites/menu/merch.lua")(),
-                confirm = function()
-                    love.system.openURL("https://needlejuicerecords.com/en-ca/pages/friday-night-funkin")
-                end
-            } or nil,   ]]
             {
                 sprite = love.filesystem.load("sprites/menu/options.lua")(),
                 confirm = function()
@@ -88,35 +81,12 @@ return {
                 end
             }
         }
-        print(#buttons)
-
-        --[[ options = love.filesystem.load("sprites/menu/menuButtons.lua")()
-        story = love.filesystem.load("sprites/menu/menuButtons.lua")()
-        freeplay = love.filesystem.load("sprites/menu/menuButtons.lua")()
-        credits = love.filesystem.load("sprites/menu/credits.lua")()
-        story:animate("story hover", true)
-        freeplay:animate("freeplay", true)
-        options:animate("options", true)
-        credits:animate("credits", true)
-        story.y,freeplay.y,options.y,credits.y = -200, -50, 100, 250
-        story.sizeX, story.sizeY = 0.75, 0.75
-        freeplay.sizeX, freeplay.sizeY = 0.75, 0.75
-        options.sizeX, options.sizeY = 0.75, 0.75
-        credits.sizeX, credits.sizeY = 0.75, 0.75 ]]
-
-        --[[ story.x, freeplay.x, options.x, credits.x = -500, -500, -500, -500
-        Timer.tween(1, story, {x = -295}, "out-expo")
-        Timer.tween(1, freeplay, {x = -320}, "out-expo")
-        Timer.tween(1, options, {x = -345}, "out-expo")
-        Timer.tween(1, credits, {x = -370}, "out-expo") ]]
-        --Timer.tween(0.88, cam, {y = 35, sizeX = 1.1, sizeY = 1.1}, "out-quad")
 
         for _, button in ipairs(buttons) do
             button.sprite:animate("idle", true)
         end
 
-        -- set all positions, more buttons there are, the y is closer to the center
-        for i, button in ipairs(buttons) do
+=        for i, button in ipairs(buttons) do
             button.sprite.x = -500
             button.sprite.sizeX = 0.75
             button.sprite.sizeY = 0.75
