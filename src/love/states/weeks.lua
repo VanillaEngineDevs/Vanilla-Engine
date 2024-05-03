@@ -71,7 +71,7 @@ local easingTypes = {
     ["bounceInOut"] = "in-out-bounce"
 }
 
--- Nabbed from the JS source of FNF v0.3.0 (PBOT Scoring)
+-- Nabbed from the JS source of FNF v0.3.0 (PBOT1 Scoring)
 local MaxScore, ScoringOffset, ScoringSlope = 500, 54.00, 0.080
 local MinScore, MissScore = 9, 0
 local PerfectThres, MissThres, KillerThres, SickThres, GoodThres, BadThres, ShitThres = 5, 160, 12.5, 45, 90, 135, 160
