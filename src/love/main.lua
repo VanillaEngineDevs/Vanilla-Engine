@@ -420,14 +420,14 @@ function love.load()
 	__VERSION__ = love.filesystem.getInfo("version.txt") and love.filesystem.read("version.txt") or "vUnknown"
 
 	weekDesc = { -- Add your week description here
-		"LEARN TO FUNK",
+		"TEACHING TIME",
 		"DADDY DEAREST",
 		"SPOOKY MONTH",
 		"PICO",
 		"MOMMY MUST MURDER",
 		"RED SNOW",
 		"HATING SIMULATOR FT. MOAWLING",
-		"TANKMAN",
+		"TANKMAN FT. JOHNYUTAH",
 		"DUE DEBTS"
 	}
 
