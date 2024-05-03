@@ -1,5 +1,6 @@
 return {
     enter = function()
+        sounds = sounds or {}
         stageImages = {
             ["Sunset"] = graphics.newImage(graphics.imagePath("week4/sunset")),
             ["BG Limo"] = love.filesystem.load("sprites/week4/bg-limo.lua")(), -- bg-limo

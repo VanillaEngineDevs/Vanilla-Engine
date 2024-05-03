@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 return {
     enter = function()
+		sounds = sounds or {}
         winColors = {
 			{49, 162, 253}, -- Blue
 			{49, 253, 140}, -- Green
@@ -137,7 +138,7 @@ return {
 		end
 
         if winAlpha > 0 then
-            winAlpha = winAlpha - ((bpm/260) * dt)
+            winAlpha = winAlpha - (((bpm or 120)/260) * dt)
         end
 
 		updateTrainPos(dt)

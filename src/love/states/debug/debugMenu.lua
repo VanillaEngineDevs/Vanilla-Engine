@@ -1,57 +1,44 @@
-local choice
+local choice, options
 return {
     enter = function()
         choice = 1
+        options = {
+            {
+                text = "Sprite Viewer",
+                state = spriteDebug
+            },
+            {
+                text = "Stage Editor",
+                state = stageDebug
+            },
+            {
+                text = "Frame Offset Viewer",
+                state = frameDebug
+            }
+        }
     end,
-
-    update = function(self, dt)
-
-    end,
-
+    
     keypressed = function(self, key)
         if key == "up" then
-            if choice ~= 1 then
-                choice = choice - 1
-            else
-                choice = 3
-            end
+            choice = choice < 1 and #options or choice - 1
         elseif key == "down" then
-            if choice ~= 3 then
-                choice = choice + 1
-            else
-                choice = 1
-            end
+            choice = choice > #options and 1 or choice + 1
         elseif key == "return" then
-            if choice == 1 then
-                Gamestate.switch(spriteDebug)
-            elseif choice == 2 then
-                Gamestate.switch(stageDebug)
-            elseif choice == 3 then
-                Gamestate.switch(frameDebug)
-            end
+            Gamestate.switch(options[choice].state)
         end
     end,
 
     draw = function()
-        graphics.setColor(255, 255, 255, 255)
+        graphics.setColor(1, 1, 1, 1)
         love.graphics.print("Debug Menu", 10, 10)
-        if choice == 1 then
-            graphics.setColor(1, 1, 0)
-        else
-            graphics.setColor(1, 1, 1)
+        for i, option in ipairs(options) do
+            if choice == i then
+                graphics.setColor(1, 1, 0)
+            else
+                graphics.setColor(1, 1, 1)
+            end
+            love.graphics.print(i .. ". " .. option.text, 10, 30 + 20 * i)
         end
-        love.graphics.print("1. Sprite Viewer", 10, 30)
-        if choice == 2 then
-            graphics.setColor(1, 1, 0)
-        else
-            graphics.setColor(1, 1, 1)
-        end
-        love.graphics.print("2. Stage Editor", 10, 50)
-        if choice == 3 then
-            graphics.setColor(1, 1, 0)
-        else
-            graphics.setColor(1, 1, 1)
-        end
-        love.graphics.print("3. Frame Offset Viewer", 10, 70)
+        graphics.setColor(1, 1, 1, 1)
     end
 }
