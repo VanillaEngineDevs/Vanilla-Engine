@@ -1,5 +1,34 @@
 -- For XML's
 
+function getImage(key)
+    local key = key .. ".png"
+    -- does it exist? if not, try remove ".png"
+    if not love.filesystem.getInfo(key) then
+        key = key:gsub(".png", "")
+    end
+    if graphics.cache[key] then
+        return graphics.cache[key]
+    else
+        local img = love.graphics.newImage(key)
+        graphics.cache[key] = img
+        return img
+    end
+
+    return nil
+end
+function getSparrow(key)
+    local ip, xp = key, key .. ".xml"
+    -- remove ".dds" from the key
+    xp = xp:gsub(".dds.xml", ".xml")
+    local i = getImage(ip)
+    if love.filesystem.getInfo(xp) then
+        local o = Sprite.getFramesFromSparrow(i, love.filesystem.read(xp))
+        return o
+    end
+
+    return nil
+end
+
 local Sprite = Object:extend()
 local stencilS, stencilX, stencilY = {}, 0, 0
 

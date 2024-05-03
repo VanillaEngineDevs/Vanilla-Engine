@@ -590,10 +590,6 @@ function love.load()
 		(love.audio.getVolume())
 	))
 
-	-- mod folder stuff
-	modweek = require "mods.week"
-	modfolder = require "mods.folder"
-
 	Gamestate.switch(menu)
 
 	love.setFpsCap(settings.fpsCap)

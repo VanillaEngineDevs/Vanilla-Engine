@@ -197,7 +197,7 @@ return {
     end,
 
     leave = function()
-        for i, v in pairs(stageImages) do
+        for _, v in pairs(stageImages) do
             v = nil
 		end
 
