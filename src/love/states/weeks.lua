@@ -211,12 +211,12 @@ return {
 		botplayAlpha = {1}
 		paused = false
 		pauseMenuSelection = 1
-		function boyPlayAlphaChange()
+		function botPlayAlphaChange()
 			Timer.tween(1.25, botplayAlpha, {0}, "in-out-cubic", function()
-				Timer.tween(1.25, botplayAlpha, {1}, "in-out-cubic", boyPlayAlphaChange)
+				Timer.tween(1.25, botplayAlpha, {1}, "in-out-cubic", botPlayAlphaChange)
 			end)
 		end
-		boyPlayAlphaChange()
+		botPlayAlphaChange()
 		pauseBG = graphics.newImage(graphics.imagePath("pause/pause_box"))
 		pauseShadow = graphics.newImage(graphics.imagePath("pause/pause_shadow"))
 		useAltAnims = false
