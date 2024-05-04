@@ -17,6 +17,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------------------
 
+main: lovefile win64 switch macos
+
 all: lovefile desktop console
 
 desktop: lovefile win64 win32 macos
