@@ -417,7 +417,6 @@ return {
 
 		for _, noteData in ipairs(chart) do
 			local data = noteData.d % 4 + 1
-			local enemyNote = noteData.d > 3
 			local time = noteData.t
 			local holdTime = noteData.l or 0
 
@@ -431,44 +430,26 @@ return {
 
 			if settings.downscroll then noteObject.sizeY = -1 end
 
-			if enemyNote then
-				noteObject.x = enemyArrows[data].x
-				table.insert(enemyNotes[data], noteObject)
+			local enemyNote = noteData.d > 3
+			local notesTable = enemyNote and enemyNotes or boyfriendNotes
+			local arrowsTable = enemyNote and enemyArrows or boyfriendArrows
 
-				if holdTime > 0 then
-					for k = 71 / speed, holdTime, 71 / speed do
-						local holdNote = sprites[data]()
-						holdNote.col = data
-						holdNote.y = -400 + (time + k) * 0.6 * speed
-						holdNote.ver = noteData.k or "normal"
-						holdNote.time = time + k
-						holdNote:animate("hold")
+			noteObject.x = arrowsTable[data].x
+			table.insert(notesTable[data], noteObject)
+			if holdTime > 0 then
+				for k = 71 / speed, holdTime, 71 / speed do
+					local holdNote = sprites[data]()
+					holdNote.col = data
+					holdNote.y = -400 + (time + k) * 0.6 * speed
+					holdNote.ver = noteData.k or "normal"
+					holdNote.time = time + k
+					holdNote:animate("hold")
 
-						holdNote.x = enemyArrows[data].x
-						table.insert(enemyNotes[data], holdNote)
-					end
-
-					enemyNotes[data][#enemyNotes[data]]:animate("end")
+					holdNote.x = arrowsTable[data].x
+					table.insert(notesTable[data], holdNote)
 				end
-			else
-				noteObject.x = boyfriendArrows[data].x
-				table.insert(boyfriendNotes[data], noteObject)
 
-				if holdTime > 0 then
-					for k = 71 / speed, holdTime, 71 / speed do
-						local holdNote = sprites[data]()
-						holdNote.col = data
-						holdNote.y = -400 + (time + k) * 0.6 * speed
-						holdNote.ver = noteData.k or "normal"
-						holdNote.time = time + k
-						holdNote:animate("hold")
-
-						holdNote.x = boyfriendArrows[data].x
-						table.insert(boyfriendNotes[data], holdNote)
-					end
-
-					boyfriendNotes[data][#boyfriendNotes[data]]:animate("end")
-				end
+				notesTable[data][#notesTable[data]]:animate("end")
 			end
 		end
 

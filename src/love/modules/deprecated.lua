@@ -52,45 +52,26 @@ function weeks.legacyGenerateNotes(self, chart)
             if settings.downscroll then noteObject.sizeY = -1 end
 
             local enemyNote = (mustHitSection and noteType >= 4) or (not mustHitSection and noteType < 4)
+            local notesTable = enemyNote and enemyNotes or boyfriendNotes
+            local arrowsTable = enemyNote and enemyArrows or boyfriendArrows
 
-            if enemyNote then
-                noteObject.x = enemyArrows[id].x
+            noteObject.x = arrowsTable[id].x
 
-                table.insert(enemyNotes[id], noteObject)
-                if holdLength > 0 then
-                    for k = 71 / speed, holdLength, 71 / speed do
-                        local holdNote = sprites[id]()
-                        holdNote.col = id
-                        holdNote.y = -400 + (time + k) * 0.6 * speed
-                        holdNote.ver = noteVer
-                        holdNote.time = time + k
-                        holdNote:animate("hold")
+            table.insert(notesTable[id], noteObject)
+            if holdLength > 0 then
+                for k = 71 / speed, holdLength, 71 / speed do
+                    local holdNote = sprites[id]()
+                    holdNote.col = id
+                    holdNote.y = -400 + (time + k) * 0.6 * speed
+                    holdNote.ver = noteVer
+                    holdNote.time = time + k
+                    holdNote:animate("hold")
 
-                        holdNote.x = enemyArrows[id].x
-                        table.insert(enemyNotes[id], holdNote)
-                    end
-
-                    enemyNotes[id][#enemyNotes[id]]:animate("end")
+                    holdNote.x = arrowsTable[id].x
+                    table.insert(notesTable[id], holdNote)
                 end
-            else
-                noteObject.x = boyfriendArrows[id].x
-                table.insert(boyfriendNotes[id], noteObject)
 
-                if holdLength > 0 then
-                    for k = 71 / speed, holdLength, 71 / speed do
-                        local holdNote = sprites[id]()
-                        holdNote.col = id
-                        holdNote.y = -400 + (time + k) * 0.6 * speed
-                        holdNote.ver = noteVer
-                        holdNote.time = time + k
-                        holdNote:animate("hold")
-
-                        holdNote.x = boyfriendArrows[id].x
-                        table.insert(boyfriendNotes[id], holdNote)
-                    end
-
-                    boyfriendNotes[id][#boyfriendNotes[id]]:animate("end")
-                end
+                notesTable[id][#notesTable[id]]:animate("end")
             end
 
             ::continue::
