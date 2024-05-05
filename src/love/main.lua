@@ -242,6 +242,7 @@ function love.load()
 	require "modules.savedata"
 	require "modules.Alphabet"
 	Option = require "modules.Option"
+	CONSTANTS = require "modules.constants"
 	loadSavedata()
 	
 	-- XML Modules

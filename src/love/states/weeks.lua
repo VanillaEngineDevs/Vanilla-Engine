@@ -17,60 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
-local animList = {
-	"singLEFT",
-	"singDOWN",
-	"singUP",
-	"singRIGHT"
-}
-local inputList = {
-	"gameLeft",
-	"gameDown",
-	"gameUp",
-	"gameRight"
-}
-local noteList = {
-	"left",
-	"down",
-	"up",
-	"right"
-}
-
-local easingTypes = {
-	["CLASSIC"] = "out-quad",
-	["linear"] = "linear",
-    ["sineIn"] = "in-sine",
-    ["sineOut"] = "out-sine",
-    ["sineInOut"] = "in-out-sine",
-    ["quadIn"] = "in-quad",
-    ["quadOut"] = "out-quad",
-    ["quadInOut"] = "in-out-quad",
-    ["cubicIn"] = "in-cubic",
-    ["cubicOut"] = "out-cubic",
-    ["cubicInOut"] = "in-out-cubic",
-    ["quartIn"] = "in-quart",
-    ["quartOut"] = "out-quart",
-    ["quartInOut"] = "in-out-quart",
-    ["quintIn"] = "in-quintic",
-    ["quintOut"] = "out-quintic",
-    ["quintInOut"] = "in-out-quintic",
-    ["expoIn"] = "in-expo",
-    ["expoOut"] = "out-expo",
-    ["expoInOut"] = "in-out-expo",
-    ["circIn"] = "in-circ",
-    ["circOut"] = "out-circ",
-    ["circInOut"] = "in-out-circ",
-    ["elasticIn"] = "in-elastic",
-    ["elasticOut"] = "out-elastic",
-    ["elasticInOut"] = "in-out-elastic",
-    ["backIn"] = "in-back",
-    ["backOut"] = "out-back",
-    ["backInOut"] = "in-out-back",
-    ["bounceIn"] = "in-bounce",
-    ["bounceOut"] = "out-bounce",
-    ["bounceInOut"] = "in-out-bounce"
-}
-
 -- Nabbed from the JS source of FNF v0.3.0 (PBOT1 Scoring)
 local MaxScore, ScoringOffset, ScoringSlope = 500, 54.00, 0.080
 local MinScore, MissScore = 9, 0
@@ -414,8 +360,8 @@ return {
 			enemyArrows[i].y = -400
 			boyfriendArrows[i].y = -400
 
-			boyfriendArrows[i]:animate(noteList[i])
-			enemyArrows[i]:animate(noteList[i])
+			boyfriendArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
+			enemyArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
 
 			if settings.downscroll then 
 				enemyArrows[i].sizeY = -1
@@ -493,8 +439,6 @@ return {
 						holdNote.time = time + k
 						holdNote:animate("hold")
 
-						if settings.downscroll then holdNote.sizeY = -1 end
-
 						holdNote.x = enemyArrows[data].x
 						table.insert(enemyNotes[data], holdNote)
 					end
@@ -513,8 +457,6 @@ return {
 						holdNote.ver = noteData.k or "normal"
 						holdNote.time = time + k
 						holdNote:animate("hold")
-
-						if settings.downscroll then holdNote.sizeY = -1 end
 
 						holdNote.x = boyfriendArrows[data].x
 						table.insert(boyfriendNotes[data], holdNote)
@@ -705,12 +647,6 @@ return {
 					beatHandler.setBPM(bpm)
 				end
 
-				if events[i].altAnim then
-					useAltAnims = true
-				else
-					useAltAnims = false
-				end
-
 				table.remove(events, i)
 
 				break
@@ -750,7 +686,7 @@ return {
 									x = point.x + (tonumber(event.value.x) or 0),
 									y = point.y + (tonumber(event.value.y) or 0)
 								},
-								easingTypes[event.value.ease or "CLASSIC"]
+								CONSTANTS.WEEKS.EASING_TYPES[event.value.ease or "CLASSIC"]
 							)
 						else
 							camera.x = point.x + tonumber(event.value.x or 0)
@@ -776,7 +712,7 @@ return {
 									time,
 									camera,
 									{defaultZoom = tonumber(event.value.zoom) or 1},
-									easingTypes[event.value.ease or "CLASSIC"]
+									CONSTANTS.WEEKS.EASING_TYPES[event.value.ease or "CLASSIC"]
 								)
 							else
 								camera.defaultZoom = tonumber(event.value.zoom) or 1
@@ -845,6 +781,10 @@ return {
 		end
 	end,
 
+	setAltAnims = function(self, useAlt)
+		useAltAnims = useAlt
+	end,
+
 	updateUI = function(self, dt)
 		if inCutscene then return end
 		if paused then return end
@@ -856,8 +796,8 @@ return {
 			local boyfriendArrow = boyfriendArrows[i]
 			local enemyNote = enemyNotes[i]
 			local boyfriendNote = boyfriendNotes[i]
-			local curAnim = animList[i]
-			local curInput = inputList[i]
+			local curAnim = CONSTANTS.WEEKS.ANIM_LIST[i]
+			local curInput = CONSTANTS.WEEKS.INPUT_LIST[i]
 			local gfNote = gfNotes[i]
 
 			local noteNum = i
@@ -866,37 +806,24 @@ return {
 			boyfriendArrow:update(dt)
 
 			if not enemyArrow:isAnimated() then
-				enemyArrow:animate(noteList[i], false)
+				enemyArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i], false)
 			end
 			if settings.botPlay then
 				if not boyfriendArrow:isAnimated() then
-					boyfriendArrow:animate(noteList[i], false)
+					boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i], false)
 				end
 			end
 
 			if #enemyNote > 0 then
 				if (enemyNote[1].time - musicTime <= 0) then
-					enemyArrow:animate(noteList[i] .. " confirm", false)
+					enemyArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
 					useAltAnims = false
-					local finishFunc = true
 
 					local whohit = enemy
-					if enemyNote[1].ver == "GF Sing" then
-						whohit = girlfriend
-					elseif enemyNote[1].ver == "mom" then
-						useAltAnims = true
-					elseif enemyNote[1].ver == "weekend-1-lightcan" then
-						if whohit then whohit:animate("light-can", false) end
-						finishFunc = false
-					elseif enemyNote[1].ver == "weekend-1-kickcan" then
-						if whohit then whohit:animate("kick-can", false) end
-						finishFunc = false
-					elseif enemyNote[1].ver == "weekend-1-kneecan" then
-						if whohit then whohit:animate("knee-forward", false) end
-						finishFunc = false
-					end
+					-- default to true if nothing is returned
+					local continue = (Gamestate.onNoteHit(enemy, enemyNote[1].ver, "EnemyHit", i) == nil or false) and true or false
 
-					if finishFunc then
+					if continue then
 						if enemyNote[1]:getAnimName() == "hold" or enemyNote[1]:getAnimName() == "end" then
 							if useAltAnims then
 								if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim .. " alt", _psychmod and true or false) end
@@ -952,7 +879,7 @@ return {
 					if (boyfriendNote[1].time - musicTime <= 0) then
 						if voicesBF then voicesBF:setVolume(1) end
 
-						boyfriendArrow:animate(noteList[i] .. " confirm", false)
+						boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
 
 						if boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end" then
 							if boyfriend and boyfriend.holdTimer >= boyfriend.maxHoldTimer then boyfriend:animate(curAnim, false) end
@@ -987,7 +914,7 @@ return {
 							ratingTimers[4] = Timer.tween(2, numbers[2], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
 							ratingTimers[5] = Timer.tween(2, numbers[3], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
 							health = health + 0.095
-							score = score + 350
+							score = score + 500
 
 							self:calculateRating()
 						else
@@ -1003,12 +930,14 @@ return {
 				-- if settings.botPlay is true, break our the if statement
 				if settings.botPlay then break end
 				local success = false
+				local didHitNote = false
 
 				if settings.ghostTapping then
 					success = true
+					didHitNote = false
 				end
 
-				boyfriendArrow:animate(noteList[i] .. " press", false)
+				boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " press", false)
 
 				if #boyfriendNote > 0 then
 					for j = 1, #boyfriendNote do
@@ -1053,9 +982,7 @@ return {
 								ratingTimers[5] = Timer.tween(2, numbers[3], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
 
 								if not settings.ghostTapping or success then
-									boyfriendArrow:animate(noteList[i] .. " confirm", false)
-
-									if boyfriend then boyfriend:animate(curAnim, false) end
+									boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
 
 									if boyfriendNote[j]:getAnimName() ~= "hold" and boyfriendNote[j]:getAnimName() ~= "end" then
 										health = health + 0.095
@@ -1063,7 +990,14 @@ return {
 										health = health + 0.0125
 									end
 
+									local continue = Gamestate.onNoteHit(boyfriend, boyfriendNote[j].ver, ratingAnim, i) == nil and true or false 
+
+									if continue then
+										if boyfriend then boyfriend:animate(curAnim, false) end
+									end
+
 									success = true
+									didHitNote = true
 								end
 
 								table.remove(boyfriendNote, j)
@@ -1081,7 +1015,9 @@ return {
 
 					if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
 
-					score = math.max(0, score - 10)
+					if didHitNote then
+						score = math.max(0, score - 10)
+					end
 					health = health - 0.135
 					misses = misses + 1
 				end
@@ -1090,7 +1026,7 @@ return {
 			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].y <= boyfriendArrow.y)) and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
 				if voicesBF then voicesBF:setVolume(1) end
 
-				boyfriendArrow:animate(noteList[i] .. " confirm", false)
+				boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
 				health = health + 0.0125
 
 				if boyfriend and boyfriend.holdTimer > boyfriend.maxHoldTimer then
@@ -1101,7 +1037,7 @@ return {
 			end
 
 			if input:released(curInput) then
-				boyfriendArrow:animate(noteList[i], false)
+				boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i], false)
 			end
 		end
 
@@ -1388,11 +1324,11 @@ return {
 			love.graphics.scale(uiScale.zoom, uiScale.zoom)
 			love.graphics.push()
 				graphics.setColor(0,0,0,settings.scrollUnderlayTrans)
-				local baseX = boyfriendArrows[1].x - (boyfriendArrows[1]:getFrameWidth(noteList[i])/2) * (pixel and 8 or 0) + (pixel and -15 or 0)
+				local baseX = boyfriendArrows[1].x - (boyfriendArrows[1]:getFrameWidth(CONSTANTS.WEEKS.NOTE_LIST[i])/2) * (pixel and 8 or 0) + (pixel and -15 or 0)
 				local scrollWidth = 0
 				-- determine the scrollWidth with the first 4 arrows
 				for i = 1, 4 do
-					scrollWidth = scrollWidth + boyfriendArrows[i]:getFrameWidth(noteList[i]) * (pixel and 8 or 0)
+					scrollWidth = scrollWidth + boyfriendArrows[i]:getFrameWidth(CONSTANTS.WEEKS.NOTE_LIST[i]) * (pixel and 8 or 0)
 				end
 				scrollWidth = scrollWidth + 30 + (pixel and 95 or 0)
 

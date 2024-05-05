@@ -125,6 +125,23 @@ return {
 		end
 	end,
 
+	onNoteHit = function(self, character, noteType, rating, id) 
+		-- rating is "EnemyHit" when an enemy hits it. Can be used to determine if the player hit it or the enemy hit it when needed
+		-- Return "true" to not play ANY animations, return "false" or nothing to play the default animations
+		if rating == "EnemyHit" then
+			if noteType == "weekend-1-lightcan" then
+				character:animate("light-can")
+				return true
+			elseif noteType == "wekend-1-kickcan" then
+				character:animate("kick-can")
+				return true
+			elseif noteType ==  "weekend-1-kneecan" then
+				character:animate("knee-forward")
+				return true
+			end
+		end
+	end,
+
 	update = function(self, dt)
 		if inCutscene then
 			if not video:isPlaying() then 

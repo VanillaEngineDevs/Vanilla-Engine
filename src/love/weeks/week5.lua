@@ -111,12 +111,21 @@ return {
 		end
 	end,
 
+	onNoteHit = function(self, character, noteType, rating, id) -- rating is "EnemyHit" when an enemy hits it. Can be used to determine if the player hit it or the enemy hit it when needed
+		-- Return "true" to not play ANY animations, return "false" or nothing to play the default animations
+		if rating == "EnemyHit" then
+			if noteType == "mom" then
+				weeks:setAltAnims(true)
+			end
+		end
+	end,
+
 	update = function(self, dt)
 		if not scaryIntro then
 			weeks:update(dt)
 			stages["mall"]:update(dt)
 
-			if not (scaryIntro or countingDown or graphics.isFading()) and not (inst:isPlaying() and voices:isPlaying()) and not paused then
+			if not (scaryIntro or countingDown or graphics.isFading()) and not (inst:isPlaying() and voicesBF:isPlaying()) and not paused then
 				if storyMode and song < 3 then
 					weeks:saveData()
 					song = song + 1
