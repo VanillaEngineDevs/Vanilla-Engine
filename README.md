@@ -1,9 +1,13 @@
-# almost entire weeks.lua needs to be rewritten to support the new FNF charts.
-
 # DOWNLOAD NIGHTLY HERE: https://nightly.link/VanillaEngineDevs/Vanilla-Engine/workflows/build/main
 
 # ![Logo](images/logo.png)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/VanillaEngineDevs/Vanilla-Engine?style=flat-square)](https://github.com/VanillaEngineDevs/Vanilla-Engine/releases/latest) [![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/VanillaEngineDevs/Vanilla-Engine?include_prereleases&style=flat-square)](https://github.com/VanillaEngineDevs/Vanilla-Engine/releases) [![GitHub all releases](https://img.shields.io/github/downloads/VanillaEngineDevs/Vanilla-Engine/total?style=flat-square)](https://github.com/VanillaEngineDevs/Vanilla-Engine/releases) [![GitHub issues](https://img.shields.io/github/issues/VanillaEngineDevs/Vanilla-Engine?style=flat-square)](https://github.com/VanillaEngineDevs/Vanilla-Engine/issues) [![GitHub](https://img.shields.io/github/license/VanillaEngineDevs/Vanilla-Engine?style=flat-square)](https://github.com/VanillaEngineDevs/Vanilla-Engine/blob/main/LICENSE) [![Discord](https://img.shields.io/discord/852658576577003550?style=flat-square)](https://discord.gg/tQGzN2Wu48)
+
+# FOR MODDING, READ HERE
+Vanilla Engine has recently been updated to support the new FNF 0.3.x charts. For backwords compatibility for Charts, Inst, and Vocals, do the following:
+1. In your week file, instead of weeks:generateNotes(chartfile, metafile, difficulty), call weeks:legacyGenerateNotes(chartfile)
+2. Only load the vocals for "VoicesBF". This is because VE now uses the FNNF 0.3.x Vocals system (split-vocal files).
+
 
 Friday Night Funkin' Vanilla Engine is a rewrite of [Friday Night Funkin'](https://ninja-muffin24.itch.io/funkin) built on [LÖVE](https://love2d.org/) for Windows and using [Funkin' Rewritten](https://github.com/HTV04/Funkin-Rewritten) for macOS, Linux, and Web platforms, as well as previously unsupported platforms, like the Nintendo Switch!
 
