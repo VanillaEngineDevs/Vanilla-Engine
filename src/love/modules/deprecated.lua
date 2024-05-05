@@ -37,7 +37,7 @@ function weeks.legacyGenerateNotes(self, chart)
             local noteVer = noteData[4] or "normal"
             local holdLength = noteData[3] or 0
 
-            if noteVer == "Hurt Note" then goto continue end
+            if noteVer == "Hurt Note" or noteType < 0 then goto continue end
 
             local id = noteType % 4 + 1
             
