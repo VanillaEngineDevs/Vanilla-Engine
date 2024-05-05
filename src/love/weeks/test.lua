@@ -28,7 +28,8 @@ return {
 		stages["stage"]:load()
 
 	    inst = love.audio.newSource("songs/test/Inst.ogg", "stream")
-		voices = love.audio.newSource("songs/test/Voices.ogg", "stream")
+		voicesBF = love.audio.newSource("songs/test/Voices-bf.ogg", "stream")
+        voicesEnemy = love.audio.newSource("songs/test/Voices-bf-pixel.ogg", "stream")
 
         -- override of the weeks.lua function
         function updateNotePos()
@@ -102,7 +103,7 @@ return {
 	initUI = function(self)
 		weeks:initUI()
 
-		weeks:generateNotes("data/test/test.json")
+		weeks:legacyGenerateNotes("data/songs/test/test.json")
 	end,
 
 	update = function(self, dt)
