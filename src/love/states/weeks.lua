@@ -40,6 +40,8 @@ local ratingTimers = {}
 local useAltAnims
 local option = "normal"
 
+local countNum = 4 -- Used for countdown
+
 return {
 	enter = function(self, option)
 		playMenuMusic = false
@@ -486,62 +488,48 @@ return {
 	end,
 
 	-- Gross countdown script
-	setupCountdown = function(self)
+	setupCountdown = function(self, countNumVal)
+		local countNumVal = countNumVal or 4
 		lastReportedPlaytime = 0
-		musicTime = (240 / bpm) * -1000
-
+		musicTime = ((60*4) / bpm) * -1000 -- countdown is 4 beats long
 		musicThres = 0
 
 		countingDown = true
-		countdownFade[1] = 0
-		audio.playSound(sounds.countdown.three)
-		Timer.after(
-			(60 / bpm),
-			function()
-				countdown:animate("ready")
-				countdownFade[1] = 1
-				audio.playSound(sounds.countdown.two)
-				Timer.tween(
-					(60 / bpm),
-					countdownFade,
-					{0},
-					"linear",
-					function()
-						countdown:animate("set")
-						countdownFade[1] = 1
-						audio.playSound(sounds.countdown.one)
-						Timer.tween(
-							(60 / bpm),
-							countdownFade,
-							{0},
-							"linear",
-							function()
-								countdown:animate("go")
-								countdownFade[1] = 1
-								audio.playSound(sounds.countdown.go)
-								Timer.tween(
-									(60 / bpm),
-									countdownFade,
-									{0},
-									"linear",
-									function()
-										countingDown = false
+		if girlfriend then girlfriend:beat(countNumVal) end
+		if boyfriend then boyfriend:beat(countNumVal) end
+		if enemy then enemy:beat(countNumVal) end
+		if CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[countNumVal] then audio.playSound(sounds.countdown[CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[countNumVal]]) end
+		if countNumVal == 4 then 
+			countdownFade[1] = 0
+			Timer.after(
+				(60/bpm), -- one beat
+				function()
+					self:setupCountdown(countNumVal - 1)
+				end
+			)
+		else
+			countdownFade[1] = 1
+			countdown:animate(CONSTANTS.WEEKS.COUNTDOWN_ANIMS[countNumVal])
+			Timer.tween(
+				(60/bpm), 
+				countdownFade,
+				{0},
+				"linear",
+				function()
+					if countNumVal ~= 1 then self:setupCountdown(countNumVal - 1)
+					else
+						countingDown = false
+						previousFrameTime = love.timer.getTime() * 1000
+						musicTime = 0
+						beatHandler.reset(0)
 
-										previousFrameTime = love.timer.getTime() * 1000
-										musicTime = 0
-										beatHandler.reset(0)
-
-										if inst then inst:play() end
-										if voicesBF then voicesBF:play() end
-										if voicesEnemy then voicesEnemy:play() end
-									end
-								)
-							end
-						)
+						if inst then inst:play() end
+						if voicesBF then voicesBF:play() end
+						if voicesEnemy then voicesEnemy:play() end
 					end
-				)
-			end
-		)
+				end
+			)
+		end
 	end,
 
 	update = function(self, dt)
@@ -731,9 +719,11 @@ return {
 		if enemy then enemy:update(dt) end
 		if boyfriend then boyfriend:update(dt) end
 
-		if boyfriend then boyfriend:beat(beatHandler.getBeat()) end
-		if enemy then enemy:beat(beatHandler.getBeat()) end
-		if girlfriend then girlfriend:beat(beatHandler.getBeat()) end
+		if beatHandler.onBeat() then
+			if boyfriend then boyfriend:beat(beatHandler.getBeat()) end
+			if enemy then enemy:beat(beatHandler.getBeat()) end
+			if girlfriend then girlfriend:beat(beatHandler.getBeat()) end
+		end
 	end,
 
 	judgeNote = function(self, msTiming)

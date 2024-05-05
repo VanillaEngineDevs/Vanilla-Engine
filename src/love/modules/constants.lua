@@ -52,6 +52,17 @@ CONSTANTS.WEEKS = {
         ["bounceIn"] = "in-bounce",
         ["bounceOut"] = "out-bounce",
         ["bounceInOut"] = "in-out-bounce"
+    },
+    COUNTDOWN_SOUNDS = {
+        "go",
+        "one",
+        "two",
+        "three"
+    },
+    COUNTDOWN_ANIMS = {
+        "go",
+        "set",
+        "ready"
     }
 }
 

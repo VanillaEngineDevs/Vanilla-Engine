@@ -70,7 +70,7 @@ return {
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/roses/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
 			voicesBF = love.audio.newSource("songs/roses/Voices-bf" .. (hasErect and "-pixel-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/roses/Voices-senpai-angry" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/roses/Voices-senpai" .. (hasErect and "-angry-erect" or "") .. ".ogg", "stream")
 		else
 			inst = love.audio.newSource("songs/senpai/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
 			voicesBF = love.audio.newSource("songs/senpai/Voices-bf" .. (hasErect and "-pixel-erect" or "") .. ".ogg", "stream")

@@ -398,38 +398,36 @@ return {
 			beat = function(self, beat)
 				local beat = math.floor(beat) or 0
 				if self.isCharacter then
-					if beatHandler.onBeat() then
-						if not self.danceIdle then
-							if (not self:isAnimated() and util.startsWith(self:getAnimName(), "sing")) or (self:getAnimName() == "idle" or self:getAnimName() == "idle loop") then
-								if beat % self.danceSpeed == 0 then 
-									if self.lastHit > 0 then
-										if beat % math.max(self.danceSpeed, 2) == 0 and self.lastHit + beatHandler.stepCrochet * self.singDuration <= musicTime then
-											self:animate("idle", false, function()
-												if self:isAnimName("idle loop") then 
-													self:animate("idle loop", true)
-												end
-											end)
-											self.lastHit = 0
-										end
-									elseif beat % self.danceSpeed == 0 then
+					if not self.danceIdle then
+						if (not self:isAnimated() and util.startsWith(self:getAnimName(), "sing")) or (self:getAnimName() == "idle" or self:getAnimName() == "idle loop") then
+							if beat % self.danceSpeed == 0 then 
+								if self.lastHit > 0 then
+									if beat % math.max(self.danceSpeed, 2) == 0 and self.lastHit + beatHandler.stepCrochet * self.singDuration <= musicTime then
 										self:animate("idle", false, function()
 											if self:isAnimName("idle loop") then 
 												self:animate("idle loop", true)
 											end
 										end)
+										self.lastHit = 0
 									end
+								elseif beat % self.danceSpeed == 0 then
+									self:animate("idle", false, function()
+										if self:isAnimName("idle loop") then 
+											self:animate("idle loop", true)
+										end
+									end)
 								end
 							end
-						else
-							if beat % self.danceSpeed == 0 then 
-								if (not self:isAnimated() and util.startsWith(self:getAnimName(), "sing")) or (self:getAnimName() == "danceLeft" or self:getAnimName() == "danceRight" or (not self:isAnimated() and self:getAnimName() == "sad")) then
-									self.danced = not self.danced
-									if self.danced then
-										self:animate("danceLeft", false)
-									else
-										self:animate("danceRight", false)
-									end	
-								end
+						end
+					else
+						if beat % self.danceSpeed == 0 then 
+							if (not self:isAnimated() and util.startsWith(self:getAnimName(), "sing")) or (self:getAnimName() == "danceLeft" or self:getAnimName() == "danceRight" or (not self:isAnimated() and self:getAnimName() == "sad")) then
+								self.danced = not self.danced
+								if self.danced then
+									self:animate("danceLeft", false)
+								else
+									self:animate("danceRight", false)
+								end	
 							end
 						end
 					end
