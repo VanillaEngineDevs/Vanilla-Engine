@@ -203,12 +203,6 @@ function saveSettings(menu)
 		end
     end
 end
---[[
-
-function love.load() -- Todo, add custom framerate support
-
-end
-]]
 
 require "modules.overrides"
 
