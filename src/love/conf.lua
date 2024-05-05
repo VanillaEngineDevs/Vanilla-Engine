@@ -32,5 +32,5 @@ function love.conf(t)
 		loveVer = major .. "." .. minor .. "." .. revision .. " " .. codename
 	end
 
-	t.window.title = "Friday Night Funkin' Vanilla Engine " .. version .. " | DEBUG | LOVE: " .. (_debug and loveVer or "")
+	t.window.title = "Friday Night Funkin' Vanilla Engine " .. version .. (_debug and " | DEBUG | LOVE: " .. loveVer or "")
 end
