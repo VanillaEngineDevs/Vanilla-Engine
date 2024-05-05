@@ -407,8 +407,13 @@ return {
 		elseif chartData.scrollSpeed["default"] then
 			_speed = chartData.scrollSpeed["default"]
 		end
+		
 
-		speed = _speed
+		if settings.customScrollSpeed == 1 then
+			speed = _speed
+		else
+			speed = settings.customScrollSpeed
+		end
 
 		for _, noteData in ipairs(chart) do
 			local data = noteData.d % 4 + 1
@@ -472,8 +477,6 @@ return {
 			local time = event.t
 			local eventName = event.e
 			local value = event.v
-
-			print(eventName, value)
 
 			table.insert(songEvents, {
 				time = time,

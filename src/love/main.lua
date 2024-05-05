@@ -428,6 +428,9 @@ function love.load()
 	}
 
 	testData = require "weeks.test"
+
+	require "modules.deprecated"
+	
 	__VERSION__ = love.filesystem.getInfo("version.txt") and love.filesystem.read("version.txt") or "vUnknown"
 
 	weekDesc = { -- Add your week description here
