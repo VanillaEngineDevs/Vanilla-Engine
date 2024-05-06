@@ -225,7 +225,7 @@ return {
                 --print(index, i, barHeight)
                 -- convert bar height from a number from 1-6
                 local animNum = math.floor(math.remap(barHeight, 0, 720, 1, 6))
-                print(index, i, animNum)
+                --print(index, i, animNum)
                 abotVisualizers[index]:animate(tostring(index) .. "_" .. tostring(animNum), false)
                 abotVisualizers[index]:draw()
                 index = index + 1
