@@ -51,19 +51,25 @@ return {
 		stages["streets"]:load()
 
 		if song == 4 then
-			inst = love.audio.newSource("songs/blazin/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/blazin/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream") 
+			lovefftINST:init(1024)
+			lovefftINST:setSoundData("songs/blazin/Inst" .. (erectMode and "-erect" or "") .. ".ogg")
 			voicesBF = nil
 			voicesEnemy = nil
 			rainShaderStartIntensity = 0.2
 			rainShaderEndIntensity = 0.4
 		elseif song == 3 then
 			inst = love.audio.newSource("songs/2hot/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			lovefftINST:init(1024)
+			lovefftINST:setSoundData("songs/2hot/Inst" .. (erectMode and "-erect" or "") .. ".ogg")
 			voicesBF = love.audio.newSource("songs/2hot/Voices-pico" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/2hot/Voices-darnell" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 			rainShaderStartIntensity = 0.2
 			rainShaderEndIntensity = 0.4
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/lit-up/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			lovefftINST:init(1024)
+			lovefftINST:setSoundData("songs/lit-up/Inst" .. (erectMode and "-erect" or "") .. ".ogg")
 			voicesBF = love.audio.newSource("songs/lit-up/Voices-pico" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/lit-up/Voices-darnell" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 
@@ -71,6 +77,8 @@ return {
 			rainShaderEndIntensity = 0.2
 		else
 			inst = love.audio.newSource("songs/darnell/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			lovefftINST:init(1024)
+			lovefftINST:setSoundData("songs/darnell/Inst" .. (erectMode and "-erect" or "") .. ".ogg")
 			voicesBF = love.audio.newSource("songs/darnell/Voices-pico" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/darnell/Voices-darnell" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 
@@ -151,7 +159,7 @@ return {
 			end
 		end
 		if love.system.getOS() ~= "NX" then 
-			intensity = math.remapToRange(musicTime/1000, 0, inst:getDuration(), rainShaderStartIntensity, rainShaderEndIntensity)
+			intensity = math.remap(musicTime/1000, 0, inst:getDuration(), rainShaderStartIntensity, rainShaderEndIntensity)
 			shaders["rain"]:send("uTime", love.timer.getTime())
 			shaders["rain"]:send("uIntensity", intensity)
 		end

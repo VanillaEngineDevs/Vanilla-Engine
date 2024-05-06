@@ -129,6 +129,9 @@ function love.load()
 	lume = require "lib.lume"
 	Object = require "lib.classic"
 	xml = require "lib.xml".parse
+	lovefftINST = require "lib.fft.lovefft"
+	lovefftBFVOCALS = require "lib.fft.lovefft"
+	lovefftENEMYVOCALS = require "lib.fft.lovefft"
 
 	-- Load modules
 	status = require "modules.status"

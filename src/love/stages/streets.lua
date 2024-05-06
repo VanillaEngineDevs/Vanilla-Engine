@@ -17,6 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
+ABOT_IMAGE = nil
+local abotVisualizers = {}
+local MAX_ABOT_VIZ = 7
+local VIS_TIME_MAX = 0.033333333333333333
+local deltaCurTime = 0
+
 return {
     enter = function()
         stageImages = {
@@ -33,6 +39,8 @@ return {
             ["abotBack"] = graphics.newImage(graphics.imagePath("weekend1/stereoBG")),
         }
 
+        ABOT_IMAGE = love.graphics.newImage(graphics.imagePath("weekend1/aBotViz"))
+
         stageImages["skybox"].x, stageImages["skybox"].y = 351, -300
         stageImages["spraycanPile"].x, stageImages["spraycanPile"].y = -314, 248
         stageImages["highwayLights"].x, stageImages["highwayLights"].y = -272, -459
@@ -43,6 +51,15 @@ return {
         stageImages["abotBack"].x, stageImages["abotBack"].y = 62, -20
         stageImages["skyline"].x, stageImages["skyline"].y = 100, -227
         stageImages["foregroundCity"].x, stageImages["foregroundCity"].y = -386, 38
+
+        for i = 1, MAX_ABOT_VIZ do
+            local viz = love.filesystem.load("sprites/weekend1/abotViz.lua")()
+            --viz:animate(tostring(i) .. "_1", false)
+            viz.x = -170 + (viz:getFrameWidth()/2 + 25) * i
+            viz.y = 0--stageImages["abot"].y + 120
+            --print(viz.x)
+            table.insert(abotVisualizers, viz)
+        end
 
         enemy = love.filesystem.load("sprites/weekend1/darnell.lua")()
         boyfriend = love.filesystem.load("sprites/pico-player.lua")()
@@ -157,6 +174,7 @@ return {
     end,
 
     update = function(self, dt)
+        deltaCurTime = deltaCurTime + dt
     end,
 
     draw = function()
@@ -188,6 +206,30 @@ return {
 
             stageImages["foreground"]:draw()
             stageImages["abotBack"]:draw()
+            local fftArray = lovefftINST:get()
+            local bfFFTArray, enemyFFTArray = {}, {}
+            local time = inst:tell()
+            if deltaCurTime > VIS_TIME_MAX then
+                deltaCurTime = 0
+                --print("Time: " .. time)
+                lovefftINST:updatePlayTime(time)
+            end
+            -- we only have 7 bars
+            local MAX_BARS = 7
+            local forEach = #fftArray / MAX_BARS
+            local index = 1
+            for i = 1, #fftArray, forEach do
+                local i = math.floor(i)
+                -- 7 bars
+                local barHeight = fftArray[i] * 720*100
+                --print(index, i, barHeight)
+                -- convert bar height from a number from 1-6
+                local animNum = math.floor(math.remap(barHeight, 0, 720, 1, 6))
+                print(index, i, animNum)
+                abotVisualizers[index]:animate(tostring(index) .. "_" .. tostring(animNum), false)
+                abotVisualizers[index]:draw()
+                index = index + 1
+            end
             stageImages["abot"]:draw()
             girlfriend:draw()
             enemy:draw()
@@ -200,6 +242,10 @@ return {
         for _, v in pairs(stageImages) do
             v = nil
 		end
+        for _, v in pairs(abotVisualizers) do
+            v = nil
+        end
+        ABOT_IMAGE = nil
 
         graphics.clearCache()
     end

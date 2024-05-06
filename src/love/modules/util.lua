@@ -90,8 +90,20 @@ function table.getKey(table, value)
     return nil
 end
 
-function math.remapToRange(value, from1, to1, from2, to2)
-    return (value - from1) / (to1 - from1) * (to2 - from2) + from2
+function math.remap(value, low1, high1, low2, high2)
+    return low2 + (value - low1) * (high2 - low2) / (high1 - low1)
+end
+
+function table.mergeValues(t1, t2)
+    -- add numbers together, concatenate strings
+    for k, v in pairs(t2) do
+        if type(v) == "number" then
+            t1[k] = (t1[k] or 0) + v
+        elseif type(v) == "string" then
+            t1[k] = (t1[k] or "") .. v
+        end
+    end
+    return t1
 end
 
 -- God like coding
