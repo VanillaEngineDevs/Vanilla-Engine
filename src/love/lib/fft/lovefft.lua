@@ -74,7 +74,7 @@ function loveFFT:push() -- Launch a new FFT computation in a separate thread usi
     for i = 1, self.fftSize do
         toFFT[i] = 0
         for j = 1, self.channelCount do
-            toFFT[i] = toFFT[i] + self.soundData:getSample(sample + i - 1, j)
+            util.tryExcept(function() toFFT[i] = toFFT[i] + self.soundData:getSample(sample + i - 1, j) end)
         end
     end
     -- Send to thread

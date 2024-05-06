@@ -106,6 +106,13 @@ function table.mergeValues(t1, t2)
     return t1
 end
 
+function util.tryExcept(try, except)
+    local status, err = pcall(try)
+    if not status and except then
+        except(err)
+    end
+end
+
 -- God like coding
 --[[
 function util.🍰(🥰, 🥵)
