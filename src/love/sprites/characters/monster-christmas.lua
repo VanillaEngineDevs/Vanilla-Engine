@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("week5/monster")),
+	love.graphics.newImage(graphics.imagePath("characters/monster-christmas")),
     -- Automatically generated from monsterChristmas.xml
 	{
 		{x = 0, y = 0, width = 375, height = 719, offsetX = -4, offsetY = 0, offsetWidth = 381, offsetHeight = 719}, -- 1: Monster Right note0000

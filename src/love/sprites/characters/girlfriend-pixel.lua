@@ -3,7 +3,7 @@ This file is part of Friday Night Funkin' DOS by HTV04
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("pixel/girlfriend")),
+	love.graphics.newImage(graphics.imagePath("characters/girlfriend-pixel")),
 	-- Automatically generated from gfPixel.xml
 	{
 		{x = 0, y = 232, width = 120, height = 106, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 1: GF IDLE0029

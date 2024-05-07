@@ -87,8 +87,8 @@ return {
 
 			rating.sizeX, rating.sizeY = 0.75, 0.75
 
-			girlfriend = love.filesystem.load("sprites/girlfriend.lua")()
-			boyfriend = love.filesystem.load("sprites/boyfriend.lua")()
+			girlfriend = love.filesystem.load("sprites/characters/girlfriend.lua")()
+			boyfriend = love.filesystem.load("sprites/characters/boyfriend.lua")()
 		else
 			pixel = true
 			love.graphics.setDefaultFilter("nearest", "nearest")
@@ -121,8 +121,8 @@ return {
 
 			rating = love.filesystem.load("sprites/pixel/rating.lua")()
 
-			girlfriend = love.filesystem.load("sprites/pixel/girlfriend.lua")()
-			boyfriend = love.filesystem.load("sprites/pixel/boyfriend.lua")()
+			girlfriend = love.filesystem.load("sprites/characters/girlfriend-pixel.lua")()
+			boyfriend = love.filesystem.load("sprites/characters/boyfriend-pixel.lua")()
 		end
 
 		numbers = {}
@@ -210,7 +210,7 @@ return {
 		end
 		if not camera.points["girlfriend"] then
 			if girlfriend then
-				camera:addPoint("girlfriend", -girlfriend.x + 100, -girlfriend.y + 75)
+				camera:addPoint("girlfriend", -girlfriend.x - 100, -girlfriend.y + 75)
 			else
 				camera:addPoint("girlfriend", 0, 0)
 			end
@@ -674,6 +674,7 @@ return {
 						camera.zoom = event.value
 						uiScale.zoom = event.value
 					elseif type(event.value) == "table" then
+						event.value.mode = event.value.mode or "stage"
 						if event.value.mode == "stage" then
 							if event.value.ease ~= "INSTANT" then
 								local time = getStepLengthsMS(bpm) * (tonumber(event.value.duration) or 4) / 1000
@@ -1118,7 +1119,7 @@ return {
 				love.graphics.push()				
 					love.graphics.push()
 						for j = #enemyNotes[i], 1, -1 do
-							if enemyNotes[i][j].y <= 560 then
+							if enemyNotes[i][j].y <= 600 then
 								local animName = enemyNotes[i][j]:getAnimName()
 								if animName ~= "on" then 
 									if settings.middleScroll then
@@ -1146,7 +1147,7 @@ return {
 					love.graphics.pop()
 					love.graphics.push()
 						for j = #boyfriendNotes[i], 1, -1 do
-							if boyfriendNotes[i][j].y <= 560 then
+							if boyfriendNotes[i][j].y <= 600 then
 								local animName = boyfriendNotes[i][j]:getAnimName()
 								if animName ~= "on" then
 									graphics.setColor(1, 1, 1, boyfriendNotes[i][j].alpha)
@@ -1205,7 +1206,7 @@ return {
 				love.graphics.push()
 					love.graphics.push()
 						for j = #enemyNotes[i], 1, -1 do
-							if enemyNotes[i][j].y <= 560 then
+							if enemyNotes[i][j].y <= 600 then
 								local animName = enemyNotes[i][j]:getAnimName()
 								if animName ~= "hold" and animName ~= "end" then
 									if settings.middleScroll then
@@ -1230,7 +1231,7 @@ return {
 					love.graphics.pop()
 					love.graphics.push()
 						for j = #boyfriendNotes[i], 1, -1 do
-							if boyfriendNotes[i][j].y <= 560 then
+							if boyfriendNotes[i][j].y <= 600 then
 								local animName = boyfriendNotes[i][j]:getAnimName()
 								if animName ~= "hold" and animName ~= "end" then
 									graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y)) / 75) * boyfriendNotes[i][j].alpha)
@@ -1276,16 +1277,8 @@ return {
 		if not colourInline[4] then colourInline[4] = 1 end
 		local colourOutline = colourOutline or {0, 0, 0, 1}
 		if not colourOutline[4] then colourOutline[4] = 1 end
-		--textshiz, -600, 400+downscrollOffset, 1200, "center"
 
-		graphics.setColor(colourOutline[1], colourOutline[2], colourOutline[3], colourOutline[4])
-		love.graphics.printf(text, -600-2, 400+downscrollOffset, 1200, "center")
-		love.graphics.printf(text, -600+2, 400+downscrollOffset, 1200, "center")
-		love.graphics.printf(text, -600, 400+downscrollOffset-2, 1200, "center")
-		love.graphics.printf(text, -600, 400+downscrollOffset+2, 1200, "center")
-
-		graphics.setColor(colourInline[1], colourInline[2], colourInline[3], colourInline[4])
-		love.graphics.printf(text, -600, 400+downscrollOffset, 1200, "center")
+		uitextfColored(text, -600, 400+downscrollOffset, 1200, "center", colourOutline, colourInline)
 
 		self:drawRating()
 	end,
@@ -1346,6 +1339,7 @@ return {
 
 		camera:removePoint("boyfriend")
 		camera:removePoint("enemy")
+		camera:removePoint("girlfriend")
 
 		Timer.clear()
 

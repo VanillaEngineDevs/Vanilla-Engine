@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("week5/boyfriend")),
+	love.graphics.newImage(graphics.imagePath("characters/boyfriend-christmas")),
     -- Automatically generated from bfChristmas.xml
 	{
 		{x = 0, y = 0, width = 395, height = 419, offsetX = 0, offsetY = 0, offsetWidth = 415, offsetHeight = 421}, -- 1: BF HEY!!0000

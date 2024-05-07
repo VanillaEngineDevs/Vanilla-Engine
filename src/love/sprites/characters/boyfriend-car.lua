@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("week4/boyfriend")),
+	love.graphics.newImage(graphics.imagePath("characters/boyfriend-car")),
 	-- Automatically generated from bfCar.xml
 	{
 		{x = 0, y = 0, width = 374, height = 357, offsetX = -1, offsetY = -5, offsetWidth = 375, offsetHeight = 362}, -- 1: BF NOTE DOWN0000

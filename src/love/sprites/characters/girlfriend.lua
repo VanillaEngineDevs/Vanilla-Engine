@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("girlfriend")),
+	love.graphics.newImage(graphics.imagePath("characters/girlfriend")),
 	-- Automatically generated from GF_assets.xml
 	{
 		{x = 0, y = 0, width = 699, height = 657, offsetX = -2, offsetY = 0, offsetWidth = 703, offsetHeight = 657}, -- 1: GF Cheer0000

@@ -46,7 +46,7 @@ return {
 
 		stageImages["Train"].x, stageImages["Train"].y = 3000, -25
 
-		enemy = love.filesystem.load("sprites/week3/pico-enemy.lua")()
+		enemy = love.filesystem.load("sprites/characters/pico-enemy.lua")()
 
 		sounds.trainPassing = love.audio.newSource("sounds/week3/train.ogg", "static")
 

@@ -27,7 +27,7 @@ return {
 		camera.defaultZoom = 0.85
 		camera.zoom = 0.85
 
-		fakeBoyfriend = love.filesystem.load("sprites/pixel/boyfriend-dead.lua")()
+		fakeBoyfriend = love.filesystem.load("sprites/characters/boyfriend-pixel-dead.lua")()
 
 		fakeBoyfriend.x, fakeBoyfriend.y = 300, 190
 
@@ -49,17 +49,17 @@ return {
 		weeks:load()
 		if song == 3 then
 			school = love.filesystem.load("sprites/week6/evil-school.lua")()
-			enemy = love.filesystem.load("sprites/week6/spirit.lua")()
+			enemy = love.filesystem.load("sprites/characters/spirit.lua")()
 			stages["evilSchool"]:enter()
 			stages["evilSchool"]:load()
 			stages["school"]:leave()
 			enemyIcon:animate("spirit", false)
 		elseif song == 2 then
-			enemy = love.filesystem.load("sprites/week6/senpai-angry.lua")()
+			enemy = love.filesystem.load("sprites/characters/senpai-angry.lua")()
 
 			stages["school"]:load()
 		else
-			enemy = love.filesystem.load("sprites/week6/senpai.lua")()
+			enemy = love.filesystem.load("sprites/characters/senpai.lua")()
 			stages["school"]:load()
 		end
 

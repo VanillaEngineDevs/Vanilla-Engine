@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("week6/spirit")),
+	love.graphics.newImage(graphics.imagePath("characters/spirit")),
 	-- Automatically generated from spirit.txt
 	{
 		{x = 0, y = 1028, width = 128, height = 128, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 1: idle spirit_0

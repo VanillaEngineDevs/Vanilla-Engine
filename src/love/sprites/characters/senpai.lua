@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("week6/senpai")),
+	love.graphics.newImage(graphics.imagePath("characters/senpai")),
 	-- Automatically generated from senpai.xml
 	{
 		{x = 1755, y = 0, width = 125, height = 163, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 1: SENPAI DOWN NOTE instance 10000

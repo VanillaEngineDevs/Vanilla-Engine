@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("week5/girlfriend")),
+	love.graphics.newImage(graphics.imagePath("characters/girlfriend-christmas")),
 	-- Automatically generated from gfChristmas.xml
 	{
 		{x = 0, y = 0, width = 817, height = 724, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 1: GF Cheer0000

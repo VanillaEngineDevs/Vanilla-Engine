@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("week7/bfHoldingGF-DEAD")),
+	love.graphics.newImage(graphics.imagePath("characters/bfHoldingGF-DEAD")),
 	-- Automatically generated from bfHoldingGF-DEAD.xml
 	{
 		{x = 611, y = 500, width = 591, height = 467, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 1: BF Dead with GF Loop0000

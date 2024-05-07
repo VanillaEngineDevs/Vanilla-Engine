@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("week7/picoSpeaker")),
+	love.graphics.newImage(graphics.imagePath("characters/picoSpeaker")),
 	-- Automatically generated from picoSpeaker.xml
 	{
 		{x = 6865, y = 667, width = 899, height = 711, offsetX = -2, offsetY = -80, offsetWidth = 1178, offsetHeight = 791}, -- 1: Pico shoot 10000

@@ -40,10 +40,10 @@ return {
 			stageImages["Bottom Bop"].x, stageImages["Bottom Bop"].y = -75, 375
 			stageImages["Santa"].x, stageImages["Santa"].y = -1350, 410
 		end
-        girlfriend = love.filesystem.load("sprites/week5/girlfriend.lua")()
-		enemy = love.filesystem.load("sprites/week5/dearest-duo.lua")()
-		boyfriend = love.filesystem.load("sprites/week5/boyfriend.lua")()
-		fakeBoyfriend = love.filesystem.load("sprites/boyfriend.lua")() -- Used for game over
+        girlfriend = love.filesystem.load("sprites/characters/girlfriend-christmas.lua")()
+		enemy = love.filesystem.load("sprites/characters/dearest-duo.lua")()
+		boyfriend = love.filesystem.load("sprites/characters/boyfriend-christmas.lua")()
+		fakeBoyfriend = love.filesystem.load("sprites/characters/boyfriend.lua")() -- Used for game over
 
 		camera.defaultZoom = 0.9
 

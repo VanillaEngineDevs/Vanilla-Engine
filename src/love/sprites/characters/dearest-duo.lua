@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("week5/dearest-duo")),
+	love.graphics.newImage(graphics.imagePath("characters/dearest-duo")),
     -- Automatically generated from mom_dad_christmas_assets.xml
 	{
 		{x = 0, y = 0, width = 873, height = 777, offsetX = -6, offsetY = -5, offsetWidth = 884, offsetHeight = 782}, -- 1: Parent Christmas Idle0000

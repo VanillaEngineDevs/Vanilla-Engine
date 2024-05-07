@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("week7/tankmanCaptain")),
+	love.graphics.newImage(graphics.imagePath("characters/tankmanCaptain")),
 	-- Automatically generated from tankmanCaptain.xml
 	{
 		{x = 487, y = 1180, width = 432, height = 563, offsetX = -99, offsetY = -26, offsetWidth = 533, offsetHeight = 589}, -- 1: PRETTY GOOD tankman 10000
@@ -161,15 +161,11 @@ return graphics.newSprite(
 	{
        	["idle"] = {start = 94, stop = 107, speed = 24, offsetX = 0, offsetY = 0},
         ["singDOWN"] = {start = 84, stop = 93, speed = 24, offsetX = -10, offsetY = -50},
-        ["singDOWN alt"] = {start = 84, stop = 93, speed = 24, offsetX = -10, offsetY = -50},
         ["singRIGHT"] = {start = 116, stop = 125, speed = 24, offsetX = -53, offsetY = -3},
-        ["singRIGHT alt"] = {start = 116, stop = 125, speed = 24, offsetX = -53, offsetY = -3},
         ["singLEFT"] = {start = 108, stop = 115, speed = 24, offsetX = 48, offsetY = -11},
-        ["singLEFT alt"] = {start = 108, stop = 115, speed = 24, offsetX = 48, offsetY = -11},
         ["singUP"] = {start = 126, stop = 135, speed = 24, offsetX = -5, offsetY = 28},
-        ["singUP alt"] = {start = 68, stop = 83, speed = 24, offsetX = 0, offsetY = -5},
 		["good"] = {start = 1, stop = 67, speed = 24, offsetX = 50, offsetY = 8}, -- fuck you
-		["ugh"] = {start = 68, stop = 83, speed = 24, offsetX = 50, offsetY = 8}
+		["ugh"] = {start = 68, stop = 83, speed = 24, offsetX = -3, offsetY = 5}
 	},
 	"idle",
 	false,

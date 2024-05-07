@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("week7/gfTankmen")),
+	love.graphics.newImage(graphics.imagePath("characters/gfTankmen")),
 	-- Automatically generated from gfTankmen.xml
 	{
 		{x = 6405, y = 0, width = 911, height = 642, offsetX = 0, offsetY = -6, offsetWidth = 911, offsetHeight = 648}, -- 1: GF Dancing at Gunpoint0029

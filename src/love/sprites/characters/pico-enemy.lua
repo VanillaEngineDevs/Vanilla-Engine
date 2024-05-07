@@ -1,5 +1,25 @@
+--[[----------------------------------------------------------------------------
+This file is part of Friday Night Funkin' Rewritten
+
+Copyright (C) 2021  HTV04
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+------------------------------------------------------------------------------]]
+
+-- NOTE: Pico's sprites are flipped horizontally as an enemy
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("pico")),
+	love.graphics.newImage(graphics.imagePath("characters/pico")),
 	-- Automatically generated from Pico_FNF_assetss.xml
 	{
 		{x = 0, y = 0, width = 723, height = 382, offsetX = -13, offsetY = -9, offsetWidth = 736, offsetHeight = 392}, -- 1: Pico Down Note0000
@@ -88,6 +108,7 @@ return graphics.newSprite(
 	{
 		sing_duration = 4,
 		isCharacter = true,
+		flipX = true,
 		icon = "pico"
 	}
 )

@@ -16,6 +16,7 @@ return {
                 state = frameDebug
             }
         }
+        settings.showDebug = false
     end,
     
     keypressed = function(self, key)

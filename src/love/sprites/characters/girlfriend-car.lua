@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("week4/girlfriend")),
+	love.graphics.newImage(graphics.imagePath("characters/girlfriend-car")),
 	-- Automatically generated from gfCar.xml
 	{
 		{x = 709, y = 3265, width = 712, height = 646, offsetX = -2, offsetY = -3, offsetWidth = 774, offsetHeight = 649}, -- 1: GF Dancing Beat Hair blowing CAR0029

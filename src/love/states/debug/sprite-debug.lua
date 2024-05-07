@@ -34,6 +34,14 @@ return {
 		end
 		selection = 1
 		dirTable = love.filesystem.getDirectoryItems(curDir)
+		-- sort so directories are first
+		table.sort(dirTable, function(a, b)
+			if love.filesystem.getInfo(curDir .. "/" .. a).type == love.filesystem.getInfo(curDir .. "/" .. b).type then
+				return a < b
+			else
+				return love.filesystem.getInfo(curDir .. "/" .. a).type == "directory"
+			end
+		end)
 	end,
 
 	enter = function(self, previous)

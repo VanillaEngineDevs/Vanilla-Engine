@@ -23,7 +23,7 @@ return {
             ["Haunted House"] = love.filesystem.load("sprites/week2/haunted-house.lua")() -- Haunted House
         }
         
-		enemy = love.filesystem.load("sprites/week2/skid-and-pump.lua")()
+		enemy = love.filesystem.load("sprites/characters/skid-and-pump.lua")()
 
 		girlfriend.x, girlfriend.y = -200, 50
 		enemy.x, enemy.y = -610, 140

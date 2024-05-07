@@ -61,9 +61,9 @@ return {
             table.insert(abotVisualizers, viz)
         end
 
-        enemy = love.filesystem.load("sprites/weekend1/darnell.lua")()
-        boyfriend = love.filesystem.load("sprites/pico-player.lua")()
-        girlfriend = love.filesystem.load("sprites/weekend1/nene.lua")()
+        enemy = love.filesystem.load("sprites/characters/darnell.lua")()
+        boyfriend = love.filesystem.load("sprites/characters/pico-player.lua")()
+        girlfriend = love.filesystem.load("sprites/characters/nene.lua")()
 
         girlfriend.STATE_DEFAULT = 0
         girlfriend.STATE_PRE_RAISE = 1
@@ -230,6 +230,8 @@ return {
                 abotVisualizers[index]:draw()
                 index = index + 1
             end
+            graphics.setColor(1, 1, 1, 1)
+            love.graphics.rectangle("fill", -315, 30, 120, 60)
             stageImages["abot"]:draw()
             girlfriend:draw()
             enemy:draw()

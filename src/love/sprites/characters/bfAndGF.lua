@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("week7/bfAndGF")),
+	love.graphics.newImage(graphics.imagePath("characters/bfAndGF")),
 	-- Automatically generated from BOYFRIEND.xml
 	-- Automatically generated from bfAndGF.xml
 	{

@@ -8,8 +8,8 @@ return {
 
 		if storyMode and not died then
 			musicPos = 0
-			camera.zoom = 1.1
-			camera.defaultZoom = 1.1
+			camera.zoom = 0.9
+			camera.defaultZoom = 0.9
 		end
 
 		song = songNum
@@ -30,11 +30,11 @@ return {
 		stages["tank"]:load()
 
 		if song == 3 then
-			girlfriend = love.filesystem.load("sprites/week7/picoSpeaker.lua")()
+			girlfriend = love.filesystem.load("sprites/characters/picoSpeaker.lua")()
 			girlfriend.x, girlfriend.y = 105, 110
-			boyfriend = love.filesystem.load("sprites/week7/bfAndGF.lua")()
+			boyfriend = love.filesystem.load("sprites/characters/bfAndGF.lua")()
 			boyfriend.x, boyfriend.y = 460, 423
-			fakeBoyfriend = love.filesystem.load("sprites/week7/gfdead.lua")()
+			fakeBoyfriend = love.filesystem.load("sprites/characters/bfAndGFdead.lua")()
 			fakeBoyfriend.x, fakeBoyfriend.y = 460, 423
 			if not died and storyMode then
 				video = cutscene.video("videos/stressCutscene.ogv")
@@ -101,6 +101,20 @@ return {
 		end
 	end,
 
+	onNoteHit = function(self, character, noteType, rating, id) 
+		-- rating is "EnemyHit" when an enemy hits it. Can be used to determine if the player hit it or the enemy hit it when needed
+		-- Return "true" to not play ANY animations, return "false" or nothing to play the default animations
+		if rating == "EnemyHit" then
+			if noteType == "ugh" then
+				character:animate("ugh")
+				return true
+			elseif noteType == "hehPrettyGood" then
+				character:animate("good")
+				return true
+			end
+		end
+	end,
+
 	update = function(self, dt)
 		weeks:update(dt)
 		stages["tank"]:update(dt)
@@ -113,36 +127,7 @@ return {
 			end
 		end
 
-		if song == 1 then
-			if musicTime >= 5620 then
-				if musicTime <= 5720 then
-					enemy:animate("ugh", false)
-				end
-			end
-			if musicTime >= 14620 then
-				if musicTime <= 14720 then
-					enemy:animate("ugh", false)
-				end
-			end
-			if musicTime >= 49120 then
-				if musicTime <= 49220 then
-					enemy:animate("ugh", false)
-				end
-			end
-			if musicTime >= 77620 then
-				if musicTime <= 77720 then
-					enemy:animate("ugh", false)
-				end
-			end
-		end
-
         if song == 3 then
-			if musicTime >= 62083 then
-				if musicTime <= 62083 + 50 then
-					enemy:animate("good", false)
-				end
-			end
-
 			if #tankmanRun > 0 then
 				for i = 1, #tankmanRun do
 					if tankmanRun[i] then
