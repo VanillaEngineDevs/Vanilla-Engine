@@ -1,12 +1,7 @@
-local leftFunc, rightFunc, confirmFunc, backFunc, drawFunc
+local confirmFunc
 
-local menuState
 
 local menuButton
-
-local function switchMenu(menu)
-	menuState = 1
-end
 
 return {
 	enter = function(self, previous)
@@ -40,7 +35,7 @@ return {
                         end
                     )
                 end
-            }, 
+            },
             {
                 sprite = love.filesystem.load("sprites/menu/freeplay.lua")(),
                 confirm = function()
@@ -111,8 +106,6 @@ return {
             buttons[menuButton].confirm()
         end
 
-		switchMenu(1)
-
 		graphics:fadeInWipe(0.6)
 
 	end,
@@ -171,7 +164,6 @@ return {
             love.graphics.pop()
             love.graphics.setFont(font)
 		love.graphics.pop()
-        
 	end,
 
 	leave = function(self)

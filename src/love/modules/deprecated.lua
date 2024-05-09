@@ -29,9 +29,9 @@ function weeks.legacyGenerateNotes(self, chart)
         sprites.rightArrow
     }
 
-    for i, section in ipairs(chart.notes) do
+    for _, section in ipairs(chart.notes) do
         local mustHitSection = section.mustHitSection or false
-        for j, noteData in ipairs(section.sectionNotes) do
+        for _, noteData in ipairs(section.sectionNotes) do
             local time = noteData[1] 
             local noteType = noteData[2]
             local noteVer = noteData[4] or "normal"

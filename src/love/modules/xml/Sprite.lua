@@ -67,7 +67,7 @@ function Sprite.getFramesFromSparrow(tex, desc)
 
     local f = {texture=tex, frames={}}
     local sw, sh = tex:getWidth(), tex:getHeight()
-    for i, c in ipairs(xml(desc)) do
+    for i, c in ipairs(xml.parse(desc)) do
         if c.tag == "SubTexture" then
             table.insert(f.frames, Sprite.newFrame(
                 c.attr.name,

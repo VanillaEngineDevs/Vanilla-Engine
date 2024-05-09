@@ -18,10 +18,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 -- Nabbed from the JS source of FNF v0.3.0 (PBOT1 Scoring)
-local MaxScore, ScoringOffset, ScoringSlope = 500, 54.00, 0.080
-local MinScore, MissScore = 9, 0
-local PerfectThres, MissThres, KillerThres, SickThres, GoodThres, BadThres, ShitThres = 5, 160, 12.5, 45, 90, 135, 160
-
 local DefaultTimeSignatureNum = 4
 local timeSignatureNum = DefaultTimeSignatureNum
 
@@ -409,7 +405,6 @@ return {
 		elseif chartData.scrollSpeed["default"] then
 			_speed = chartData.scrollSpeed["default"]
 		end
-		
 
 		if settings.customScrollSpeed == 1 then
 			speed = _speed
@@ -728,29 +723,29 @@ return {
 	end,
 
 	judgeNote = function(self, msTiming)
-		if msTiming <= SickThres then
+		if msTiming <= CONSTANTS.WEEKS.JUDGE_THRES.SICK_THRES then
 			return "sick"
-		elseif msTiming < GoodThres then
+		elseif msTiming < CONSTANTS.WEEKS.JUDGE_THRES.GOOD_THRES then
 			return "good"
-		elseif msTiming < BadThres then
+		elseif msTiming < CONSTANTS.WEEKS.JUDGE_THRES.BAD_THRES then
 			return "bad"
-		elseif msTiming < ShitThres then
+		elseif msTiming < CONSTANTS.WEEKS.JUDGE_THRES.SHIT_THRES then
 			return "shit"
 		else
-			return miss
+			return "miss"
 		end
 	end,
 
 	scoreNote = function(self, msTiming)
-		if msTiming > MissThres then
-			return MissScore
+		if msTiming > CONSTANTS.WEEKS.JUDGE_THRES.MISS_THRES then
+			return CONSTANTS.WEEKS.MISS_SCORE
 		else
-			if msTiming < PerfectThres then
-				return MaxScore
+			if msTiming < CONSTANTS.WEEKS.JUDGE_THRES.PERFECT_THRES then
+				return CONSTANTS.WEEKS.MAX_SCORE
 			else
-				local factor = 1 - 1 / (1 + math.exp(-ScoringSlope * (msTiming - ScoringOffset)))
+				local factor = 1 - 1 / (1 + math.exp(-CONSTANTS.WEEKS.SCORING_SLOPE * (msTiming - CONSTANTS.WEEKS.SCORING_OFFSET)))
 				--var score = funkin_play_scoring_Scoring.PBOT1_MAX_SCORE * factor + funkin_play_scoring_Scoring.PBOT1_MIN_SCORE | 0;
-				local score = bit.bxor(MaxScore * factor + MinScore, 0)
+				local score = bit.bxor(CONSTANTS.WEEKS.MAX_SCORE * factor + CONSTANTS.WEEKS.MIN_SCORE, 0)
 				return score
 			end
 		end
@@ -917,7 +912,7 @@ return {
 				if #boyfriendNote > 0 then
 					for j = 1, #boyfriendNote do
 						if boyfriendNote[j] and boyfriendNote[j]:getAnimName() == "on" then
-							if (boyfriendNote[j].time - musicTime <= MissThres) then
+							if (boyfriendNote[j].time - musicTime <= CONSTANTS.WEEKS.JUDGE_THRES.MISS_THRES) then
 								local notePos
 								local ratingAnim
 

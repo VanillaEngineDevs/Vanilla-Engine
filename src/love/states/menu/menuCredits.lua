@@ -19,7 +19,7 @@ return {
                 }
             },
             ["Friday Night Funkin"] = {
-                heading = CreateText("Friday Night Funkin'", true),
+                heading = CreateText("Friday Night Funkin", true),
                 selected = false,
                 members = {
                     {name = CreateText("ninjamuffin99"), desc = "Programmer", selected = false, callback = function() love.system.openURL("https://twitter.com/ninja_muffin99") end},

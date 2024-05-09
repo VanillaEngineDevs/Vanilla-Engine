@@ -63,7 +63,21 @@ CONSTANTS.WEEKS = {
         "go",
         "set",
         "ready"
-    }
+    },
+    JUDGE_THRES = {
+        PERFECT_THRES = 5,
+        MISS_THRES = 160,
+        KILLER_THRES = 12.5,
+        SICK_THRES = 45,
+        GOOD_THRES = 90,
+        BAD_THRES = 135,
+        SHIT_THRES = 160
+    },
+    MAX_SCORE = 500,
+    MIN_SCORE = 0,
+    MISS_SCORE = 0,
+    SCORING_OFFSET = 54.00,
+    SCORING_SLOPE = 0.080
 }
 
 return CONSTANTS

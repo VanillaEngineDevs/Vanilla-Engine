@@ -56,7 +56,7 @@ return {
 
         if not inCutscene then
 			tankAngle = (tankAngle or 10) + (tankSpeed or 7) * dt
-			stageImages["Tank Rolling"].x = 0 + 1500 * math.cos(math.pi / 180 * (1 * tankAngle + 180))
+			stageImages["Tank Rolling"].x = 1500 * math.cos(math.pi / 180 * (1 * tankAngle + 180))
             stageImages["Tank Rolling"].y = 1200 + 1100 * math.sin(math.pi / 180 * (1 * tankAngle + 180))
 
             stageImages["Tank Rolling"].orientation = math.rad(tankAngle - 90 + 15)

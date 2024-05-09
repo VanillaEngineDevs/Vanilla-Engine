@@ -32,7 +32,7 @@ local invalidkeys = {
     ["lsuper"] = "lsuper",
     ["menu"] = "menu",
 }
-local curInput = inputList[i]
+
 return {
     enter = function(self)
         images = {

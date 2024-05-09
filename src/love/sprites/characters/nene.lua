@@ -1,5 +1,5 @@
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("weekend1/Nene")),
+	love.graphics.newImage(graphics.imagePath("characters/Nene")),
 	-- Automatically generated from Nene.xml
 	{
 		{x = 0, y = 0, width = 433, height = 294, offsetX = 42, offsetY = -45, offsetWidth = 312, offsetHeight = 496, rotated = true}, -- 1: ComboCheer0001

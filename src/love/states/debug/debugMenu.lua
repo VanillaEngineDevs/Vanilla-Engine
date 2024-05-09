@@ -16,6 +16,7 @@ return {
                 state = frameDebug
             }
         }
+        settings.lastDEBUGOption = settings.showDebug
         settings.showDebug = false
     end,
     

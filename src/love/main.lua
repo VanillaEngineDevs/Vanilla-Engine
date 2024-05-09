@@ -142,6 +142,7 @@ function borderedText(text,x,y,r,sx,sy,ox,oy,kx,ky,alpha)
 	graphics.setColor(1,1,1, alpha or 1)
 	love.graphics.print(text,x,y,r,sx,sy,ox,oy,kx,ky)
 end
+
 mainDrawing = true
 
 require "modules.overrides"
@@ -160,7 +161,7 @@ function love.load()
 	json = require "lib.json"
 	lume = require "lib.lume"
 	Object = require "lib.classic"
-	xml = require "lib.xml".parse
+	xml = require "lib.xml"
 	lovefftINST = require "lib.fft.lovefft"
 	lovefftBFVOCALS = require "lib.fft.lovefft"
 	lovefftENEMYVOCALS = require "lib.fft.lovefft"
@@ -664,6 +665,9 @@ function love.focus(t)
 end
 
 function love.quit()
+	if settings.lastDEBUGOption then
+		settings.showDebug = settings.lastDEBUGOption
+	end
 	saveSettings(false)
 	saveSavedata()
 end

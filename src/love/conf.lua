@@ -26,6 +26,7 @@ function love.conf(t)
 	t.identity = "VE-FNFR"
 	t.version = "11.4"
 	t.console = _debug
+	t.window.vsync = false
 
 	if _debug then
 		local major, minor, revision, codename = love.getVersion()

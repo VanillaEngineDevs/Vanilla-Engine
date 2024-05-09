@@ -1,5 +1,5 @@
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("weekend1/darnell")),
+	love.graphics.newImage(graphics.imagePath("characters/darnell")),
 		-- Automatically generated from darnell.xml
 	{
 		{x = 432, y = 921, width = 374, height = 471, offsetX = -44, offsetY = -79, offsetWidth = 643, offsetHeight = 665, rotated = false}, -- 1: Idle0001

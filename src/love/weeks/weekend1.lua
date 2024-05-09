@@ -143,7 +143,7 @@ return {
 			elseif noteType == "wekend-1-kickcan" then
 				character:animate("kick-can")
 				return true
-			elseif noteType ==  "weekend-1-kneecan" then
+			elseif noteType == "weekend-1-kneecan" then
 				character:animate("knee-forward")
 				return true
 			end
