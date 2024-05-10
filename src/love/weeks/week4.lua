@@ -31,8 +31,6 @@ return {
 		difficulty = songAppend
 		erectMode = isErect
 
-		enemyIcon:animate("mommy mearest", false)
-
 		self:load()
 	end,
 

@@ -39,15 +39,10 @@ return {
 		difficulty = songAppend
 		erectMode = isErect
 
-		enemyIcon:animate("dearest duo", false)
-
 		self:load()
 	end,
 
 	load = function(self)
-		weeks:load()
-		stages["mall"]:load()
-
 		if song == 3 then
 			camera.defaultZoom = 0.9
 
@@ -64,7 +59,7 @@ return {
 
 			enemy.x, enemy.y = -780, 420
 
-			enemyIcon:animate("monster", false)
+			enemyIcon = icon.newIcon(icon.imagePath("monster"))
 
 			inst = love.audio.newSource("songs/winter-horrorland/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 			voicesBF = love.audio.newSource("songs/winter-horrorland/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
@@ -78,6 +73,10 @@ return {
 			voicesBF = love.audio.newSource("songs/cocoa/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/cocoa/Voices-parents-christmas" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 		end
+		
+		weeks:load()
+		stages["mall"]:load()
+
 
 		self:initUI()
 

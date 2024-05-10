@@ -22,6 +22,7 @@ function WEEKEND1_getNextCanWithState(state)
 		end
 	end
 end ]]
+local lastSaveDataBool = false
 
 return {
 	enter = function(self, from, songNum, songAppend, isErect)
@@ -29,11 +30,9 @@ return {
 
 		stages["streets"]:enter()
 
-		song = songNum
+		song = 5
 		difficulty = songAppend
 		erectMode = isErect
-
-		enemyIcon:animate("dad", false)
 
 		if love.system.getOS() ~= "NX" then 
 			gameCanvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
@@ -91,7 +90,12 @@ return {
 
 	initUI = function(self)
 		weeks:initUI()
-		if song == 4 then
+		if song == 5 then
+			if storyMode and not died then
+				video = cutscene.video("videos/blazinCutscene.ogv")
+				video:play()
+			end
+		elseif song == 4 then
 			weeks:generateNotes("data/songs/blazin/blazin-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/blazin/blazin-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 
 			for i = 1, 4 do
@@ -110,13 +114,13 @@ return {
 			for i = 1, 3 do
 				numbers[i].x = numbers[i].x + 525
 			end
-		elseif song == 3 then
-			weeks:generateNotes("data/songs/2hot/2hot-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/2hot/2hot-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 
 			if storyMode and not died then
-				video = cutscene.video("videos/2hot.ogv")
+				video = cutscene.video("videos/2hotCutscene.ogv")
 				video:play()
 			end
+		elseif song == 3 then
+			weeks:generateNotes("data/songs/2hot/2hot-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/2hot/2hot-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		elseif song == 2 then
 			weeks:generateNotes("data/songs/lit-up/lit-up-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/lit-up/lit-up-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
 		else
@@ -153,9 +157,22 @@ return {
 	update = function(self, dt)
 		if inCutscene then
 			if not video:isPlaying() then 
-				inCutscene = false
-				video:destroy()
-				weeks:setupCountdown()
+				if song ~= 5 then
+					inCutscene = false
+					video:destroy()
+					weeks:setupCountdown()
+				else -- cheap work around
+					status.setLoading(true)
+
+					graphics:fadeOutWipe(
+						0.7,
+						function()
+							Gamestate.switch(menu)
+
+							status.setLoading(false)
+						end
+					)
+				end
 			end
 		end
 		if love.system.getOS() ~= "NX" then 

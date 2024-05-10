@@ -18,8 +18,6 @@ camera.points = {}
 
 camera.mustHit = true
 
--- e stands for extra
-
 function camera:moveToMain(time, x, y)
     if camTimer then 
         Timer.cancel(camTimer)

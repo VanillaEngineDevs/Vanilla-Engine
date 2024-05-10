@@ -18,7 +18,6 @@ function Checkbox:new(x,y,checked)
 
     self:setGraphicSize(math.floor(0.9 * self.width))
 
-    --self.daValue = checked
     self:set_daValue(checked)
 
     return self

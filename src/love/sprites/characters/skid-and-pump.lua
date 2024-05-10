@@ -120,6 +120,6 @@ return graphics.newSprite(
 	{
 		sing_duration = 4,
 		isCharacter = true,
-		icon = "skid and pump"
+		icon = "spooky"
 	}
 )

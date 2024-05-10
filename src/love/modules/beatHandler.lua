@@ -61,8 +61,6 @@ function beatHandler.update(dt)
     beatHandler.isBeatHit = false
     beatHandler.curBeat = math.abs(math.floor((musicTime / 1000) * (beatHandler.bpm / 60)))
 
-    
-
     if math.floor((musicTime / 1000) * (beatHandler.bpm / 60)) > 0 then
         if beatHandler.curBeat > beatHandler.lastBeat then
             beatHandler.isBeatHit = true

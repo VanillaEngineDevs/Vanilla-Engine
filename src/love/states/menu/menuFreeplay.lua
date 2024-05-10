@@ -17,23 +17,25 @@ local function CreateWeek(weekIndex, hasErect)
     }
 
     for i, songName in ipairs(weekMeta[weekIndex][2]) do
-        local hasErect = false
-        if weekMeta[weekIndex][3] then
-            hasErect = table.contains(weekMeta[weekIndex][3], songName)
-        end
-        local song = {
-            name = songName,
-            diffs = {
-                -- diffname, isErect
-                {"easy", false},
-                {"normal", false},
-                {"hard", false},
-                (hasErect and {"erect", true} or nil),
-                (hasErect and {"nightmare", true} or nil)
+        if type(songName) == "string" then
+            local hasErect = false
+            if weekMeta[weekIndex][3] then
+                hasErect = table.contains(weekMeta[weekIndex][3], songName)
+            end
+            local song = {
+                name = songName,
+                diffs = {
+                    -- diffname, isErect
+                    {"easy", false},
+                    {"normal", false},
+                    {"hard", false},
+                    (hasErect and {"erect", true} or nil),
+                    (hasErect and {"nightmare", true} or nil)
+                }
             }
-        }
 
-        table.insert(week.songs, song)
+            table.insert(week.songs, song)
+        end
     end
 
     return week
@@ -102,7 +104,7 @@ return {
         
         averageAccuracy = string.format("%.2f%%", averageAccuracy)
 
-        for i = 1, #weekMeta do
+        for i = 0, #weekMeta do
             allWeeks[i] = CreateWeek(i)
         end
     end,
@@ -112,7 +114,7 @@ return {
             if menuNum == 1 then
                 weekNum = weekNum + 1
                 if weekNum > #weekMeta then
-                    weekNum = 1
+                    weekNum = 0
                 end
                 if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
                     songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
@@ -134,7 +136,7 @@ return {
         elseif input:pressed("up") then
             if menuNum == 1 then
                 weekNum = weekNum - 1
-                if weekNum < 1 then
+                if weekNum < 0 then
                     weekNum = #weekMeta
                 end
                 if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then

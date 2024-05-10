@@ -81,6 +81,8 @@ return {
             button.sprite:animate("idle", true)
         end
 
+        buttons[menuButton].sprite:animate("hover", true)
+
         for i, button in ipairs(buttons) do
             button.sprite.x = -500
             button.sprite.sizeX = 0.75

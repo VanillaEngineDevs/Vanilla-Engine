@@ -20,10 +20,12 @@ return {
 		weekNum = 1
 		theTracks = ""
 		for trackLength = 1, #weekMeta[weekNum][2] do
-			if theTracks ~= "" then
-				theTracks = theTracks .. " | " .. weekMeta[weekNum][2][trackLength]
-			else
-				theTracks = weekMeta[weekNum][2][trackLength]
+			if type(weekMeta[weekNum][2][trackLength]) == "string" then 
+				if theTracks ~= "" then
+					theTracks = theTracks .. " | " .. weekMeta[weekNum][2][trackLength]
+				else
+					theTracks = weekMeta[weekNum][2][trackLength]
+				end
 			end
 		end
 
@@ -171,10 +173,12 @@ return {
 			end
 			theTracks = ""
 			for trackLength = 1, #weekMeta[weekNum][2] do
-				if theTracks ~= "" then
-					theTracks = theTracks .. " | " .. weekMeta[weekNum][2][trackLength]
-				else
-					theTracks = weekMeta[weekNum][2][trackLength]
+				if type(weekMeta[weekNum][2][trackLength]) == "string" then
+					if theTracks ~= "" then
+						theTracks = theTracks .. " | " .. weekMeta[weekNum][2][trackLength]
+					else
+						theTracks = weekMeta[weekNum][2][trackLength]
+					end
 				end
 			end
 			if enemyDanceLines:isAnimName("week" .. weekNum-1) then

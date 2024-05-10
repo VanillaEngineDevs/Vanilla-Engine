@@ -15,8 +15,6 @@ return {
 		song = songNum
 		difficulty = songAppend
 		erectMode = isErect
-
-		enemyIcon:animate("tankman")
     
 		self:load()
 

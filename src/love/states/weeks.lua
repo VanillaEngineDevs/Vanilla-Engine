@@ -69,13 +69,11 @@ return {
 			}
 
 			images = {
-				icons = love.graphics.newImage(graphics.imagePath("icons")),
 				notes = love.graphics.newImage(graphics.imagePath("notes")),
 				numbers = love.graphics.newImage(graphics.imagePath("numbers")),
 			}
 
 			sprites = {
-				icons = love.filesystem.load("sprites/icons.lua"),
 				numbers = love.filesystem.load("sprites/numbers.lua"),
 			}
 
@@ -105,13 +103,11 @@ return {
 			}
 
 			images = {
-				icons = love.graphics.newImage(graphics.imagePath("icons")),
 				notes = love.graphics.newImage(graphics.imagePath("pixel/notes")),
 				numbers = love.graphics.newImage(graphics.imagePath("pixel/numbers")),
 			}
 
 			sprites = {
-				icons = love.filesystem.load("sprites/icons.lua"),
 				numbers = love.filesystem.load("sprites/pixel/numbers.lua"),
 			}
 
@@ -135,16 +131,6 @@ return {
 		else
 			downscrollOffset = 0
 		end
-
-		enemyIcon = sprites.icons()
-		boyfriendIcon = sprites.icons()
-
-		enemyIcon.y = 350 + downscrollOffset
-		boyfriendIcon.y = 350 + downscrollOffset
-		enemyIcon.sizeX = 1.5
-		boyfriendIcon.sizeX = -1.5
-		enemyIcon.sizeY = 1.5
-		boyfriendIcon.sizeY = 1.5
 
 		countdownFade = {}
 		countdown = love.filesystem.load("sprites/countdown.lua")()
@@ -228,6 +214,16 @@ return {
 			end
 		end
 
+		enemyIcon = icon.newIcon(icon.imagePath((enemy and enemy.icon) and enemy.icon) or "dad", (enemy and enemy.optionsTable) and (enemy.optionsTable.scale or 1) or 1)
+		boyfriendIcon = icon.newIcon(icon.imagePath((boyfriend and boyfriend.icon) and boyfriend.icon) or "bf", (boyfriend and boyfriend.optionsTable) and (boyfriend.optionsTable.scale or 1) or 1)
+
+		enemyIcon.y = 350 + downscrollOffset
+		boyfriendIcon.y = 350 + downscrollOffset
+		enemyIcon.sizeX = 1.5
+		boyfriendIcon.sizeX = -1.5
+		enemyIcon.sizeY = 1.5
+		boyfriendIcon.sizeY = 1.5
+
 		graphics:fadeInWipe(0.6)
 	end,
 
@@ -241,6 +237,7 @@ return {
 	end,
 
 	saveData = function(self)
+		if not DO_SAVE_DATA then return end
 		local diff = difficulty ~= "" and difficulty or "normal"
 		if savedata[weekNum] then
 			if savedata[weekNum][song] then
@@ -528,7 +525,7 @@ return {
 	end,
 
 	update = function(self, dt)
-		if input:pressed("pause") and not countingDown and not inCutscene and not doingDialogue and not paused then
+		if input:pressed("pause") and not countingDown and not inCutscene and not paused then
 			if not graphics.isFading() then 
 				paused = true
 				pauseTime = musicTime
@@ -1013,39 +1010,33 @@ return {
 
 		-- Enemy
 		if health >= 1.595 then
-			if enemyIcon:getAnimName() == (enemy and enemy.icon or "boyfriend") then
-				enemyIcon:animate((enemy and enemy.icon or "boyfriend") .. " losing", false)
-			end
+			enemyIcon:setFrame(2)
 		elseif health < 1.595 then
-			if enemyIcon:getAnimName() == (enemy and enemy.icon or "boyfriend") .. " losing" then
-				enemyIcon:animate(enemy and enemy.icon or "boyfriend", false)
-			end
+			enemyIcon:setFrame(1)
 		end
 
 		-- Boyfriend
 		if health > 2 then
 			health = 2
-		elseif health > 0.325 and boyfriendIcon:getAnimName() == (boyfriend and boyfriend.icon or "boyfriend") .. " losing" then
-			boyfriendIcon:animate(boyfriend and boyfriend.icon or "boyfriend", false)
+		elseif health > 0.325 and boyfriendIcon:getCurFrame() == 2 then
+			boyfriendIcon:setFrame(1)
 		elseif health <= 0 then -- Game over
 			if not settings.practiceMode then Gamestate.push(gameOver) end
 			health = 0
-		elseif health <= 0.325 and (boyfriend and boyfriendIcon:getAnimName()) == boyfriend.icon then
-			if not pixel then 
-				boyfriendIcon:animate((boyfriend and boyfriend.icon or "boyfriend") .. " losing", false)
-			end
+		elseif health <= 0.325 and boyfriendIcon:getCurFrame() == 1 then
+			boyfriendIcon:setFrame(2)
 		end
 
 		enemyIcon.x = 425 - health * 500
 		boyfriendIcon.x = 585 - health * 500
 
 		if beatHandler.onBeat() then
-			if enemyIconTimer then Timer.cancel(enemyIconTimer) end
-			if boyfriendIconTimer then Timer.cancel(boyfriendIconTimer) end
-
-			enemyIconTimer = Timer.tween((60 / bpm) / 16, enemyIcon, {sizeX = 1.75, sizeY = 1.75}, "out-quad", function() enemyIconTimer = Timer.tween((60 / bpm), enemyIcon, {sizeX = 1.5, sizeY = 1.5}, "out-quad") end)
-			boyfriendIconTimer = Timer.tween((60 / bpm) / 16, boyfriendIcon, {sizeX = -1.75, sizeY = 1.75}, "out-quad", function() boyfriendIconTimer = Timer.tween((60 / bpm), boyfriendIcon, {sizeX = -1.5, sizeY = 1.5}, "out-quad") end)
+			enemyIcon.sizeX, enemyIcon.sizeY = 1.75, 1.75
+			boyfriendIcon.sizeX, boyfriendIcon.sizeY = -1.75, 1.75
 		end
+
+		enemyIcon.sizeX, enemyIcon.sizeY = util.coolLerp(enemyIcon.sizeX, 1.5, 0.1), util.lerp(enemyIcon.sizeY, 1.5, 0.1)
+		boyfriendIcon.sizeX, boyfriendIcon.sizeY = util.coolLerp(boyfriendIcon.sizeX, -1.5, 0.1), util.lerp(boyfriendIcon.sizeY, 1.5, 0.1)
 	end,
 
 	drawRating = function(self)

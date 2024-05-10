@@ -103,6 +103,6 @@ return graphics.newSprite(
 	{
 		sing_duration = 4,
 		isCharacter = true,
-		icon = "mommy mearest"
+		icon = "mom"
 	}
 )

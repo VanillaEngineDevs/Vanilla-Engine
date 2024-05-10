@@ -32,8 +32,6 @@ return {
 		camera.zoom = 1
 		camera.defaultZoom = 1
 
-		enemyIcon:animate("pico", false)
-
 		self:load()
 	end,
 

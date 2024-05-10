@@ -31,9 +31,6 @@ return {
 
 		fakeBoyfriend.x, fakeBoyfriend.y = 300, 190
 
-		boyfriendIcon:animate("boyfriend (pixel)", false)
-		enemyIcon:animate("senpai", false)
-
 		pixelFont = love.graphics.newFont("fonts/pixel.fnt")
 
 		song = songNum
@@ -46,14 +43,12 @@ return {
 	end,
 
 	load = function(self)
-		weeks:load()
 		if song == 3 then
 			school = love.filesystem.load("sprites/week6/evil-school.lua")()
 			enemy = love.filesystem.load("sprites/characters/spirit.lua")()
 			stages["evilSchool"]:enter()
 			stages["evilSchool"]:load()
 			stages["school"]:leave()
-			enemyIcon:animate("spirit", false)
 		elseif song == 2 then
 			enemy = love.filesystem.load("sprites/characters/senpai-angry.lua")()
 
@@ -62,6 +57,8 @@ return {
 			enemy = love.filesystem.load("sprites/characters/senpai.lua")()
 			stages["school"]:load()
 		end
+		
+		weeks:load()
 
 		if song == 3 then
 			inst = love.audio.newSource("songs/thorns/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")

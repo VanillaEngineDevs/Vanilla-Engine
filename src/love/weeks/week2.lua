@@ -37,21 +37,16 @@ return {
 			love.audio.newSource("sounds/week2/thunder2.ogg", "static")
 		}
 
-		enemyIcon:animate("skid and pump", false)
-
 		self:load()
 	end,
 
 	load = function(self)
-		weeks:load()
-		stages["hauntedHouse"]:load()
-
 		if song == 3 then
 			enemy = love.filesystem.load("sprites/characters/monster.lua")()
 
 			enemy.x, enemy.y = -610, 120
 
-			enemyIcon:animate("monster", false)
+			enemyIcon = icon.newIcon(icon.imagePath("monster"))
 
 			inst = love.audio.newSource("songs/monster/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 			voicesBF = love.audio.newSource("songs/monster/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
@@ -65,6 +60,9 @@ return {
 			voicesBF = love.audio.newSource("songs/spookeez/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/spookeez/Voices-spooky" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 		end
+		
+		weeks:load()
+		stages["hauntedHouse"]:load()
 
 		self:initUI()
 

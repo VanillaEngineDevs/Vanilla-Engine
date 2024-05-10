@@ -135,6 +135,7 @@ return graphics.newSprite(
 	{
 		sing_duration = 4,
 		isCharacter = true,
-		icon = "spirit"
+		icon = "spirit",
+		scale = 5
 	}
 )

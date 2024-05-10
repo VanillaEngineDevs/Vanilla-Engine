@@ -204,6 +204,8 @@ return {
 			clipRect = nil,
 			stencilInfo = nil,
 
+			optionsTable = optionsTable or {},
+
 			alpha = 1,
 
 			icon = optionsTable and optionsTable.icon or "boyfriend",
@@ -524,15 +526,11 @@ return {
 						love.graphics.draw(
 							sheet,
 							frames[self.curFrame],
-							--[[ (frameData[self.curFrame].rotated and y or x),
-							(frameData[self.curFrame].rotated and x or y), ]]
 							x,
 							y,
 							self.orientation + (frameData[self.curFrame].rotated and -math.rad(90) or 0),
 							self.sizeX * (self.flipX and -1 or 1),
 							self.sizeY,
-							--[[ (frameData[self.curFrame].rotated and oy or ox),
-							(frameData[self.curFrame].rotated and ox or oy), ]]
 							ox,
 							oy,
 							self.shearX,

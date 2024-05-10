@@ -163,13 +163,12 @@ function love.load()
 	Object = require "lib.classic"
 	xml = require "lib.xml"
 	lovefftINST = require "lib.fft.lovefft"
-	lovefftBFVOCALS = require "lib.fft.lovefft"
-	lovefftENEMYVOCALS = require "lib.fft.lovefft"
 
 	-- Load modules
 	status = require "modules.status"
 	audio = require "modules.audio"
 	graphics = require "modules.graphics"
+	icon = require "modules.Icon"
 	camera = require "modules.camera"
 	beatHandler = require "modules.beatHandler"
 	util = require "modules.util"
@@ -189,7 +188,7 @@ function love.load()
 
 	playMenuMusic = true
 
-	-- disable vsync
+	-- disable vsy
 	love.window.setVSync(0)
 
 	graphics.setImageType(settings.setImageType)
@@ -259,6 +258,7 @@ function love.load()
 
 	-- Load week data
 	weekData = {
+		[0] = require "weeks.test",
 		require "weeks.tutorial",
 		require "weeks.week1",
 		require "weeks.week2",
@@ -269,8 +269,6 @@ function love.load()
 		require "weeks.week7",
 		require "weeks.weekend1"
 	}
-
-	testData = require "weeks.test"
 
 	require "modules.deprecated"
 	
@@ -289,6 +287,12 @@ function love.load()
 	}
 
 	weekMeta = { -- Add/remove weeks here
+		[0] = {
+			"Test",
+			{
+				"Test"
+			}
+		},
 		{
 			"Tutorial",
 			{
@@ -351,10 +355,6 @@ function love.load()
 				"Cocoa",
 				"Eggnog",
 				"Winter Horrorland"
-			},
-			{
-				"Cocoa",
-				"Eggnog"
 			}
 		},
 		{
@@ -384,7 +384,8 @@ function love.load()
 				"Darnell",
 				"Lit Up",
 				"2hot",
-				"Blazin"
+				"Blazin",
+				{"Cutscene", false}
 			}
 		}
 	}
@@ -450,6 +451,8 @@ function love.load()
 	Gamestate.switch(menu)
 
 	love.setFpsCap(settings.fpsCap)
+
+	DO_SAVE_DATA = true
 end
 
 function love.resize(width, height)
@@ -497,21 +500,6 @@ function love.keypressed(key)
 		end)
 	elseif key == "7" and not love.keyboard.isDown("lalt") then
 		Gamestate.switch(debugMenu)
-	elseif key == "7" and love.keyboard.isDown("lalt") then
-		status.setLoading(true)
-        graphics:fadeOutWipe(
-            0.7,
-            function()
-                _psychmod = false
-                storyMode = false
-    
-                music:stop()
-    
-                Gamestate.switch(testData, songNum)
-    
-                status.setLoading(false)
-            end
-        )
 	elseif key == "`" and love.keyboard.isDown("lalt") then
 		status.setLoading(true)
 		graphics:fadeOutWipe(

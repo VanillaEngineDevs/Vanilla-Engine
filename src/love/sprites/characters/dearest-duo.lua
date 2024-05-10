@@ -172,6 +172,6 @@ return graphics.newSprite(
 	{
 		sing_duration = 4,
 		isCharacter = true,
-		icon = "dearest duo"
+		icon = "parents-christmas"
 	}
 )
