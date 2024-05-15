@@ -7,12 +7,6 @@ function cover:setup()
     self.image = love.graphics.newImage(graphics.imagePath("holdCovers"))
     self.spr = love.filesystem.load("sprites/holdCover.lua")
 
-    --[[ for i = 1, 4 do
-        self.covers[i] = self.spr()
-        self.covers[i].visible = false
-        self.covers[i].y = boyfriendArrows[i].y + 35
-        self.covers[i].x = boyfriendArrows[i].x - 5
-    end ]]
     for i = 1, 2 do
         self.covers[i] = {}
         for j = 1, 4 do
