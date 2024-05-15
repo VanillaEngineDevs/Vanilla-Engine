@@ -1,13 +1,16 @@
 local splash = {}
 splash.cache = {}
 splash.spr = nil
+splash.image = nil
 
 function splash:setup()
     -- called at the start of each song
     if not pixel then
         self.image = love.graphics.newImage(graphics.imagePath("noteSplashes"))
+        self.spr = love.filesystem.load("sprites/noteSplashes.lua")
     else
         self.image = love.graphics.newImage(graphics.imagePath("pixel/pixelSplashes"))
+        self.spr = love.filesystem.load("sprites/pixel/pixelSplashes.lua")
     end
 end
 
@@ -15,11 +18,7 @@ function splash:new(settings, id)
     local s = {}
     s.anim = settings.anim
     s.posX = settings.posX
-    if not pixel then
-        s.sprite = love.filesystem.load("sprites/noteSplashes.lua")()
-    else
-        s.sprite = love.filesystem.load("sprites/pixel/pixelSplashes.lua")()
-    end
+    s.sprite = self.spr()
     s.sprite.x = s.posX
     s.sprite.y = -400
     s.sprite.id = id

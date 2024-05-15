@@ -437,6 +437,9 @@ return {
 			end,
 			
 			draw = function(self)
+				if not self.visible then
+					return
+				end
 				self.curFrame = math.floor(frame or 1)
 
 				if self.curFrame <= anim.stop then

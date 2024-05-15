@@ -179,6 +179,8 @@ function love.load()
 	require "modules.Alphabet"
 	Option = require "modules.Option"
 	CONSTANTS = require "modules.constants"
+	NoteSplash = require "modules.Splash"
+	HoldCover = require "modules.Cover"
 	loadSavedata()
 
 	-- XML Modules

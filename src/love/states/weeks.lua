@@ -367,6 +367,9 @@ return {
 			boyfriendNotes[i] = {}
 			gfNotes[i] = {}
 		end
+
+		NoteSplash:setup()
+		HoldCover:setup()
 	end,
 
 	generateNotes = function(self, chart, metadata, difficulty)
@@ -756,6 +759,8 @@ return {
 		if inCutscene then return end
 		if paused then return end
 
+		NoteSplash:update(dt)
+		HoldCover:update(dt)
 		updateNotePos()
 
 		for i = 1, 4 do
@@ -792,6 +797,11 @@ return {
 
 					if continue then
 						if enemyNote[1]:getAnimName() == "hold" or enemyNote[1]:getAnimName() == "end" then
+							if enemyNote[1]:getAnimName() == "hold" then
+								HoldCover:show(i, 2)
+							else
+								HoldCover:hide(i, 2)
+							end
 							if useAltAnims then
 								if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim .. " alt", _psychmod and true or false) end
 							else
@@ -849,6 +859,11 @@ return {
 						boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
 
 						if boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end" then
+							if boyfriendNote[1]:getAnimName() == "hold" then
+								HoldCover:show(i, 1)
+							else
+								HoldCover:hide(i, 1)
+							end
 							if boyfriend and boyfriend.holdTimer >= boyfriend.maxHoldTimer then boyfriend:animate(curAnim, false) end
 						else
 							if boyfriend then boyfriend:animate(curAnim, false) end
@@ -922,6 +937,16 @@ return {
 								ratingAnim = self:judgeNote(notePos)
 								score = score + self:scoreNote(notePos)
 
+								if ratingAnim == "sick" then
+									NoteSplash:new(
+										{
+											anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
+											posX = boyfriendArrow.x,
+										},
+										i
+									)
+								end
+
 								combo = combo + 1
 								noteCounter = noteCounter + 1
 
@@ -991,6 +1016,11 @@ return {
 			end
 
 			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].y <= boyfriendArrow.y)) and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
+				if boyfriendNote[1]:getAnimName() == "hold" then
+					HoldCover:show(i, 1)
+				else
+					HoldCover:hide(i, 1)
+				end
 				if voicesBF then voicesBF:setVolume(1) end
 
 				boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
@@ -1101,61 +1131,6 @@ return {
 				love.graphics.scale(0.7, -0.7)
 			end
 			love.graphics.scale(uiScale.zoom, uiScale.zoom)
-			for i = 1, 4 do
-				love.graphics.push()				
-					love.graphics.push()
-						for j = #enemyNotes[i], 1, -1 do
-							if enemyNotes[i][j].y <= 600 then
-								local animName = enemyNotes[i][j]:getAnimName()
-								if animName ~= "on" then 
-									if settings.middleScroll then
-										graphics.setColor(1, 1, 1, enemyNotes[i][j].alpha * 0.8)
-									else
-										graphics.setColor(1, 1, 1, enemyNotes[i][j].alpha)
-									end
-	
-									if not pixel then
-										enemyNotes[i][j]:draw()
-									else
-										if not settings.downscroll then
-											enemyNotes[i][j]:udraw(8, 8)
-										else
-											if enemyNotes[i][j]:getAnimName() == "end" then
-												enemyNotes[i][j]:udraw(8, 8)
-											else
-												enemyNotes[i][j]:udraw(8, -8)
-											end
-										end
-									end
-								end
-							end
-						end
-					love.graphics.pop()
-					love.graphics.push()
-						for j = #boyfriendNotes[i], 1, -1 do
-							if boyfriendNotes[i][j].y <= 600 then
-								local animName = boyfriendNotes[i][j]:getAnimName()
-								if animName ~= "on" then
-									graphics.setColor(1, 1, 1, boyfriendNotes[i][j].alpha)
-									if not pixel then
-										boyfriendNotes[i][j]:draw()
-									else
-										if not settings.downscroll then
-											boyfriendNotes[i][j]:udraw(8, 8)
-										else
-											if boyfriendNotes[i][j]:getAnimName() == "end" then
-												boyfriendNotes[i][j]:udraw(8, 8)
-											else
-												boyfriendNotes[i][j]:udraw(8, -8)
-											end
-										end
-									end
-								end
-							end
-						end
-					love.graphics.pop()
-				love.graphics.pop()
-			end
 			graphics.setColor(1, 1, 1)
 
 			for i = 1, 4 do
@@ -1194,24 +1169,22 @@ return {
 						for j = #enemyNotes[i], 1, -1 do
 							if enemyNotes[i][j].y <= 600 then
 								local animName = enemyNotes[i][j]:getAnimName()
-								if animName ~= "hold" and animName ~= "end" then
-									if settings.middleScroll then
-										graphics.setColor(1, 1, 1, 0.8 * enemyNotes[i][j].alpha)
-									else
-										graphics.setColor(1, 1, 1, 1 * enemyNotes[i][j].alpha)
-									end
-
-									if not pixel then
-										enemyNotes[i][j]:draw()
-									else
-										if not settings.downscroll then
-											enemyNotes[i][j]:udraw(8, 8)
-										else
-											enemyNotes[i][j]:udraw(8, -8)
-										end
-									end
-									graphics.setColor(1, 1, 1)
+								if settings.middleScroll then
+									graphics.setColor(1, 1, 1, 0.8 * enemyNotes[i][j].alpha)
+								else
+									graphics.setColor(1, 1, 1, 1 * enemyNotes[i][j].alpha)
 								end
+
+								if not pixel then
+									enemyNotes[i][j]:draw()
+								else
+									if not settings.downscroll then
+										enemyNotes[i][j]:udraw(8, 8)
+									else
+										enemyNotes[i][j]:udraw(8, -8)
+									end
+								end
+								graphics.setColor(1, 1, 1)
 							end
 						end
 					love.graphics.pop()
@@ -1219,17 +1192,15 @@ return {
 						for j = #boyfriendNotes[i], 1, -1 do
 							if boyfriendNotes[i][j].y <= 600 then
 								local animName = boyfriendNotes[i][j]:getAnimName()
-								if animName ~= "hold" and animName ~= "end" then
-									graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y)) / 75) * boyfriendNotes[i][j].alpha)
+								graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y)) / 75) * boyfriendNotes[i][j].alpha)
 
-									if not pixel then 
-										boyfriendNotes[i][j]:draw()
+								if not pixel then 
+									boyfriendNotes[i][j]:draw()
+								else
+									if not settings.downscroll then
+										boyfriendNotes[i][j]:udraw(8, 8)
 									else
-										if not settings.downscroll then
-											boyfriendNotes[i][j]:udraw(8, 8)
-										else
-											boyfriendNotes[i][j]:udraw(8, -8)
-										end
+										boyfriendNotes[i][j]:udraw(8, -8)
 									end
 								end
 							end
@@ -1237,6 +1208,13 @@ return {
 					love.graphics.pop()
 					graphics.setColor(1, 1, 1)
 				love.graphics.pop()
+			end
+
+			HoldCover:draw()
+			if not pixel then
+				NoteSplash:draw()
+			else
+				NoteSplash:udraw(8, 8)
 			end
 
 			graphics.setColor(1, 1, 1, countdownFade[1])
