@@ -18,8 +18,6 @@ return {
 		song = 1
 		difficulty = ""
 
-		enemyIcon:animate("boyfriend (pixel)", false)
-
 		self:load()
 	end,
 

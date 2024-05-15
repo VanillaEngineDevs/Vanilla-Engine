@@ -42,8 +42,6 @@ return {
 		enemy.x, enemy.y = 30, -90
 		boyfriend.x, boyfriend.y = 260, 100
 
-		enemyIcon:animate("girlfriend", false)
-
 		self:load()
 	end,
 

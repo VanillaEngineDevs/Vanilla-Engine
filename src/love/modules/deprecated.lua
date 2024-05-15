@@ -102,3 +102,76 @@ function weeks.legacyGenerateNotes(self, chart)
         table.sort(boyfriendNotes[i], function(a, b) return a.y < b.y end)
     end
 end
+
+-- I gotta rename this file..,..,.
+-- This file will just have spare functions,.,.
+function weeks.cneGenerateNotes(self, chart, metadata)
+    local chart = json.decode(love.filesystem.read(chart))
+    local metadata = json.decode(love.filesystem.read(metadata))
+
+    bpm = metadata.bpm or 100
+    beatHandler.setBPM(bpm)
+
+    if settings.customScrollSpeed == 1 then
+        speed = chart.screenSpeed or 1
+    else
+        speed = settings.customScrollSpeed
+    end
+
+    local sprites = {
+        sprites.leftArrow,
+        sprites.downArrow,
+        sprites.upArrow,
+        sprites.rightArrow
+    }
+    
+    for _, strumline in ipairs(chart.strumLines) do
+        -- strumline.visible, if its nil, set to true
+        if strumline.visible == nil then strumline.visible = true end
+        if (strumline.type ~= 0 and strumline.type ~= 1) or not strumline.visible then goto continue end
+        local enemyNote = strumline.type == 0
+        local notesTable = enemyNote and enemyNotes or boyfriendNotes
+        local arrowsTable = enemyNote and enemyArrows or boyfriendArrows
+
+        for _, note in ipairs(strumline.notes) do
+            local time = note.time
+            local noteType = note.id
+            local noteVer = note.type == 0 and "normal" or note.type or "normal"
+            local holdLength = note.sLen or 0
+
+            if noteVer == "Hurt Note" or noteType < 0 then goto continue end
+
+            local id = noteType % 4 + 1
+            
+            local noteObject = sprites[id]()
+            noteObject.col = id
+            noteObject.y = -400 + time * 0.6 * speed
+            noteObject.ver = noteVer
+            noteObject.time = time
+            noteObject:animate("on")
+
+            if settings.downscroll then noteObject.sizeY = -1 end
+
+            noteObject.x = arrowsTable[id].x
+
+            table.insert(notesTable[id], noteObject)
+            if holdLength > 0 then
+                for k = 71 / speed, holdLength, 71 / speed do
+                    local holdNote = sprites[id]()
+                    holdNote.col = id
+                    holdNote.y = -400 + (time + k) * 0.6 * speed
+                    holdNote.ver = noteVer
+                    holdNote.time = time + k
+                    holdNote:animate("hold")
+
+                    holdNote.x = arrowsTable[id].x
+                    table.insert(notesTable[id], holdNote)
+                end
+
+                notesTable[id][#notesTable[id]]:animate("end")
+            end
+        end
+
+        ::continue::
+    end
+end
