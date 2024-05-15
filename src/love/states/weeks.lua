@@ -808,6 +808,14 @@ return {
 								if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim, (_psychmod and true or false)) end
 							end
 						else
+							NoteSplash:new(
+								{
+									anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
+									posX = enemyArrow.x,
+									posY = enemyArrow.y,
+								},
+								i
+							)
 							if useAltAnims then
 								if whohit then whohit:animate(curAnim .. " alt", false) end
 							else
@@ -942,6 +950,7 @@ return {
 										{
 											anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
 											posX = boyfriendArrow.x,
+											posY = boyfriendArrow.y,
 										},
 										i
 									)
