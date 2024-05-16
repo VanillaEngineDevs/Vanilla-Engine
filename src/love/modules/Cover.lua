@@ -34,9 +34,14 @@ function cover:update(dt)
     end
 end
 
+function cover:getVisibility(id, plr)
+    return self.covers[plr][id].hiding
+end
+
 -- 1 = boyfriend, 2 = enemy
 function cover:show(id, plr)
     if not self.covers[plr][id].visible then
+        self.covers[plr][id].hiding = false
         self.covers[plr][id].visible = true
         self.covers[plr][id]:animate(CONSTANTS.WEEKS.NOTE_LIST[id] .. " start", false, function()
             self.covers[plr][id]:animate(CONSTANTS.WEEKS.NOTE_LIST[id], true)
@@ -45,6 +50,7 @@ function cover:show(id, plr)
 end
 
 function cover:hide(id, plr)
+    self.covers[plr][id].hiding = true
     self.covers[plr][id]:animate(CONSTANTS.WEEKS.NOTE_LIST[id] .. " end", false, function()
         self.covers[plr][id].visible = false
     end)

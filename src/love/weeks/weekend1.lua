@@ -30,7 +30,7 @@ return {
 
 		stages["streets"]:enter()
 
-		song = 5
+		song = songNum
 		difficulty = songAppend
 		erectMode = isErect
 

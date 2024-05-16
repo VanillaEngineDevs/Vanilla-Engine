@@ -392,6 +392,8 @@ return {
 			if not stepCrochet then stepCrochet = crochet / 4 end
 		end
 
+		if not bpm then bpm = 120 end
+
 		local sprites = {
 			sprites.leftArrow,
 			sprites.downArrow,
@@ -486,7 +488,9 @@ return {
 	setupCountdown = function(self, countNumVal)
 		local countNumVal = countNumVal or 4
 		lastReportedPlaytime = 0
-		musicTime = ((60*4) / bpm) * -1000 -- countdown is 4 beats long
+		if countNumVal == 4 then
+			musicTime = ((60*4) / bpm) * -1000 -- countdown is 4 beats long
+		end
 		musicThres = 0
 
 		countingDown = true
@@ -1040,6 +1044,10 @@ return {
 				end
 
 				table.remove(boyfriendNote, 1)
+			end
+
+			if not input:down(curInput) and not HoldCover:getVisibility(i, 1) then
+				HoldCover:hide(i, 1)
 			end
 
 			if input:released(curInput) then
