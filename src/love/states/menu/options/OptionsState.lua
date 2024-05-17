@@ -1,6 +1,9 @@
 local OptionsState = {}
 
 OptionsState.options = {"Gamemodes", "Gameplay", "Graphics", "Controls", "Miscillaneous"}
+if love.system.getOS() == "NX" then
+    OptionsState.options = {"Gamemodes", "Gameplay", "Graphics", "Miscillaneous"}
+end
 OptionsState.grpOptions = Group()
 OptionsState.curSelected = 1
 OptionsState.menuBG = nil
