@@ -73,11 +73,28 @@ CONSTANTS.WEEKS = {
         BAD_THRES = 135,
         SHIT_THRES = 160
     },
+    HEALTH = {
+        MAX = 2,
+        MIN = 0,
+        STARTING = 2 / 2,
+        BONUS = {
+            KILLER = 2 / 100 * 2,
+            SICK = 1.5 / 100 * 2,
+            GOOD = 0.75 / 100 * 2,
+            BAD = 0 / 100 * 2,
+            SHIT = -1 / 100 * 2
+        },
+        MISS_PENALTY = 4 / 100 * 2,
+        GHOST_MISS_PENALTY = 2 / 100 * 2,
+
+        WINNING_THRESHOLD = 0.8 * 2,
+        LOSING_THRESHOLD = 0.2 * 2
+    },
     MAX_SCORE = 500,
     MIN_SCORE = 0,
     MISS_SCORE = 0,
     SCORING_OFFSET = 54.00,
-    SCORING_SLOPE = 0.080
+    SCORING_SLOPE = 0.080,
 }
 
 return CONSTANTS

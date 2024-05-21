@@ -38,6 +38,8 @@ local option = "normal"
 
 local countNum = 4 -- Used for countdown
 
+local healthLerp
+
 return {
 	enter = function(self, option)
 		playMenuMusic = false
@@ -304,7 +306,8 @@ return {
 		enemyNotes = {}
 		boyfriendNotes = {}
 		gfNotes = {}
-		health = 1
+		health = CONSTANTS.WEEKS.HEALTH.STARTING
+		healthLerp = health
 		score = 0
 		misses = 0
 		ratingPercent = 0.0
@@ -767,6 +770,8 @@ return {
 		HoldCover:update(dt)
 		updateNotePos()
 
+		healthLerp = util.coolLerp(healthLerp, health, 0.15)
+
 		for i = 1, 4 do
 			local enemyArrow = enemyArrows[i]
 			local boyfriendArrow = boyfriendArrows[i]
@@ -847,10 +852,10 @@ return {
 					if voicesBF then voicesBF:setVolume(0) end
 
 					if boyfriendNote[1]:getAnimName() ~= "hold" and boyfriendNote[1]:getAnimName() ~= "end" then 
-						health = health - 0.095
+						health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY
 						misses = misses + 1
 					else
-						health = health - 0.0125
+						health = health - (CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * 0.1)
 					end
 
 					table.remove(boyfriendNote, 1)
@@ -907,7 +912,7 @@ return {
 							ratingTimers[3] = Timer.tween(2, numbers[1], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
 							ratingTimers[4] = Timer.tween(2, numbers[2], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
 							ratingTimers[5] = Timer.tween(2, numbers[3], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
-							health = health + 0.095
+							health = health + (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper("sick")] or 0)
 							score = score + 500
 
 							self:calculateRating()
@@ -990,7 +995,7 @@ return {
 									boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
 
 									if boyfriendNote[j]:getAnimName() ~= "hold" and boyfriendNote[j]:getAnimName() ~= "end" then
-										health = health + 0.095
+										health = health + (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper(ratingAnim)] or 0)
 									else
 										health = health + 0.0125
 									end
@@ -1023,7 +1028,7 @@ return {
 					if didHitNote then
 						score = math.max(0, score - 10)
 					end
-					health = health - 0.135
+					health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY
 					misses = misses + 1
 				end
 			end
@@ -1056,26 +1061,24 @@ return {
 		end
 
 		-- Enemy
-		if health >= 1.595 then
+		if health >= CONSTANTS.WEEKS.HEALTH.WINNING_THRESHOLD then
 			enemyIcon:setFrame(2)
-		elseif health < 1.595 then
+		elseif health < CONSTANTS.WEEKS.HEALTH.WINNING_THRESHOLD then
 			enemyIcon:setFrame(1)
 		end
 
 		-- Boyfriend
-		if health > 2 then
-			health = 2
-		elseif health > 0.325 and boyfriendIcon:getCurFrame() == 2 then
+		health = util.clamp(health, CONSTANTS.WEEKS.HEALTH.MIN, CONSTANTS.WEEKS.HEALTH.MAX)
+		if health > CONSTANTS.WEEKS.HEALTH.LOSING_THRESHOLD and boyfriendIcon:getCurFrame() == 2 then
 			boyfriendIcon:setFrame(1)
 		elseif health <= 0 then -- Game over
 			if not settings.practiceMode then Gamestate.push(gameOver) end
-			health = 0
-		elseif health <= 0.325 and boyfriendIcon:getCurFrame() == 1 then
+		elseif health <= CONSTANTS.WEEKS.HEALTH.LOSING_THRESHOLD and boyfriendIcon:getCurFrame() == 1 then
 			boyfriendIcon:setFrame(2)
 		end
 
-		enemyIcon.x = 425 - health * 500
-		boyfriendIcon.x = 585 - health * 500
+		enemyIcon.x = 425 - healthLerp * 500
+		boyfriendIcon.x = 585 - healthLerp * 500
 
 		if beatHandler.onBeat() then
 			enemyIcon.sizeX, enemyIcon.sizeY = 1.75, 1.75
@@ -1291,7 +1294,7 @@ return {
 			graphics.setColor(1, 0, 0)
 			love.graphics.rectangle("fill", -500, 350+downscrollOffset, 1000, 25)
 			graphics.setColor(0, 1, 0)
-			love.graphics.rectangle("fill", 500, 350+downscrollOffset, -health * 500, 25)
+			love.graphics.rectangle("fill", 500, 350+downscrollOffset, -healthLerp * 500, 25)
 			graphics.setColor(0, 0, 0)
 			love.graphics.setLineWidth(10)
 			love.graphics.rectangle("line", -500, 350+downscrollOffset, 1000, 25)
