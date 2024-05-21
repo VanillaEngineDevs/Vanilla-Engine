@@ -528,6 +528,7 @@ return {
 						if inst then inst:play() end
 						if voicesBF then voicesBF:play() end
 						if voicesEnemy then voicesEnemy:play() end
+						beatHandler.setBeat(0)
 					end
 				end
 			)
