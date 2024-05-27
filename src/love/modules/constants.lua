@@ -1,5 +1,11 @@
 local CONSTANTS = {}
 
+CONSTANTS.OPTIONS ={
+    SHOW_RESULTS_SCREEN = true,
+    DO_SAVE_DATA = true,
+    DO_MODS = true,
+}
+
 CONSTANTS.WEEKS = {
     ANIM_LIST = {
         "singLEFT",

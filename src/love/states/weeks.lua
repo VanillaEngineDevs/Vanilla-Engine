@@ -40,8 +40,31 @@ local countNum = 4 -- Used for countdown
 
 local healthLerp
 
+local allStates = {
+	sickCounter = 0,
+	goodCounter = 0,
+	badCounter = 0,
+	shitCounter = 0,
+	missCounter = 0,
+	maxCombo = 0,
+	score = 0
+}
+
+local sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
+
 return {
 	enter = function(self, option)
+		allStates = {
+			sickCounter = 0,
+			goodCounter = 0,
+			badCounter = 0,
+			shitCounter = 0,
+			missCounter = 0,
+			maxCombo = 0,
+			score = 0
+		}
+		
+		sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
 		playMenuMusic = false
 		beatHandler.reset()
 		option = option or "normal"
@@ -239,7 +262,7 @@ return {
 	end,
 
 	saveData = function(self)
-		if not DO_SAVE_DATA then return end
+		if not CONSTANTS.OPTIONS.DO_SAVE_DATA then return end
 		local diff = difficulty ~= "" and difficulty or "normal"
 		if savedata[weekNum] then
 			if savedata[weekNum][song] then
@@ -278,6 +301,14 @@ return {
 		--if not (countingDown or graphics.isFading()) and not (inst and inst:isPlaying()) and not paused and not inCutscene then
 		-- use inst, if inst doesn't exist, use voices, else dont use anything
 		if not (countingDown or graphics.isFading()) and not ((inst and inst:isPlaying()) or (voicesBF and voicesBF:isPlaying())) and not paused and not inCutscene then
+			allStates.sickCounter = allStates.sickCounter + sickCounter
+			allStates.goodCounter = allStates.goodCounter + goodCounter
+			allStates.badCounter = allStates.badCounter + badCounter
+			allStates.shitCounter = allStates.shitCounter + shitCounter
+			allStates.missCounter = allStates.missCounter + misses
+			if maxCombo > allStates.maxCombo then allStates.maxCombo = maxCombo end
+			allStates.score = allStates.score + score
+
 			if storyMode and song < #weekMeta[weekNum][2] then
 				self:saveData()
 				song = song + 1
@@ -291,7 +322,20 @@ return {
 				graphics:fadeOutWipe(
 					0.7,
 					function()
-						Gamestate.switch(menu)
+						Gamestate.switch(resultsScreen, {
+							diff = string.lower(CURDIFF),
+							song = not storyMode and SONGNAME or weekDesc[weekNum],
+							artist = not storyMode and ARTIST or nil,
+							scores = {
+								sickCount = allStates.sickCounter,
+								goodCount = allStates.goodCounter,
+								badCount = allStates.badCounter,
+								shitCount = allStates.shitCounter,
+								missedCount = allStates.missCounter,
+								maxCombo = allStates.maxCombo,
+								score = allStates.score
+							}
+						})
 
 						status.setLoading(false)
 					end
@@ -300,7 +344,7 @@ return {
 		end
 	end,
 
-	initUI = function(self, option)
+	initUI = function(self)
 		events = {}
 		songEvents = {}
 		enemyNotes = {}
@@ -343,20 +387,38 @@ return {
 		}
 
 		for i = 1, 4 do
-			if settings.middleScroll then 
-				boyfriendArrows[i].x = -410 + 165 * i
-				-- ew stuff
-				enemyArrows[1].x = -925 + 165 * 1 
-				enemyArrows[2].x = -925 + 165 * 2
-				enemyArrows[3].x = 100 + 165 * 3
-				enemyArrows[4].x = 100 + 165 * 4
-			else
-				enemyArrows[i].x = -925 + 165 * i
-				boyfriendArrows[i].x = 100 + 165 * i
-			end
+			if pixel and settings.pixelPerfect then
+				if not settings.middleScroll then 
+					boyfriendArrows[i].x = -20 + 20 * i
+					
+					-- ew stuff
+					enemyArrows[1].x = -125 + 20 * 1
+					enemyArrows[2].x = -125 + 20 * 2
+					enemyArrows[3].x = 25 + 20 * 3
+					enemyArrows[4].x = 25 + 20 * 4
+				else
+					enemyArrows[i].x = -125 + 20 * i
+					boyfriendArrows[i].x = 25 + 20 * i
+				end
 
-			enemyArrows[i].y = -400
-			boyfriendArrows[i].y = -400
+				enemyArrows[i].y = -55
+				boyfriendArrows[i].y = -55
+			else
+				if settings.middleScroll then 
+					boyfriendArrows[i].x = -410 + 165 * i
+					-- ew stuff
+					enemyArrows[1].x = -925 + 165 * 1 
+					enemyArrows[2].x = -925 + 165 * 2
+					enemyArrows[3].x = 100 + 165 * 3
+					enemyArrows[4].x = 100 + 165 * 4
+				else
+					enemyArrows[i].x = -925 + 165 * i
+					boyfriendArrows[i].x = 100 + 165 * i
+				end
+
+				enemyArrows[i].y = -400
+				boyfriendArrows[i].y = -400
+			end
 
 			boyfriendArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
 			enemyArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
@@ -381,6 +443,10 @@ return {
 		local chart = chartData.notes[difficulty]
 
 		local metadata = json.decode(love.filesystem.read(metadata))
+
+		SONGNAME = metadata.songName
+		CURDIFF = difficulty
+		ARTIST = metadata.artist
 
 		local events = {}
 		
@@ -892,6 +958,7 @@ return {
 						if boyfriendNote[1]:getAnimName() ~= "hold" and boyfriendNote[1]:getAnimName() ~= "end" then 
 							noteCounter = noteCounter + 1
 							combo = combo + 1
+							if combo > maxCombo then maxCombo = combo end
 
 							numbers[1]:animate(tostring(math.floor(combo / 100 % 10)), false)
 							numbers[2]:animate(tostring(math.floor(combo / 10 % 10)), false)
@@ -954,6 +1021,15 @@ return {
 
 								ratingAnim = self:judgeNote(notePos)
 								score = score + self:scoreNote(notePos)
+								if ratingAnim == "sick" then
+									sickCounter = sickCounter + 1
+								elseif ratingAnim == "good" then
+									goodCounter = goodCounter + 1
+								elseif ratingAnim == "bad" then
+									badCounter = badCounter + 1
+								elseif ratingAnim == "shit" then
+									shitCounter = shitCounter + 1
+								end
 
 								if ratingAnim == "sick" then
 									NoteSplash:new(
@@ -967,6 +1043,7 @@ return {
 								end
 
 								combo = combo + 1
+								if combo > maxCombo then maxCombo = combo end
 								noteCounter = noteCounter + 1
 
 								numbers[1]:animate(tostring(math.floor(combo / 100 % 10)), false)
@@ -1095,7 +1172,7 @@ return {
 			--love.graphics.origin()
 			love.graphics.translate(0, -35)
 			graphics.setColor(1, 1, 1, ratingVisibility[1])
-			if pixel then
+			if pixel and not settings.pixelPerfect then
 				love.graphics.translate(-16, 0)
 				rating:udraw(5.25, 5.25)
 				for i = 1, 3 do
@@ -1164,24 +1241,24 @@ return {
 				else
 					graphics.setColor(1, 1, 1, enemyArrows[i].alpha)
 				end
-				if not pixel then
-					enemyArrows[i]:draw()
-				else
+				if pixel and not settings.pixelPerfect then
 					if not settings.downscroll then
 						enemyArrows[i]:udraw(8, 8)
 					else
 						enemyArrows[i]:udraw(8, -8)
 					end
+				else
+					enemyArrows[i]:draw()
 				end
 				graphics.setColor(1, 1, 1)
-				if not pixel then 
-					boyfriendArrows[i]:draw()
-				else
+				if pixel and not settings.pixelPerfect then
 					if not settings.downscroll then
 						boyfriendArrows[i]:udraw(8, 8)
 					else
 						boyfriendArrows[i]:udraw(8, -8)
 					end
+				else
+					boyfriendArrows[i]:draw()
 				end
 				graphics.setColor(1, 1, 1)
 
@@ -1196,14 +1273,14 @@ return {
 									graphics.setColor(1, 1, 1, 1 * enemyNotes[i][j].alpha)
 								end
 
-								if not pixel then
-									enemyNotes[i][j]:draw()
-								else
+								if pixel and not settings.pixelPerfect then
 									if not settings.downscroll then
 										enemyNotes[i][j]:udraw(8, 8)
 									else
 										enemyNotes[i][j]:udraw(8, -8)
 									end
+								else
+									enemyNotes[i][j]:draw()
 								end
 								graphics.setColor(1, 1, 1)
 							end
@@ -1215,14 +1292,14 @@ return {
 								local animName = boyfriendNotes[i][j]:getAnimName()
 								graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y)) / 75) * boyfriendNotes[i][j].alpha)
 
-								if not pixel then 
-									boyfriendNotes[i][j]:draw()
-								else
+								if pixel and not settings.pixelPerfect then
 									if not settings.downscroll then
 										boyfriendNotes[i][j]:udraw(8, 8)
 									else
 										boyfriendNotes[i][j]:udraw(8, -8)
 									end
+								else
+									boyfriendNotes[i][j]:draw()
 								end
 							end
 						end
@@ -1232,24 +1309,24 @@ return {
 			end
 
 			HoldCover:draw()
-			if not pixel then
-				NoteSplash:draw()
-			else
+			if pixel and not settings.pixelPerfect then
 				NoteSplash:udraw(8, 8)
+			else
+				NoteSplash:draw()
 			end
 
 			graphics.setColor(1, 1, 1, countdownFade[1])
 			if not settings.downscroll then
-				if not pixel or pixel then 
-					countdown:draw()
-				else
+				if pixel and not settings.pixelPerfect then
 					countdown:udraw(6.75, 6.75)
+				else
+					countdown:draw()
 				end
 			else
-				if not pixel or pixel then 
-					countdown:udraw(1, -1)
-				else
+				if pixel and not settings.pixelPerfect then
 					countdown:udraw(6.75, -6.75)
+				else
+					countdown:udraw(1, -1)
 				end
 			end
 			graphics.setColor(1, 1, 1)
@@ -1297,7 +1374,7 @@ return {
 			graphics.setColor(0, 1, 0)
 			love.graphics.rectangle("fill", 500, 350+downscrollOffset, -healthLerp * 500, 25)
 			graphics.setColor(0, 0, 0)
-			love.graphics.setLineWidth(10)
+			love.graphics.setLineWidth(8)
 			love.graphics.rectangle("line", -500, 350+downscrollOffset, 1000, 25)
 			love.graphics.setLineWidth(1)
 			graphics.setColor(1, 1, 1)
@@ -1329,5 +1406,6 @@ return {
 		Timer.clear()
 
 		fakeBoyfriend = nil
+		importMods.inMod = false
 	end
 }

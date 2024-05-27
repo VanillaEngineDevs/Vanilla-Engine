@@ -24,7 +24,6 @@ end
 
 function m_graphics:leave()
     settings.fpsCap = self.optionsArray[1]:getValue()
-    love.setFpsCap(settings.fpsCap)
     settings.hardwareCompression = self.optionsArray[2]:getValue()
 
     self.super.leave(self)

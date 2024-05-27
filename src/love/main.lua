@@ -182,6 +182,10 @@ function love.load()
 	NoteSplash = require "modules.Splash"
 	HoldCover = require "modules.Cover"
 	loadSavedata()
+	settings.pixelPerfect = false
+
+	-- Modding
+	importMods = require "modding.importMods"
 
 	-- XML Modules
 	Sprite = require "modules.xml.Sprite"
@@ -238,6 +242,7 @@ function love.load()
 	menuSettings = require "states.menu.options.OptionsState"
 	menuCredits = require "states.menu.menuCredits"
 	menuSelect = require "states.menu.menuSelect"
+	resultsScreen = require "states.menu.results"
 
 	firstStartup = true
 
@@ -392,6 +397,8 @@ function love.load()
 		}
 	}
 
+	modWeekPlacement = #weekMeta -- everything after the main weeks is a mod folder.
+
 	-- LÖVE init
 	if curOS == "OS X" then
 		love.window.setIcon(love.image.newImageData("icons/macos.png"))
@@ -450,11 +457,17 @@ function love.load()
 		(love.audio.getVolume())
 	))
 
+
+	volumeWidth = {width = 160 }
+
+	if CONSTANTS.OPTIONS.DO_MODS then
+		importMods.setup()
+		importMods.loadAllMods()
+	end
+
 	Gamestate.switch(menu)
 
 	love.setFpsCap(settings.fpsCap)
-
-	DO_SAVE_DATA = true
 end
 
 function love.resize(width, height)
@@ -520,6 +533,21 @@ function love.keypressed(key)
 			lastAudioVolume = love.audio.getVolume()
 			love.audio.setVolume(0)
 		end
+	--[[ elseif key == "-" and love.keyboard.isDown("lalt") then
+		Gamestate.switch(resultsScreen, {
+			diff = "hard",
+			song = "High Erect",
+			artist = "Kohta Takahashi (feat. Kawai Sprite)",
+			scores = {
+				sickCount = 10,
+				goodCount = 15,
+				badCount = 20,
+				shitCount = 25,
+				missedCount = 30,
+				maxCombo = 384,
+				score = 192000
+			}
+		}) ]]
 	elseif key == "-" then
 		volFade = 1
 		if fixVol > 0 then
@@ -594,41 +622,78 @@ function love.draw()
 	graphics.screenBase(push:getWidth(), push:getHeight())
 
 	if mainDrawing then
-		push:start()
-			graphics.setColor(1, 1, 1) -- Fade effect on
-			Gamestate.draw()
-			love.graphics.setColor(1, 1, 1) -- Fade effect off
-			love.graphics.setFont(font)
-			if status.getLoading() then
-				love.graphics.print("Loading...", push:getWidth() - 175, push:getHeight() - 50)
-			end
-			if volFade > 0  then
-				love.graphics.setColor(1, 1, 1, volFade)
-				fixVol = tonumber(string.format(
-					"%.1f  ",
-					(love.audio.getVolume())
-				))
-				love.graphics.setColor(0.5, 0.5, 0.5, volFade - 0.3)
+		if not status.getNoResize() then
+			push:start()
+				graphics.setColor(1, 1, 1) -- Fade effect on
+				Gamestate.draw()
+				love.graphics.setColor(1, 1, 1) -- Fade effect off
+				love.graphics.setFont(font)
+				if status.getLoading() then
+					love.graphics.print("Loading...", push:getWidth() - 175, push:getHeight() - 50)
+				end
+				if volFade > 0  then
+					love.graphics.setColor(1, 1, 1, volFade)
+					fixVol = tonumber(string.format(
+						"%.1f  ",
+						(love.audio.getVolume())
+					))
+					love.graphics.setColor(0.5, 0.5, 0.5, volFade - 0.3)
 
-				love.graphics.rectangle("fill", 1110, 0, 170, 50)
+					love.graphics.rectangle("fill", 1110, 0, 170, 50)
 
-				love.graphics.setColor(1, 1, 1, volFade)
+					love.graphics.setColor(1, 1, 1, volFade)
 
-				if volTween then Timer.cancel(volTween) end
-				volTween = Timer.tween(
-					0.2, 
-					volumeWidth, 
-					{width = fixVol * 160},
-					"out-quad"
-				)
-				love.graphics.rectangle("fill", 1113, 10, volumeWidth.width, 30)
-				graphics.setColor(1, 1, 1, 1)
-			end
-			if fade.mesh then 
-				graphics.setColor(1,1,1)
-				love.graphics.draw(fade.mesh, 0, fade.y, 0, push:getWidth(), fade.height)
-			end
-		push:finish()
+					if volTween then Timer.cancel(volTween) end
+					volTween = Timer.tween(
+						0.2, 
+						volumeWidth, 
+						{width = fixVol * 160},
+						"out-quad"
+					)
+					love.graphics.rectangle("fill", 1113, 10, volumeWidth.width, 30)
+					graphics.setColor(1, 1, 1, 1)
+				end
+				if fade.mesh then 
+					graphics.setColor(1,1,1)
+					love.graphics.draw(fade.mesh, 0, fade.y, 0, push:getWidth(), fade.height)
+				end
+			push:finish()
+		else
+				graphics.setColor(1, 1, 1) -- Fade effect on
+				Gamestate.draw()
+				love.graphics.setColor(1, 1, 1) -- Fade effect off
+				love.graphics.setFont(font)
+				if status.getLoading() then
+					love.graphics.print("Loading...", graphics.getWidth() - 175, graphics.getHeight() - 50)
+				end
+				if volFade > 0  then
+					love.graphics.setColor(1, 1, 1, volFade)
+					fixVol = tonumber(string.format(
+						"%.1f  ",
+						(love.audio.getVolume())
+					))
+					love.graphics.setColor(0.5, 0.5, 0.5, volFade - 0.3)
+
+					love.graphics.rectangle("fill", 1110, 0, 170, 50)
+
+					love.graphics.setColor(1, 1, 1, volFade)
+
+					if volTween then Timer.cancel(volTween) end
+					volTween = Timer.tween(
+						0.2, 
+						volumeWidth, 
+						{width = fixVol * 160},
+						"out-quad"
+					)
+					love.graphics.rectangle("fill", 1113, 10, volumeWidth.width, 30)
+					graphics.setColor(1, 1, 1, 1)
+				end
+				if fade.mesh then 
+					graphics.setColor(1,1,1)
+					love.graphics.draw(fade.mesh, 0, fade.y, 0, graphics.getWidth(), fade.height)
+				end
+		end
+
 
 		graphics.setColor(1,1,1,capturedScreenshot.flash)
 		love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())

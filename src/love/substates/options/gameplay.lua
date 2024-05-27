@@ -39,6 +39,15 @@ function gameplay:enter()
         )
     )
 
+    --[[ self:addOption(
+        Option:new(
+            "Pixel Perfect",
+            "If checked, pixel weeks will be pixel perfect. Mod developers may force-disable this option",
+            settings.pixelPerfect,
+            "bool"
+        )
+    ) ]]
+
     local o = Option:new(
         "Scrollspeed",
         "How fast the notes scroll, 1 is the default song speed",
@@ -75,8 +84,9 @@ function gameplay:leave()
     settings.middleScroll = self.optionsArray[2]:getValue()
     settings.ghostTapping = self.optionsArray[3]:getValue()
     settings.botPlay = self.optionsArray[4]:getValue()
-    settings.customScrollSpeed = self.optionsArray[5]:getValue()
-    settings.scrollUnderlayTrans = self.optionsArray[6]:getValue()
+    --[[ settings.pixelPerfect = self.optionsArray[5]:getValue() ]]
+    settings.customScrollSpeed = self.optionsArray[6]:getValue()
+    settings.scrollUnderlayTrans = self.optionsArray[7]:getValue()
     
 
     self.super.leave(self)

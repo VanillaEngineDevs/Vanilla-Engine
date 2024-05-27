@@ -42,6 +42,7 @@ if love.filesystem.getInfo("settings") then
         customBindRight = customBindRight,
         window = settings.window,
         fpsCap = settings.fpsCap,
+        pixelPerfect = false,
         settingsVer = settingsVer
     }
     serialized = lume.serialize(settingdata)
@@ -68,6 +69,7 @@ if not love.filesystem.getInfo("settings") or settingsVer ~= 3 then
     settings.scrollUnderlayTrans = 0
     settings.window = false
     settings.fpsCap = 60
+    settings.pixelPerfect = false
     --settings.noteSkins = 1
     customBindLeft = "a"
     customBindRight = "d"
@@ -92,6 +94,7 @@ if not love.filesystem.getInfo("settings") or settingsVer ~= 3 then
         keystrokes = settings.keystrokes,
         scrollUnderlayTrans = settings.scrollUnderlayTrans,
         fpsCap = settings.fpsCap,
+        pixelPerfect = false,
 
         customBindLeft = "a",
         customBindRight = "d",
@@ -136,6 +139,7 @@ function saveSettings(menu)
             flashinglights = settings.flashinglights,
             window = settings.window,
 			fpsCap = settings.fpsCap,
+            pixelPerfect = false,
             customBindDown = customBindDown,
             customBindUp = customBindUp,
             customBindLeft = customBindLeft,
@@ -176,6 +180,7 @@ function saveSettings(menu)
             flashinglights = settings.flashinglights,
 			window = settings.window,
 			fpsCap = settings.fpsCap,
+            pixelPerfect = false,
 
             customBindDown = customBindDown,
             customBindUp = customBindUp,

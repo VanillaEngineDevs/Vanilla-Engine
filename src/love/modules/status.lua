@@ -32,7 +32,7 @@ return {
 	setNoResize = function(state)
 		noResize = state
 	end,
-	getNoResize = function(state)
+	getNoResize = function()
 		return noResize
 	end,
 

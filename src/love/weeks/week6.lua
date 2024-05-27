@@ -40,6 +40,10 @@ return {
 		self:load()
 
 		musicPos = 0
+		if settings.pixelPerfect then
+			status.setNoResize(true)
+			canvas = love.graphics.newCanvas(256, 144)
+		end
 	end,
 
 	load = function(self)
@@ -146,6 +150,9 @@ return {
 	end,
 
 	update = function(self, dt)
+		if settings.pixelPerfect then
+			graphics.screenBase(256, 144)
+		end
 		weeks:update(dt)
 		if song ~= 3 then
 			stages["school"]:update(dt)
@@ -172,6 +179,12 @@ return {
 	end,
 
 	draw = function(self)
+		local canvasScale = 1
+		if settings.pixelPerfect then
+			graphics.screenBase(256, 144)
+			love.graphics.setCanvas(canvas)
+			love.graphics.clear()
+		end
 		love.graphics.push()
 			love.graphics.translate(graphics.getWidth()/2, graphics.getHeight()/2)
 			love.graphics.scale(camera.zoom, camera.zoom)
@@ -188,6 +201,14 @@ return {
 		else
 			weeks:drawUI()
 		end
+		if settings.pixelPerfect then
+			love.graphics.setCanvas()
+			graphics.screenBase(love.graphics.getWidth(), love.graphics.getHeight())
+
+			canvasScale = math.min(math.floor(graphics.getWidth() / 256), math.floor(graphics.getHeight() / 144))
+			if canvasScale < 1 then canvasScale = math.min(graphics.getWidth() / 256, graphics.getHeight() / 144) end
+			love.graphics.draw(canvas, graphics.getWidth() / 2, graphics.getHeight() / 2, nil, canvasScale, canvasScale, 128, 72)
+		end
 	end,
 
 	leave = function(self)
@@ -200,6 +221,7 @@ return {
 		weeks:leave()
 		stages["school"]:leave()
 		stages["evilSchool"]:leave()
+		status.setNoResize(false)
 
 		love.graphics.setDefaultFilter("linear")
 	end

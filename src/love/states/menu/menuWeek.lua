@@ -124,7 +124,7 @@ return {
 
 		--week images
 		weekImages = {}
-		for i = 0, 7 do 
+		for i = 0, modWeekPlacement-1 do 
 			table.insert(weekImages, graphics.newImage(graphics.imagePath("menu/week" .. i)))
 		end
 		table.insert(weekImages, graphics.newImage(graphics.imagePath("menu/weekend1")))
@@ -159,7 +159,6 @@ return {
 				end
 			)
 		end
-		
 	end,
 
 	update = function(self, dt)
@@ -221,8 +220,8 @@ return {
 					currentWeek = currentWeek - 1
 					weekNum = weekNum - 1
 				else
-					currentWeek = #weekMeta - 1
-					weekNum = #weekMeta
+					currentWeek = modWeekPlacement - 1
+					weekNum = modWeekPlacement
 				end
 				if freeplayColours[weekNum] then colourTween() else colourTweenAlt() end
 				menuFunc()
@@ -235,7 +234,7 @@ return {
 					arrowRight:animate("arrow", true)
 				end)
 
-				if currentWeek ~= #weekMeta - 1 then
+				if currentWeek ~= modWeekPlacement - 1 then
 					currentWeek = currentWeek + 1
 					weekNum = weekNum + 1
 				else

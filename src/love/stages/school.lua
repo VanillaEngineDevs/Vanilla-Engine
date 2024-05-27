@@ -35,22 +35,29 @@ return {
 		enemy = love.filesystem.load("sprites/characters/senpai.lua")()
 		enemy.colours = {255,170,111}
 		fakeBoyfriend = love.filesystem.load("sprites/characters/boyfriend-pixel-dead.lua")() -- Used for game over
-        girlfriend.x, girlfriend.y = 30, -50
-		boyfriend.x, boyfriend.y = 300, 190
-		fakeBoyfriend.x, fakeBoyfriend.y = 300, 190
-		enemy.x, enemy.y = -340, -20
+		if settings.pixelPerfect then
+			girlfriend.x, girlfriend.y = 0, 0
+			boyfriend.x, boyfriend.y = 50, 30
+			fakeBoyfriend.x, fakeBoyfriend.y = 50, 30
+			enemy.x, enemy.y = -50, 0
+		else
+			girlfriend.x, girlfriend.y = 30, -50
+			boyfriend.x, boyfriend.y = 300, 190
+			fakeBoyfriend.x, fakeBoyfriend.y = 300, 190
+			enemy.x, enemy.y = -340, -20
+		end
     end,
 
     load = function(self)
         if song == 3 then
             enemy = love.filesystem.load("sprites/characters/spirit.lua")()
             stageImages["School"] = love.filesystem.load("sprites/week6/evil-school.lua")()
-			enemy.x, enemy.y = -340, -20
+			enemy.x, enemy.y = -50, 0
         elseif song == 2 then
             enemy = love.filesystem.load("sprites/characters/senpai-angry.lua")()
 			enemy.colours = {255,170,111}
             stageImages["Freaks"]:animate("dissuaded", true)
-			enemy.x, enemy.y = -340, -20
+			enemy.x, enemy.y = -50, 0
         end
     end,
 
@@ -65,30 +72,57 @@ return {
     end,
 
     draw = function()
-        love.graphics.push()
-			love.graphics.translate(camera.x * 0.9, camera.y * 0.9)
+		if not settings.pixelPerfect then
+			love.graphics.push()
+				love.graphics.translate(camera.x * 0.9, camera.y * 0.9)
 
-			if song ~= 3 then
-				stageImages["Sky"]:udraw()
-			end
+				if song ~= 3 then
+					stageImages["Sky"]:udraw()
+				end
 
-			stageImages["School"]:udraw()
-			if song ~= 3 then
-				stageImages["Street"]:udraw()
-				stageImages["Trees Back"]:udraw()
+				stageImages["School"]:udraw()
+				if song ~= 3 then
+					stageImages["Street"]:udraw()
+					stageImages["Trees Back"]:udraw()
 
-				stageImages["Trees"]:udraw()
-				stageImages["Petals"]:udraw()
-				stageImages["Freaks"]:udraw()
-			end
-			girlfriend:udraw()
-		love.graphics.pop()
-		love.graphics.push()
-			love.graphics.translate(camera.x, camera.y)
+					stageImages["Trees"]:udraw()
+					stageImages["Petals"]:udraw()
+					stageImages["Freaks"]:udraw()
+				end
+				girlfriend:udraw()
+			love.graphics.pop()
+			love.graphics.push()
+				love.graphics.translate(camera.x, camera.y)
 
-			enemy:udraw()
-			boyfriend:udraw()
-		love.graphics.pop()
+				enemy:udraw()
+				boyfriend:udraw()
+			love.graphics.pop()
+		else
+			love.graphics.push()
+				love.graphics.translate(camera.x * 0.9, camera.y * 0.9)
+
+				if song ~= 3 then
+					stageImages["Sky"]:draw()
+				end
+
+				stageImages["School"]:draw()
+				if song ~= 3 then
+					stageImages["Street"]:draw()
+					stageImages["Trees Back"]:draw()
+
+					stageImages["Trees"]:draw()
+					stageImages["Petals"]:draw()
+					stageImages["Freaks"]:draw()
+				end
+				girlfriend:draw()
+			love.graphics.pop()
+			love.graphics.push()
+				love.graphics.translate(camera.x, camera.y)
+
+				enemy:draw()
+				boyfriend:draw()
+			love.graphics.pop()
+		end
     end,
 
     leave = function()

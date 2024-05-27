@@ -183,7 +183,7 @@ return {
                     function()
                         songAppend = allWeeks[weekNum].songs[songNum].diffs[songDifficulty][1]
                         isErect = songDifficulty > 3 and allWeeks[weekNum].songs[songNum].diffs[songDifficulty][2] or false
-                        _psychmod = false
+                        importMods.inMod = weekNum > modWeekPlacement
     
                         storyMode = false
     

@@ -54,10 +54,25 @@ return {
 	imagePath = function(path)
 		local pathStr = "images/" .. imageType .. "/" .. path .. "." .. imageType
 
-		if love.filesystem.getInfo(pathStr) then
-			return pathStr
+		if not importMods.inMod then
+			if love.filesystem.getInfo(pathStr) then
+				return pathStr
+			else
+				return "images/png/" .. path .. ".png"
+			end
 		else
-			return "images/png/" .. path .. ".png"
+			local currentMod = importMods.getCurrentMod()
+			if love.filesystem.getInfo(currentMod.path .. "/images/" .. imageType .. "/" .. path .. "." .. imageType) then
+				return currentMod.path .. "/images/" .. imageType .. "/" .. path .. "." .. imageType
+			elseif love.filesystem.getInfo(currentMod.path .. "/images/png/" .. path .. ".png") then
+				return currentMod.path .. "/images/png/" .. path .. ".png"
+			else
+				if love.filesystem.getInfo(pathStr) then
+					return pathStr
+				else
+					return "images/png/" .. path .. ".png"
+				end
+			end
 		end
 	end,
 	setImageType = function(type)
@@ -104,6 +119,14 @@ return {
 				return image
 			end,
 
+			getWidth = function(self)
+				return width
+			end,
+
+			getHeight = function(self)
+				return height
+			end,
+
 			draw = function(self)
 				local x = self.x
 				local y = self.y
@@ -131,7 +154,8 @@ return {
 
 			udraw = function(self, sx, sy)
 				local sx = sx or 7
-				local sy = sy or 7
+				local sy = sy or sx 
+				print(sx, sy)
 				local x = self.x
 				local y = self.y
 
@@ -179,6 +203,7 @@ return {
 
 		local isAnimated
 		local isLooped
+		local forceFrameStart
 
 		local options
 
@@ -237,7 +262,7 @@ return {
 				return anims[name] ~= nil
 			end,
 
-			animate = function(self, animName, loopAnim, func, forceSpecial)
+			animate = function(self, animName, loopAnim, func, forceSpecial, frameOverride, keepFrameOverride)
 				-- defaults forceSpecial to true
 				forceSpecial = forceSpecial == nil and true or forceSpecial
 				self.holdTimer = 0
@@ -268,10 +293,16 @@ return {
 
 				self.func = func
 				
-				frame = anim.start
+				frame = frameOverride or anim.start
 				isLooped = loopAnim
 
 				isAnimated = true
+
+				if not keepFrameOverride then
+					forceFrameStart = nil
+				else
+					forceFrameStart = frameOverride
+				end
 			end,
 			getAnims = function(self)
 				return anims
@@ -310,7 +341,7 @@ return {
 						self.func = nil
 					end
 					if isLooped then
-						frame = anim.start
+						frame = forceFrameStart or anim.start
 					else
 						isAnimated = false
 					end
