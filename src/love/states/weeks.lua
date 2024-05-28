@@ -52,6 +52,8 @@ local allStates = {
 	score = 0
 }
 
+modEvents = {}
+
 local sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
 
 return {
@@ -362,6 +364,7 @@ return {
 
 	initUI = function(self)
 		events = {}
+		modEvents = {}
 		songEvents = {}
 		enemyNotes = {}
 		boyfriendNotes = {}
@@ -473,8 +476,9 @@ return {
 
 	generateNotes = function(self, chart, metadata, difficulty)
 		local eventBpm
+		local chart = getFilePath(chart)
 		local chartData = json.decode(love.filesystem.read(chart))
-		local chart = chartData.notes[difficulty]
+		chart = chartData.notes[difficulty]
 
 		local metadata = json.decode(love.filesystem.read(metadata))
 
@@ -521,12 +525,21 @@ return {
 			local data = noteData.d % 4 + 1
 			local time = noteData.t
 			local holdTime = noteData.l or 0
+			noteData.k = noteData.k or "normal"
 
 			local noteObject = sprites[data]()
+
+			local dataStuff = {}
+
+			if noteTypes[noteData.k] then
+				dataStuff = noteTypes[noteData.k]
+			else
+				dataStuff = noteTypes["normal"]
+			end
 			
 			noteObject.col = data
 			noteObject.y = -400 + time * 0.6 * speed
-			noteObject.ver = noteData.k or "normal"
+			noteObject.ver = noteData.k
 			noteObject.time = time
 			noteObject:animate("on")
 
@@ -539,6 +552,17 @@ return {
 			noteObject.x = arrowsTable[data].x
 			noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
 			local r, g, b = CONSTANTS.ARROW_COLORS[data][1], CONSTANTS.ARROW_COLORS[data][2], CONSTANTS.ARROW_COLORS[data][3]
+
+			if dataStuff.r then r = {decToRGB(dataStuff.r)} end
+			if dataStuff.g then g = {decToRGB(dataStuff.g)} end
+			if dataStuff.b then b = {decToRGB(dataStuff.b)} end
+			noteObject.hitNote = not dataStuff.ignoreNote
+
+			noteObject.healthGainMult = dataStuff.healthMult or 1
+			noteObject.healthLossMult = dataStuff.healthLossMult or 1
+
+			noteObject.causesMiss = dataStuff.causesMiss or false
+
 			noteObject.shader:send("r", r)
 			noteObject.shader:send("g", g)
 			noteObject.shader:send("b", b)
@@ -554,6 +578,9 @@ return {
 
 					holdNote.x = arrowsTable[data].x
 					holdNote.shader = noteObject.shader
+					holdNote.healthGainMult = noteObject.healthGainMult
+					holdNote.healthLossMult = noteObject.healthLossMult
+					holdNote.causesMiss = noteObject.causesMiss
 					table.insert(notesTable[data], holdNote)
 				end
 
@@ -817,6 +844,15 @@ return {
 			end
 		end
 
+		for i, event in ipairs(modEvents) do
+			if event.time <= absMusicTime then
+				Gamestate.onEvent(event)
+
+				table.remove(modEvents, i)
+				break
+			end
+		end
+
 		if (beatHandler.onBeat() and beatHandler.getBeat() % camera.camBopInterval == 0 and camera.zooming and camera.zoom < 1.35 and not camera.locked) then 
 			camera.zoom = camera.zoom + 0.015 * camera.camBopIntensity
 			uiCam.zoom = uiCam.zoom + 0.03 * camera.camBopIntensity
@@ -911,7 +947,8 @@ return {
 						ableTohit = enemyNote[j].hitNote
 					end
 
-					if (enemyNote[j].time - musicTime <= 0) and ableTohit then
+					if (enemyNote[j].time - musicTime <= 0) and ableTohit and not enemyNote[j].causesMiss then
+						print("hit", ableTohit, enemyNote[j].causesMiss)
 						enemyArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
 						useAltAnims = false
 	
@@ -971,14 +1008,14 @@ return {
 			end
 
 			if #boyfriendNote > 0 then
-				if (boyfriendNote[1].time - musicTime <= -200) then
+				if (boyfriendNote[1].time - musicTime <= -200) and not boyfriendNote[1].causesMiss then
 					if voicesBF then voicesBF:setVolume(0) end
 
 					if boyfriendNote[1]:getAnimName() ~= "hold" and boyfriendNote[1]:getAnimName() ~= "end" then 
-						health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult
+						health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult * boyfriendNote[1].healthLossMult
 						misses = misses + 1
 					else
-						health = health - (CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * 0.1) * healthLossMult
+						health = health - (CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * 0.1) * healthLossMult * boyfriendNote[1].healthLossMult
 						Gamestate.onNoteMiss(boyfriend, boyfriendNote[1].ver, "BoyfriendMiss", i)
 					end
 
@@ -994,58 +1031,67 @@ return {
 
 			if settings.botPlay then 
 				if #boyfriendNote > 0 then
-					if (boyfriendNote[1].time - musicTime <= 0) then
-						if voicesBF then voicesBF:setVolume(1) end
+					for j = 1, #boyfriendNote do
+						local ableTohit = true
+						if boyfriendNote[j].hitNote ~= nil then
+							ableTohit = boyfriendNote[j].hitNote
+						end
+						if (boyfriendNote[j].time - musicTime <= 0) and not boyfriendNote.causesMiss and ableTohit then
+							if voicesBF then voicesBF:setVolume(j) end
 
-						boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
+							boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
 
-						if boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end" then
-							if boyfriendNote[1]:getAnimName() == "hold" then
-								HoldCover:show(i, 1, boyfriendNote[1].x, boyfriendNote[1].y)
+							if boyfriendNote[j]:getAnimName() == "hold" or boyfriendNote[j]:getAnimName() == "end" then
+								if boyfriendNote[j]:getAnimName() == "hold" then
+									HoldCover:show(i, 1, boyfriendNote[j].x, boyfriendNote[j].y)
+								else
+									HoldCover:hide(i, 1)
+								end
+								if boyfriend and boyfriend.holdTimer >= boyfriend.maxHoldTimer then boyfriend:animate(curAnim, false) end
 							else
-								HoldCover:hide(i, 1)
+								if boyfriend then boyfriend:animate(curAnim, false) end
 							end
-							if boyfriend and boyfriend.holdTimer >= boyfriend.maxHoldTimer then boyfriend:animate(curAnim, false) end
-						else
-							if boyfriend then boyfriend:animate(curAnim, false) end
+
+							if boyfriend then boyfriend.lastHit = musicTime end
+
+							if boyfriendNote[j]:getAnimName() ~= "hold" and boyfriendNote[1]:getAnimName() ~= "end" then 
+								noteCounter = noteCounter + 1
+								combo = combo + 1
+								if combo > maxCombo then maxCombo = combo end
+
+								numbers[1]:animate(tostring(math.floor(combo / 100 % 10)), false)
+								numbers[2]:animate(tostring(math.floor(combo / 10 % 10)), false)
+								numbers[3]:animate(tostring(math.floor(combo % 10)), false)
+
+								for i = 1, 5 do
+									if ratingTimers[i] then Timer.cancel(ratingTimers[i]) end
+								end
+
+								rating.y = 300 - 50 + (settings.downscroll and 0 or -490)
+								for i = 1, 3 do
+									numbers[i].y = 300 + 50 + (settings.downscroll and 0 or -490)
+								end
+
+								ratingVisibility[1] = 1
+								ratingTimers[1] = Timer.tween(2, ratingVisibility, {0}, "linear")
+								ratingTimers[2] = Timer.tween(2, rating, {y = 300 + (settings.downscroll and 0 or -490) - 100}, "out-elastic")
+
+								ratingTimers[3] = Timer.tween(2, numbers[1], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
+								ratingTimers[4] = Timer.tween(2, numbers[2], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
+								ratingTimers[5] = Timer.tween(2, numbers[3], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
+								health = health + (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper("sick")] or 0) * healthGainMult  * boyfriendNote[j].healthGainMult
+								score = score + 500
+
+								self:calculateRating()
+							else
+								health = health + 0.0125 * healthGainMult * boyfriendNote[j].healthGainMult
+							end
+
+							table.remove(boyfriendNote, 1)
+						elseif boyfriendNote[j].time - musicTime <= 0 and not boyfriendNote[j].didHit and not boyfriendNote[j].causesMiss and not ableTohit then
+							boyfriendNote[j].didHit = true
+							Gamestate.onNoteHit(boyfriend, boyfriendNote[j].ver, "BoyfriendHit", i)
 						end
-
-						if boyfriend then boyfriend.lastHit = musicTime end
-
-						if boyfriendNote[1]:getAnimName() ~= "hold" and boyfriendNote[1]:getAnimName() ~= "end" then 
-							noteCounter = noteCounter + 1
-							combo = combo + 1
-							if combo > maxCombo then maxCombo = combo end
-
-							numbers[1]:animate(tostring(math.floor(combo / 100 % 10)), false)
-							numbers[2]:animate(tostring(math.floor(combo / 10 % 10)), false)
-							numbers[3]:animate(tostring(math.floor(combo % 10)), false)
-
-							for i = 1, 5 do
-								if ratingTimers[i] then Timer.cancel(ratingTimers[i]) end
-							end
-
-							rating.y = 300 - 50 + (settings.downscroll and 0 or -490)
-							for i = 1, 3 do
-								numbers[i].y = 300 + 50 + (settings.downscroll and 0 or -490)
-							end
-
-							ratingVisibility[1] = 1
-							ratingTimers[1] = Timer.tween(2, ratingVisibility, {0}, "linear")
-							ratingTimers[2] = Timer.tween(2, rating, {y = 300 + (settings.downscroll and 0 or -490) - 100}, "out-elastic")
-
-							ratingTimers[3] = Timer.tween(2, numbers[1], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
-							ratingTimers[4] = Timer.tween(2, numbers[2], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
-							ratingTimers[5] = Timer.tween(2, numbers[3], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
-							health = health + (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper("sick")] or 0) * healthGainMult
-							score = score + 500
-
-							self:calculateRating()
-						else
-							health = health + 0.0125 * healthGainMult
-						end
-
-						table.remove(boyfriendNote, 1)
 					end
 				end
 			end
@@ -1066,7 +1112,7 @@ return {
 				if #boyfriendNote > 0 then
 					for j = 1, #boyfriendNote do
 						if boyfriendNote[j] and boyfriendNote[j]:getAnimName() == "on" then
-							if (boyfriendNote[j].time - musicTime <= CONSTANTS.WEEKS.JUDGE_THRES.MISS_THRES) then
+							if (boyfriendNote[j].time - musicTime <= CONSTANTS.WEEKS.JUDGE_THRES.MISS_THRES and ((boyfriendNote[j].causesMiss and boyfriendNote[j].time - musicTime > 0) or true)) and not boyfriendNote[j].didHit then
 								local notePos
 								local ratingAnim
 
@@ -1130,15 +1176,20 @@ return {
 									boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
 
 									if boyfriendNote[j]:getAnimName() ~= "hold" and boyfriendNote[j]:getAnimName() ~= "end" then
-										health = health + (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper(ratingAnim)] or 0) * healthGainMult
+										health = health + (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper(ratingAnim)] or 0) * healthGainMult * boyfriendNote[j].healthGainMult
 									else
-										health = health + 0.0125 * healthGainMult
+										health = health + 0.0125 * healthGainMult * boyfriendNote[j].healthGainMult
 									end
 
 									local continue = Gamestate.onNoteHit(boyfriend, boyfriendNote[j].ver, ratingAnim, i) == nil and true or false 
 
 									if continue then
-										if boyfriend then boyfriend:animate(curAnim, false) end
+										if not boyfriendNote[j].causesMiss then
+											if boyfriend then boyfriend:animate(curAnim, false) end
+										else
+											audio.playSound(sounds.miss[love.math.random(3)])
+											if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
+										end
 									end
 
 									success = true
@@ -1163,7 +1214,7 @@ return {
 					if didHitNote then
 						score = math.max(0, score - 10)
 					end
-					health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult
+					health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult * boyfriendNote[1].healthLossMult
 					misses = misses + 1
 				end
 			end
@@ -1177,7 +1228,7 @@ return {
 				if voicesBF then voicesBF:setVolume(1) end
 
 				boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
-				health = health + 0.0125 * healthGainMult
+				health = health + 0.0125 * healthGainMult * boyfriendNote[1].healthGainMult
 
 				if boyfriend and boyfriend.holdTimer > boyfriend.maxHoldTimer then
 					if boyfriend then boyfriend:animate(curAnim, false) end

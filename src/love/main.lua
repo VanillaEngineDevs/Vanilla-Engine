@@ -229,6 +229,12 @@ function love.load()
 		["streets"] = require "stages.streets"
 	}
 
+	-- Load Note types
+	noteTypes = {
+		["normal"] = require "notetypes.normal",
+		["Hurt Note"] = require "notetypes.hurt"
+	}
+
 	shaders = {}
 	if love.system.getOS() ~= "NX" then 
 		shaders["rain"] = love.graphics.newShader("shaders/rain.glsl")	

@@ -30,6 +30,14 @@ function importMods.loadMod(mod) -- The file name of the mod
         end
     end
 
+    if love.filesystem.getInfo("mods/" .. mod .. "/notetypes/") then
+        local notetypesList = love.filesystem.getDirectoryItems("mods/" .. mod .. "/notetypes")
+        for i, notetype in ipairs(notetypesList) do
+            local notetypeData = require(("mods." .. mod .. ".notetypes." .. notetype):gsub("/", "."):gsub(".lua", ""))
+            noteTypes[notetypeData.name] = notetypeData
+        end
+    end
+
     table.insert(importMods.storedMods, {
         name = mod,
         path = "mods/" .. mod
@@ -85,7 +93,11 @@ end
 function getFilePath(path)
     local currentMod = importMods.getCurrentMod()
 
-    return currentMod.path .. "/" .. path
+    if currentMod then
+        return currentMod.path .. "/" .. path
+    else
+        return path
+    end
 end
 
 return importMods

@@ -1,7 +1,8 @@
 -- REQUIRE THIS FILE AFTER ALL THE STATES. THIS FILE ADDS BACK DEPRECATED FUNCTIONS FROM THEM.
 
 function weeks.legacyGenerateNotes(self, chart)
-    local chart = json.decode(love.filesystem.read(chart)).song
+    local chart = getFilePath(chart)
+    chart = json.decode(love.filesystem.read(chart)).song
 
     for i = 1, #chart.notes do
         bpm = chart.notes[i].bpm
@@ -43,6 +44,13 @@ function weeks.legacyGenerateNotes(self, chart)
             
             local noteObject = sprites[id]()
 
+            local dataStuff = {}
+            if noteTypes[noteVer] then
+                dataStuff = noteTypes[noteVer]
+            else
+                dataStuff = noteTypes["normal"]
+            end
+
             noteObject.col = id
             noteObject.y = -400 + time * 0.6 * speed
             noteObject.ver = noteVer
@@ -58,6 +66,17 @@ function weeks.legacyGenerateNotes(self, chart)
             noteObject.x = arrowsTable[id].x
             noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
             local r, g, b = CONSTANTS.ARROW_COLORS[id][1], CONSTANTS.ARROW_COLORS[id][2], CONSTANTS.ARROW_COLORS[id][3]
+
+			if dataStuff.r then r = {decToRGB(dataStuff.r)} end
+			if dataStuff.g then g = {decToRGB(dataStuff.g)} end
+			if dataStuff.b then b = {decToRGB(dataStuff.b)} end
+			noteObject.hitNote = not dataStuff.ignoreNote
+
+            noteObject.healthGainMult = dataStuff.healthMult or 1
+			noteObject.healthLossMult = dataStuff.healthLossMult or 1
+
+            noteObject.causesMiss = dataStuff.causesMiss or false
+
 			noteObject.shader:send("r", r)
 			noteObject.shader:send("g", g)
 			noteObject.shader:send("b", b)
@@ -74,6 +93,9 @@ function weeks.legacyGenerateNotes(self, chart)
 
                     holdNote.x = arrowsTable[id].x
                     holdNote.shader = noteObject.shader
+                    holdNote.healthGainMult = noteObject.healthGainMult
+					holdNote.healthLossMult = noteObject.healthLossMult
+                    holdNote.causesMiss = noteObject.causesMiss
                     table.insert(notesTable[id], holdNote)
                 end
 
@@ -81,6 +103,15 @@ function weeks.legacyGenerateNotes(self, chart)
             end
 
             ::continue::
+        end
+
+        for i, event in ipairs(chart.events) do
+            local time, eventData = event[1], event[2]
+
+            table.insert(modEvents, {
+                time = time,
+                events = eventData
+            })
         end
 
         local deltaSteps = section.lengthInSteps or 16
@@ -112,7 +143,8 @@ end
 -- I gotta rename this file..,..,.
 -- This file will just have spare functions,.,.
 function weeks.cneGenerateNotes(self, chart, metadata)
-    local chart = json.decode(love.filesystem.read(chart))
+    local chart = getFilePath(chart)
+    chart = json.decode(love.filesystem.read(chart))
     local metadata = json.decode(love.filesystem.read(metadata))
 
     bpm = metadata.bpm or 100
@@ -150,6 +182,14 @@ function weeks.cneGenerateNotes(self, chart, metadata)
             local id = noteType % 4 + 1
             
             local noteObject = sprites[id]()
+
+            if noteTypes[noteVer] then
+				dataStuff = noteTypes[noteVer]
+			else
+				dataStuff = noteTypes["normal"]
+			end
+
+
             noteObject.col = id
             noteObject.y = -400 + time * 0.6 * speed
             noteObject.ver = noteVer
@@ -161,6 +201,24 @@ function weeks.cneGenerateNotes(self, chart, metadata)
             noteObject.x = arrowsTable[id].x
             noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
             local r, g, b = CONSTANTS.ARROW_COLORS[id][1], CONSTANTS.ARROW_COLORS[id][2], CONSTANTS.ARROW_COLORS[id][3]
+
+            local dataStuff = {}
+            if noteTypes[noteVer] then
+                dataStuff = noteTypes[noteVer]
+            else
+                dataStuff = noteTypes["normal"]
+            end
+
+            if dataStuff.r then r = {decToRGB(dataStuff.r)} end
+			if dataStuff.g then g = {decToRGB(dataStuff.g)} end
+			if dataStuff.b then b = {decToRGB(dataStuff.b)} end
+			noteObject.hitNote = not dataStuff.ignoreNote
+
+            noteObject.healthGainMult = dataStuff.healthMult or 1
+			noteObject.healthLossMult = dataStuff.healthLossMult or 1
+
+            noteObject.causesMiss = dataStuff.causesMiss or false
+            
             noteObject.shader:send("r", r)
             noteObject.shader:send("g", g)
             noteObject.shader:send("b", b)
@@ -177,6 +235,9 @@ function weeks.cneGenerateNotes(self, chart, metadata)
 
                     holdNote.x = arrowsTable[id].x
                     holdNote.shader = noteObject.shader
+                    holdNote.healthGainMult = noteObject.healthGainMult
+					holdNote.healthLossMult = noteObject.healthLossMult
+                    holdNote.causesMiss = noteObject.causesMiss
                     table.insert(notesTable[id], holdNote)
                 end
 
