@@ -164,9 +164,11 @@ return {
 	end,
 
 	load = function(self)
+		camera.camBopIntensity = 1
+		camera.camBopInterval = 4
 		dying = false
 		function self:onDeath()
-			Gamestate.switch(gameOver)
+			Gamestate.push(gameOver)
 		end
 		self.useBuiltinGameover = true
 		self.overrideHealthbarText = nil
