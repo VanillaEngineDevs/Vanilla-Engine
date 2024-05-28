@@ -124,7 +124,7 @@ return {
 
 		--week images
 		weekImages = {}
-		for i = 0, modWeekPlacement-1 do 
+		for i = 0, modWeekPlacement-2 do 
 			table.insert(weekImages, graphics.newImage(graphics.imagePath("menu/week" .. i)))
 		end
 		table.insert(weekImages, graphics.newImage(graphics.imagePath("menu/weekend1")))
@@ -297,7 +297,7 @@ return {
 
 				love.graphics.setColor(freeColour[1]/255, freeColour[2]/255, freeColour[3]/255)
 				love.graphics.scale(camera.zoom, camera.zoom)
-				for i = 1, #weekDesc do
+				for i = 1, modWeekPlacement do
 					weekImages[i]:draw()
 				end
 
