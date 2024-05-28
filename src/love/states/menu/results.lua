@@ -477,7 +477,7 @@ return {
         scorePopin = nil
         resultsAnim = nil
         topBarBlack = nil
-        resultsFont = nil
+        resultsFont = {quads={}, img=nil}
         curDiff = nil
         thePosEverX = 0
         thePosEverY = {0}

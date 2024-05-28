@@ -38,7 +38,9 @@ local option = "normal"
 
 local countNum = 4 -- Used for countdown
 
-local healthLerp
+healthLerp = 1
+
+local dying = false
 
 local allStates = {
 	sickCounter = 0,
@@ -162,10 +164,22 @@ return {
 	end,
 
 	load = function(self)
+		dying = false
+		function self:onDeath()
+			Gamestate.switch(gameOver)
+		end
+		self.useBuiltinGameover = true
+		self.overrideHealthbarText = nil
+		self.overrideDrawHealthbar = nil
+		P1HealthColors = {0, 1, 0}
+		P2HealthColors = {1, 0, 0}
 		botplayY = 0
 		botplayAlpha = {1}
 		paused = false
 		pauseMenuSelection = 1
+		healthGainMult = 1
+		healthLossMult = 1
+		self.ignoreHealthClamping = false
 		function botPlayAlphaChange()
 			Timer.tween(1.25, botplayAlpha, {0}, "in-out-cubic", function()
 				Timer.tween(1.25, botplayAlpha, {1}, "in-out-cubic", botPlayAlphaChange)
@@ -668,7 +682,8 @@ return {
 					paused = false 
 				elseif pauseMenuSelection == 2 then
 					pauseRestart = true
-					Gamestate.push(gameOver)
+					dying = true
+					self:onDeath()
 				elseif pauseMenuSelection == 3 then
 					paused = false
 					if inst then inst:stop() end
@@ -936,6 +951,11 @@ return {
 						table.remove(enemyNote, 1)
 
 						break
+					elseif not ableTohit and enemyNote[j].time - musicTime <= 0 and not enemyNote[j].didHit then
+						enemyNote[j].didHit = true
+						Gamestate.onNoteHit(enemy, enemyNote[j].ver, "EnemyHit", i)
+
+						break
 					end
 				end
 			end
@@ -953,10 +973,11 @@ return {
 					if voicesBF then voicesBF:setVolume(0) end
 
 					if boyfriendNote[1]:getAnimName() ~= "hold" and boyfriendNote[1]:getAnimName() ~= "end" then 
-						health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY
+						health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult
 						misses = misses + 1
 					else
-						health = health - (CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * 0.1)
+						health = health - (CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * 0.1) * healthLossMult
+						Gamestate.onNoteMiss(boyfriend, boyfriendNote[1].ver, "BoyfriendMiss", i)
 					end
 
 					table.remove(boyfriendNote, 1)
@@ -1014,12 +1035,12 @@ return {
 							ratingTimers[3] = Timer.tween(2, numbers[1], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
 							ratingTimers[4] = Timer.tween(2, numbers[2], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
 							ratingTimers[5] = Timer.tween(2, numbers[3], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
-							health = health + (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper("sick")] or 0)
+							health = health + (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper("sick")] or 0) * healthGainMult
 							score = score + 500
 
 							self:calculateRating()
 						else
-							health = health + 0.0125
+							health = health + 0.0125 * healthGainMult
 						end
 
 						table.remove(boyfriendNote, 1)
@@ -1107,9 +1128,9 @@ return {
 									boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
 
 									if boyfriendNote[j]:getAnimName() ~= "hold" and boyfriendNote[j]:getAnimName() ~= "end" then
-										health = health + (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper(ratingAnim)] or 0)
+										health = health + (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper(ratingAnim)] or 0) * healthGainMult
 									else
-										health = health + 0.0125
+										health = health + 0.0125 * healthGainMult
 									end
 
 									local continue = Gamestate.onNoteHit(boyfriend, boyfriendNote[j].ver, ratingAnim, i) == nil and true or false 
@@ -1140,7 +1161,7 @@ return {
 					if didHitNote then
 						score = math.max(0, score - 10)
 					end
-					health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY
+					health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult
 					misses = misses + 1
 				end
 			end
@@ -1154,7 +1175,7 @@ return {
 				if voicesBF then voicesBF:setVolume(1) end
 
 				boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
-				health = health + 0.0125
+				health = health + 0.0125 * healthGainMult
 
 				if boyfriend and boyfriend.holdTimer > boyfriend.maxHoldTimer then
 					if boyfriend then boyfriend:animate(curAnim, false) end
@@ -1194,11 +1215,16 @@ return {
 		end
 
 		-- Boyfriend
-		health = util.clamp(health, CONSTANTS.WEEKS.HEALTH.MIN, CONSTANTS.WEEKS.HEALTH.MAX)
+		if not self.ignoreHealthClamping then
+			health = util.clamp(health, CONSTANTS.WEEKS.HEALTH.MIN, CONSTANTS.WEEKS.HEALTH.MAX)
+		end
 		if health > CONSTANTS.WEEKS.HEALTH.LOSING_THRESHOLD and boyfriendIcon:getCurFrame() == 2 then
 			boyfriendIcon:setFrame(1)
-		elseif health <= 0 then -- Game over
-			if not settings.practiceMode then Gamestate.push(gameOver) end
+		elseif health <= 0 and self.useBuiltinGameover then -- Game over
+			if not settings.practiceMode and not dying then
+				dying = true
+				self:onDeath() 
+			end
 		elseif health <= CONSTANTS.WEEKS.HEALTH.LOSING_THRESHOLD and boyfriendIcon:getCurFrame() == 1 then
 			boyfriendIcon:setFrame(2)
 		end
@@ -1268,7 +1294,11 @@ return {
 			love.graphics.pop()
 			return 
 		end
-		self:drawHealthbar()
+		if self.overrideDrawHealthbar then
+			self:overrideDrawHealthbar(score, health, misses, ratingPercent, healthLerp)
+		else
+			self:drawHealthbar()
+		end
 		love.graphics.push()
 			love.graphics.translate(push:getWidth() / 2, push:getHeight() / 2)
 			if not settings.downscroll then
@@ -1382,14 +1412,14 @@ return {
 		love.graphics.pop()
 	end,
 
-	healthbarText = function(self, text, colourInline, colourOutline)
+	healthbarText = function(self, text, offsetX, offsetY)
 		local text = text or "???"
-		local colourInline = colourInline or {1, 1, 1, 1}
-		if not colourInline[4] then colourInline[4] = 1 end
-		local colourOutline = colourOutline or {0, 0, 0, 1}
-		if not colourOutline[4] then colourOutline[4] = 1 end
+		local colourInline ={1, 1, 1, 1}
+		local colourOutline = {0, 0, 0, 1}
+		local offsetX = offsetX or 0
+		local offsetY = offsetY or 0
 
-		uitextfColored(text, -600, 400+downscrollOffset, 1200, "center", colourOutline, colourInline)
+		uitextfColored(text, -600+offsetX, 400+downscrollOffset+offsetY, 1200, "center", colourOutline, colourInline)
 
 		self:drawRating()
 	end,
@@ -1419,9 +1449,9 @@ return {
 				graphics.setColor(1,1,1,1)
 			love.graphics.pop()
 			graphics.setColor(1, 1, 1, visibility)
-			graphics.setColor(1, 0, 0)
+			graphics.setColor(P2HealthColors[1], P2HealthColors[2], P2HealthColors[3])
 			love.graphics.rectangle("fill", -500, 350+downscrollOffset, 1000, 25)
-			graphics.setColor(0, 1, 0)
+			graphics.setColor(P1HealthColors[1], P1HealthColors[2], P1HealthColors[3])
 			love.graphics.rectangle("fill", 500, 350+downscrollOffset, -healthLerp * 500, 25)
 			graphics.setColor(0, 0, 0)
 			love.graphics.setLineWidth(8)
@@ -1432,7 +1462,11 @@ return {
 			boyfriendIcon:draw()
 			enemyIcon:draw()
 
-			self:healthbarText("Score: " .. score .. " | Misses: " .. misses .. " | Accuracy: " .. ((math.floor(ratingPercent * 10000) / 100)) .. "%")
+			if self.overrideHealthbarText then
+				self:overrideHealthbarText(score, misses, ((math.floor(ratingPercent * 10000) / 100)) .. "%")
+			else
+				self:healthbarText("Score: " .. score .. " | Misses: " .. misses .. " | Accuracy: " .. ((math.floor(ratingPercent * 10000) / 100)) .. "%")
+			end
 
 			--[[ if settings.botPlay then
 				botplayY = botplayY + math.sin(love.timer.getTime()) * 0.15
