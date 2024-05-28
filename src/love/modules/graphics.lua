@@ -248,6 +248,9 @@ return {
 
 			danced = false,
 
+			shader = nil,
+			shaderEnabled = true,
+
 			setSheet = function(self, imageData)
 				sheet = imageData
 				sheetWidth = sheet:getWidth()
@@ -512,16 +515,6 @@ return {
 							height = frameData[self.curFrame].offsetY
 						end
 					else
-						--[[ if frameData[self.curFrame].offsetWidth == 0 then
-							width = math.floor(frameData[self.curFrame].width / 2)
-						else
-							width = math.floor(frameData[self.curFrame].offsetWidth / 2) + frameData[self.curFrame].offsetX
-						end
-						if frameData[self.curFrame].offsetHeight == 0 then
-							height = math.floor(frameData[self.curFrame].height / 2)
-						else
-							height = math.floor(frameData[self.curFrame].offsetHeight / 2) + frameData[self.curFrame].offsetY
-						end ]]
 						if not frameData[self.curFrame].rotated then
 							if frameData[self.curFrame].offsetWidth == 0 then
 								width = math.floor(frameData[self.curFrame].width / 2)
@@ -555,6 +548,13 @@ return {
 						oy = height + anim.offsetX + self.offsetX
 					end
 
+					local lastShader = love.graphics.getShader()
+					if self.shaderEnabled then
+						love.graphics.setShader(self.shader)
+					end
+					local lastColor = {love.graphics.getColor()}
+					graphics.setColor(lastColor[1], lastColor[2], lastColor[3], lastColor[4] * self.alpha)
+
 					if self.visible then
 						--love.graphics.rotate((frameData[self.curFrame].rotated and -math.rad(90) or 0))
 						love.graphics.draw(
@@ -577,6 +577,9 @@ return {
 						self.stencilInfo = nil
 						love.graphics.setStencilTest()
 					end
+
+					love.graphics.setShader(lastShader)
+					love.graphics.setColor(lastColor)
 				end
 			end,
 

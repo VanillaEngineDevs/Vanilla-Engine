@@ -229,10 +229,9 @@ function love.load()
 		["streets"] = require "stages.streets"
 	}
 
+	shaders = {}
 	if love.system.getOS() ~= "NX" then 
-		shaders = {
-			["rain"] = love.graphics.newShader("shaders/rain.glsl")
-		}
+		shaders["rain"] = love.graphics.newShader("shaders/rain.glsl")	
 	end
 
 	-- Load Menus
@@ -444,7 +443,7 @@ function love.load()
 	storyMode = false
 	countingDown = false
 
-	uiScale = {zoom = 1, x = 1, y = 1, sizeX = 1, sizeY = 1}
+	uiCam = {zoom = 1, x = 1, y = 1, sizeX = 1, sizeY = 1}
 
 	musicTime = 0
 	health = 0

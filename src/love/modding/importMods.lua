@@ -82,4 +82,10 @@ function loadImageFile(path)
     return love.graphics.newImage(path)
 end
 
+function getFilePath(path)
+    local currentMod = importMods.getCurrentMod()
+
+    return currentMod.path .. "/" .. path
+end
+
 return importMods

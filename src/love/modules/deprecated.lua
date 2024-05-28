@@ -56,6 +56,11 @@ function weeks.legacyGenerateNotes(self, chart)
             local arrowsTable = enemyNote and enemyArrows or boyfriendArrows
 
             noteObject.x = arrowsTable[id].x
+            noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
+            local r, g, b = CONSTANTS.ARROW_COLORS[id][1], CONSTANTS.ARROW_COLORS[id][2], CONSTANTS.ARROW_COLORS[id][3]
+			noteObject.shader:send("r", r)
+			noteObject.shader:send("g", g)
+			noteObject.shader:send("b", b)
 
             table.insert(notesTable[id], noteObject)
             if holdLength > 0 then
@@ -68,6 +73,7 @@ function weeks.legacyGenerateNotes(self, chart)
                     holdNote:animate("hold")
 
                     holdNote.x = arrowsTable[id].x
+                    holdNote.shader = noteObject.shader
                     table.insert(notesTable[id], holdNote)
                 end
 
@@ -153,6 +159,11 @@ function weeks.cneGenerateNotes(self, chart, metadata)
             if settings.downscroll then noteObject.sizeY = -1 end
 
             noteObject.x = arrowsTable[id].x
+            noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
+            local r, g, b = CONSTANTS.ARROW_COLORS[id][1], CONSTANTS.ARROW_COLORS[id][2], CONSTANTS.ARROW_COLORS[id][3]
+            noteObject.shader:send("r", r)
+            noteObject.shader:send("g", g)
+            noteObject.shader:send("b", b)
 
             table.insert(notesTable[id], noteObject)
             if holdLength > 0 then
@@ -165,6 +176,7 @@ function weeks.cneGenerateNotes(self, chart, metadata)
                     holdNote:animate("hold")
 
                     holdNote.x = arrowsTable[id].x
+                    holdNote.shader = noteObject.shader
                     table.insert(notesTable[id], holdNote)
                 end
 

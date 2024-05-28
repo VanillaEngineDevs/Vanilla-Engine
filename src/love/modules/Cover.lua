@@ -26,9 +26,13 @@ end
 function cover:update(dt)
     for i = 1, 4 do
         if self.covers[1][i].visible then
+            self.covers[1][i].x = boyfriendArrows[i].x - 5
+            self.covers[1][i].y = boyfriendArrows[i].y + 35
             self.covers[1][i]:update(dt)
         end
         if self.covers[2][i].visible then
+            self.covers[2][i].x = enemyArrows[i].x - 5
+            self.covers[2][i].y = enemyArrows[i].y + 35
             self.covers[2][i]:update(dt)
         end
     end

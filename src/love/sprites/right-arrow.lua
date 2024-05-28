@@ -20,18 +20,18 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 return graphics.newSprite(
 	images.notes,
 	{
-		{x = 808, y = 238, width = 155, height = 157, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 3: arrowRIGHT0000
-		{x = 647, y = 397, width = 154, height = 157, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 48: red alone0000
-		{x = 952, y = 452, width = 51, height = 64, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 46: red tail0000
-		{x = 1172, y = 457, width = 51, height = 44, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 47: red hold0000
-		{x = 1669, y = 0, width = 225, height = 228, offsetX = -1, offsetY = -2, offsetWidth = 228, offsetHeight = 231}, -- 49: right confirm0000
-		{x = 1669, y = 232, width = 225, height = 228, offsetX = -1, offsetY = -2, offsetWidth = 228, offsetHeight = 231}, -- 50: right confirm0001
-		{x = 1206, y = 0, width = 228, height = 231, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 51: right confirm0002
-		{x = 1206, y = 0, width = 228, height = 231, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 52: right confirm0003
-		{x = 469, y = 400, width = 139, height = 142, offsetX = -3, offsetY = -7, offsetWidth = 149, offsetHeight = 152}, -- 53: right press0000
-		{x = 469, y = 400, width = 139, height = 142, offsetX = -3, offsetY = -7, offsetWidth = 149, offsetHeight = 152}, -- 54: right press0001
-		{x = 316, y = 398, width = 149, height = 152, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 55: right press0002
-		{x = 316, y = 398, width = 149, height = 152, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 56: right press0003
+		{x = 311, y = 237, width = 154, height = 157, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0, rotated = false}, -- 3: arrowRIGHT0000
+		{x = 1, y = 237, width = 154, height = 157, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0, rotated = false}, -- 30: red0000
+		{x = 1051, y = 444, width = 50, height = 64, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0, rotated = false}, -- 31: red hold end0000
+		{x = 1102, y = 444, width = 50, height = 44, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0, rotated = false}, -- 32: red hold piece0000
+		{x = 1406, y = 1, width = 223, height = 226, offsetX = -1, offsetY = -3, offsetWidth = 226, offsetHeight = 230, rotated = false}, -- 33: right confirm0000
+		{x = 1630, y = 1, width = 223, height = 226, offsetX = -1, offsetY = -3, offsetWidth = 226, offsetHeight = 230, rotated = false}, -- 34: right confirm0001
+		{x = 953, y = 1, width = 226, height = 230, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0, rotated = false}, -- 35: right confirm0002
+		{x = 953, y = 1, width = 226, height = 230, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0, rotated = false}, -- 36: right confirm0003
+		{x = 912, y = 444, width = 138, height = 141, offsetX = -4, offsetY = -5, offsetWidth = 148, offsetHeight = 152, rotated = false}, -- 37: right press0000
+		{x = 912, y = 444, width = 138, height = 141, offsetX = -4, offsetY = -5, offsetWidth = 148, offsetHeight = 152, rotated = false}, -- 38: right press0001
+		{x = 466, y = 389, width = 148, height = 152, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0, rotated = false}, -- 39: right press0002
+		{x = 466, y = 389, width = 148, height = 152, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0, rotated = false}, -- 40: right press0003
 	},
 	{
 		["off"] = {start = 1, stop = 1, speed = 0, offsetX = 0, offsetY = 0},

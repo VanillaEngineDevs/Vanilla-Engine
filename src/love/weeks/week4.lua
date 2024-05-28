@@ -76,11 +76,11 @@ return {
 		-- Hardcoded M.I.L.F camera scaling
 		if song == 3 and musicTime > 56000 and musicTime < 67000 and musicThres ~= oldMusicThres and math.fmod(absMusicTime, 60000 / bpm) < 100 then
 			if camScaleTimer then Timer.cancel(camScaleTimer) end
-			if uiScaleTimer then Timer.cancel(uiScaleTimer) end
+			if uiCamTimer then Timer.cancel(uiCamTimer) end
 
 			camScaleTimer = Timer.tween((60 / bpm) / 16, camera, {zoom = camera.zoom * 1.05}, "out-quad", function() camScaleTimer = Timer.tween((60 / bpm), camera, {zoom = camera.defaultZoom}, "out-quad") end)
 
-			uiScaleTimer = Timer.tween((60 / bpm) / 16, uiScale, {zoom = uiScale.zoom * 1.03}, "out-quad", function() camScaleTimer = Timer.tween((60 / bpm), uiScale, {x = 1, y = 1}, "out-quad") end)
+			uiCamTimer = Timer.tween((60 / bpm) / 16, uiCam, {zoom = uiCam.zoom * 1.03}, "out-quad", function() camScaleTimer = Timer.tween((60 / bpm), uiCam, {x = 1, y = 1}, "out-quad") end)
 			camera.zooming = false
 		elseif song == 3 and musicTime > 67000 then 
 			camera.zooming = true
@@ -88,7 +88,7 @@ return {
 
 		if not camera.zooming then 
 			camera.zoom = util.lerp(camera.defaultZoom, camera.zoom, util.clamp(1 - (dt * 3.125), 0, 1))
-			uiScale.zoom = util.lerp(1, uiScale.zoom, util.clamp(1 - (dt * 3.125), 0, 1))
+			uiCam.zoom = util.lerp(1, uiCam.zoom, util.clamp(1 - (dt * 3.125), 0, 1))
 		end -- so the camera actually unzooms
 
 		weeks:checkSongOver()

@@ -94,7 +94,7 @@ return {
 			}
 
 			images = {
-				notes = love.graphics.newImage(graphics.imagePath("notes")),
+				notes = love.graphics.newImage(graphics.imagePath("NOTE_assets")),
 				numbers = love.graphics.newImage(graphics.imagePath("numbers")),
 			}
 
@@ -323,7 +323,7 @@ return {
 					0.7,
 					function()
 						Gamestate.switch(resultsScreen, {
-							diff = string.lower(CURDIFF),
+							diff = string.lower(CURDIFF or "normal"),
 							song = not storyMode and SONGNAME or weekDesc[weekNum],
 							artist = not storyMode and ARTIST or nil,
 							scores = {
@@ -404,6 +404,24 @@ return {
 				enemyArrows[i].y = -55
 				boyfriendArrows[i].y = -55
 			else
+				if not pixel then
+					enemyArrows[i].shader = love.graphics.newShader("shaders/RGBPallette.glsl")
+					boyfriendArrows[i].shader = love.graphics.newShader("shaders/RGBPallette.glsl")
+
+					enemyArrows[i].shaderEnabled = false
+					boyfriendArrows[i].shaderEnabled = false
+
+					local r = CONSTANTS.ARROW_COLORS[i][1]
+					local g = CONSTANTS.ARROW_COLORS[i][2]
+					local b = CONSTANTS.ARROW_COLORS[i][3]
+
+					enemyArrows[i].shader:send("r", r)
+					enemyArrows[i].shader:send("g", g)
+					enemyArrows[i].shader:send("b", b)
+					boyfriendArrows[i].shader:send("r", r)
+					boyfriendArrows[i].shader:send("g", g)
+					boyfriendArrows[i].shader:send("b", b)
+				end
 				if settings.middleScroll then 
 					boyfriendArrows[i].x = -410 + 165 * i
 					-- ew stuff
@@ -503,6 +521,11 @@ return {
 			local arrowsTable = enemyNote and enemyArrows or boyfriendArrows
 
 			noteObject.x = arrowsTable[data].x
+			noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
+			local r, g, b = CONSTANTS.ARROW_COLORS[data][1], CONSTANTS.ARROW_COLORS[data][2], CONSTANTS.ARROW_COLORS[data][3]
+			noteObject.shader:send("r", r)
+			noteObject.shader:send("g", g)
+			noteObject.shader:send("b", b)
 			table.insert(notesTable[data], noteObject)
 			if holdTime > 0 then
 				for k = 71 / speed, holdTime, 71 / speed do
@@ -514,6 +537,7 @@ return {
 					holdNote:animate("hold")
 
 					holdNote.x = arrowsTable[data].x
+					holdNote.shader = noteObject.shader
 					table.insert(notesTable[data], holdNote)
 				end
 
@@ -554,7 +578,7 @@ return {
 	end,
 
 	-- Gross countdown script
-	setupCountdown = function(self, countNumVal)
+	setupCountdown = function(self, countNumVal, func)
 		local countNumVal = countNumVal or 4
 		lastReportedPlaytime = 0
 		if countNumVal == 4 then
@@ -572,7 +596,7 @@ return {
 			Timer.after(
 				(60/bpm), -- one beat
 				function()
-					self:setupCountdown(countNumVal - 1)
+					self:setupCountdown(countNumVal - 1, func)
 				end
 			)
 		else
@@ -584,7 +608,7 @@ return {
 				{0},
 				"linear",
 				function()
-					if countNumVal ~= 1 then self:setupCountdown(countNumVal - 1)
+					if countNumVal ~= 1 then self:setupCountdown(countNumVal - 1, func)
 					else
 						countingDown = false
 						previousFrameTime = love.timer.getTime() * 1000
@@ -595,6 +619,7 @@ return {
 						if voicesBF then voicesBF:play() end
 						if voicesEnemy then voicesEnemy:play() end
 						beatHandler.setBeat(0)
+						if func then func() end
 					end
 				end
 			)
@@ -741,7 +766,7 @@ return {
 				elseif event.name == "ZoomCamera" then
 					if type(event.value) == "number" then
 						camera.zoom = event.value
-						uiScale.zoom = event.value
+						uiCam.zoom = event.value
 					elseif type(event.value) == "table" then
 						event.value.mode = event.value.mode or "stage"
 						if event.value.mode == "stage" then
@@ -777,12 +802,12 @@ return {
 
 		if (beatHandler.onBeat() and beatHandler.getBeat() % camera.camBopInterval == 0 and camera.zooming and camera.zoom < 1.35 and not camera.locked) then 
 			camera.zoom = camera.zoom + 0.015 * camera.camBopIntensity
-			uiScale.zoom = uiScale.zoom + 0.03 * camera.camBopIntensity
+			uiCam.zoom = uiCam.zoom + 0.03 * camera.camBopIntensity
 		end
 
 		if camera.zooming and not camera.locked then 
 			camera.zoom = util.lerp(camera.defaultZoom, camera.zoom, util.clamp(1 - (dt * 3.125), 0, 1))
-			uiScale.zoom = util.lerp(1, uiScale.zoom, util.clamp(1 - (dt * 3.125), 0, 1))
+			uiCam.zoom = util.lerp(1, uiCam.zoom, util.clamp(1 - (dt * 3.125), 0, 1))
 		end
 
 		if girlfriend then girlfriend:update(dt) end
@@ -862,47 +887,70 @@ return {
 				end
 			end
 
+			if not pixel then
+				if enemyArrow:getAnimName() ~= CONSTANTS.WEEKS.NOTE_LIST[i] then
+					enemyArrow.shaderEnabled = true
+				else
+					enemyArrow.shaderEnabled = false
+				end
+
+				if boyfriendArrow:getAnimName() ~= CONSTANTS.WEEKS.NOTE_LIST[i] then
+					boyfriendArrow.shaderEnabled = true
+				else
+					boyfriendArrow.shaderEnabled = false
+				end
+			end
+
 			if #enemyNote > 0 then
-				if (enemyNote[1].time - musicTime <= 0) then
-					enemyArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
-					useAltAnims = false
-
-					local whohit = enemy
-					-- default to true if nothing is returned
-					local continue = (Gamestate.onNoteHit(enemy, enemyNote[1].ver, "EnemyHit", i) == nil or false) and true or false
-
-					if continue then
-						if enemyNote[1]:getAnimName() == "hold" or enemyNote[1]:getAnimName() == "end" then
-							if enemyNote[1]:getAnimName() == "hold" then
-								HoldCover:show(i, 2)
-							else
-								HoldCover:hide(i, 2)
-							end
-							if useAltAnims then
-								if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim .. " alt", _psychmod and true or false) end
-							else
-								if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim, (_psychmod and true or false)) end
-							end
-						else
-							NoteSplash:new(
-								{
-									anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
-									posX = enemyArrow.x,
-									posY = enemyArrow.y,
-								},
-								i
-							)
-							if useAltAnims then
-								if whohit then whohit:animate(curAnim .. " alt", false) end
-							else
-								if whohit then whohit:animate(curAnim, false) end
-							end
-						end
+				for j = 1, #enemyNote do
+					local ableTohit = true
+					if enemyNote[j].hitNote ~= nil then
+						ableTohit = enemyNote[j].hitNote
 					end
 
-					if whohit then whohit.lastHit = musicTime end
+					if (enemyNote[j].time - musicTime <= 0) and ableTohit then
+						enemyArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
+						useAltAnims = false
+	
+						local whohit = enemy
+						-- default to true if nothing is returned
+						local continue = (Gamestate.onNoteHit(enemy, enemyNote[j].ver, "EnemyHit", i) == nil or false) and true or false
+	
+						if continue then
+							if enemyNote[j]:getAnimName() == "hold" or enemyNote[j]:getAnimName() == "end" then
+								if enemyNote[j]:getAnimName() == "hold" then
+									HoldCover:show(i, 2, enemyNote[j].x, enemyNote[j].y)
+								else
+									HoldCover:hide(i, 2)
+								end
+								if useAltAnims then
+									if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim .. " alt", _psychmod and true or false) end
+								else
+									if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim, (_psychmod and true or false)) end
+								end
+							else
+								NoteSplash:new(
+									{
+										anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
+										posX = enemyArrow.x,
+										posY = enemyArrow.y,
+									},
+									i
+								)
+								if useAltAnims then
+									if whohit then whohit:animate(curAnim .. " alt", false) end
+								else
+									if whohit then whohit:animate(curAnim, false) end
+								end
+							end
+						end
+	
+						if whohit then whohit.lastHit = musicTime end
+	
+						table.remove(enemyNote, 1)
 
-					table.remove(enemyNote, 1)
+						break
+					end
 				end
 			end
 
@@ -944,7 +992,7 @@ return {
 
 						if boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end" then
 							if boyfriendNote[1]:getAnimName() == "hold" then
-								HoldCover:show(i, 1)
+								HoldCover:show(i, 1, boyfriendNote[1].x, boyfriendNote[1].y)
 							else
 								HoldCover:hide(i, 1)
 							end
@@ -1113,7 +1161,7 @@ return {
 
 			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].y <= boyfriendArrow.y)) and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
 				if boyfriendNote[1]:getAnimName() == "hold" then
-					HoldCover:show(i, 1)
+					HoldCover:show(i, 1, boyfriendNote[1].x, boyfriendNote[1].y)
 				else
 					HoldCover:hide(i, 1)
 				end
@@ -1228,7 +1276,8 @@ return {
 			else
 				love.graphics.scale(0.7, -0.7)
 			end
-			love.graphics.scale(uiScale.zoom, uiScale.zoom)
+			love.graphics.scale(uiCam.zoom, uiCam.zoom)
+			love.graphics.translate(uiCam.x, uiCam.y)
 			graphics.setColor(1, 1, 1)
 
 			for i = 1, 4 do
@@ -1265,7 +1314,7 @@ return {
 				love.graphics.push()
 					love.graphics.push()
 						for j = #enemyNotes[i], 1, -1 do
-							if enemyNotes[i][j].y <= 600 then
+							if enemyNotes[i][j].y <= 600 and enemyNotes[i][j].y >= -600 then
 								local animName = enemyNotes[i][j]:getAnimName()
 								if settings.middleScroll then
 									graphics.setColor(1, 1, 1, 0.8 * enemyNotes[i][j].alpha)
@@ -1288,7 +1337,7 @@ return {
 					love.graphics.pop()
 					love.graphics.push()
 						for j = #boyfriendNotes[i], 1, -1 do
-							if boyfriendNotes[i][j].y <= 600 then
+							if boyfriendNotes[i][j].y <= 600 and boyfriendNotes[i][j].y >= -600 then
 								local animName = boyfriendNotes[i][j]:getAnimName()
 								graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y)) / 75) * boyfriendNotes[i][j].alpha)
 
@@ -1350,7 +1399,8 @@ return {
 		love.graphics.push()
 			love.graphics.translate(push:getWidth() / 2, push:getHeight() / 2)
 			love.graphics.scale(0.7, 0.7)
-			love.graphics.scale(uiScale.zoom, uiScale.zoom)
+			love.graphics.scale(uiCam.zoom, uiCam.zoom)
+			love.graphics.translate(uiCam.x, uiCam.y)
 			love.graphics.push()
 				graphics.setColor(0,0,0,settings.scrollUnderlayTrans)
 				local baseX = boyfriendArrows[1].x - (boyfriendArrows[1]:getFrameWidth(CONSTANTS.WEEKS.NOTE_LIST[i])/2) * (pixel and 8 or 0) + (pixel and -15 or 0)
@@ -1384,11 +1434,11 @@ return {
 
 			self:healthbarText("Score: " .. score .. " | Misses: " .. misses .. " | Accuracy: " .. ((math.floor(ratingPercent * 10000) / 100)) .. "%")
 
-			if settings.botPlay then
+			--[[ if settings.botPlay then
 				botplayY = botplayY + math.sin(love.timer.getTime()) * 0.15
 				uitext("BOTPLAY", -85, botplayY, 0, 2, 2, 0, 0, 0, 0, botplayAlpha[1])
 				graphics.setColor(1, 1, 1)
-			end
+			end ]]
 		love.graphics.pop()
 	end,
 

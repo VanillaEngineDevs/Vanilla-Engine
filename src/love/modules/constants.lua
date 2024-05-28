@@ -1,10 +1,39 @@
 local CONSTANTS = {}
 
-CONSTANTS.OPTIONS ={
+CONSTANTS.OPTIONS = {
     SHOW_RESULTS_SCREEN = true,
     DO_SAVE_DATA = true,
     DO_MODS = true,
 }
+
+function hexToRGB(hex)
+    local r = bit.band(bit.rshift(hex, 16), 0xFF) / 255
+    local g = bit.band(bit.rshift(hex, 8), 0xFF) / 255
+    local b = bit.band(hex, 0xFF) / 255
+    return r, g, b
+end
+
+function decToRGB(dec)
+    local r = bit.band(bit.rshift(dec, 16), 0xFF) / 255
+    local g = bit.band(bit.rshift(dec, 8), 0xFF) / 255
+    local b = bit.band(dec, 0xFF) / 255
+    return r, g, b
+end
+
+CONSTANTS.RAW_ARROW_COLORS = {
+    {0xFFC24B99, 0xFFFFFFFF, 0xFF3C1F56},
+    {0xFF00FFFF, 0xFFFFFFFF, 0xFF1542B7},
+    {0xFF12FA05, 0xFFFFFFFF, 0xFF0A4447},
+    {0xFFF9393F, 0xFFFFFFFF, 0xFF651038}
+}
+CONSTANTS.ARROW_COLORS = {}
+for i, v in ipairs(CONSTANTS.RAW_ARROW_COLORS) do
+    CONSTANTS.ARROW_COLORS[i] = {
+        {hexToRGB(v[1])},
+        {hexToRGB(v[2])},
+        {hexToRGB(v[3])}
+    }
+end
 
 CONSTANTS.WEEKS = {
     ANIM_LIST = {
