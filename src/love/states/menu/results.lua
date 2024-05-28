@@ -406,6 +406,12 @@ return {
         for i = 1, #scoreNumbers.sprites do
             scoreNumbers.sprites[i]:update(dt)
         end
+
+        if input:pressed("confirm") then
+            resultsMusic:stop()
+            Gamestate.switch(menuSelect)
+            music:play()
+        end
     end,
 
     draw = function(self)
