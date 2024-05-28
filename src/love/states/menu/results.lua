@@ -469,7 +469,7 @@ return {
 
     leave = function(self)
         tallies = {}
-        scoreNumbers = {}
+        scoreNumbers.sprites = {}
         resultsGF = nil
         resultsBF = nil
         soundSystem = nil
