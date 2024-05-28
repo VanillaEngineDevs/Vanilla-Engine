@@ -1,5 +1,5 @@
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("resultsScreen/resultBoyfriendGOOD")),
+	love.graphics.newImage(graphics.imagePath(love.math.random(1, 300) and "resultsScreen/resultSuperFuckingMarioGOOD" or "resultsScreen/resultBoyfriendGOOD")),
     	-- Automatically generated from resultBoyfriendGOOD.xml
 	{
 		{x = 4, y = 4, width = 451, height = 464, offsetX = -114, offsetY = 0, offsetWidth = 655, offsetHeight = 937, rotated = false}, -- 1: Boyfriend Good Anim0000
