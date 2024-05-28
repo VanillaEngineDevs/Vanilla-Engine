@@ -150,7 +150,7 @@ require "modules.overrides"
 function love.load()
 	paused = false
 	settings = {}
-	local curOS = love.system.getOS()
+	curOS = love.system.getOS()
 
 	-- Load libraries
 	baton = require "lib.baton"

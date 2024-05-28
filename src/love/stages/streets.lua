@@ -206,29 +206,31 @@ return {
 
             stageImages["foreground"]:draw()
             stageImages["abotBack"]:draw()
-            local fftArray = lovefftINST:get()
-            local bfFFTArray, enemyFFTArray = {}, {}
-            local time = inst:tell()
-            if deltaCurTime > VIS_TIME_MAX then
-                deltaCurTime = 0
-                --print("Time: " .. time)
-                lovefftINST:updatePlayTime(time)
-            end
-            -- we only have 7 bars
-            local MAX_BARS = 7
-            local forEach = #fftArray / MAX_BARS
-            local index = 1
-            for i = 1, #fftArray, forEach do
-                local i = math.floor(i)
-                -- 7 bars
-                local barHeight = fftArray[i] * 720*100
-                --print(index, i, barHeight)
-                -- convert bar height from a number from 1-6
-                local animNum = math.floor(math.remap(barHeight, 0, 720, 1, 6))
-                --print(index, i, animNum)
-                abotVisualizers[index]:animate(tostring(index) .. "_" .. tostring(animNum), false)
-                abotVisualizers[index]:draw()
-                index = index + 1
+            if curOS ~= "NX" then
+                local fftArray = lovefftINST:get()
+                local bfFFTArray, enemyFFTArray = {}, {}
+                local time = inst:tell()
+                if deltaCurTime > VIS_TIME_MAX then
+                    deltaCurTime = 0
+                    --print("Time: " .. time)
+                    lovefftINST:updatePlayTime(time)
+                end
+                -- we only have 7 bars
+                local MAX_BARS = 7
+                local forEach = #fftArray / MAX_BARS
+                local index = 1
+                for i = 1, #fftArray, forEach do
+                    local i = math.floor(i)
+                    -- 7 bars
+                    local barHeight = fftArray[i] * 720*100
+                    --print(index, i, barHeight)
+                    -- convert bar height from a number from 1-6
+                    local animNum = math.floor(math.remap(barHeight, 0, 720, 1, 6))
+                    --print(index, i, animNum)
+                    abotVisualizers[index]:animate(tostring(index) .. "_" .. tostring(animNum), false)
+                    abotVisualizers[index]:draw()
+                    index = index + 1
+                end
             end
             graphics.setColor(1, 1, 1, 1)
             love.graphics.rectangle("fill", -315, 30, 120, 60)

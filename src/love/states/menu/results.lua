@@ -407,7 +407,7 @@ return {
             scoreNumbers.sprites[i]:update(dt)
         end
 
-        if input:pressed("confirm") then
+        if input:pressed("confirm") and scoreNumbers.visible then
             resultsMusic:stop()
             Gamestate.switch(menuSelect)
             music:play()

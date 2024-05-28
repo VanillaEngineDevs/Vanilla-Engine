@@ -887,20 +887,6 @@ return {
 				end
 			end
 
-			if not pixel then
-				if enemyArrow:getAnimName() ~= CONSTANTS.WEEKS.NOTE_LIST[i] then
-					enemyArrow.shaderEnabled = true
-				else
-					enemyArrow.shaderEnabled = false
-				end
-
-				if boyfriendArrow:getAnimName() ~= CONSTANTS.WEEKS.NOTE_LIST[i] then
-					boyfriendArrow.shaderEnabled = true
-				else
-					boyfriendArrow.shaderEnabled = false
-				end
-			end
-
 			if #enemyNote > 0 then
 				for j = 1, #enemyNote do
 					local ableTohit = true
@@ -1183,6 +1169,20 @@ return {
 
 			if input:released(curInput) then
 				boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i], false)
+			end
+
+			if not pixel then
+				if enemyArrow:getAnimName() ~= CONSTANTS.WEEKS.NOTE_LIST[i] then
+					enemyArrow.shaderEnabled = true
+				else
+					enemyArrow.shaderEnabled = false
+				end
+
+				if boyfriendArrow:getAnimName() ~= CONSTANTS.WEEKS.NOTE_LIST[i] then
+					boyfriendArrow.shaderEnabled = true
+				else
+					boyfriendArrow.shaderEnabled = false
+				end
 			end
 		end
 
