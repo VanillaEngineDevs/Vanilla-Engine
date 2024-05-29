@@ -1,6 +1,11 @@
 -- REQUIRE THIS FILE AFTER ALL THE STATES. THIS FILE ADDS BACK DEPRECATED FUNCTIONS FROM THEM.
 
 function weeks.legacyGenerateNotes(self, chart)
+    if importMods.inMod then
+        importMods.setupScripts()
+    end
+    self.overrideHealthbarText = importMods.uiHealthbarTextMod or nil
+	self.overrideDrawHealthbar = importMods.uiHealthbarMod or nil
     local chart = getFilePath(chart)
     chart = json.decode(love.filesystem.read(chart)).song
 
@@ -96,6 +101,7 @@ function weeks.legacyGenerateNotes(self, chart)
                     holdNote.healthGainMult = noteObject.healthGainMult
 					holdNote.healthLossMult = noteObject.healthLossMult
                     holdNote.causesMiss = noteObject.causesMiss
+                    holdNote.hitNote = noteObject.hitNote
                     table.insert(notesTable[id], holdNote)
                 end
 
@@ -143,6 +149,11 @@ end
 -- I gotta rename this file..,..,.
 -- This file will just have spare functions,.,.
 function weeks.cneGenerateNotes(self, chart, metadata)
+    if importMods.inMod then
+        importMods.setupScripts()
+    end
+    self.overrideHealthbarText = importMods.uiHealthbarTextMod or nil
+	self.overrideDrawHealthbar = importMods.uiHealthbarMod or nil
     local chart = getFilePath(chart)
     chart = json.decode(love.filesystem.read(chart))
     local metadata = json.decode(love.filesystem.read(metadata))
@@ -188,7 +199,6 @@ function weeks.cneGenerateNotes(self, chart, metadata)
 			else
 				dataStuff = noteTypes["normal"]
 			end
-
 
             noteObject.col = id
             noteObject.y = -400 + time * 0.6 * speed
@@ -238,6 +248,7 @@ function weeks.cneGenerateNotes(self, chart, metadata)
                     holdNote.healthGainMult = noteObject.healthGainMult
 					holdNote.healthLossMult = noteObject.healthLossMult
                     holdNote.causesMiss = noteObject.causesMiss
+                    holdNote.hitNote = noteObject.hitNote
                     table.insert(notesTable[id], holdNote)
                 end
 

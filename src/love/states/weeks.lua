@@ -173,8 +173,6 @@ return {
 			Gamestate.push(gameOver)
 		end
 		self.useBuiltinGameover = true
-		self.overrideHealthbarText = nil
-		self.overrideDrawHealthbar = nil
 		P1HealthColors = {0, 1, 0}
 		P2HealthColors = {1, 0, 0}
 		botplayY = 0
@@ -406,56 +404,38 @@ return {
 		}
 
 		for i = 1, 4 do
-			if pixel and settings.pixelPerfect then
-				if not settings.middleScroll then 
-					boyfriendArrows[i].x = -20 + 20 * i
-					
-					-- ew stuff
-					enemyArrows[1].x = -125 + 20 * 1
-					enemyArrows[2].x = -125 + 20 * 2
-					enemyArrows[3].x = 25 + 20 * 3
-					enemyArrows[4].x = 25 + 20 * 4
-				else
-					enemyArrows[i].x = -125 + 20 * i
-					boyfriendArrows[i].x = 25 + 20 * i
-				end
+			if not pixel then
+				enemyArrows[i].shader = love.graphics.newShader("shaders/RGBPallette.glsl")
+				boyfriendArrows[i].shader = love.graphics.newShader("shaders/RGBPallette.glsl")
 
-				enemyArrows[i].y = -55
-				boyfriendArrows[i].y = -55
-			else
-				if not pixel then
-					enemyArrows[i].shader = love.graphics.newShader("shaders/RGBPallette.glsl")
-					boyfriendArrows[i].shader = love.graphics.newShader("shaders/RGBPallette.glsl")
+				enemyArrows[i].shaderEnabled = false
+				boyfriendArrows[i].shaderEnabled = false
 
-					enemyArrows[i].shaderEnabled = false
-					boyfriendArrows[i].shaderEnabled = false
+				local r = CONSTANTS.ARROW_COLORS[i][1]
+				local g = CONSTANTS.ARROW_COLORS[i][2]
+				local b = CONSTANTS.ARROW_COLORS[i][3]
 
-					local r = CONSTANTS.ARROW_COLORS[i][1]
-					local g = CONSTANTS.ARROW_COLORS[i][2]
-					local b = CONSTANTS.ARROW_COLORS[i][3]
-
-					enemyArrows[i].shader:send("r", r)
-					enemyArrows[i].shader:send("g", g)
-					enemyArrows[i].shader:send("b", b)
-					boyfriendArrows[i].shader:send("r", r)
-					boyfriendArrows[i].shader:send("g", g)
-					boyfriendArrows[i].shader:send("b", b)
-				end
-				if settings.middleScroll then 
-					boyfriendArrows[i].x = -410 + 165 * i
-					-- ew stuff
-					enemyArrows[1].x = -925 + 165 * 1 
-					enemyArrows[2].x = -925 + 165 * 2
-					enemyArrows[3].x = 100 + 165 * 3
-					enemyArrows[4].x = 100 + 165 * 4
-				else
-					enemyArrows[i].x = -925 + 165 * i
-					boyfriendArrows[i].x = 100 + 165 * i
-				end
-
-				enemyArrows[i].y = -400
-				boyfriendArrows[i].y = -400
+				enemyArrows[i].shader:send("r", r)
+				enemyArrows[i].shader:send("g", g)
+				enemyArrows[i].shader:send("b", b)
+				boyfriendArrows[i].shader:send("r", r)
+				boyfriendArrows[i].shader:send("g", g)
+				boyfriendArrows[i].shader:send("b", b)
 			end
+			if settings.middleScroll then 
+				boyfriendArrows[i].x = -410 + 165 * i + CONSTANTS.WEEKS.STRUM_X_OFFSET
+				-- ew stuff
+				enemyArrows[1].x = -925 + 165 * 1 + CONSTANTS.WEEKS.STRUM_X_OFFSET
+				enemyArrows[2].x = -925 + 165 * 2 + CONSTANTS.WEEKS.STRUM_X_OFFSET
+				enemyArrows[3].x = 100 + 165 * 3 + CONSTANTS.WEEKS.STRUM_X_OFFSET
+				enemyArrows[4].x = 100 + 165 * 4 + CONSTANTS.WEEKS.STRUM_X_OFFSET
+			else
+				enemyArrows[i].x = -925 + 165 * i + CONSTANTS.WEEKS.STRUM_X_OFFSET
+				boyfriendArrows[i].x = 100 + 165 * i + CONSTANTS.WEEKS.STRUM_X_OFFSET
+			end
+
+			enemyArrows[i].y = CONSTANTS.WEEKS.STRUM_Y
+			boyfriendArrows[i].y = CONSTANTS.WEEKS.STRUM_Y
 
 			boyfriendArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
 			enemyArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
@@ -477,6 +457,11 @@ return {
 	generateNotes = function(self, chart, metadata, difficulty)
 		local eventBpm
 		local chart = getFilePath(chart)
+		if importMods.inMod then
+			importMods.setupScripts()
+		end
+		self.overrideHealthbarText = importMods.uiHealthbarTextMod or nil
+		self.overrideDrawHealthbar = importMods.uiHealthbarMod or nil
 		local chartData = json.decode(love.filesystem.read(chart))
 		chart = chartData.notes[difficulty]
 
@@ -538,7 +523,7 @@ return {
 			end
 			
 			noteObject.col = data
-			noteObject.y = -400 + time * 0.6 * speed
+			noteObject.y = CONSTANTS.WEEKS.STRUM_Y + time * 0.6 * speed
 			noteObject.ver = noteData.k
 			noteObject.time = time
 			noteObject:animate("on")
@@ -571,7 +556,7 @@ return {
 				for k = 71 / speed, holdTime, 71 / speed do
 					local holdNote = sprites[data]()
 					holdNote.col = data
-					holdNote.y = -400 + (time + k) * 0.6 * speed
+					holdNote.y = CONSTANTS.WEEKS.STRUM_Y + (time + k) * 0.6 * speed
 					holdNote.ver = noteData.k or "normal"
 					holdNote.time = time + k
 					holdNote:animate("hold")
@@ -581,6 +566,7 @@ return {
 					holdNote.healthGainMult = noteObject.healthGainMult
 					holdNote.healthLossMult = noteObject.healthLossMult
 					holdNote.causesMiss = noteObject.causesMiss
+					holdNote.hitNote = noteObject.hitNote
 					table.insert(notesTable[data], holdNote)
 				end
 
@@ -948,7 +934,6 @@ return {
 					end
 
 					if (enemyNote[j].time - musicTime <= 0) and ableTohit and not enemyNote[j].causesMiss then
-						print("hit", ableTohit, enemyNote[j].causesMiss)
 						enemyArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
 						useAltAnims = false
 	
@@ -1530,9 +1515,9 @@ return {
 	end,
 
 	leave = function(self)
-		if inst then inst:stop() end
-		if voicesBF then voicesBF:stop() end
-		if voicesEnemy then voicesEnemy:stop() end
+		if inst then inst:stop(); inst = nil end
+		if voicesBF then voicesBF:stop(); voicesBF = nil end
+		if voicesEnemy then voicesEnemy:stop(); voicesEnemy = nil end
 
 		playMenuMusic = true
 
@@ -1543,6 +1528,7 @@ return {
 		Timer.clear()
 
 		fakeBoyfriend = nil
+		importMods.removeScripts()
 		importMods.inMod = false
 	end
 }

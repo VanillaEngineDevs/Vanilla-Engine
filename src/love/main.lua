@@ -470,6 +470,8 @@ function love.load()
 		importMods.loadAllMods()
 	end
 
+	love.audio.setVolume(0)
+
 	Gamestate.switch(menu)
 
 	love.setFpsCap(settings.fpsCap)

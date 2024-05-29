@@ -1,6 +1,9 @@
 local importMods = {}
 importMods.storedMods = {}
+importMods.storedModsScripts = {}
 importMods.inMod = false
+importMods.uiHealthbarMod = nil
+importMods.uiHealthbarTextMod = nil
 
 function importMods.setup()
     if not love.filesystem.getInfo("mods") then
@@ -38,12 +41,66 @@ function importMods.loadMod(mod) -- The file name of the mod
         end
     end
 
+    if love.filesystem.getInfo("mods/" .. mod .. "/scripts/") then
+        local scriptsList = love.filesystem.getDirectoryItems("mods/" .. mod .. "/scripts")
+        for i, script in ipairs(scriptsList) do
+            local scriptData = require(("mods." .. mod .. ".scripts." .. script):gsub("/", "."):gsub(".lua", ""))
+            if type(scriptData) == "function" then
+                scriptData = {true, script, scriptData}
+            elseif type(scriptData) == "boolean" then
+                scriptData = {scriptData, script, CONSTANTS.MISC.EMPTY_FUNCTION}
+            end
+            if #scriptData == 0 then
+                scriptData = {false, "unknown", CONSTANTS.MISC.EMPTY_FUNCTION}
+            end
+            if #scriptData > 1 then
+                if scriptData[1] then
+                    if scriptData[2] == "uiHealthbarText"then
+                        importMods.uiHealthbarTextMod = scriptData
+                    elseif scriptData[2] == "uiHealthbar" then
+                        importMods.uiHealthbarMod = scriptData
+                    end
+                end
+            end
+
+            if importMods.storedModsScripts[mod] == nil then
+                importMods.storedModsScripts[mod] = {}
+            end
+            table.insert(importMods.storedModsScripts[mod], scriptData)
+        end
+    end
+
     table.insert(importMods.storedMods, {
         name = mod,
         path = "mods/" .. mod
     })
+end
 
-    print("Loaded mod: " .. mod)
+function importMods.setupScripts()
+    local currentMod = importMods.getCurrentMod()
+
+    if importMods.storedModsScripts[currentMod.name] then
+        for _, script in ipairs(importMods.storedModsScripts[currentMod.name]) do
+            if script[2] == "uiHealthbarText" then
+                importMods.lastUiHealthbarTextMod = importMods.uiHealthbarTextMod
+                importMods.uiHealthbarTextMod = script[3]
+            elseif script[2] == "uiHealthbar" then
+                importMods.lastUiHealthbarMod = importMods.uiHealthbarMod
+                importMods.uiHealthbarMod = script[3]
+                print("Setting uiHealthbar")
+            end
+        end
+    end
+end
+
+function importMods.removeScripts()
+    importMods.uiHealthbarTextMod = importMods.lastUiHealthbarTextMod
+    importMods.uiHealthbarMod = importMods.lastUiHealthbarMod
+
+    importMods.lastUiHealthbarTextMod = nil
+    importMods.lastUiHealthbarMod = nil
+
+    print("Removing scripts", importMods.uiHealthbarMod, importMods.uiHealthbarTextMod)
 end
 
 function importMods.loadAllMods()
@@ -65,7 +122,6 @@ end
 function loadLuaFile(path)
     local currentMod = importMods.getCurrentMod()
 
-
     if love.filesystem.getInfo(currentMod.path .. "/" .. path) then
         return love.filesystem.load(currentMod.path .. "/" .. path)
     else
@@ -85,8 +141,6 @@ function loadAudioFile(path)
 end
 
 function loadImageFile(path)
-    local currentMod = importMods.getCurrentMod()
-
     return love.graphics.newImage(path)
 end
 

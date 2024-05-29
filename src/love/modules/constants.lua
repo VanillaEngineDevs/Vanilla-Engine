@@ -36,6 +36,8 @@ for i, v in ipairs(CONSTANTS.RAW_ARROW_COLORS) do
 end
 
 CONSTANTS.WEEKS = {
+    STRUM_Y = -400,
+    STRUM_X_OFFSET = 0,
     ANIM_LIST = {
         "singLEFT",
         "singDOWN",
@@ -130,6 +132,10 @@ CONSTANTS.WEEKS = {
     MISS_SCORE = 0,
     SCORING_OFFSET = 54.00,
     SCORING_SLOPE = 0.080,
+}
+
+CONSTANTS.MISC = {
+    EMPTY_FUNCTION = function() end
 }
 
 return CONSTANTS
