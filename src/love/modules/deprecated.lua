@@ -7,7 +7,6 @@ function weeks.legacyGenerateNotes(self, chart)
     self.overrideHealthbarText = importMods.uiHealthbarTextMod or nil
 	self.overrideDrawHealthbar = importMods.uiHealthbarMod or nil
     local chart = getFilePath(chart)
-    print(chart
     chart = json.decode(love.filesystem.read(chart)).song
 
     for i = 1, #chart.notes do
