@@ -256,7 +256,7 @@ return {
     -- Clothing hangers favourite
 
     enter = function(self)
-        tankman = love.filesystem.load("sprites/week7/tankmanCaptain.lua")()
+        tankman = love.filesystem.load("sprites/characters/tankmanCaptain.lua")()
 
         tankman:animate("idle", true)
         tankman.sizeX = -0.65

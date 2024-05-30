@@ -155,7 +155,6 @@ return {
 			udraw = function(self, sx, sy)
 				local sx = sx or 7
 				local sy = sy or sx 
-				print(sx, sy)
 				local x = self.x
 				local y = self.y
 

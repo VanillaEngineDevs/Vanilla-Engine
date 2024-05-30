@@ -56,9 +56,9 @@ function importMods.loadMod(mod) -- The file name of the mod
             if #scriptData > 1 then
                 if scriptData[1] then
                     if scriptData[2] == "uiHealthbarText"then
-                        importMods.uiHealthbarTextMod = scriptData
+                        importMods.uiHealthbarTextMod = scriptData[3]
                     elseif scriptData[2] == "uiHealthbar" then
-                        importMods.uiHealthbarMod = scriptData
+                        importMods.uiHealthbarMod = scriptData[3]
                     end
                 end
             end
