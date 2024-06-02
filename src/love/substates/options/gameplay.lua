@@ -85,8 +85,8 @@ function gameplay:leave()
     settings.ghostTapping = self.optionsArray[3]:getValue()
     settings.botPlay = self.optionsArray[4]:getValue()
     --[[ settings.pixelPerfect = self.optionsArray[5]:getValue() ]]
-    settings.customScrollSpeed = self.optionsArray[6]:getValue()
-    settings.scrollUnderlayTrans = self.optionsArray[7]:getValue()
+    settings.customScrollSpeed = self.optionsArray[5]:getValue()
+    settings.scrollUnderlayTrans = self.optionsArray[6]:getValue()
     
 
     self.super.leave(self)
