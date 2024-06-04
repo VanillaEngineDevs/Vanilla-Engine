@@ -101,6 +101,41 @@ function importMods.getStageFileFromName(name)
     return nil
 end
 
+-- now sprites/ stuffs
+function importMods.getAllModsSprites()
+    local spritesList = {}
+    for i, mod in ipairs(importMods.storedMods) do
+        if love.filesystem.getInfo(mod.path .. "/sprites/") then
+            local sprites = love.filesystem.getDirectoryItems(mod.path .. "/sprites")
+            for i, sprite in ipairs(sprites) do
+                table.insert(spritesList, {
+                    name = sprite,
+                    mod = mod.name
+                })
+            end
+        end
+    end
+    return spritesList
+end
+
+function importMods.getSpriteFileFromName(name)
+    for i, mod in ipairs(importMods.storedMods) do
+        if love.filesystem.getInfo(mod.path .. "/" .. name) then
+            return love.filesystem.load(mod.path .. "/" .. name)
+        end
+    end
+    return nil
+end
+
+function importMods.getModFromSprite(fileName)
+    for i, mod in ipairs(importMods.storedMods) do
+        if love.filesystem.getInfo(mod.path .. "/" .. fileName) then
+            return mod
+        end
+    end
+    return nil
+end
+
 function importMods.setupScripts()
     local currentMod = importMods.getCurrentMod()
 
@@ -112,7 +147,6 @@ function importMods.setupScripts()
             elseif script[2] == "uiHealthbar" then
                 importMods.lastUiHealthbarMod = importMods.uiHealthbarMod
                 importMods.uiHealthbarMod = script[3]
-                print("Setting uiHealthbar")
             end
         end
     end
@@ -124,8 +158,6 @@ function importMods.removeScripts()
 
     importMods.lastUiHealthbarTextMod = nil
     importMods.lastUiHealthbarMod = nil
-
-    print("Removing scripts", importMods.uiHealthbarMod, importMods.uiHealthbarTextMod)
 end
 
 function importMods.loadAllMods()
@@ -147,7 +179,6 @@ end
 function importMods.setCurrentMod(mod)
     for i, storedMod in ipairs(importMods.storedMods) do
         if storedMod.name == mod.name then
-            print("Setting mod to", i + modWeekPlacement)
             weekNum = i + modWeekPlacement
             return
         end

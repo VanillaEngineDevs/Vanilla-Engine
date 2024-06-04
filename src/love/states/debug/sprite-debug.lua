@@ -34,21 +34,21 @@ return {
 		end
 		selection = 1
 		dirTable = love.filesystem.getDirectoryItems(curDir)
-		-- sort so directories are first
-		table.sort(dirTable, function(a, b)
-			if love.filesystem.getInfo(curDir .. "/" .. a).type == love.filesystem.getInfo(curDir .. "/" .. b).type then
-				return a < b
-			else
-				return love.filesystem.getInfo(curDir .. "/" .. a).type == "directory"
-			end
-		end)
-
-		-- remove all files that don't end in .lua or is a directory
-		for i = #dirTable, 1, -1 do
-			if love.filesystem.getInfo(curDir .. "/" .. dirTable[i]).type ~= "directory" and not dirTable[i]:match("%.lua$") then
-				table.remove(dirTable, i)
+		if curDir == "sprites" then
+			local modsDirTable = importMods.getAllModsSprites()
+			for i, v in ipairs(modsDirTable) do
+				table.insert(dirTable, v.name)
 			end
 		end
+		-- sort so directories are first
+		table.sort(dirTable, function(a, b)
+			local isDir = false
+			if love.filesystem.getInfo(curDir .. "/" .. a) and love.filesystem.getInfo(curDir .. "/" .. a).type == love.filesystem.getInfo(curDir .. "/" .. b).type then
+				return a < b
+			else
+				return love.filesystem.getInfo(curDir .. "/" .. a) and love.filesystem.getInfo(curDir .. "/" .. a).type == "directory"
+			end
+		end)
 	end,
 
 	enter = function(self, previous)
@@ -77,7 +77,14 @@ return {
 	end,
 
 	spriteViewer = function(self, spritePath)
-		local spriteData = love.filesystem.load(spritePath)
+		local spriteData = nil--[[ love.filesystem.load(spritePath) ]]
+		if love.filesystem.getInfo(spritePath) then
+			spriteData = love.filesystem.load(spritePath)
+		else
+			importMods.setCurrentMod(importMods.getModFromSprite(spritePath))
+			importMods.inMod = true
+			spriteData = importMods.getSpriteFileFromName(spritePath)
+		end
 
 		svMode = 2
 
@@ -136,8 +143,12 @@ return {
 				end
 			end
 			if input:pressed("confirm") then
-				if love.filesystem.getInfo(curDir .. "/" .. dirTable[selection]).type == "directory" then
-					self:spriteViewerSearch(dirTable[selection])
+				if love.filesystem.getInfo(curDir .. "/" .. dirTable[selection]) then
+					if love.filesystem.getInfo(curDir .. "/" .. dirTable[selection]).type == "directory" then
+						self:spriteViewerSearch(dirTable[selection])
+					else
+						self:spriteViewer(curDir .. "/" .. dirTable[selection])
+					end
 				else
 					self:spriteViewer(curDir .. "/" .. dirTable[selection])
 				end
@@ -183,7 +194,7 @@ return {
 				uitextColored(dirTable[i], 0, (i - 1) * 20, 0, nil,
 					(
 						i == selection and {1, 1, 0} or
-						love.filesystem.getInfo(curDir .. "/" .. dirTable[i]).type == "directory" and {1, 0, 1} or
+						love.filesystem.getInfo(curDir .. "/" .. dirTable[i]) and love.filesystem.getInfo(curDir .. "/" .. dirTable[i]).type == "directory" and {1, 0, 1} or
 						{1, 1, 1}
 					)
 				)
