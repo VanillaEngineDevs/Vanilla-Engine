@@ -202,6 +202,7 @@ function love.load()
 	CONSTANTS = require "modules.constants"
 	NoteSplash = require "modules.Splash"
 	HoldCover = require "modules.Cover"
+	waveform = require "modules.Waveform"
 	loadSavedata()
 	settings.pixelPerfect = false
 
