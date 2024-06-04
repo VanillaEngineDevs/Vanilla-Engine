@@ -42,6 +42,13 @@ return {
 				return love.filesystem.getInfo(curDir .. "/" .. a).type == "directory"
 			end
 		end)
+
+		-- remove all files that don't end in .lua or is a directory
+		for i = #dirTable, 1, -1 do
+			if love.filesystem.getInfo(curDir .. "/" .. dirTable[i]).type ~= "directory" and not dirTable[i]:match("%.lua$") then
+				table.remove(dirTable, i)
+			end
+		end
 	end,
 
 	enter = function(self, previous)
@@ -164,24 +171,22 @@ return {
 			love.graphics.pop()
 
 			for i = 1, #spriteAnims do
-				if i == selection then
-					graphics.setColor(1, 1, 0)
-				end
-				love.graphics.print(spriteAnims[i], 0, (i - 1) * 20)
+				uitextColored(spriteAnims[i], 0, (i - 1) * 20, 0, nil, (i == selection and {1, 1, 0} or {1, 1, 1}))
 				graphics.setColor(1, 1, 1)
 
-				love.graphics.print("X: " .. tostring(overlaySprite:getCurrentAnim().offsetX + (sprite.x - overlaySprite.x)), 0, (#spriteAnims + 1) * 20)
-				love.graphics.print("Y: " .. tostring(overlaySprite:getCurrentAnim().offsetY - (sprite.y - overlaySprite.y)), 0, (#spriteAnims + 2) * 20)
-				love.graphics.print("Frame: " .. tostring(overlaySprite:getFrameFromCurrentAnim()), 0, (#spriteAnims + 3) * 20)
+				uitextColored("X: " .. tostring(overlaySprite:getCurrentAnim().offsetX + (sprite.x - overlaySprite.x)), 0, (#spriteAnims + 1) * 20)
+				uitextColored("Y: " .. tostring(overlaySprite:getCurrentAnim().offsetY - (sprite.y - overlaySprite.y)), 0, (#spriteAnims + 2) * 20)
+				uitextColored("Frame: " .. tostring(overlaySprite:getFrameFromCurrentAnim()), 0, (#spriteAnims + 3) * 20)
 			end
 		else
 			for i = 1, #dirTable do
-				if i == selection then
-					graphics.setColor(1, 1, 0)
-				elseif love.filesystem.getInfo(curDir .. "/" .. dirTable[i]).type == "directory" then
-					graphics.setColor(1, 0, 1)
-				end
-				love.graphics.print(dirTable[i], 0, (i - 1) * 20)
+				uitextColored(dirTable[i], 0, (i - 1) * 20, 0, nil,
+					(
+						i == selection and {1, 1, 0} or
+						love.filesystem.getInfo(curDir .. "/" .. dirTable[i]).type == "directory" and {1, 0, 1} or
+						{1, 1, 1}
+					)
+				)
 				graphics.setColor(1, 1, 1)
 			end
 		end

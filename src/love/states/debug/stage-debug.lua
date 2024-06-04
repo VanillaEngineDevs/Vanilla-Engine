@@ -4,6 +4,12 @@ local menuID, selection
 local curDir, dirTable
 local stageImgNames = {}
 local curChanging = "stage"
+local curStage = nil
+local beat = 0
+local onBeat = false
+local time = 0
+local bpm = 102
+local danced = false
 return {
     stageViewerSearch = function(self, dir)
         svMode = 1
@@ -15,6 +21,10 @@ return {
 		end
 		selection = 1
 		dirTable = love.filesystem.getDirectoryItems(curDir)
+		local modsDirTable = importMods.getAllModsStages()
+		for i, v in ipairs(modsDirTable) do
+			table.insert(dirTable, v.name)
+		end
     end,
 
     enter = function(self, previous)
@@ -32,6 +42,7 @@ return {
 		if svMode == 2 then
             -- Stage Positions
 			if curChanging == "stage" then
+				if not stageImages[stageImgNames[selection]] then return end
 				if key == "a" then
 					stageImages[stageImgNames[selection]].x = stageImages[stageImgNames[selection]].x - 1
 				elseif key == "d" then
@@ -116,9 +127,21 @@ return {
 	end,
 
     update = function(self, dt)
+		time = time + 1000 * dt
+		if time >= 60000 / bpm then
+			time = 0
+			beat = beat + 1
+			onBeat = true
+		end
+		
 		if graphics.isFading() then return end
 		if svMode == 2 then
-            stages[fileStr]:update(dt)
+            curStage:update(dt)
+			if onBeat then
+				boyfriend:beat(beat)
+				girlfriend:beat(beat)
+				enemy:beat(beat)
+			end
             boyfriend:update(dt)
             girlfriend:update(dt)
 			enemy:update(dt)
@@ -173,18 +196,28 @@ return {
 				end
 			end
 			if input:pressed("confirm") then
-				if love.filesystem.getInfo(curDir .. "/" .. dirTable[selection]).type == "directory" then
+				local isDir = false
+				if love.filesystem.getInfo(curDir .. "/" .. dirTable[selection], isDir) then
+					isDir = love.filesystem.getInfo(curDir .. "/" .. dirTable[selection]).type == "directory"
+				end
+				if isDir then
                     fileStr = dirTable[selection]
                     fileStr = fileStr:sub(1, -5)
-                    stages[fileStr]:enter()
+
                     selection = 1
 					self:stageViewerSearch(dirTable[selection])
 				else
                     fileStr = dirTable[selection]
                     fileStr = fileStr:sub(1, -5)
-                    boyfriend = love.filesystem.load("sprites/boyfriend.lua")()
-                    girlfriend = love.filesystem.load("sprites/girlfriend.lua")()
-                    stages[fileStr]:enter()
+                    boyfriend = love.filesystem.load("sprites/characters/boyfriend.lua")()
+                    girlfriend = love.filesystem.load("sprites/characters/girlfriend.lua")()
+					if love.filesystem.getInfo("stages/" .. fileStr .. ".lua") then
+						curStage = love.filesystem.load("stages/" .. fileStr .. ".lua")()
+					else
+						importMods.setCurrentMod(importMods.getModFromStage(fileStr))
+						curStage = importMods.getStageFileFromName(fileStr)()
+					end
+                    curStage:enter()
 					if not camera.points["enemy"] then camera:addPoint("enemy", -boyfriend.x + 100, -boyfriend.y + 75) end
 					if not camera.points["boyfriend"] then camera:addPoint("boyfriend", -enemy.x - 100, -enemy.y + 75) end
 					for i, v in pairs(stageImages) do
@@ -193,9 +226,9 @@ return {
 					end
                     selection = 1
 					svMode = 2
-					boyfriend:animate("idle", true)
-					girlfriend:animate("idle", true)
-					enemy:animate("idle", true)
+					boyfriend:animate("idle", false)
+					girlfriend:animate("idle", false)
+					enemy:animate("idle", false)
 				end
 			end
 		end
@@ -209,6 +242,8 @@ return {
 		if input:pressed("debugZoomIn") then
 			camera.zoom = camera.zoom + 0.1
 		end
+
+		onBeat = false
 	end,
 
     draw = function()
@@ -218,49 +253,49 @@ return {
 			love.graphics.push()
 				love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 				love.graphics.scale(camera.zoom, camera.zoom)
-                stages[fileStr]:draw()
+                curStage:draw()
 			love.graphics.pop()
 
 			if curChanging == "stage" then
-				love.graphics.print(stageImgNames[selection], 0, 0)
-				love.graphics.print("X: " .. stageImages[stageImgNames[selection]].x ..
-					"\nY:" .. stageImages[stageImgNames[selection]].y ..
-					"\nSizeX:" .. stageImages[stageImgNames[selection]].sizeX ..
-					"\nSizeY:" .. stageImages[stageImgNames[selection]].sizeY, 0, 40
-				)
+				if stageImgNames[selection] then
+					uitextColored(stageImgNames[selection], 0, 0)
+					uitextColored("X: " .. stageImages[stageImgNames[selection]].x ..
+						"\nY:" .. stageImages[stageImgNames[selection]].y ..
+						"\nSizeX:" .. stageImages[stageImgNames[selection]].sizeX ..
+						"\nSizeY:" .. stageImages[stageImgNames[selection]].sizeY, 0, 40
+					)
+				end
 			elseif curChanging == "boyfriend" then
-				love.graphics.print("Boyfriend", 0, 0)
-				love.graphics.print("X: " .. boyfriend.x ..
+				uitextColored("Boyfriend", 0, 0)
+				uitextColored("X: " .. boyfriend.x ..
 					"\nY:" .. boyfriend.y ..
 					"\nSizeX:" .. boyfriend.sizeX ..
 					"\nSizeY:" .. boyfriend.sizeY, 0, 40
 				)
 			elseif curChanging == "girlfriend" then
-				love.graphics.print("Girlfriend", 0, 0)
-				love.graphics.print("X: " .. girlfriend.x ..
+				uitextColored("Girlfriend", 0, 0)
+				uitextColored("X: " .. girlfriend.x ..
 					"\nY:" .. girlfriend.y ..
 					"\nSizeX:" .. girlfriend.sizeX ..
 					"\nSizeY:" .. girlfriend.sizeY, 0, 40
 				)
 			elseif curChanging == "enemy" then
-				love.graphics.print("Enemy", 0, 0)
-				love.graphics.print("X: " .. enemy.x ..
+				uitextColored("Enemy", 0, 0)
+				uitextColored("X: " .. enemy.x ..
 					"\nY:" .. enemy.y ..
 					"\nSizeX:" .. enemy.sizeX ..
 					"\nSizeY:" .. enemy.sizeY, 0, 40
 				)
 			end
 
-            love.graphics.print("\n\n\n\n\n\nCamX: " .. camera.x .. "\nCamY: " .. camera.y ..
+            uitextColored("\n\n\n\n\n\nCamX: " .. camera.x .. "\nCamY: " .. camera.y ..
 				"\n\nPress Esc to exit at any time", 0, 40)
 		else
 			for i = 1, #dirTable do
 				if i == selection then
 					graphics.setColor(1, 1, 0)
-				elseif love.filesystem.getInfo(curDir .. "/" .. dirTable[i]).type == "directory" then
-					graphics.setColor(1, 0, 1)
 				end
-				love.graphics.print(dirTable[i], 0, (i - 1) * 20)
+				uitextColored(dirTable[i], 0, (i - 1) * 20, 0, nil, (i == selection and {1, 1, 0} or {1, 1, 1}))
 				graphics.setColor(1, 1, 1)
 			end
 		end

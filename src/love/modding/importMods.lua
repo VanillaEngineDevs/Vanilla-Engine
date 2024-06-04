@@ -76,6 +76,31 @@ function importMods.loadMod(mod) -- The file name of the mod
     })
 end
 
+function importMods.getAllModsStages()
+    local stagesList = {}
+    for i, mod in ipairs(importMods.storedMods) do
+        if love.filesystem.getInfo(mod.path .. "/stages/") then
+            local stages = love.filesystem.getDirectoryItems(mod.path .. "/stages")
+            for i, stage in ipairs(stages) do
+                table.insert(stagesList, {
+                    name = stage,
+                    mod = mod.name
+                })
+            end
+        end
+    end
+    return stagesList
+end
+
+function importMods.getStageFileFromName(name)
+    for i, mod in ipairs(importMods.storedMods) do
+        if love.filesystem.getInfo(mod.path .. "/stages/" .. name .. ".lua") then
+            return love.filesystem.load(mod.path .. "/stages/" .. name .. ".lua")
+        end
+    end
+    return nil
+end
+
 function importMods.setupScripts()
     local currentMod = importMods.getCurrentMod()
 
@@ -117,6 +142,26 @@ end
 
 function importMods.getCurrentMod()
     return importMods.storedMods[weekNum - modWeekPlacement]
+end
+
+function importMods.setCurrentMod(mod)
+    for i, storedMod in ipairs(importMods.storedMods) do
+        if storedMod.name == mod.name then
+            print("Setting mod to", i + modWeekPlacement)
+            weekNum = i + modWeekPlacement
+            return
+        end
+    end
+    return nil
+end
+
+function importMods.getModFromStage(fileName)
+    for i, mod in ipairs(importMods.storedMods) do
+        if love.filesystem.getInfo(mod.path .. "/stages/" .. fileName .. ".lua") then
+            return mod
+        end
+    end
+    return nil
 end
 
 function loadLuaFile(path)

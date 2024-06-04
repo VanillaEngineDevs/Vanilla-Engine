@@ -39,34 +39,6 @@ function util.bound(x, min, max)
     return math.min(math.max(x, min), max)
 end
 
--- math overrides
--- @param n number
--- @return an approximated sine value
--- A faster but slightly less accurate version of math.sin
--- https://github.com/HaxeFlixel/flixel/blob/dev/flixel/math/FlxMath.hx#L503
-function math.fastSin(n)
-    n = n * 0.3183098862
-    if n > 1 then
-        --n -= (Math.ceil(n) >> 1) << 1;
-        n = n - bit.rshift(bit.lshift(math.ceil(n), 1), 1) * 2
-    elseif n < -1 then
-        --n += (Math.ceil(-n) >> 1) << 1;
-        n = n + bit.rshift(bit.lshift(math.ceil(-n), 1), 1) * 2
-    end
-
-    if n > 0 then
-        return n * (3.1 + n * (0.5 + n * (-7.2 + n * 3.6)))
-    else
-        return n * (3.1 - n * (0.5 + n * (7.2 + n * 3.6)))
-    end
-end
-
--- @param n number
--- @return an approximated cosine value
-function math.fastCos(n)
-    return math.fastSin(n + 1.570796327)
-end
-
 function math.roundDecimal(value, precision)
     local power = 10 ^ precision
     return math.floor(value * power + 0.5) / power
@@ -85,6 +57,15 @@ function table.getKey(table, value)
     for k, v in pairs(table) do
         if v == value then
             return k
+        end
+    end
+    return nil
+end
+
+function table.find(table, element)
+    for i, value in ipairs(table) do
+        if value == element then
+            return i
         end
     end
     return nil

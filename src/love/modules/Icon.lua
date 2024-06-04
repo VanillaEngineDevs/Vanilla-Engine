@@ -8,8 +8,20 @@ return {
         end
         local img = graphics.cache[path]
         local frameData = {
-            {x = 0, y = 0, width = img:getWidth()/2, height = img:getHeight(), offsetX = 0, offsetY = 0, offsetWidth = img:getWidth()/2, offsetHeight = img:getHeight(), rotated = false},
-            {x = img:getWidth()/2, y = 0, width = img:getWidth(), height = img:getHeight(), offsetX = 0, offsetY = 0, offsetWidth = img:getWidth()/2, offsetHeight = img:getHeight(), rotated = false}
+            {
+                x = 0, y = 0, 
+                width = img:getWidth()/2, height = img:getHeight(), 
+                offsetX = 0, offsetY = 0, 
+                offsetWidth = img:getWidth()/2, offsetHeight = img:getHeight(), 
+                rotated = false
+            },
+            {
+                x = img:getWidth()/2, y = 0, 
+                width = img:getWidth(), height = img:getHeight(), 
+                offsetX = 0, offsetY = 0, 
+                offsetWidth = img:getWidth()/2, offsetHeight = img:getHeight(), 
+                rotated = false
+            }
         }
         local image, width, height
         local frames = {}

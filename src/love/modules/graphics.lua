@@ -245,7 +245,7 @@ return {
 
 			visible = true,
 
-			danced = false,
+			danced = true,
 
 			shader = nil,
 			shaderEnabled = true,
@@ -458,7 +458,7 @@ return {
 						if beat % self.danceSpeed == 0 then 
 							if (not self:isAnimated() and util.startsWith(self:getAnimName(), "sing")) or (self:getAnimName() == "danceLeft" or self:getAnimName() == "danceRight" or (not self:isAnimated() and self:getAnimName() == "sad")) then
 								self.danced = not self.danced
-								if self.danced then
+								if not self.danced then
 									self:animate("danceLeft", false)
 								else
 									self:animate("danceRight", false)
