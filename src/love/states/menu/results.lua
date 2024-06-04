@@ -331,7 +331,9 @@ return {
                     Timer.tween(0.5, tallies[i], {
                         curNum = tallies[i].num
                     }, "out-quart", function()
-                        tallies[i].curNum = tallies[i].num
+                        if tallies[i] then
+                            tallies[i].curNum = tallies[i].num
+                        end
                     end)
                 end
             )

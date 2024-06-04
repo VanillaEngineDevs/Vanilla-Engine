@@ -38,6 +38,7 @@ end
 CONSTANTS.WEEKS = {
     STRUM_Y = -400,
     STRUM_X_OFFSET = 0,
+    PIXELS_PER_MS = 0.45, 
     ANIM_LIST = {
         "singLEFT",
         "singDOWN",

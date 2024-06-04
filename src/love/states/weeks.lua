@@ -245,12 +245,12 @@ return {
 			for i = 1, 4 do
 				for j, note in ipairs(boyfriendNotes[i]) do
 					local strumlineY = boyfriendArrows[i].y
-					note.y = (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
+					note.y = strumlineY - CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - note.time) * speed--[[ (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2))) ]]
 				end
 
 				for _, note in ipairs(enemyNotes[i]) do
 					local strumlineY = enemyArrows[i].y
-					note.y = (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2)))
+					note.y = strumlineY - CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - note.time) * speed--[[ (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2))) ]]
 				end
 			end
 		end
