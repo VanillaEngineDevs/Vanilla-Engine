@@ -486,7 +486,7 @@ return {
 
 		if not bpm then bpm = 120 end
 
-		local sprites = {
+		noteSprites = {
 			sprites.leftArrow,
 			sprites.downArrow,
 			sprites.upArrow,
@@ -512,7 +512,7 @@ return {
 			local holdTime = noteData.l or 0
 			noteData.k = noteData.k or "normal"
 
-			local noteObject = sprites[data]()
+			local noteObject = noteSprites[data]()
 
 			local dataStuff = {}
 
@@ -554,7 +554,7 @@ return {
 			table.insert(notesTable[data], noteObject)
 			if holdTime > 0 then
 				for k = 71 / speed, holdTime, 71 / speed do
-					local holdNote = sprites[data]()
+					local holdNote = noteSprites[data]()
 					holdNote.col = data
 					holdNote.y = CONSTANTS.WEEKS.STRUM_Y + (time + k) * 0.6 * speed
 					holdNote.ver = noteData.k or "normal"

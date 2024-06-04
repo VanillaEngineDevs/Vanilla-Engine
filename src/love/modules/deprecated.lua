@@ -28,7 +28,7 @@ function weeks.legacyGenerateNotes(self, chart)
         speed = settings.customScrollSpeed
     end
 
-    local sprites = {
+    noteSprites = {
         sprites.leftArrow,
         sprites.downArrow,
         sprites.upArrow,
@@ -47,7 +47,7 @@ function weeks.legacyGenerateNotes(self, chart)
 
             local id = noteType % 4 + 1
             
-            local noteObject = sprites[id]()
+            local noteObject = noteSprites[id]()
 
             local dataStuff = {}
             if noteTypes[noteVer] then
@@ -89,7 +89,7 @@ function weeks.legacyGenerateNotes(self, chart)
             table.insert(notesTable[id], noteObject)
             if holdLength > 0 then
                 for k = 71 / speed, holdLength, 71 / speed do
-                    local holdNote = sprites[id]()
+                    local holdNote = noteSprites[id]()
                     holdNote.col = id
                     holdNote.y = -400 + (time + k) * 0.6 * speed
                     holdNote.ver = noteVer
@@ -167,7 +167,7 @@ function weeks.cneGenerateNotes(self, chart, metadata)
         speed = settings.customScrollSpeed
     end
 
-    local sprites = {
+    noteSprites = {
         sprites.leftArrow,
         sprites.downArrow,
         sprites.upArrow,
@@ -192,13 +192,7 @@ function weeks.cneGenerateNotes(self, chart, metadata)
 
             local id = noteType % 4 + 1
             
-            local noteObject = sprites[id]()
-
-            if noteTypes[noteVer] then
-				dataStuff = noteTypes[noteVer]
-			else
-				dataStuff = noteTypes["normal"]
-			end
+            local noteObject = noteSprites[id]()
 
             noteObject.col = id
             noteObject.y = -400 + time * 0.6 * speed
@@ -236,7 +230,7 @@ function weeks.cneGenerateNotes(self, chart, metadata)
             table.insert(notesTable[id], noteObject)
             if holdLength > 0 then
                 for k = 71 / speed, holdLength, 71 / speed do
-                    local holdNote = sprites[id]()
+                    local holdNote = noteSprites[id]()
                     holdNote.col = id
                     holdNote.y = -400 + (time + k) * 0.6 * speed
                     holdNote.ver = noteVer
