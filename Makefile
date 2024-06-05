@@ -39,6 +39,8 @@ win64: lovefile
 	@rm -rf build/win64
 	@mkdir -p build/win64
 
+	@cp resources/win64_libs/* build/win64
+
 	@cp resources/win64/love/OpenAL32.dll build/win64
 	@cp resources/win64/love/SDL2.dll build/win64
 	@cp resources/win64/love/license.txt build/win64

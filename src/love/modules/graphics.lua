@@ -62,9 +62,9 @@ return {
 			end
 		else
 			local currentMod = importMods.getCurrentMod()
-			if love.filesystem.getInfo(currentMod.path .. "/images/" .. imageType .. "/" .. path .. "." .. imageType) then
+			if currentMod and love.filesystem.getInfo(currentMod.path .. "/images/" .. imageType .. "/" .. path .. "." .. imageType) then
 				return currentMod.path .. "/images/" .. imageType .. "/" .. path .. "." .. imageType
-			elseif love.filesystem.getInfo(currentMod.path .. "/images/png/" .. path .. ".png") then
+			elseif currentMod and love.filesystem.getInfo(currentMod.path .. "/images/png/" .. path .. ".png") then
 				return currentMod.path .. "/images/png/" .. path .. ".png"
 			else
 				if love.filesystem.getInfo(pathStr) then
