@@ -415,6 +415,9 @@ return {
 				local g = CONSTANTS.ARROW_COLORS[i][2]
 				local b = CONSTANTS.ARROW_COLORS[i][3]
 
+				enemyArrows[i].updateShaderAlpha = true
+				boyfriendArrows[i].updateShaderAlpha = true
+
 				enemyArrows[i].shader:send("r", r)
 				enemyArrows[i].shader:send("g", g)
 				enemyArrows[i].shader:send("b", b)
@@ -436,6 +439,9 @@ return {
 
 			enemyArrows[i].y = CONSTANTS.WEEKS.STRUM_Y
 			boyfriendArrows[i].y = CONSTANTS.WEEKS.STRUM_Y
+
+			enemyArrows[i].finishedAlpha = 1
+			boyfriendArrows[i].finishedAlpha = 1
 
 			boyfriendArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
 			enemyArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
@@ -609,6 +615,49 @@ return {
 	-- Gross countdown script
 	setupCountdown = function(self, countNumVal, func)
 		local countNumVal = countNumVal or 4
+		if not storyMode and countNumVal == 4 then
+			print("Countdown is 4, but we're not in story mode. Skipping.")
+			-- strum spawning
+			for i = 1, 4 do
+				boyfriendArrows[i].alpha = 0
+				boyfriendArrows[i].y = boyfriendArrows[i].y - 50
+				enemyArrows[i].alpha = 0
+				enemyArrows[i].y = enemyArrows[i].y - 50
+				Timer.after(
+					0.5 + (0.2 * i),
+					function()
+						Timer.tween(
+							1,
+							boyfriendArrows[i],
+							{
+								alpha = boyfriendArrows[i].finishedAlpha,
+								y = CONSTANTS.WEEKS.STRUM_Y
+							},
+							"out-circ",
+							function()
+								-- Stop updating the shader because that can cause some performance issues
+								boyfriendArrows[i].alpha = boyfriendArrows[i].finishedAlpha
+								boyfriendArrows[i].updateShaderAlpha = false
+							end
+						)
+
+						Timer.tween(
+							1,
+							enemyArrows[i],
+							{
+								alpha = enemyArrows[i].finishedAlpha,
+								y = CONSTANTS.WEEKS.STRUM_Y
+							},
+							"out-circ",
+							function()
+								enemyArrows[i].alpha = enemyArrows[i].finishedAlpha
+								enemyArrows[i].updateShaderAlpha = false
+							end
+						)
+					end
+				)
+			end
+		end
 		lastReportedPlaytime = 0
 		if countNumVal == 4 then
 			musicTime = ((60*4) / bpm) * -1000 -- countdown is 4 beats long
