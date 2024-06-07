@@ -616,7 +616,6 @@ return {
 	setupCountdown = function(self, countNumVal, func)
 		local countNumVal = countNumVal or 4
 		if not storyMode and countNumVal == 4 then
-			print("Countdown is 4, but we're not in story mode. Skipping.")
 			-- strum spawning
 			for i = 1, 4 do
 				boyfriendArrows[i].alpha = 0
@@ -1238,18 +1237,18 @@ return {
 							end
 						end
 					end
-				end
 
-				if not success then
-					audio.playSound(sounds.miss[love.math.random(3)])
-
-					if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
-
-					if didHitNote then
-						score = math.max(0, score - 10)
+					if not success then
+						audio.playSound(sounds.miss[love.math.random(3)])
+	
+						if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
+	
+						if didHitNote then
+							score = math.max(0, score - 10)
+						end
+						health = health - (CONSTANTS.WEEKS.HEALTH.MISS_PENALTY or 0.2) * (healthLossMult or 1) * (boyfriendNote[1].healthLossMult or 1)
+						misses = misses + 1
 					end
-					health = health - (CONSTANTS.WEEKS.HEALTH.MISS_PENALTY or 0.2) * (healthLossMult or 1) * (boyfriendNote[1].healthLossMult or 1)
-					misses = misses + 1
 				end
 			end
 

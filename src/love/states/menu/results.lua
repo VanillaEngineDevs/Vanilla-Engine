@@ -26,6 +26,7 @@ local thePosEverX = 0
 local thePosEverY = {0}
 
 local function printResultsFont(x, y, text, scale)
+    local text = text or "UNDEFINED"
     -- remove anything that isn't in letterOrder. BUT KEEP SPACES
     text = text:gsub("[^" .. letterOrder .. " ]", "")
     for i = 1, #text do

@@ -111,13 +111,15 @@ function weeks.legacyGenerateNotes(self, chart)
             ::continue::
         end
 
-        for i, event in ipairs(chart.events) do
-            local time, eventData = event[1], event[2]
+        if chart.events then
+            for i, event in ipairs(chart.events) do
+                local time, eventData = event[1], event[2]
 
-            table.insert(modEvents, {
-                time = time,
-                events = eventData
-            })
+                table.insert(modEvents, {
+                    time = time,
+                    events = eventData
+                })
+            end
         end
 
         table.sort(modEvents, function(a, b) return a.time < b.time end)

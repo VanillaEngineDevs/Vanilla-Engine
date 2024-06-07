@@ -49,6 +49,7 @@ return {
                         else
                             note.alpha = 0.7
                         end
+                        note.shader:send("a", note.alpha)
 
                         if note:getAnimName() == "hold" or note:getAnimName() == "end" then
                             -- just remove it from boyfriendNotes[i]
@@ -77,6 +78,7 @@ return {
                         else
                             note.alpha = 0.7
                         end
+                        note.shader:send("a", note.alpha)
 
                         if note:getAnimName() == "hold" or note:getAnimName() == "end" then
                             -- just remove it from enemyNotes[i]

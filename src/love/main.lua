@@ -686,39 +686,39 @@ function love.draw()
 				end
 			push:finish()
 		else
-				graphics.setColor(1, 1, 1) -- Fade effect on
-				Gamestate.draw()
-				love.graphics.setColor(1, 1, 1) -- Fade effect off
-				love.graphics.setFont(font)
-				if status.getLoading() then
-					love.graphics.print("Loading...", graphics.getWidth() - 175, graphics.getHeight() - 50)
-				end
-				if volFade > 0  then
-					love.graphics.setColor(1, 1, 1, volFade)
-					fixVol = tonumber(string.format(
-						"%.1f  ",
-						(love.audio.getVolume())
-					))
-					love.graphics.setColor(0.5, 0.5, 0.5, volFade - 0.3)
+			graphics.setColor(1, 1, 1) -- Fade effect on
+			Gamestate.draw()
+			love.graphics.setColor(1, 1, 1) -- Fade effect off
+			love.graphics.setFont(font)
+			if status.getLoading() then
+				love.graphics.print("Loading...", graphics.getWidth() - 175, graphics.getHeight() - 50)
+			end
+			if volFade > 0  then
+				love.graphics.setColor(1, 1, 1, volFade)
+				fixVol = tonumber(string.format(
+					"%.1f  ",
+					(love.audio.getVolume())
+				))
+				love.graphics.setColor(0.5, 0.5, 0.5, volFade - 0.3)
 
-					love.graphics.rectangle("fill", 1110, 0, 170, 50)
+				love.graphics.rectangle("fill", 1110, 0, 170, 50)
 
-					love.graphics.setColor(1, 1, 1, volFade)
+				love.graphics.setColor(1, 1, 1, volFade)
 
-					if volTween then Timer.cancel(volTween) end
-					volTween = Timer.tween(
-						0.2, 
-						volumeWidth, 
-						{width = fixVol * 160},
-						"out-quad"
-					)
-					love.graphics.rectangle("fill", 1113, 10, volumeWidth.width, 30)
-					graphics.setColor(1, 1, 1, 1)
-				end
-				if fade.mesh then 
-					graphics.setColor(1,1,1)
-					love.graphics.draw(fade.mesh, 0, fade.y, 0, graphics.getWidth(), fade.height)
-				end
+				if volTween then Timer.cancel(volTween) end
+				volTween = Timer.tween(
+					0.2, 
+					volumeWidth, 
+					{width = fixVol * 160},
+					"out-quad"
+				)
+				love.graphics.rectangle("fill", 1113, 10, volumeWidth.width, 30)
+				graphics.setColor(1, 1, 1, 1)
+			end
+			if fade.mesh then 
+				graphics.setColor(1,1,1)
+				love.graphics.draw(fade.mesh, 0, fade.y, 0, graphics.getWidth(), fade.height)
+			end
 		end
 
 
