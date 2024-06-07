@@ -1248,7 +1248,7 @@ return {
 					if didHitNote then
 						score = math.max(0, score - 10)
 					end
-					health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult * boyfriendNote[1].healthLossMult
+					health = health - (CONSTANTS.WEEKS.HEALTH.MISS_PENALTY or 0.2) * (healthLossMult or 1) * (boyfriendNote[1].healthLossMult or 1)
 					misses = misses + 1
 				end
 			end
@@ -1431,7 +1431,7 @@ return {
 				love.graphics.push()
 					love.graphics.push()
 						for j = #enemyNotes[i], 1, -1 do
-							if enemyNotes[i][j].y <= 600 and enemyNotes[i][j].y >= -600 then
+							if enemyNotes[i][j].y+enemyNotes[i][j].offsetY2 <= 600 and enemyNotes[i][j].y+enemyNotes[i][j].offsetY2 >= -600 then
 								local animName = enemyNotes[i][j]:getAnimName()
 								if settings.middleScroll then
 									graphics.setColor(1, 1, 1, 0.8 * enemyNotes[i][j].alpha)
@@ -1454,9 +1454,9 @@ return {
 					love.graphics.pop()
 					love.graphics.push()
 						for j = #boyfriendNotes[i], 1, -1 do
-							if boyfriendNotes[i][j].y <= 600 and boyfriendNotes[i][j].y >= -600 then
+							if boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2 <= 600 and boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2 >= -600 then
 								local animName = boyfriendNotes[i][j]:getAnimName()
-								graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y)) / 75) * boyfriendNotes[i][j].alpha)
+								graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2)) / 75) * boyfriendNotes[i][j].alpha)
 
 								if pixel and not settings.pixelPerfect then
 									if not settings.downscroll then

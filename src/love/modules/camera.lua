@@ -19,17 +19,11 @@ camera.points = {}
 camera.mustHit = true
 
 function camera:moveToMain(time, x, y)
+    if camera.locked then return end
     if camTimer then 
         Timer.cancel(camTimer)
     end
     camTimer = Timer.tween(time, camera, {x = x, y = y}, "out-quad")
-end
-
-function camera:moveToExtra(time, x, y)
-    if camTimerE then 
-        Timer.cancel(camTimerE)
-    end
-    camTimerE = Timer.tween(time, camera, {ex = x, ey = y}, "out-quad")
 end
 
 function camera:reset()
@@ -57,6 +51,7 @@ function camera:addPoint(name, x, y)
 end
 
 function camera:moveToPoint(time, name, mustHit)
+    if camera.locked then return end
     if camTimer then 
         Timer.cancel(camTimer)
     end

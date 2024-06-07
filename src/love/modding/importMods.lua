@@ -24,6 +24,7 @@ function importMods.loadMod(mod) -- The file name of the mod
         local weeksList = love.filesystem.getDirectoryItems("mods/" .. mod .. "/weeks")
         for i, week in ipairs(weeksList) do
             local weekDataFile = require(("mods." .. mod .. ".weeks." .. week):gsub("/", "."):gsub(".lua", ""))
+            weekDataFile.modNum = #importMods.storedMods + 1
             table.insert(weekData, weekDataFile)
             table.insert(weekDesc, weekDataFile.description)
             table.insert(weekMeta, {
@@ -173,7 +174,7 @@ function importMods.loadAllMods()
 end
 
 function importMods.getCurrentMod()
-    return importMods.storedMods[weekNum - modWeekPlacement]
+    return importMods.storedMods[weekData[weekNum].modNum]
 end
 
 function importMods.setCurrentMod(mod)

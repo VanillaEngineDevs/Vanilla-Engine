@@ -37,10 +37,7 @@ end
 
 function Video:update(dt)
     self.time = self.time + dt
-    if self.time - self.lastFrameTime >= 1 / self.video:getFramerate() then
-        self.lastFrameTime = self.time
-        self:play(self.time)
-    end
+    self:play(self.time)
 end
 
 function Video:release()

@@ -120,6 +120,8 @@ function weeks.legacyGenerateNotes(self, chart)
             })
         end
 
+        table.sort(modEvents, function(a, b) return a.time < b.time end)
+
         local deltaSteps = section.lengthInSteps or 16
         totalSteps = totalSteps + deltaSteps
         totalPos = totalPos + ((60/bpm) * 1000 / 4) * deltaSteps
