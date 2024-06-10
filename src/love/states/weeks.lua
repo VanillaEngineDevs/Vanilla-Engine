@@ -374,33 +374,27 @@ return {
 		ratingPercent = 0.0
 		noteCounter = 0
 
-		if not pixel then
-			sprites.leftArrow = love.filesystem.load("sprites/left-arrow.lua")
-			sprites.downArrow = love.filesystem.load("sprites/down-arrow.lua")
-			sprites.upArrow = love.filesystem.load("sprites/up-arrow.lua")
-			sprites.rightArrow = love.filesystem.load("sprites/right-arrow.lua")
-
-			sprites.receptors = love.filesystem.load("sprites/receptor.lua")
-		else
-			sprites.leftArrow = love.filesystem.load("sprites/pixel/left-arrow.lua")
-			sprites.downArrow = love.filesystem.load("sprites/pixel/down-arrow.lua")
-			sprites.upArrow = love.filesystem.load("sprites/pixel/up-arrow.lua")
-			sprites.rightArrow = love.filesystem.load("sprites/pixel/right-arrow.lua")
-
-			sprites.receptors = love.filesystem.load("sprites/pixel/receptor.lua")
+		if not noteSprites then
+			self:setNoteSprites( -- the default sprites
+				love.filesystem.load("sprites/receptor.lua")(),
+				love.filesystem.load("sprites/left-arrow.lua")(),
+				love.filesystem.load("sprites/down-arrow.lua")(),
+				love.filesystem.load("sprites/up-arrow.lua")(),
+				love.filesystem.load("sprites/right-arrow.lua")()
+			)
 		end
 
 		enemyArrows = {
-			sprites.receptors(),
-			sprites.receptors(),
-			sprites.receptors(),
-			sprites.receptors()
+			noteSprites[5](),
+			noteSprites[5](),
+			noteSprites[5](),
+			noteSprites[5]()
 		}
 		boyfriendArrows= {
-			sprites.receptors(),
-			sprites.receptors(),
-			sprites.receptors(),
-			sprites.receptors()
+			noteSprites[5](),
+			noteSprites[5](),
+			noteSprites[5](),
+			noteSprites[5]()
 		}
 
 		for i = 1, 4 do
@@ -460,6 +454,16 @@ return {
 		HoldCover:setup()
 	end,
 
+	setNoteSprites = function(self, receptors, left, down, up, right)
+		noteSprites = {
+			left,
+			down,
+			up,
+			right,
+			receptors
+		}
+	end,
+
 	generateNotes = function(self, chart, metadata, difficulty)
 		local eventBpm
 		local chart = getFilePath(chart)
@@ -491,13 +495,6 @@ return {
 		end
 
 		if not bpm then bpm = 120 end
-
-		noteSprites = {
-			sprites.leftArrow,
-			sprites.downArrow,
-			sprites.upArrow,
-			sprites.rightArrow
-		}
 
 		local _speed = 1
 		if chartData.scrollSpeed[difficulty] then
@@ -1578,5 +1575,7 @@ return {
 		fakeBoyfriend = nil
 		importMods.removeScripts()
 		importMods.inMod = false
+
+		noteSprites = nil
 	end
 }

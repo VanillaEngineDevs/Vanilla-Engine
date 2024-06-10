@@ -1,5 +1,3 @@
--- REQUIRE THIS FILE AFTER ALL THE STATES. THIS FILE ADDS BACK DEPRECATED FUNCTIONS FROM THEM.
-
 function weeks.legacyGenerateNotes(self, chart)
     if importMods.inMod then
         importMods.setupScripts()
@@ -27,13 +25,6 @@ function weeks.legacyGenerateNotes(self, chart)
     else
         speed = settings.customScrollSpeed
     end
-
-    noteSprites = {
-        sprites.leftArrow,
-        sprites.downArrow,
-        sprites.upArrow,
-        sprites.rightArrow
-    }
 
     for _, section in ipairs(chart.notes) do
         local mustHitSection = section.mustHitSection or false
@@ -150,8 +141,6 @@ function weeks.legacyGenerateNotes(self, chart)
     end
 end
 
--- I gotta rename this file..,..,.
--- This file will just have spare functions,.,.
 function weeks.cneGenerateNotes(self, chart, metadata)
     if importMods.inMod then
         importMods.setupScripts()
@@ -170,13 +159,6 @@ function weeks.cneGenerateNotes(self, chart, metadata)
     else
         speed = settings.customScrollSpeed
     end
-
-    noteSprites = {
-        sprites.leftArrow,
-        sprites.downArrow,
-        sprites.upArrow,
-        sprites.rightArrow
-    }
     
     for _, strumline in ipairs(chart.strumLines) do
         -- strumline.visible, if its nil, set to true
