@@ -85,7 +85,11 @@ return {
 	newImage = function(image, optionsTable)
 		local pathStr = image
 		if not graphics.cache[pathStr] then 
-			graphics.cache[pathStr] = love.graphics.newImage(pathStr)
+			if love.filesystem.getInfo(pathStr) then
+				graphics.cache[pathStr] = love.graphics.newImage(pathStr)
+			else
+				graphics.cache[pathStr] = love.graphics.newImage("images/missing.png")
+			end
 		end
 		local image, width, height
 
@@ -187,6 +191,17 @@ return {
 
 	newSprite = function(imageData, frameData, animData, animName, loopAnim, optionsTable)
 		local sheet, sheetWidth, sheetHeight
+
+		if type(imageData) ~= "userdata" and type(imageData) == "string" then
+			if not graphics.cache[imageData] then 
+				if love.filesystem.getInfo(imageData) then
+					graphics.cache[imageData] = love.graphics.newImage(imageData)
+				else
+					graphics.cache[imageData] = love.graphics.newImage("images/missing.png")
+				end
+			end
+			imageData = graphics.cache[imageData]
+		end
 
 		local frames = {}
 		local frame
@@ -520,6 +535,7 @@ return {
 							height = frameData[self.curFrame].offsetY
 						end
 					else
+						-- erm... what the sigma?
 						if not frameData[self.curFrame].rotated then
 							if frameData[self.curFrame].offsetWidth == 0 then
 								width = math.floor(frameData[self.curFrame].width / 2)
