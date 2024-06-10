@@ -376,11 +376,11 @@ return {
 
 		if not noteSprites then
 			self:setNoteSprites( -- the default sprites
-				love.filesystem.load("sprites/receptor.lua")(),
-				love.filesystem.load("sprites/left-arrow.lua")(),
-				love.filesystem.load("sprites/down-arrow.lua")(),
-				love.filesystem.load("sprites/up-arrow.lua")(),
-				love.filesystem.load("sprites/right-arrow.lua")()
+				love.filesystem.load("sprites/receptor.lua"),
+				love.filesystem.load("sprites/left-arrow.lua"),
+				love.filesystem.load("sprites/down-arrow.lua"),
+				love.filesystem.load("sprites/up-arrow.lua"),
+				love.filesystem.load("sprites/right-arrow.lua")
 			)
 		end
 

@@ -48,8 +48,8 @@ return {
 			voicesEnemy = love.audio.newSource("songs/high/Voices-mom" .. (erectMode and "-car-erect" or "") .. ".ogg", "stream")
 		else
 			inst = love.audio.newSource("songs/satin-panties/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/satin-panties/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/satin-panties/Voices-mom" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/satin-panties/Voices-bf" .. (erectMode and "-car-erect" or "") .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/satin-panties/Voices-mom" .. (erectMode and "-car-erect" or "") .. ".ogg", "stream")
 		end
 
 		self:initUI()

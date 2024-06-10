@@ -380,6 +380,7 @@ function love.load()
 				"M.I.L.F"
 			},
 			{
+				"Satin Panties",
 				"High"
 			}
 		},
@@ -389,6 +390,9 @@ function love.load()
 				"Cocoa",
 				"Eggnog",
 				"Winter Horrorland"
+			},
+			{
+				"Eggnog"
 			}
 		},
 		{
