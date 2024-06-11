@@ -375,13 +375,23 @@ return {
 		noteCounter = 0
 
 		if not noteSprites then
-			self:setNoteSprites( -- the default sprites
-				love.filesystem.load("sprites/receptor.lua"),
-				love.filesystem.load("sprites/left-arrow.lua"),
-				love.filesystem.load("sprites/down-arrow.lua"),
-				love.filesystem.load("sprites/up-arrow.lua"),
-				love.filesystem.load("sprites/right-arrow.lua")
-			)
+			if not pixel then
+				self:setNoteSprites( -- the default sprites
+					love.filesystem.load("sprites/receptor.lua"),
+					love.filesystem.load("sprites/left-arrow.lua"),
+					love.filesystem.load("sprites/down-arrow.lua"),
+					love.filesystem.load("sprites/up-arrow.lua"),
+					love.filesystem.load("sprites/right-arrow.lua")
+				)
+			else
+				self:setNoteSprites( -- the pixel sprites
+					love.filesystem.load("sprites/pixel/receptor.lua"),
+					love.filesystem.load("sprites/pixel/left-arrow.lua"),
+					love.filesystem.load("sprites/pixel/down-arrow.lua"),
+					love.filesystem.load("sprites/pixel/up-arrow.lua"),
+					love.filesystem.load("sprites/pixel/right-arrow.lua")
+				)
+			end
 		end
 
 		enemyArrows = {
@@ -1577,5 +1587,7 @@ return {
 		importMods.inMod = false
 
 		noteSprites = nil
+
+		camera.defaultZoom = 1
 	end
 }
