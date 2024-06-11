@@ -269,6 +269,7 @@ function love.load()
 	menuSettings = require "states.menu.options.OptionsState"
 	menuCredits = require "states.menu.menuCredits"
 	menuSelect = require "states.menu.menuSelect"
+	menuMods = require "states.menu.menuMods"
 	resultsScreen = require "states.menu.results"
 
 	firstStartup = true
@@ -614,6 +615,10 @@ function love.mousemoved(x, y, dx, dy, istouch)
 	if capturedScreenshot.img then
 		capturedScreenshot.hovered = x > capturedScreenshot.x and x < capturedScreenshot.x + 320 and y > capturedScreenshot.y and y < capturedScreenshot.y + 180
 	end
+end
+
+function love.wheelmoved(x, y)
+	Gamestate.wheelmoved(x, y)
 end
 
 function love.touchpressed(id, x, y, dx, dy, pressure)

@@ -35,10 +35,10 @@ return {
 		screenWidth, screenHeight = width, height
 	end,
 	getWidth = function()
-		return screenWidth or love.graphics.getWidth()
+		return 1280 or love.graphics.getWidth()
 	end,
 	getHeight = function()
-		return screenHeight or love.graphics.getHeight()
+		return 720 or love.graphics.getHeight()
 	end,
 
 	cache = {},

@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 return graphics.newSprite(
 	Alphabet.image,
         	-- Automatically generated from alphabet.xml
