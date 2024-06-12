@@ -671,9 +671,11 @@ return {
 		musicThres = 0
 
 		countingDown = true
-		if girlfriend then girlfriend:beat(countNumVal) end
-		if boyfriend then boyfriend:beat(countNumVal) end
-		if enemy then enemy:beat(countNumVal) end
+		if countNumVal % 2 == 1 then
+			if girlfriend then girlfriend:beat(countNumVal) end
+			if boyfriend then boyfriend:beat(countNumVal) end
+			if enemy then enemy:beat(countNumVal) end
+		end
 		if CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[countNumVal] then audio.playSound(sounds.countdown[CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[countNumVal]]) end
 		if countNumVal == 4 then 
 			countdownFade[1] = 0
