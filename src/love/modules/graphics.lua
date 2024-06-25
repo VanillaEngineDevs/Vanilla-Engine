@@ -366,10 +366,6 @@ return {
 					end
 				end
 
-				if self.updateShaderAlpha then
-					self.shader:send("a", self.alpha)
-				end
-
 				self.holdTimer = self.holdTimer + dt
 
 				if self.specialAnim then 

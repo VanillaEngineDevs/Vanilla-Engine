@@ -1,10 +1,9 @@
 extern vec3 r;
 extern vec3 g;
 extern vec3 b;
-extern float a = 1.0;
 extern float mult = 1.0;
 
-vec4 effect(vec4 _, Image texture, vec2 texture_coords, vec2 screen_coords)
+vec4 effect(vec4 color2, Image texture, vec2 texture_coords, vec2 screen_coords)
 {
     vec4 color = Texel(texture, texture_coords);
 
@@ -14,7 +13,7 @@ vec4 effect(vec4 _, Image texture, vec2 texture_coords, vec2 screen_coords)
 
     vec4 newColor = color;
     newColor.rgb = min(color.r * r + color.g * g + color.b * b, vec3(1.0));
-    newColor.a = color.a * a;
+    newColor.a = color.a * color2.a;
 
     color = mix(color, newColor, mult);
 
