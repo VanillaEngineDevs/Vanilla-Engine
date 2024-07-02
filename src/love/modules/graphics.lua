@@ -112,6 +112,7 @@ return {
 			scrollY = 1,
 
 			visible = true,
+			alpha = 1,
 
 			setImage = function(self, image)
 				image = image
@@ -131,6 +132,10 @@ return {
 				return height
 			end,
 
+			setScale = function(self, scale)
+				self.sizeX, self.sizeY = scale, scale
+			end,
+
 			draw = function(self)
 				local x = self.x
 				local y = self.y
@@ -139,6 +144,9 @@ return {
 					x = math.floor(x)
 					y = math.floor(y)
 				end
+
+				local lastColor = {love.graphics.getColor()}
+				graphics.setColor(lastColor[1], lastColor[2], lastColor[3], lastColor[4] * self.alpha)
 
 				if self.visible then
 					love.graphics.draw(
@@ -154,6 +162,8 @@ return {
 						self.shearY
 					)
 				end
+
+				love.graphics.setColor(lastColor[1], lastColor[2], lastColor[3])
 			end,
 
 			udraw = function(self, sx, sy)
@@ -167,18 +177,25 @@ return {
 					y = math.floor(y)
 				end
 
-				love.graphics.draw(
-					image,
-					self.x,
-					self.y,
-					self.orientation,
-					sx,
-					sy,
-					math.floor(width / 2) + self.offsetX,
-					math.floor(height / 2) + self.offsetY,
-					self.shearX,
-					self.shearY
-				)
+				local lastColor = {love.graphics.getColor()}
+				graphics.setColor(lastColor[1], lastColor[2], lastColor[3], lastColor[4] * self.alpha)
+
+				if self.visible then
+					love.graphics.draw(
+						image,
+						self.x,
+						self.y,
+						self.orientation,
+						sx,
+						sy,
+						math.floor(width / 2) + self.offsetX,
+						math.floor(height / 2) + self.offsetY,
+						self.shearX,
+						self.shearY
+					)
+				end
+
+				love.graphics.setColor(lastColor[1], lastColor[2], lastColor[3])
 			end
 		}
 

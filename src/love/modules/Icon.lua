@@ -1,6 +1,6 @@
 return {
     imagePath = function(path)
-        return graphics.imagePath("icons/icon-" .. path)
+        return graphics.imagePath("icons/icon-" .. (path or "bf"))
     end,
     newIcon = function(path, scale)
         if not graphics.cache[path] then

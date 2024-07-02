@@ -808,7 +808,7 @@ return {
 
 		for i, event in ipairs(songEvents) do
 			if event.time <= absMusicTime then
-				if event.name == "FocusCamera" then
+				if event.name == "FocusCamera" and camera.lockedMoving then
 					if type(event.value) == "number" then
 						if event.value == 0 then -- Boyfriend
 							camera:moveToPoint(1.25, "boyfriend")

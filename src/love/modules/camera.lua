@@ -8,6 +8,7 @@ camera.zooming = true
 camera.locked = false
 camera.camBopIntensity = 1
 camera.camBopInterval = 4
+camera.lockedMoving = false
 
 camera.esizeX = 1
 camera.esizeY = 1
