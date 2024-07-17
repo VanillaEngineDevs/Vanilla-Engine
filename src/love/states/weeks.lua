@@ -808,7 +808,7 @@ return {
 
 		for i, event in ipairs(songEvents) do
 			if event.time <= absMusicTime then
-				if event.name == "FocusCamera" and camera.lockedMoving then
+				if event.name == "FocusCamera" and not camera.lockedMoving then
 					if type(event.value) == "number" then
 						if event.value == 0 then -- Boyfriend
 							camera:moveToPoint(1.25, "boyfriend")
@@ -1528,7 +1528,7 @@ return {
 			love.graphics.translate(uiCam.x, uiCam.y)
 			love.graphics.push()
 				graphics.setColor(0,0,0,settings.scrollUnderlayTrans)
-				local baseX = boyfriendArrows[1].x - (boyfriendArrows[1]:getFrameWidth(CONSTANTS.WEEKS.NOTE_LIST[i])/2) * (pixel and 8 or 0) + (pixel and -15 or 0)
+				local baseX = boyfriendArrows[1].x - (boyfriendArrows[1]:getFrameWidth(CONSTANTS.WEEKS.NOTE_LIST[1])/2) * (pixel and 8 or 0) + (pixel and -15 or 0)
 				local scrollWidth = 0
 				-- determine the scrollWidth with the first 4 arrows
 				for i = 1, 4 do
