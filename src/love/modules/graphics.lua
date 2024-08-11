@@ -954,6 +954,7 @@ function graphics:doStickerTrans(func)
 end
 
 function graphics:drawStickers()
+	if not self.stickerGroup then return end 
 	self.stickerGroup:draw()
 end
 
