@@ -497,6 +497,8 @@ function love.load()
 		importMods.loadAllMods()
 	end
 
+	--[[ graphics:initStickerData() ]]
+
 	Gamestate.switch(menu)
 
 	love.setFpsCap(settings.fpsCap)
@@ -693,6 +695,7 @@ function love.draw()
 					graphics.setColor(1,1,1)
 					love.graphics.draw(fade.mesh, 0, fade.y, 0, push:getWidth(), fade.height)
 				end
+				graphics:drawStickers()
 			push:finish()
 		else
 			graphics.setColor(1, 1, 1) -- Fade effect on
@@ -728,6 +731,7 @@ function love.draw()
 				graphics.setColor(1,1,1)
 				love.graphics.draw(fade.mesh, 0, fade.y, 0, graphics.getWidth(), fade.height)
 			end
+			graphics:drawStickers()
 		end
 
 

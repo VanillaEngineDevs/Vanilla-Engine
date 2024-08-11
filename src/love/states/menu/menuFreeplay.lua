@@ -178,7 +178,7 @@ return {
             if menuNum == 2 then
                 status.setLoading(true)
     
-                graphics:fadeOutWipe(
+                graphics:doStickerTrans(
                     0.7,
                     function()
                         songAppend = allWeeks[weekNum].songs[songNum].diffs[songDifficulty][1]
