@@ -477,6 +477,7 @@ return {
 	generateNotes = function(self, chart, metadata, difficulty)
 		local eventBpm
 		local chart = getFilePath(chart)
+		local metadata = getFilePath(metadata)
 		if importMods.inMod then
 			importMods.setupScripts()
 		end
