@@ -237,7 +237,7 @@ return {
             stageImages["abot"]:draw()
             girlfriend:draw()
             enemy:draw()
-            boyfriend:draw()
+            --boyfriend:draw()
             stageImages["spraycanPile"]:draw()
 		love.graphics.pop()
     end,

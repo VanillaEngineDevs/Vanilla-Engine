@@ -23,6 +23,7 @@ function WEEKEND1_getNextCanWithState(state)
 	end
 end ]]
 local lastSaveDataBool = false
+local alternates = {false, false}
 
 return {
 	enter = function(self, from, songNum, songAppend, isErect)
@@ -59,6 +60,8 @@ return {
 			voicesEnemy = nil
 			rainShaderStartIntensity = 0.2
 			rainShaderEndIntensity = 0.4
+			enemy = love.filesystem.load("sprites/characters/darnell-fighting.lua")()
+			enemy.x = 350
 		elseif song == 3 then
 			inst = love.audio.newSource("songs/2hot/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 			if curOS ~= "NX" then
@@ -148,18 +151,97 @@ return {
 	onNoteHit = function(self, character, noteType, rating, id) 
 		-- rating is "EnemyHit" when an enemy hits it. Can be used to determine if the player hit it or the enemy hit it when needed
 		-- Return "true" to not play ANY animations, return "false" or nothing to play the default animations
+		if not util.startsWith(noteType or "", "weekend-1-") then return false end
+
 		if rating == "EnemyHit" then
 			if noteType == "weekend-1-lightcan" then
 				character:animate("light-can")
-				return true
 			elseif noteType == "wekend-1-kickcan" then
 				character:animate("kick-can")
-				return true
 			elseif noteType == "weekend-1-kneecan" then
 				character:animate("knee-forward")
-				return true
 			end
+		else
+
 		end
+
+		-- blazin
+		if noteType == "weekend-1-blockhigh" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+		elseif noteType == "weekend-1-blocklow" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+		elseif noteType == "weekend-1-blockspin" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+
+		elseif noteType == "weekend-1-punchlow" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+		elseif noteType == "weekend-1-punchlowblocked" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+		elseif noteType == "weekend-1-punchlowdodged" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+		elseif noteType == "weekend-1-punchlowspin" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+
+		elseif noteType == "weekend-1-punchhigh" then
+			enemy:animate("hit high")
+		elseif noteType == "weekend-1-punchhighblocked" then
+			enemy:animate("blocking")
+		elseif noteType == "weekend-1-punchhighdodged" then
+			enemy:animate("dodge")
+		elseif noteType == "weekend-1-punchhighspin" then
+			enemy:animate("spin")
+
+		elseif noteType == "weekend-1-dodgehigh" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+		elseif noteType == "weekend-1-dodgelow" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+		elseif noteType == "weekend-1-dodgespin" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+
+		elseif noteType == "weekend-1-hithigh" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+		elseif noteType == "weekend-1-hitlow" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+
+		elseif noteType == "weekend-1-hitspin" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+		elseif noteType == "weekend-1-picouppercutprep" then
+			alternates[1] = not alternates[1]
+			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+		elseif noteType == "weekend-1-picouppercut" then
+			
+
+		elseif noteType == "weekend-1-darnelluppercutprep" then
+			alternates[1] = not alternates[1]
+			enemy:animate("pre-uppercut")
+		elseif noteType == "weekend-1-darnelluppercut" then
+			enemy:animate("uppercut")
+		elseif noteType == "weekend-1-idle" then
+			enemy:animate("idle")
+		elseif noteType == "weekend-1-fakeout" then
+			enemy:animate("fake out")
+		elseif noteType == "weekend-1-taunt" then
+			enemy:animate("cringe")
+		elseif noteType == "weekend-1-tauntforce" then
+			enemy:animate("pissed")
+		elseif noteType == "weekend-1-reversefakeout" then
+			enemy:animate("fake out")
+		end
+
+		return true
 	end,
 
 	update = function(self, dt)

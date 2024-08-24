@@ -91,6 +91,8 @@ return {
 		sprite = spriteData()
 		overlaySprite = spriteData()
 
+		print(spritePath, spriteData, overlaySprite, sprite)
+
 		spriteAnims = {}
 		for i, _ in pairs(sprite.getAnims()) do
 			table.insert(spriteAnims, i)
