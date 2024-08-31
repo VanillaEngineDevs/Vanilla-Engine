@@ -341,10 +341,10 @@ Sprite.play = Sprite.animate -- Incase users wan't to use a function more haxefl
 function Sprite:screenCenter(ax)
     if ax == nil then ax = "xy" end
     if ax:find("x") then
-        self.x = (love.graphics.getWidth() - self.width) / 2
+        self.x = (1280 - self.width) / 2
     end
     if ax:find("y") then
-        self.y = (love.graphics.getHeight() - self.height) / 2
+        self.y = (720 - self.height) / 2
     end
     return self
 end
