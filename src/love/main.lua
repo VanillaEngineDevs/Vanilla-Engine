@@ -273,6 +273,7 @@ function love.load()
 	menuSettings = require "states.menu.options.OptionsState"
 	menuCredits = require "states.menu.menuCredits"
 	menuSelect = require "states.menu.menuSelect"
+	menuMods = require "states.menu.menuMods"
 	resultsScreen = require "states.menu.results"
 
 	firstStartup = true
@@ -384,6 +385,7 @@ function love.load()
 				"M.I.L.F"
 			},
 			{
+				"Satin Panties",
 				"High"
 			}
 		},
@@ -393,6 +395,9 @@ function love.load()
 				"Cocoa",
 				"Eggnog",
 				"Winter Horrorland"
+			},
+			{
+				"Eggnog"
 			}
 		},
 		{
@@ -495,6 +500,8 @@ function love.load()
 		importMods.setup()
 		importMods.loadAllMods()
 	end
+
+	--[[ graphics:initStickerData() ]]
 
 	Gamestate.switch(menu)
 
@@ -616,6 +623,10 @@ function love.mousemoved(x, y, dx, dy, istouch)
 	end
 end
 
+function love.wheelmoved(x, y)
+	Gamestate.wheelmoved(x, y)
+end
+
 function love.touchpressed(id, x, y, dx, dy, pressure)
 	Gamestate.touchpressed(id, x, y, dx, dy, pressure)
 end
@@ -688,6 +699,7 @@ function love.draw()
 					graphics.setColor(1,1,1)
 					love.graphics.draw(fade.mesh, 0, fade.y, 0, push:getWidth(), fade.height)
 				end
+				graphics:drawStickers()
 			push:finish()
 		else
 			graphics.setColor(1, 1, 1) -- Fade effect on
@@ -723,6 +735,7 @@ function love.draw()
 				graphics.setColor(1,1,1)
 				love.graphics.draw(fade.mesh, 0, fade.y, 0, graphics.getWidth(), fade.height)
 			end
+			graphics:drawStickers()
 		end
 
 

@@ -3,7 +3,8 @@
         "love"
     ],
     "Lua.diagnostics.disable": [
-        "redundant-parameter"
+        "redundant-parameter",
+        "missing-parameter"
     ],
     "Lua.runtime.version": "LuaJIT",
     "Lua.runtime.special": [],

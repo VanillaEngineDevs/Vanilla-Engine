@@ -66,7 +66,7 @@ return {
 			voicesEnemy = love.audio.newSource("songs/winter-horrorland/Voices-monster" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/eggnog/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/eggnog/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/eggnog/Voices-bf" .. (erectMode and "-christmas-erect" or "") .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/eggnog/Voices-parents-christmas" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
 		else
 			inst = love.audio.newSource("songs/cocoa/Inst.ogg", "stream")

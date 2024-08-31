@@ -1,6 +1,7 @@
 local importMods = {}
 importMods.storedMods = {}
 importMods.storedModsScripts = {}
+importMods.storedModsIncludingDisabled = {}
 importMods.inMod = false
 importMods.uiHealthbarMod = nil
 importMods.uiHealthbarTextMod = nil
@@ -77,6 +78,17 @@ function importMods.loadMod(mod) -- The file name of the mod
     })
 end
 
+function importMods.loadModToAllModsIncludingDisabled(modMeta, path)
+    table.insert(importMods.storedModsIncludingDisabled, {
+        name = modMeta.name,
+        description = modMeta.description,
+        enabled = modMeta.enabled,
+        creator = modMeta.creator,
+        path = path
+    })
+end
+
+
 function importMods.getAllModsStages()
     local stagesList = {}
     for i, mod in ipairs(importMods.storedMods) do
@@ -91,6 +103,18 @@ function importMods.getAllModsStages()
         end
     end
     return stagesList
+end
+
+function importMods.getAllMods()
+    local modsList = {}
+    for i, mod in ipairs(importMods.storedModsIncludingDisabled) do
+        table.insert(modsList, mod)
+    end
+    return modsList
+end
+
+function importMods.getModFromIndex(index)
+    return importMods.storedModsIncludingDisabled[index]
 end
 
 function importMods.getStageFileFromName(name)
@@ -167,8 +191,10 @@ function importMods.loadAllMods()
         if love.filesystem.getInfo("mods/" .. mod .. "/meta.lua") then
             local meta = love.filesystem.load("mods/" .. mod .. "/meta.lua")()
             if meta.enabled == nil or meta.enabled then
+                print("Loading mod: " .. mod)
                 importMods.loadMod(mod)
             end
+            importMods.loadModToAllModsIncludingDisabled(meta, "mods/" .. mod)
         end
     end
 end
@@ -194,6 +220,37 @@ function importMods.getModFromStage(fileName)
         end
     end
     return nil
+end
+
+function importMods.rewriteAllMetas(newModMetas)
+    for i, mod in ipairs(importMods.storedModsIncludingDisabled) do
+        mod.name = newModMetas[i].name
+        mod.description = newModMetas[i].description
+        mod.enabled = newModMetas[i].enabled
+        mod.creator = newModMetas[i].creator
+
+        love.filesystem.write(mod.path .. "/meta.lua", [[
+return {
+    enabled = ]] .. tostring(mod.enabled) .. [[,
+    name = "]] .. mod.name .. [[",
+    creator = "]] .. mod.creator .. [[",
+    description = "]] .. mod.description .. [["
+}
+        ]])
+    end
+end
+
+function importMods.reloadAllMods()
+    importMods.storedMods = {}
+    importMods.storedModsScripts = {}
+    importMods.storedModsIncludingDisabled = {}
+    -- update weekMeta, weekDesc, and weekData to remove all mods past modWeekPlacement
+    for i = #weekMeta, modWeekPlacement + 1, -1 do
+        table.remove(weekMeta, i)
+        table.remove(weekDesc, i)
+        table.remove(weekData, i)
+    end
+    importMods.loadAllMods()
 end
 
 function loadLuaFile(path)

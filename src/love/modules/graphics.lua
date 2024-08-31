@@ -30,15 +30,15 @@ local fadeTimer
 
 local screenWidth, screenHeight
 
-return {
+local graphics = {
 	screenBase = function(width, height)
 		screenWidth, screenHeight = width, height
 	end,
 	getWidth = function()
-		return screenWidth or love.graphics.getWidth()
+		return 1280 or love.graphics.getWidth()
 	end,
 	getHeight = function()
-		return screenHeight or love.graphics.getHeight()
+		return 720 or love.graphics.getHeight()
 	end,
 
 	cache = {},
@@ -112,6 +112,7 @@ return {
 			scrollY = 1,
 
 			visible = true,
+			alpha = 1,
 
 			setImage = function(self, image)
 				image = image
@@ -131,6 +132,10 @@ return {
 				return height
 			end,
 
+			setScale = function(self, scale)
+				self.sizeX, self.sizeY = scale, scale
+			end,
+
 			draw = function(self)
 				local x = self.x
 				local y = self.y
@@ -139,6 +144,9 @@ return {
 					x = math.floor(x)
 					y = math.floor(y)
 				end
+
+				local lastColor = {love.graphics.getColor()}
+				graphics.setColor(lastColor[1], lastColor[2], lastColor[3], lastColor[4] * self.alpha)
 
 				if self.visible then
 					love.graphics.draw(
@@ -154,6 +162,8 @@ return {
 						self.shearY
 					)
 				end
+
+				love.graphics.setColor(lastColor[1], lastColor[2], lastColor[3])
 			end,
 
 			udraw = function(self, sx, sy)
@@ -167,18 +177,25 @@ return {
 					y = math.floor(y)
 				end
 
-				love.graphics.draw(
-					image,
-					self.x,
-					self.y,
-					self.orientation,
-					sx,
-					sy,
-					math.floor(width / 2) + self.offsetX,
-					math.floor(height / 2) + self.offsetY,
-					self.shearX,
-					self.shearY
-				)
+				local lastColor = {love.graphics.getColor()}
+				graphics.setColor(lastColor[1], lastColor[2], lastColor[3], lastColor[4] * self.alpha)
+
+				if self.visible then
+					love.graphics.draw(
+						image,
+						self.x,
+						self.y,
+						self.orientation,
+						sx,
+						sy,
+						math.floor(width / 2) + self.offsetX,
+						math.floor(height / 2) + self.offsetY,
+						self.shearX,
+						self.shearY
+					)
+				end
+
+				love.graphics.setColor(lastColor[1], lastColor[2], lastColor[3])
 			end
 		}
 
@@ -366,10 +383,6 @@ return {
 					end
 				end
 
-				if self.updateShaderAlpha then
-					self.shader:send("a", self.alpha)
-				end
-
 				self.holdTimer = self.holdTimer + dt
 
 				if self.specialAnim then 
@@ -480,9 +493,9 @@ return {
 							if (not self:isAnimated() and util.startsWith(self:getAnimName(), "sing")) or (self:getAnimName() == "danceLeft" or self:getAnimName() == "danceRight" or (not self:isAnimated() and self:getAnimName() == "sad")) then
 								self.danced = not self.danced
 								if not self.danced then
-									self:animate("danceLeft", false)
-								else
 									self:animate("danceRight", false)
+								else
+									self:animate("danceLeft", false)
 								end	
 							end
 						end
@@ -854,3 +867,95 @@ return {
 		return r / fade, g / fade, b / fade, a
 	end
 }
+
+function graphics:initStickerData()
+	self.stickerGroup = Group()
+	self.stickerInfo = json.decode(love.filesystem.read("data/stickers/stickers-set1.json"))
+	self.unnamedIndexStickers = {}
+	for _, BALLS in pairs(self.stickerInfo.stickers) do
+		table.insert(self.unnamedIndexStickers, BALLS)
+	end
+
+	self.stickerSoundsPaths = love.filesystem.getDirectoryItems("sounds/stickers/keys/")
+	self.allStickerSounds = {}
+
+	for i, _ in ipairs(self.stickerSoundsPaths) do
+		table.insert(self.allStickerSounds, love.audio.newSource("sounds/stickers/keys/" .. self.stickerSoundsPaths[i], "stream"))
+	end
+end
+
+function graphics:newSticker(stickerName)
+	local s = self.newImage(graphics.imagePath("stickers/" .. stickerName))
+	s.timing = 0
+
+	return s
+end
+
+function graphics:doStickerTrans(func)
+	isFading = true
+	self.stickerGroup:clear()
+
+	local xPos = -25
+	local yPos = -25
+	while xPos <= push:getWidth() do
+		local rndStickerPack = self.unnamedIndexStickers[love.math.random(1, #self.unnamedIndexStickers)]
+		
+		local sticker = self:newSticker(rndStickerPack[love.math.random(1, #rndStickerPack)])
+		sticker.visible = false
+
+		sticker.x, sticker.y = xPos, yPos
+
+		xPos = xPos + sticker:getWidth()/3
+
+		if xPos >= push:getWidth() then
+			if yPos <= push:getHeight() then
+				xPos = -25
+				yPos = yPos + love.math.random(70, 120)
+			end
+		end
+
+		sticker.orientation = math.rad(love.math.random(-60, 70))
+
+
+		self.stickerGroup:add(sticker)
+	end
+
+	table.shuffle(self.stickerGroup.members)
+	print(#self.stickerGroup.members)
+
+	for i, sticker in ipairs(self.stickerGroup.members) do
+		sticker.timing = math.remap(i, 0, #self.stickerGroup.members, 0, 0.9)
+
+		Timer.after(sticker.timing, function()
+			sticker.visible = true
+			local daSound = self.allStickerSounds[love.math.random(1, #self.allStickerSounds)]
+			daSound:play()
+
+			func()
+
+			Timer.after(sticker.timing, function()
+				sticker.visible = false
+				local daSound = self.allStickerSounds[love.math.random(1, #self.allStickerSounds)]
+				daSound:play()
+				if i == #self.stickerGroup.members then
+					isFading = false
+				end
+			end)
+		end)
+	end
+
+	table.sort(self.stickerGroup.members, function(a, b)
+		return a.timing < b.timing
+	end)
+
+	local last = self.stickerGroup.members[#self.stickerGroup.members]
+	last.angle = 0
+	last.x, last.y = push:getWidth()/2, push:getHeight()/2
+end
+
+function graphics:drawStickers()
+	if not self.stickerGroup then return end 
+	self.stickerGroup:draw()
+end
+
+return graphics

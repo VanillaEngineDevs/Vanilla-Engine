@@ -87,12 +87,22 @@ function table.mergeValues(t1, t2)
     return t1
 end
 
+function table.shuffle(tbl)
+    for i = #tbl, 2, -1 do
+        local j = love.math.random(i)
+        tbl[i], tbl[j] = tbl[j], tbl[i]
+    end
+
+    return tbl
+end
+
 function util.tryExcept(try, except)
     local status, err = pcall(try)
     if not status and except then
         except(err)
     end
 end
+
 
 -- God like coding
 --[[

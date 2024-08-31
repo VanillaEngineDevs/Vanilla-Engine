@@ -216,6 +216,7 @@ return {
 					else
 						importMods.setCurrentMod(importMods.getModFromStage(fileStr))
 						curStage = importMods.getStageFileFromName(fileStr)()
+						importMods.inMod = true
 					end
                     curStage:enter()
 					if not camera.points["enemy"] then camera:addPoint("enemy", -boyfriend.x + 100, -boyfriend.y + 75) end

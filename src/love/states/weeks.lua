@@ -379,13 +379,23 @@ end
 		noteCounter = 0
 
 		if not noteSprites then
-			self:setNoteSprites( -- the default sprites
-				love.filesystem.load("sprites/receptor.lua"),
-				love.filesystem.load("sprites/left-arrow.lua"),
-				love.filesystem.load("sprites/down-arrow.lua"),
-				love.filesystem.load("sprites/up-arrow.lua"),
-				love.filesystem.load("sprites/right-arrow.lua")
-			)
+			if not pixel then
+				self:setNoteSprites( -- the default sprites
+					love.filesystem.load("sprites/receptor.lua"),
+					love.filesystem.load("sprites/left-arrow.lua"),
+					love.filesystem.load("sprites/down-arrow.lua"),
+					love.filesystem.load("sprites/up-arrow.lua"),
+					love.filesystem.load("sprites/right-arrow.lua")
+				)
+			else
+				self:setNoteSprites( -- the pixel sprites
+					love.filesystem.load("sprites/pixel/receptor.lua"),
+					love.filesystem.load("sprites/pixel/left-arrow.lua"),
+					love.filesystem.load("sprites/pixel/down-arrow.lua"),
+					love.filesystem.load("sprites/pixel/up-arrow.lua"),
+					love.filesystem.load("sprites/pixel/right-arrow.lua")
+				)
+			end
 		end
 
 		enemyArrows = {
@@ -471,6 +481,7 @@ end
 	generateNotes = function(self, chart, metadata, difficulty)
 		local eventBpm
 		local chart = getFilePath(chart)
+		local metadata = getFilePath(metadata)
 		if importMods.inMod then
 			importMods.setupScripts()
 		end
@@ -669,9 +680,11 @@ end
 		musicThres = 0
 
 		countingDown = true
-		if girlfriend then girlfriend:beat(countNumVal) end
-		if boyfriend then boyfriend:beat(countNumVal) end
-		if enemy then enemy:beat(countNumVal) end
+		if countNumVal % 2 == 1 then
+			if girlfriend then girlfriend:beat(countNumVal) end
+			if boyfriend then boyfriend:beat(countNumVal) end
+			if enemy then enemy:beat(countNumVal) end
+		end
 		if CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[countNumVal] then audio.playSound(sounds.countdown[CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[countNumVal]]) end
 		if countNumVal == 4 then 
 			countdownFade[1] = 0
@@ -804,7 +817,7 @@ end
 
 		for i, event in ipairs(songEvents) do
 			if event.time <= absMusicTime then
-				if event.name == "FocusCamera" then
+				if event.name == "FocusCamera" and not camera.lockedMoving then
 					if type(event.value) == "number" then
 						if event.value == 0 then -- Boyfriend
 							camera:moveToPoint(1.25, "boyfriend")
@@ -1524,7 +1537,7 @@ end
 			love.graphics.translate(uiCam.x, uiCam.y)
 			love.graphics.push()
 				graphics.setColor(0,0,0,settings.scrollUnderlayTrans)
-				local baseX = boyfriendArrows[1].x - (boyfriendArrows[1]:getFrameWidth(CONSTANTS.WEEKS.NOTE_LIST[i])/2) * (pixel and 8 or 0) + (pixel and -15 or 0)
+				local baseX = boyfriendArrows[1].x - (boyfriendArrows[1]:getFrameWidth(CONSTANTS.WEEKS.NOTE_LIST[1])/2) * (pixel and 8 or 0) + (pixel and -15 or 0)
 				local scrollWidth = 0
 				-- determine the scrollWidth with the first 4 arrows
 				for i = 1, 4 do
@@ -1585,5 +1598,7 @@ end
 		importMods.inMod = false
 
 		noteSprites = nil
+
+		camera.defaultZoom = 1
 	end
 }

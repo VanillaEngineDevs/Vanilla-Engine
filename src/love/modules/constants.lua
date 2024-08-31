@@ -35,6 +35,8 @@ for i, v in ipairs(CONSTANTS.RAW_ARROW_COLORS) do
     }
 end
 
+CONSTANTS.MS_PER_SEC = 1000
+
 CONSTANTS.WEEKS = {
     STRUM_Y = -400,
     STRUM_X_OFFSET = 0,

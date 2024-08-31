@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
-
-
 return {
     enter = function()
         stageImages = {
@@ -92,11 +90,10 @@ return {
 			love.graphics.translate(camera.x * 1.1, camera.y * 1.1)
 
             stageImages["foreground"]:draw()
-            
+ 
             girlfriend:draw()
 
             enemy:draw()
-            boyfriend:draw()
 
             stageImages["spraycanPile"]:draw()
 		love.graphics.pop()

@@ -145,6 +145,24 @@ function weeks.legacyGenerateNotes(self, chart)
     end
 end
 
+function weeks.generatePsychEvents(self, eventsChart)
+    modEvents = {}
+    local eventsChart = getFilePath(eventsChart)
+    eventsChart = json.decode(love.filesystem.read(eventsChart)).song
+
+    for i, event in ipairs(eventsChart.events) do
+        local time, eventData = event[1], event[2]
+
+        table.insert(modEvents, {
+            time = time,
+            events = eventData
+        })
+    end
+
+
+    table.sort(modEvents, function(a, b) return a.time < b.time end)
+end
+
 function weeks.cneGenerateNotes(self, chart, metadata)
     if importMods.inMod then
         importMods.setupScripts()
