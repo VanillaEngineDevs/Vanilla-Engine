@@ -7,7 +7,7 @@ return {
 		stages["stage"]:enter()
         enemy = nil
         love.graphics.setDefaultFilter("nearest", "nearest")
-        enemy = love.filesystem.load("sprites/characters/boyfriend-pixel.lua")()
+        enemy = BaseCharacter("sprites/characters/boyfriend-pixel.lua")
         love.graphics.setDefaultFilter("linear", "linear")
 
         enemy.flipX = true

@@ -42,7 +42,7 @@ return {
 
 	load = function(self)
 		if song == 3 then
-			enemy = love.filesystem.load("sprites/characters/monster.lua")()
+			enemy = BaseCharacter("sprites/characters/monster.lua")
 
 			enemy.x, enemy.y = -610, 120
 

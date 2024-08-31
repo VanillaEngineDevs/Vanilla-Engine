@@ -11,8 +11,8 @@ return {
         for i = 0, 5 do
             stageImages["Tank " .. i+1] = love.filesystem.load("sprites/week7/tank" .. i .. ".lua")() -- all the tank viewers
         end
-        girlfriend = love.filesystem.load("sprites/characters/gfTankmen.lua")()
-		enemy = love.filesystem.load("sprites/characters/tankmanCaptain.lua")()
+        girlfriend = BaseCharacter("sprites/characters/gfTankmen.lua")
+		enemy = BaseCharacter("sprites/characters/tankmanCaptain.lua")
         stageImages["Tank 1"].x, stageImages["Tank 1"].y = -1000, 603
 		stageImages["Tank 2"].x, stageImages["Tank 2"].y = -675, 739
 		stageImages["Tank 3"].x, stageImages["Tank 3"].y = -250, 614

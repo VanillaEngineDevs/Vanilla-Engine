@@ -38,7 +38,7 @@ return {
 		curtains.y = -100
 
 		girlfriend = nil
-		enemy = love.filesystem.load("sprites/characters/girlfriend.lua")()
+		enemy = BaseCharacter("sprites/characters/girlfriend.lua")
 		enemy.x, enemy.y = 30, -90
 		boyfriend.x, boyfriend.y = 260, 100
 

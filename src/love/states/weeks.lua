@@ -42,6 +42,8 @@ healthLerp = 1
 
 local dying = false
 
+noteSprites = nil
+
 local allStates = {
 	sickCounter = 0,
 	goodCounter = 0,
@@ -110,8 +112,8 @@ return {
 
 			rating.sizeX, rating.sizeY = 0.75, 0.75
 
-			girlfriend = love.filesystem.load("sprites/characters/girlfriend.lua")()
-			boyfriend = love.filesystem.load("sprites/characters/boyfriend.lua")()
+			girlfriend = BaseCharacter("sprites/characters/girlfriend.lua")
+			boyfriend = BaseCharacter("sprites/characters/boyfriend.lua")
 		else
 			pixel = true
 			love.graphics.setDefaultFilter("nearest", "nearest")
@@ -142,8 +144,8 @@ return {
 
 			rating = love.filesystem.load("sprites/pixel/rating.lua")()
 
-			girlfriend = love.filesystem.load("sprites/characters/girlfriend-pixel.lua")()
-			boyfriend = love.filesystem.load("sprites/characters/boyfriend-pixel.lua")()
+			girlfriend = BaseCharacter("sprites/characters/girlfriend-pixel.lua")
+			boyfriend = BaseCharacter("sprites/characters/boyfriend-pixel.lua")
 		end
 
 		numbers = {}
@@ -242,18 +244,20 @@ return {
 		-- Function so people can override it if they want
 		-- Do some cool note effects or something!
 		function updateNotePos()
-			for i = 1, 4 do
-				for j, note in ipairs(boyfriendNotes[i]) do
-					local strumlineY = boyfriendArrows[i].y
-					note.y = strumlineY - CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - note.time) * speed--[[ (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2))) ]]
-				end
+		for i = 1, 4 do
+			for j, note in ipairs(boyfriendNotes[i]) do
+				if note.time - musicTime >= 15000 then break end
+				local strumlineY = boyfriendArrows[i].y
+				note.y = strumlineY - CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - note.time) * speed--[[ (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2))) ]]
+			end
 
-				for _, note in ipairs(enemyNotes[i]) do
-					local strumlineY = enemyArrows[i].y
-					note.y = strumlineY - CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - note.time) * speed--[[ (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2))) ]]
-				end
+			for _, note in ipairs(enemyNotes[i]) do
+				if note.time - musicTime >= 15000 then break end
+				local strumlineY = enemyArrows[i].y
+				note.y = strumlineY - CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - note.time) * speed--[[ (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2))) ]]
 			end
 		end
+end
 
 		enemyIcon = icon.newIcon(icon.imagePath((enemy and enemy.icon) and enemy.icon) or "dad", (enemy and enemy.optionsTable) and (enemy.optionsTable.scale or 1) or 1)
 		boyfriendIcon = icon.newIcon(icon.imagePath((boyfriend and boyfriend.icon) and boyfriend.icon) or "bf", (boyfriend and boyfriend.optionsTable) and (boyfriend.optionsTable.scale or 1) or 1)
@@ -376,11 +380,11 @@ return {
 
 		if not noteSprites then
 			self:setNoteSprites( -- the default sprites
-				love.filesystem.load("sprites/receptor.lua")(),
-				love.filesystem.load("sprites/left-arrow.lua")(),
-				love.filesystem.load("sprites/down-arrow.lua")(),
-				love.filesystem.load("sprites/up-arrow.lua")(),
-				love.filesystem.load("sprites/right-arrow.lua")()
+				love.filesystem.load("sprites/receptor.lua"),
+				love.filesystem.load("sprites/left-arrow.lua"),
+				love.filesystem.load("sprites/down-arrow.lua"),
+				love.filesystem.load("sprites/up-arrow.lua"),
+				love.filesystem.load("sprites/right-arrow.lua")
 			)
 		end
 
@@ -399,8 +403,8 @@ return {
 
 		for i = 1, 4 do
 			if not pixel then
-				enemyArrows[i].shader = love.graphics.newShader("shaders/RGBPallette.glsl")
-				boyfriendArrows[i].shader = love.graphics.newShader("shaders/RGBPallette.glsl")
+				enemyArrows[i].shader = CONSTANTS.WEEKS.LANE_SHADERS[i]
+				boyfriendArrows[i].shader = CONSTANTS.WEEKS.LANE_SHADERS[i]
 
 				enemyArrows[i].shaderEnabled = false
 				boyfriendArrows[i].shaderEnabled = false
@@ -538,8 +542,12 @@ return {
 			local arrowsTable = enemyNote and enemyArrows or boyfriendArrows
 
 			noteObject.x = arrowsTable[data].x
-			noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
-			local r, g, b = CONSTANTS.ARROW_COLORS[data][1], CONSTANTS.ARROW_COLORS[data][2], CONSTANTS.ARROW_COLORS[data][3]
+			noteObject.shader = CONSTANTS.WEEKS.LANE_SHADERS[data]
+            local r, g, b = CONSTANTS.ARROW_COLORS[data][1], CONSTANTS.ARROW_COLORS[data][2], CONSTANTS.ARROW_COLORS[data][3]
+
+            if dataStuff.r or dataStuff.g or dataStuff.b then
+                noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
+            end
 
 			if dataStuff.r then r = {decToRGB(dataStuff.r)} end
 			if dataStuff.g then g = {decToRGB(dataStuff.g)} end

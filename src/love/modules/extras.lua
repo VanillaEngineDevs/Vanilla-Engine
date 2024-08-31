@@ -60,8 +60,12 @@ function weeks.legacyGenerateNotes(self, chart)
             local arrowsTable = enemyNote and enemyArrows or boyfriendArrows
 
             noteObject.x = arrowsTable[id].x
-            noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
+            noteObject.shader = CONSTANTS.WEEKS.LANE_SHADERS[id]
             local r, g, b = CONSTANTS.ARROW_COLORS[id][1], CONSTANTS.ARROW_COLORS[id][2], CONSTANTS.ARROW_COLORS[id][3]
+
+            if dataStuff.r or dataStuff.g or dataStuff.b then
+                noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
+            end
 
 			if dataStuff.r then r = {decToRGB(dataStuff.r)} end
 			if dataStuff.g then g = {decToRGB(dataStuff.g)} end
@@ -188,15 +192,19 @@ function weeks.cneGenerateNotes(self, chart, metadata)
 
             if settings.downscroll then noteObject.sizeY = -1 end
 
-            noteObject.x = arrowsTable[id].x
-            noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
-            local r, g, b = CONSTANTS.ARROW_COLORS[id][1], CONSTANTS.ARROW_COLORS[id][2], CONSTANTS.ARROW_COLORS[id][3]
-
             local dataStuff = {}
             if noteTypes[noteVer] then
                 dataStuff = noteTypes[noteVer]
             else
                 dataStuff = noteTypes["normal"]
+            end
+
+            noteObject.x = arrowsTable[id].x
+            noteObject.shader = CONSTANTS.WEEKS.LANE_SHADERS[id]
+            local r, g, b = CONSTANTS.ARROW_COLORS[id][1], CONSTANTS.ARROW_COLORS[id][2], CONSTANTS.ARROW_COLORS[id][3]
+
+            if dataStuff.r or dataStuff.g or dataStuff.b then
+                noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
             end
 
             if dataStuff.r then r = {decToRGB(dataStuff.r)} end

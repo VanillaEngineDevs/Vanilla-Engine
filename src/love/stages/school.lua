@@ -30,11 +30,11 @@ return {
 			["Petals"] = love.filesystem.load("sprites/week6/petals.lua")(), -- petals
 			["Freaks"] = love.filesystem.load("sprites/week6/freaks.lua")() -- freaks
         }
-		girlfriend = love.filesystem.load("sprites/characters/girlfriend-pixel.lua")()
-		boyfriend = love.filesystem.load("sprites/characters/boyfriend-pixel.lua")()
-		enemy = love.filesystem.load("sprites/characters/senpai.lua")()
+		girlfriend = BaseCharacter("sprites/characters/girlfriend-pixel.lua")
+		boyfriend = BaseCharacter("sprites/characters/boyfriend-pixel.lua")
+		enemy = BaseCharacter("sprites/characters/senpai.lua")
 		enemy.colours = {255,170,111}
-		fakeBoyfriend = love.filesystem.load("sprites/characters/boyfriend-pixel-dead.lua")() -- Used for game over
+		fakeBoyfriend = BaseCharacter("sprites/characters/boyfriend-pixel-dead.lua") -- Used for game over
 		if settings.pixelPerfect then
 			girlfriend.x, girlfriend.y = 0, 0
 			boyfriend.x, boyfriend.y = 50, 30
@@ -50,11 +50,11 @@ return {
 
     load = function(self)
         if song == 3 then
-            enemy = love.filesystem.load("sprites/characters/spirit.lua")()
+            enemy = BaseCharacter("sprites/characters/spirit.lua")
             stageImages["School"] = love.filesystem.load("sprites/week6/evil-school.lua")()
 			enemy.x, enemy.y = -50, 0
         elseif song == 2 then
-            enemy = love.filesystem.load("sprites/characters/senpai-angry.lua")()
+            enemy = BaseCharacter("sprites/characters/senpai-angry.lua")
 			enemy.colours = {255,170,111}
             stageImages["Freaks"]:animate("dissuaded", true)
 			enemy.x, enemy.y = -50, 0

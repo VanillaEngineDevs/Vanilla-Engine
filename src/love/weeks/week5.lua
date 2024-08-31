@@ -55,7 +55,7 @@ return {
 				camera.zoom = 0.9
 			end
 
-			enemy = love.filesystem.load("sprites/characters/monster-christmas.lua")()
+			enemy = BaseCharacter("sprites/characters/monster-christmas.lua")
 
 			enemy.x, enemy.y = -780, 420
 

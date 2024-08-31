@@ -28,7 +28,7 @@ return {
         stageImages["Stage Front"].y = 400
         stageImages["Curtains"].y = -100
 
-        enemy = love.filesystem.load("sprites/characters/daddy-dearest.lua")()
+        enemy = BaseCharacter("sprites/characters/daddy-dearest.lua")
 
         girlfriend.x, girlfriend.y = 30, -90
         enemy.x, enemy.y = -380, -110

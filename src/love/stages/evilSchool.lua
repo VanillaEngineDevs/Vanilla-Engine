@@ -24,7 +24,7 @@ return {
         stageImages = {
 			["Evil School"] = love.filesystem.load("sprites/week6/evil-school.lua")() -- evil school
         }
-        enemy = love.filesystem.load("sprites/characters/spirit.lua")()
+        enemy = BaseCharacter("sprites/characters/spirit.lua")
 		enemy.x, enemy.y = -340, -20
 
         girlfriend.x, girlfriend.y = 30, -50

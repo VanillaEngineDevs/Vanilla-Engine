@@ -133,6 +133,12 @@ CONSTANTS.WEEKS = {
     MISS_SCORE = 0,
     SCORING_OFFSET = 54.00,
     SCORING_SLOPE = 0.080,
+    LANE_SHADERS = {
+        love.graphics.newShader("shaders/RGBPallette.glsl"),
+        love.graphics.newShader("shaders/RGBPallette.glsl"),
+        love.graphics.newShader("shaders/RGBPallette.glsl"),
+        love.graphics.newShader("shaders/RGBPallette.glsl")
+    }
 }
 
 CONSTANTS.MISC = {

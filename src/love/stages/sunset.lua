@@ -8,10 +8,10 @@ return {
             ["Limo"] = love.filesystem.load("sprites/week4/limo.lua")(), -- limo
             ["Fast Car"] = graphics.newImage(graphics.imagePath("week4/fastCarLol")) -- fast-car
         }
-        girlfriend = love.filesystem.load("sprites/characters/girlfriend-car.lua")()
-        enemy = love.filesystem.load("sprites/characters/mommy-mearest.lua")()
-        boyfriend = love.filesystem.load("sprites/characters/boyfriend-car.lua")()
-        fakeBoyfriend = love.filesystem.load("sprites/characters/boyfriend.lua")() -- Used for game over
+        girlfriend = BaseCharacter("sprites/characters/girlfriend-car.lua")
+        enemy = BaseCharacter("sprites/characters/mommy-mearest.lua")
+        boyfriend = BaseCharacter("sprites/characters/boyfriend-car.lua")
+        fakeBoyfriend = BaseCharacter("sprites/characters/boyfriend.lua") -- Used for game over
 
         sounds.car = {
             love.audio.newSource("sounds/week4/carPass0.ogg", "static"),

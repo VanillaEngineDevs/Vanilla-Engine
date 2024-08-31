@@ -206,6 +206,10 @@ function love.load()
 	loadSavedata()
 	settings.pixelPerfect = false
 
+	-- Load Characters
+	BaseCharacter = require "data.characters.BaseCharacter"
+	NeneCharacter = require "data.characters.NeneCharacter"
+
 	-- Modding
 	importMods = require "modding.importMods"
 

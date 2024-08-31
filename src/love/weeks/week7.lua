@@ -28,11 +28,11 @@ return {
 		stages["tank"]:load()
 
 		if song == 3 then
-			girlfriend = love.filesystem.load("sprites/characters/picoSpeaker.lua")()
+			girlfriend = BaseCharacter("sprites/characters/picoSpeaker.lua")
 			girlfriend.x, girlfriend.y = 105, 110
-			boyfriend = love.filesystem.load("sprites/characters/bfAndGF.lua")()
+			boyfriend = BaseCharacter("sprites/characters/bfAndGF.lua")
 			boyfriend.x, boyfriend.y = 460, 423
-			fakeBoyfriend = love.filesystem.load("sprites/characters/bfAndGFdead.lua")()
+			fakeBoyfriend = BaseCharacter("sprites/characters/bfAndGFdead.lua")
 			fakeBoyfriend.x, fakeBoyfriend.y = 460, 423
 			if not died and storyMode then
 				video = cutscene.video("videos/stressCutscene.ogv")
