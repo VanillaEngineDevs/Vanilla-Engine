@@ -22,16 +22,12 @@ local function CreateWeek(weekIndex, hasErect)
             if not song.show then goto continue end
             local song = {
                 name = song[1],
-                diffs = {
-                    -- diffname, songExt
-                    {"easy", ext=""},
-                    {"normal", ext=""},
-                    {"hard", ext=""},
-                    (hasErect and {"erect", ext="-erect"} or nil),
-                    (hasErect and {"nightmare", ext="-erect"} or nil),
-                    (hasPico and {"pico", ext="-pico"} or nil)
-                }
+                diffs = util.cloneTable(song.diffs)
             }
+
+            table.insert(song.diffs, (hasErect and {"erect", ext="-erect"} or nil))
+            table.insert(song.diffs, (hasErect and {"nightmare", ext="-erect"} or nil))
+            table.insert(song.diffs, (hasPico and {"pico", ext="-pico"} or nil))
 
             table.insert(week.songs, song)
         elseif type(song) == "string" then
@@ -107,7 +103,6 @@ return {
         curWeekScore = 0
         averageAccuracy = 0
         ratingText = "???"
-        songDifficulty = 2
 
         curSongScore = 0
         curSongAccuracy = 0
@@ -116,9 +111,11 @@ return {
         
         averageAccuracy = string.format("%.2f%%", averageAccuracy)
 
-        for i = 0, #weekMeta do
+        for i = 1, #weekMeta do
             allWeeks[i] = CreateWeek(i)
         end
+
+        songDifficulty = util.clamp(2, 1, #allWeeks[weekNum].songs[songNum].diffs)
     end,
     
     update = function(self, dt)
@@ -126,7 +123,7 @@ return {
             if menuNum == 1 then
                 weekNum = weekNum + 1
                 if weekNum > #weekMeta then
-                    weekNum = 0
+                    weekNum = 1
                 end
                 if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
                     songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
@@ -148,7 +145,7 @@ return {
         elseif input:pressed("up") then
             if menuNum == 1 then
                 weekNum = weekNum - 1
-                if weekNum < 0 then
+                if weekNum < 1 then
                     weekNum = #weekMeta
                 end
 

@@ -57,7 +57,7 @@ return {
         if song == 3 then
             camera.defaultZoom = 0.9
     
-            if scaryIntro then
+            if __scaryIntro then
                 camera.x, camera.y = -150, 750
                 camera.zoom = 2.5
     

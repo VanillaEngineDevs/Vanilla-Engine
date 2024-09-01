@@ -21,7 +21,7 @@ local walls, escalator, christmasTree, snow
 
 local topBop, bottomBop, santa
 
-local scaryIntro = false
+__scaryIntro = false
 
 return {
 	enter = function(self, from, songNum, songAppend, _songExt)
@@ -46,7 +46,7 @@ return {
 		if song == 3 then
 			camera.defaultZoom = 0.9
 
-			if scaryIntro then
+			if __scaryIntro then
 				camera.x, camera.y = -150, 750
 				camera.zoom = 2.5
 
@@ -80,11 +80,11 @@ return {
 
 		self:initUI()
 
-		if scaryIntro then
+		if __scaryIntro then
 			Timer.after(
 				5,
 				function()
-					scaryIntro = false
+					__scaryIntro = false
 
 					camTimer = Timer.tween(2, camera, {x = -boyfriend.x + 100, y = -boyfriend.y + 75, sizeX = 0.9, sizeY = 0.9}, "out-quad")
 
@@ -121,18 +121,18 @@ return {
 	end,
 
 	update = function(self, dt)
-		if not scaryIntro then
+		if not __scaryIntro then
 			weeks:update(dt)
 			stages["mall"]:update(dt)
 
-			if not (scaryIntro or countingDown or graphics.isFading()) and not (inst:isPlaying() and voicesBF:isPlaying()) and not paused then
+			if not (__scaryIntro or countingDown or graphics.isFading()) and not (inst:isPlaying() and voicesBF:isPlaying()) and not paused then
 				if storyMode and song < 3 then
 					weeks:saveData()
 					song = song + 1
 
 					-- Winter Horrorland setup
 					if song == 3 then
-						scaryIntro = true
+						__scaryIntro = true
 
 						audio.playSound(sounds.lightsOff)
 
@@ -169,7 +169,7 @@ return {
 			stages["mall"]:draw()
 		love.graphics.pop()
 
-		if not scaryIntro then
+		if not __scaryIntro then
 			weeks:drawUI()
 		end
 	end,

@@ -82,7 +82,7 @@ return {
 
 				if stageImages["Train"].x < -3000 and stageImages["Train"].finishing then
 					--trainReset() -- bruh this shit is trying to troll me rn
-					-- 				why does it reset the train then still do it 1 more time
+					-- 			      why does it reset the train then still do it 1 more time
 					stageImages["Train"].doShit = false
 					stageImages["Train"].moving	= false
 					stageImages["Train"].startedMoving = false

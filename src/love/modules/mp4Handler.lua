@@ -1,5 +1,7 @@
+---@diagnostic disable: undefined-global
 --https://github.com/semyon422/aqua/blob/27ae6a4ab6ae40c0bd68d94b3f14a88607fe0120/video/video.lua
 -- CURRENTLY ONLY SUPPORTS WINDOWS x64. PLEASE USE LOVE2D'S BUILT-IN .ogv SUPPORT FOR NOW.
+-- ALSO ITS NOT EVEN ADDED YET LMFAO
 if love.system.getOS() == "Windows" then
     Try(
         function()

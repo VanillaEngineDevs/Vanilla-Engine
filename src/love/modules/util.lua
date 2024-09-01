@@ -103,6 +103,14 @@ function util.tryExcept(try, except)
     end
 end
 
+function util.cloneTable(t)
+    local newT = {}
+    for k, v in pairs(t) do
+        newT[k] = v
+    end
+
+    return newT
+end
 
 -- God like coding
 --[[

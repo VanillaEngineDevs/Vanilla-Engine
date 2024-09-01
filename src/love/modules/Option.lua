@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 local Option = {}
 
 Option.__index = Option

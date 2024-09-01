@@ -10,11 +10,11 @@ return graphics.newSprite(
 		{x = 60, y = 0, width = 30, height = 30, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0} -- 3: Spirit
 	},
 	{
-		[bf] = {start = 1, stop = 1, speed = 0, offsetX = 0, offsetY = 0},
+		["bf"] = {start = 1, stop = 1, speed = 0, offsetX = 0, offsetY = 0},
 		["senpai"] = {start = 2, stop = 2, speed = 0, offsetX = 0, offsetY = 0},
 		["spirit"] = {start = 3, stop = 3, speed = 0, offsetX = 0, offsetY = 0}
 	},
-	bf,
+	"bf",
 	false,
 	{
 		floored = true

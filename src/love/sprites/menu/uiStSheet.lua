@@ -1,4 +1,5 @@
 return graphics.newSprite(
+	---@diagnostic disable-next-line: undefined-global
 	uiStSheetImg, -- Do not add the .png extension
 	{
 		{x = 0, y = 0, width = 200, height = 200, offsetX = 0, offsetY = 0, offsetWidth = 200, offsetHeight = 200}, -- 1: uiStSheet boolOff0000

@@ -299,10 +299,17 @@ function love.load()
 				if song.show == nil then 
 					song.show = true 
 				end
+				if song.diffs == nil then
+					song.diffs = {{"easy", ext=""}, {"normal", ext=""}, {"hard", ext=""}}
+				else
+					for _, v in ipairs(song.diffs) do
+						v.ext = v[2]
+					end
+				end
 			end
 		end
 	end
-	modWeekPlacement = #weekMeta -- everything after the main weeks is a mod folder.
+	modWeekPlacement = #weekMeta-1 -- everything after the main weeks is a mod folder.
 
 	require "modules.extras"
 	

@@ -1,10 +1,4 @@
 return { -- Add/remove weeks here
-    [0] = {
-        "Test",
-        {
-            "Test"
-        }
-    },
     {
         "Tutorial",
         {
@@ -76,5 +70,11 @@ return { -- Add/remove weeks here
             {"Blazin"},
             {"Cutscene", show=false}
         }
-    }
+    },
+    {
+        "Test",
+        {
+            {"Test", diffs = {{"normal", ext=""}}}, -- Test only has a "normal" difficulty with no extension.
+        }
+    },
 }

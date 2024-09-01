@@ -6,7 +6,8 @@
         "redundant-parameter",
         "missing-parameter",
         "lowercase-global",
-        "assign-type-mismatch"
+        "assign-type-mismatch",
+        "redefined-local"
     ],
     "Lua.runtime.version": "LuaJIT",
     "Lua.runtime.special": [],
