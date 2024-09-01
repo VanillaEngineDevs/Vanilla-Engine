@@ -20,13 +20,22 @@ return {
 		weekNum = 1
 		theTracks = ""
 		for trackLength = 1, #weekMeta[weekNum][2] do
-			if type(weekMeta[weekNum][2][trackLength]) == "string" then 
+			if type(weekMeta[weekNum][2][trackLength]) == "table" then
+				if not weekMeta[weekNum][2][trackLength].show then goto continue end
+				if theTracks ~= "" then
+					theTracks = theTracks .. " | " .. weekMeta[weekNum][2][trackLength][1]
+				else
+					theTracks = weekMeta[weekNum][2][trackLength][1]
+				end
+			elseif type(weekMeta[weekNum][2][trackLength]) == "string" then
 				if theTracks ~= "" then
 					theTracks = theTracks .. " | " .. weekMeta[weekNum][2][trackLength]
 				else
 					theTracks = weekMeta[weekNum][2][trackLength]
 				end
 			end
+
+			::continue::
 		end
 
 		currentWeek = 0
@@ -153,7 +162,7 @@ return {
 
 					storyMode = true
 
-					Gamestate.switch(weekData[weekNum], songNum, songAppend)
+					Gamestate.switch(weekData[weekNum], songNum, songAppend, "")
 
 					status.setLoading(false)
 				end
@@ -172,13 +181,22 @@ return {
 			end
 			theTracks = ""
 			for trackLength = 1, #weekMeta[weekNum][2] do
-				if type(weekMeta[weekNum][2][trackLength]) == "string" then
+				if type(weekMeta[weekNum][2][trackLength]) == "table" then
+					if not weekMeta[weekNum][2][trackLength].show then goto continue end
+					if theTracks ~= "" then
+						theTracks = theTracks .. " | " .. weekMeta[weekNum][2][trackLength][1]
+					else
+						theTracks = weekMeta[weekNum][2][trackLength][1]
+					end
+				elseif type(weekMeta[weekNum][2][trackLength]) == "string" then
 					if theTracks ~= "" then
 						theTracks = theTracks .. " | " .. weekMeta[weekNum][2][trackLength]
 					else
 						theTracks = weekMeta[weekNum][2][trackLength]
 					end
 				end
+	
+				::continue::
 			end
 			if enemyDanceLines:isAnimName("week" .. weekNum-1) then
 				enemyDanceLines:animate("week" .. weekNum-1, true)

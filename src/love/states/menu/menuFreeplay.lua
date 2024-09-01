@@ -16,26 +16,38 @@ local function CreateWeek(weekIndex, hasErect)
         songs = {}
     }
 
-    for i, songName in ipairs(weekMeta[weekIndex][2]) do
-        if type(songName) == "string" then
-            local hasErect = false
-            if weekMeta[weekIndex][3] then
-                hasErect = table.contains(weekMeta[weekIndex][3], songName)
-            end
+    for _, song in ipairs(weekMeta[weekIndex][2]) do
+        if type(song) == "table" then
+            local hasErect, hasPico = song.erect, song.pico
+            if not song.show then goto continue end
             local song = {
-                name = songName,
+                name = song[1],
                 diffs = {
-                    -- diffname, isErect
-                    {"easy", false},
-                    {"normal", false},
-                    {"hard", false},
-                    (hasErect and {"erect", true} or nil),
-                    (hasErect and {"nightmare", true} or nil)
+                    -- diffname, songExt
+                    {"easy", ext=""},
+                    {"normal", ext=""},
+                    {"hard", ext=""},
+                    (hasErect and {"erect", ext="-erect"} or nil),
+                    (hasErect and {"nightmare", ext="-erect"} or nil),
+                    (hasPico and {"pico", ext="-pico"} or nil)
+                }
+            }
+
+            table.insert(week.songs, song)
+        elseif type(song) == "string" then
+            local song = {
+                name = song,
+                diffs = {
+                    {"easy", ext=""},
+                    {"normal", ext=""},
+                    {"hard", ext=""}
                 }
             }
 
             table.insert(week.songs, song)
         end
+
+        ::continue::
     end
 
     return week
@@ -129,8 +141,8 @@ return {
                 end
             end
             if menuNum ~= 1 then
-                songBefore = weekMeta[weekNum][2][songNum-1] or ""
-                songAfter = weekMeta[weekNum][2][songNum+1] or ""
+                songBefore = weekMeta[weekNum][2][songNum-1] and weekMeta[weekNum][2][songNum-1][1] or ""
+                songAfter = weekMeta[weekNum][2][songNum+1] and weekMeta[weekNum][2][songNum+1][1] or ""
             end
             audio.playSound(selectSound)
         elseif input:pressed("up") then
@@ -139,6 +151,7 @@ return {
                 if weekNum < 0 then
                     weekNum = #weekMeta
                 end
+
                 if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
                     songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
                 end
@@ -157,8 +170,8 @@ return {
                 end
             end
             if menuNum ~= 1 then
-                songBefore = weekMeta[weekNum][2][songNum-1] or ""
-                songAfter = weekMeta[weekNum][2][songNum+1] or ""
+                songBefore = weekMeta[weekNum][2][songNum-1] and weekMeta[weekNum][2][songNum-1][1] or ""
+                songAfter = weekMeta[weekNum][2][songNum+1] and weekMeta[weekNum][2][songNum+1][1] or ""
             end
             audio.playSound(selectSound)
         elseif input:pressed("left") then
@@ -182,14 +195,13 @@ return {
                     0.7,
                     function()
                         songAppend = allWeeks[weekNum].songs[songNum].diffs[songDifficulty][1]
-                        isErect = songDifficulty > 3 and allWeeks[weekNum].songs[songNum].diffs[songDifficulty][2] or false
                         importMods.inMod = weekNum > modWeekPlacement
     
                         storyMode = false
     
                         music:stop()
     
-                        Gamestate.switch(weekData[weekNum], songNum, songAppend, isErect)
+                        Gamestate.switch(weekData[weekNum], songNum, songAppend, allWeeks[weekNum].songs[songNum].diffs[songDifficulty].ext)
     
                         status.setLoading(false)
                     end
@@ -204,8 +216,8 @@ return {
                 curSongAccuracy = string.format("%.2f%%", curSongAccuracy)
             end
             
-            songBefore = weekMeta[weekNum][2][songNum-1] or ""
-            songAfter = weekMeta[weekNum][2][songNum+1] or ""
+            songBefore = weekMeta[weekNum][2][songNum-1] and weekMeta[weekNum][2][songNum-1][1] or ""
+            songAfter = weekMeta[weekNum][2][songNum+1] and weekMeta[weekNum][2][songNum+1][1] or ""
             audio.playSound(confirmSound)
         elseif input:pressed("back") then
             if menuNum ~= 1 then
@@ -220,8 +232,8 @@ return {
             if menuNum == 1 then
                 songNum = 1
                 menuNum = 2
-                songBefore = weekMeta[weekNum][2][songNum-1] or ""
-                songAfter = weekMeta[weekNum][2][songNum+1] or ""
+                songBefore = weekMeta[weekNum][2][songNum-1] and weekMeta[weekNum][2][songNum-1][1] or ""
+                songAfter = weekMeta[weekNum][2][songNum+1] and weekMeta[weekNum][2][songNum+1][1] or ""
             else
                 menuNum = 1
             end

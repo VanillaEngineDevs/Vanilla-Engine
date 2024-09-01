@@ -35,13 +35,7 @@ function uitextflarge(text,x,y,limit,align,hovered,r,sx,sy,ox,oy,kx,ky)
 	local oy = oy or 0
 	local kx = kx or 0
 	local ky = ky or 0
-	--[[ if not hovered then graphics.setColor(0,0,0) else graphics.setColor(1,1,1) end
-	love.graphics.printf(text,x-6,y,limit,align,r,sx,sy,ox,oy,kx,ky)
-	love.graphics.printf(text,x+6,y,limit,align,r,sx,sy,ox,oy,kx,ky)
-	love.graphics.printf(text,x,y-6,limit,align,r,sx,sy,ox,oy,kx,ky)
-	love.graphics.printf(text,x,y+6,limit,align,r,sx,sy,ox,oy,kx,ky)
-	if not hovered then graphics.setColor(1,1,1) else graphics.setColor(0,0,0) end
-	love.graphics.printf(text,x,y,limit,align,r,sx,sy,ox,oy,kx,ky) ]]
+
 	if not hovered then graphics.setColor(0,0,0) else graphics.setColor(1,1,1) end
 	for i = -6, 6 do
 		for j = -6, 6 do
@@ -296,144 +290,23 @@ function love.load()
 	TankmanDatingSim = require "misc.dating"
 
 	-- Load week data
-	weekData = {
-		[0] = require "weeks.test",
-		require "weeks.tutorial",
-		require "weeks.week1",
-		require "weeks.week2",
-		require "weeks.week3",
-		require "weeks.week4",
-		require "weeks.week5",
-		require "weeks.week6",
-		require "weeks.week7",
-		require "weeks.weekend1"
-	}
+	weekData = require "data.weeks.weekData"
+	weekDesc = require "data.weeks.weekDescriptions"
+	weekMeta = require "data.weeks.weekMeta"
+	for i, week in ipairs(weekMeta) do
+		for k, song in ipairs(week[2]) do
+			if type(song) == "table" then
+				if song.show == nil then 
+					song.show = true 
+				end
+			end
+		end
+	end
+	modWeekPlacement = #weekMeta -- everything after the main weeks is a mod folder.
 
 	require "modules.extras"
 	
 	__VERSION__ = love.filesystem.getInfo("version.txt") and love.filesystem.read("version.txt") or "vUnknown"
-
-	weekDesc = { -- Add your week description here
-		"TEACHING TIME",
-		"DADDY DEAREST",
-		"SPOOKY MONTH",
-		"PICO",
-		"MOMMY MUST MURDER",
-		"RED SNOW",
-		"HATING SIMULATOR FT. MOAWLING",
-		"TANKMAN FT. JOHNYUTAH",
-		"DUE DEBTS"
-	}
-
-	weekMeta = { -- Add/remove weeks here
-		[0] = {
-			"Test",
-			{
-				"Test"
-			}
-		},
-		{
-			"Tutorial",
-			{
-				"Tutorial"
-			}
-		},
-		{
-			"Week 1",
-			{
-				"Bopeebo",
-				"Fresh",
-				"Dadbattle"
-			},
-			-- Erect remix's
-			{
-				"Bopeebo",
-				"Fresh",
-				"Dadbattle"
-			}
-		},
-		{
-			"Week 2",
-			{
-				"Spookeez",
-				"South",
-				"Monster"
-			},
-			{
-				"Spookeez",
-				"South"
-			}
-		},
-		{
-			"Week 3",
-			{
-				"Pico",
-				"Philly Nice",
-				"Blammed"
-			},
-			{
-				"Pico",
-				"Philly Nice",
-				"Blammed"
-			}
-		},
-		{
-			"Week 4",
-			{
-				"Satin Panties",
-				"High",
-				"M.I.L.F"
-			},
-			{
-				"Satin Panties",
-				"High"
-			}
-		},
-		{
-			"Week 5",
-			{
-				"Cocoa",
-				"Eggnog",
-				"Winter Horrorland"
-			},
-			{
-				"Eggnog"
-			}
-		},
-		{
-			"Week 6",
-			{
-				"Senpai",
-				"Roses",
-				"Thorns"
-			},
-			{
-				"Senpai",
-				"Roses",
-				"Thorns"
-			}
-		},
-		{
-			"Week 7",
-			{
-				"Ugh",
-				"Guns",
-				"Stress"
-			}
-		},
-		{
-			"Weekend 1",
-			{
-				"Darnell",
-				"Lit Up",
-				"2hot",
-				"Blazin",
-				{"Cutscene", false}
-			}
-		}
-	}
-
-	modWeekPlacement = #weekMeta -- everything after the main weeks is a mod folder.
 
 	-- LÖVE init
 	if curOS == "OS X" then
@@ -492,7 +365,6 @@ function love.load()
 		"%.1f  ",
 		(love.audio.getVolume())
 	))
-
 
 	volumeWidth = {width = 160 }
 

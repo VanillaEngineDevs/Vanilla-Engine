@@ -7,7 +7,7 @@ function m_graphics:enter()
         settings.fpsCap,
         "number"
     )
-    o.minValue = _debug and 1 or 30
+    o.minValue = debug and 1 or 30
     o.maxValue = 500
     self:addOption(o)
     self:addOption(

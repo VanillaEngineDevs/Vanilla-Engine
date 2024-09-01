@@ -1,5 +1,5 @@
 return {
-    enter = function(self, from, songNum, songAppend, isErect)
+    enter = function(self, from, songNum, songAppend, _songExt)
 		weeks:enter() 
 
 		stages["tank"]:enter()
@@ -14,7 +14,7 @@ return {
 
 		song = songNum
 		difficulty = songAppend
-		erectMode = isErect
+		songExt = _songExt
     
 		self:load()
 
@@ -39,21 +39,21 @@ return {
 				video:play()
 			end
 
-			inst = love.audio.newSource("songs/stress/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/stress/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/stress/Voices-tankman" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/stress/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/stress/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/stress/Voices-tankman" .. songExt .. ".ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/guns/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/guns/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/guns/Voices-tankman" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/guns/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/guns/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/guns/Voices-tankman" .. songExt .. ".ogg", "stream")
 			if storyMode and not died then
 				video = cutscene.video("videos/gunsCutscene.ogv")
 				video:play()
 			end
 		else
-			inst = love.audio.newSource("songs/ugh/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/ugh/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/ugh/Voices-tankman" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/ugh/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/ugh/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/ugh/Voices-tankman" .. songExt .. ".ogg", "stream")
 			if storyMode and not died then
 				video = cutscene.video("videos/ughCutscene.ogv")
 				video:play()
@@ -71,8 +71,8 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/songs/stress/stress-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/stress/stress-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
-			weeks:generateGFNotes("data/songs/stress/stress-chart" .. (erectMode and "-erect" or "") .. ".json", "picospeaker")
+			weeks:generateNotes("data/songs/stress/stress-chart" .. songExt .. ".json", "data/songs/stress/stress-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateGFNotes("data/songs/stress/stress-chart" .. songExt .. ".json", "picospeaker")
 
 			tankmanRunImg = love.graphics.newImage(graphics.imagePath("week7/tankmanKilled1"))
 
@@ -93,9 +93,9 @@ return {
 				end
 			end
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/guns/guns-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/guns/guns-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/guns/guns-chart" .. songExt .. ".json", "data/songs/guns/guns-metadata" .. songExt .. ".json", difficulty)
 		else
-			weeks:generateNotes("data/songs/ugh/ugh-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/ugh/ugh-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/ugh/ugh-chart" .. songExt .. ".json", "data/songs/ugh/ugh-metadata" .. songExt .. ".json", difficulty)
 		end
 	end,
 

@@ -20,14 +20,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 local sky, city, cityWindows, behindTrain, street
 
 return {
-	enter = function(self, from, songNum, songAppend, isErect)
+	enter = function(self, from, songNum, songAppend, _songExt)
 		weeks:enter()
 
 		stages["city"]:enter()
 
 		song = songNum
 		difficulty = songAppend
-		hasErect = isErect
+		songExt = _songExt
 
 		camera.zoom = 1
 		camera.defaultZoom = 1
@@ -40,17 +40,17 @@ return {
 		stages["city"]:load()
 
 		if song == 3 then
-			inst = love.audio.newSource("songs/blammed/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/blammed/Voices-bf" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/blammed/Voices-pico" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/blammed/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/blammed/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/blammed/Voices-pico" .. songExt .. ".ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/philly-nice/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/philly-nice/Voices-bf" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/philly-nice/Voices-pico" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/philly-nice/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/philly-nice/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/philly-nice/Voices-pico" .. songExt .. ".ogg", "stream")
 		else
-			inst = love.audio.newSource("songs/pico/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/pico/Voices-bf" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/pico/Voices-pico" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/pico/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/pico/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/pico/Voices-pico" .. songExt .. ".ogg", "stream")
 		end
 
 		self:initUI()
@@ -62,11 +62,11 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/songs/blammed/blammed-chart" .. (hasErect and "-erect" or "") .. ".json", "data/songs/blammed/blammed-metadata" .. (hasErect and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/blammed/blammed-chart" .. songExt .. ".json", "data/songs/blammed/blammed-metadata" .. songExt .. ".json", difficulty)
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/philly-nice/philly-nice-chart" .. (hasErect and "-erect" or "") .. ".json", "data/songs/philly-nice/philly-nice-metadata" .. (hasErect and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/philly-nice/philly-nice-chart" .. songExt .. ".json", "data/songs/philly-nice/philly-nice-metadata" .. songExt .. ".json", difficulty)
 		else
-			weeks:generateNotes("data/songs/pico/pico-chart" .. (hasErect and "-erect" or "") .. ".json", "data/songs/pico/pico-metadata" .. (hasErect and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/pico/pico-chart" .. songExt .. ".json", "data/songs/pico/pico-metadata" .. songExt .. ".json", difficulty)
 		end
 	end,
 

@@ -1341,8 +1341,8 @@ end
 			boyfriendIcon.sizeX, boyfriendIcon.sizeY = -1.75, 1.75
 		end
 
-		enemyIcon.sizeX, enemyIcon.sizeY = util.coolLerp(enemyIcon.sizeX, 1.5, 0.1), util.lerp(enemyIcon.sizeY, 1.5, 0.1)
-		boyfriendIcon.sizeX, boyfriendIcon.sizeY = util.coolLerp(boyfriendIcon.sizeX, -1.5, 0.1), util.lerp(boyfriendIcon.sizeY, 1.5, 0.1)
+		enemyIcon.sizeX, enemyIcon.sizeY = util.coolLerp(enemyIcon.sizeX, 1.5, 0.1), enemyIcon.sizeX
+		boyfriendIcon.sizeX, boyfriendIcon.sizeY = util.coolLerp(boyfriendIcon.sizeX, -1.5, 0.1), -boyfriendIcon.sizeX
 	end,
 
 	drawRating = function(self)

@@ -26,14 +26,14 @@ local lastSaveDataBool = false
 local alternates = {false, false}
 
 return {
-	enter = function(self, from, songNum, songAppend, isErect)
+	enter = function(self, from, songNum, songAppend, _songExt)
 		weeks:enter()
 
 		stages["streets"]:enter()
 
 		song = songNum
 		difficulty = songAppend
-		erectMode = isErect
+		songExt = _songExt
 
 		if love.system.getOS() ~= "NX" then 
 			gameCanvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
@@ -51,10 +51,10 @@ return {
 		stages["streets"]:load()
 
 		if song == 4 then
-			inst = love.audio.newSource("songs/blazin/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream") 
+			inst = love.audio.newSource("songs/blazin/Inst" .. songExt .. ".ogg", "stream") 
 			if curOS ~= "NX" then
 				lovefftINST:init(1024)
-				lovefftINST:setSoundData("songs/blazin/Inst" .. (erectMode and "-erect" or "") .. ".ogg")
+				lovefftINST:setSoundData("songs/blazin/Inst" .. songExt .. ".ogg")
 			end
 			voicesBF = nil
 			voicesEnemy = nil
@@ -63,34 +63,34 @@ return {
 			enemy = love.filesystem.load("sprites/characters/darnell-fighting.lua")()
 			enemy.x = 350
 		elseif song == 3 then
-			inst = love.audio.newSource("songs/2hot/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/2hot/Inst" .. songExt .. ".ogg", "stream")
 			if curOS ~= "NX" then
 				lovefftINST:init(1024)
-				lovefftINST:setSoundData("songs/2hot/Inst" .. (erectMode and "-erect" or "") .. ".ogg")
+				lovefftINST:setSoundData("songs/2hot/Inst" .. songExt .. ".ogg")
 			end
-			voicesBF = love.audio.newSource("songs/2hot/Voices-pico" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/2hot/Voices-darnell" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/2hot/Voices-pico" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/2hot/Voices-darnell" .. songExt .. ".ogg", "stream")
 			rainShaderStartIntensity = 0.2
 			rainShaderEndIntensity = 0.4
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/lit-up/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/lit-up/Inst" .. songExt .. ".ogg", "stream")
 			if curOS ~= "NX" then
 				lovefftINST:init(1024)
-				lovefftINST:setSoundData("songs/lit-up/Inst" .. (erectMode and "-erect" or "") .. ".ogg")
+				lovefftINST:setSoundData("songs/lit-up/Inst" .. songExt .. ".ogg")
 			end
-			voicesBF = love.audio.newSource("songs/lit-up/Voices-pico" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/lit-up/Voices-darnell" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/lit-up/Voices-pico" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/lit-up/Voices-darnell" .. songExt .. ".ogg", "stream")
 
 			rainShaderStartIntensity = 0.1
 			rainShaderEndIntensity = 0.2
 		else
-			inst = love.audio.newSource("songs/darnell/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/darnell/Inst" .. songExt .. ".ogg", "stream")
 			if curOS ~= "NX" then
 				lovefftINST:init(1024)
-				lovefftINST:setSoundData("songs/darnell/Inst" .. (erectMode and "-erect" or "") .. ".ogg")
+				lovefftINST:setSoundData("songs/darnell/Inst" .. songExt .. ".ogg")
 			end
-			voicesBF = love.audio.newSource("songs/darnell/Voices-pico" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/darnell/Voices-darnell" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/darnell/Voices-pico" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/darnell/Voices-darnell" .. songExt .. ".ogg", "stream")
 
 			rainShaderStartIntensity = 0
 			rainShaderEndIntensity = 0.1
@@ -107,7 +107,7 @@ return {
 				video:play()
 			end
 		elseif song == 4 then
-			weeks:generateNotes("data/songs/blazin/blazin-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/blazin/blazin-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/blazin/blazin-chart" .. songExt .. ".json", "data/songs/blazin/blazin-metadata" .. songExt .. ".json", difficulty)
 
 			for i = 1, 4 do
 				enemyArrows[i].visible = false
@@ -131,11 +131,11 @@ return {
 				video:play()
 			end
 		elseif song == 3 then
-			weeks:generateNotes("data/songs/2hot/2hot-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/2hot/2hot-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/2hot/2hot-chart" .. songExt .. ".json", "data/songs/2hot/2hot-metadata" .. songExt .. ".json", difficulty)
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/lit-up/lit-up-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/lit-up/lit-up-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/lit-up/lit-up-chart" .. songExt .. ".json", "data/songs/lit-up/lit-up-metadata" .. songExt .. ".json", difficulty)
 		else
-			weeks:generateNotes("data/songs/darnell/darnell-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/darnell/darnell-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/darnell/darnell-chart" .. songExt .. ".json", "data/songs/darnell/darnell-metadata" .. songExt .. ".json", difficulty)
 
 			if storyMode and not died then
 				video = cutscene.video("videos/darnellCutscene.ogv")
@@ -151,7 +151,6 @@ return {
 	onNoteHit = function(self, character, noteType, rating, id) 
 		-- rating is "EnemyHit" when an enemy hits it. Can be used to determine if the player hit it or the enemy hit it when needed
 		-- Return "true" to not play ANY animations, return "false" or nothing to play the default animations
-		if not util.startsWith(noteType or "", "weekend-1-") then return false end
 
 		if rating == "EnemyHit" then
 			if noteType == "weekend-1-lightcan" then
@@ -166,82 +165,86 @@ return {
 		end
 
 		-- blazin
-		if noteType == "weekend-1-blockhigh" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
-		elseif noteType == "weekend-1-blocklow" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
-		elseif noteType == "weekend-1-blockspin" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+		if song == 4 then
+			if not util.startsWith(noteType or "", "weekend-1-") then return false end
 
-		elseif noteType == "weekend-1-punchlow" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
-		elseif noteType == "weekend-1-punchlowblocked" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
-		elseif noteType == "weekend-1-punchlowdodged" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
-		elseif noteType == "weekend-1-punchlowspin" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+			if noteType == "weekend-1-blockhigh" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+			elseif noteType == "weekend-1-blocklow" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+			elseif noteType == "weekend-1-blockspin" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
 
-		elseif noteType == "weekend-1-punchhigh" then
-			enemy:animate("hit high")
-		elseif noteType == "weekend-1-punchhighblocked" then
-			enemy:animate("blocking")
-		elseif noteType == "weekend-1-punchhighdodged" then
-			enemy:animate("dodge")
-		elseif noteType == "weekend-1-punchhighspin" then
-			enemy:animate("spin")
+			elseif noteType == "weekend-1-punchlow" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+			elseif noteType == "weekend-1-punchlowblocked" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+			elseif noteType == "weekend-1-punchlowdodged" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+			elseif noteType == "weekend-1-punchlowspin" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
 
-		elseif noteType == "weekend-1-dodgehigh" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
-		elseif noteType == "weekend-1-dodgelow" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
-		elseif noteType == "weekend-1-dodgespin" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+			elseif noteType == "weekend-1-punchhigh" then
+				enemy:animate("hit high")
+			elseif noteType == "weekend-1-punchhighblocked" then
+				enemy:animate("blocking")
+			elseif noteType == "weekend-1-punchhighdodged" then
+				enemy:animate("dodge")
+			elseif noteType == "weekend-1-punchhighspin" then
+				enemy:animate("spin")
 
-		elseif noteType == "weekend-1-hithigh" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
-		elseif noteType == "weekend-1-hitlow" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+			elseif noteType == "weekend-1-dodgehigh" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+			elseif noteType == "weekend-1-dodgelow" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+			elseif noteType == "weekend-1-dodgespin" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
 
-		elseif noteType == "weekend-1-hitspin" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
-		elseif noteType == "weekend-1-picouppercutprep" then
-			alternates[1] = not alternates[1]
-			enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
-		elseif noteType == "weekend-1-picouppercut" then
-			
+			elseif noteType == "weekend-1-hithigh" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+			elseif noteType == "weekend-1-hitlow" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
 
-		elseif noteType == "weekend-1-darnelluppercutprep" then
-			alternates[1] = not alternates[1]
-			enemy:animate("pre-uppercut")
-		elseif noteType == "weekend-1-darnelluppercut" then
-			enemy:animate("uppercut")
-		elseif noteType == "weekend-1-idle" then
-			enemy:animate("idle")
-		elseif noteType == "weekend-1-fakeout" then
-			enemy:animate("fake out")
-		elseif noteType == "weekend-1-taunt" then
-			enemy:animate("cringe")
-		elseif noteType == "weekend-1-tauntforce" then
-			enemy:animate("pissed")
-		elseif noteType == "weekend-1-reversefakeout" then
-			enemy:animate("fake out")
+			elseif noteType == "weekend-1-hitspin" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+			elseif noteType == "weekend-1-picouppercutprep" then
+				alternates[1] = not alternates[1]
+				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+			elseif noteType == "weekend-1-picouppercut" then
+				
+
+			elseif noteType == "weekend-1-darnelluppercutprep" then
+				alternates[1] = not alternates[1]
+				enemy:animate("pre-uppercut")
+			elseif noteType == "weekend-1-darnelluppercut" then
+				enemy:animate("uppercut")
+			elseif noteType == "weekend-1-idle" then
+				enemy:animate("idle")
+			elseif noteType == "weekend-1-fakeout" then
+				enemy:animate("fake out")
+			elseif noteType == "weekend-1-taunt" then
+				enemy:animate("cringe")
+			elseif noteType == "weekend-1-tauntforce" then
+				enemy:animate("pissed")
+			elseif noteType == "weekend-1-reversefakeout" then
+				enemy:animate("fake out")
+			end
+
+			return true
 		end
-
-		return true
 	end,
 
 	update = function(self, dt)
@@ -284,24 +287,30 @@ return {
             return
         end
 		-- The switch is too weak for shaders :(
-		if love.system.getOS() ~= "NX" then love.graphics.setCanvas(gameCanvas) end
+		local lastCanvas = love.graphics.getCanvas()
+		if love.system.getOS() ~= "NX" then 
+			love.graphics.setCanvas(gameCanvas) 
+
+			end
 		love.graphics.push()
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
 			stages["streets"]:draw()
 		love.graphics.pop()
-		if love.system.getOS() ~= "NX" then love.graphics.setCanvas() end
+		if love.system.getOS() ~= "NX" then 
+			love.graphics.setCanvas(lastCanvas) 
+
+			end
 
 		if love.system.getOS() ~= "NX" then 
 			love.graphics.setShader(shaders["rain"])
-			love.graphics.draw(gameCanvas, 0, 0, 0, love.graphics.getWidth() / 1280, love.graphics.getHeight() / 720)
+			love.graphics.draw(gameCanvas)
 			love.graphics.setShader()
 		end
 		 
 		if love.system.getOS() ~= "NX" then 
 			love.graphics.push() -- canvas' fuck with the game so we need to do this lol
-				love.graphics.scale(love.graphics.getWidth() / 1280, love.graphics.getHeight() / 720)
 		end
 			weeks:drawUI()
 		if love.system.getOS() ~= "NX" then 

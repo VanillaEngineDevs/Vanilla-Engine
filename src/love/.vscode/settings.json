@@ -4,7 +4,9 @@
     ],
     "Lua.diagnostics.disable": [
         "redundant-parameter",
-        "missing-parameter"
+        "missing-parameter",
+        "lowercase-global",
+        "assign-type-mismatch"
     ],
     "Lua.runtime.version": "LuaJIT",
     "Lua.runtime.special": [],

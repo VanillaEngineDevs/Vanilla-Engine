@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return {
-	enter = function(self, from, songNum, songAppend, isErect)
+	enter = function(self, from, songNum, songAppend, _songExt)
 		love.graphics.setDefaultFilter("nearest")
 		weeks:enter("pixel")
 
@@ -35,7 +35,7 @@ return {
 
 		song = songNum
 		difficulty = songAppend
-		hasErect = isErect
+		songExt = _songExt
 
 		self:load()
 
@@ -65,17 +65,17 @@ return {
 		weeks:load()
 
 		if song == 3 then
-			inst = love.audio.newSource("songs/thorns/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/thorns/Voices-bf" .. (hasErect and "-pixel-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/thorns/Voices-spirit" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/thorns/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/thorns/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/thorns/Voices-spirit" .. songExt .. ".ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/roses/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/roses/Voices-bf" .. (hasErect and "-pixel-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/roses/Voices-senpai" .. (hasErect and "-angry-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/roses/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/roses/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/roses/Voices-senpai" .. songExt .. ".ogg", "stream")
 		else
-			inst = love.audio.newSource("songs/senpai/Inst" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/senpai/Voices-bf" .. (hasErect and "-pixel-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/senpai/Voices-senpai" .. (hasErect and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/senpai/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/senpai/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/senpai/Voices-senpai" .. songExt .. ".ogg", "stream")
 		end
 		enemy.x, enemy.y = -340, -20
 
@@ -86,7 +86,7 @@ return {
 		weeks:initUI("pixel")
 
 		if song == 3 then
-			weeks:generateNotes("data/songs/thorns/thorns-chart" .. (hasErect and "-erect" or "") .. ".json", "data/songs/thorns/thorns-metadata" .. (hasErect and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/thorns/thorns-chart" .. songExt .. ".json", "data/songs/thorns/thorns-metadata" .. songExt .. ".json", difficulty)
 			if storyMode and not died then
 				dialogue.set("data/songs/thorns/thornsDialogue.txt")
 				dialogue.addSpeaker("dad", graphics.newImage(graphics.imagePath("week6/spiritFaceForward")), 400, 250, 6, 6, false)
@@ -106,7 +106,7 @@ return {
 				weeks:setupCountdown()
 			end
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/roses/roses-chart" .. (hasErect and "-erect" or "") .. ".json", "data/songs/roses/roses-metadata" .. (hasErect and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/roses/roses-chart" .. songExt .. ".json", "data/songs/roses/roses-metadata" .. songExt .. ".json", difficulty)
 			if storyMode and not died then
 				dialogue.set("data/songs/roses/rosesDialogue.txt")
 				dialogue.addSpeaker("dad", love.filesystem.load("sprites/week6/angrySenpaiBox.lua")(), 650, 375, 6, 6, true, false)
@@ -126,7 +126,7 @@ return {
 				weeks:setupCountdown()
 			end
 		else
-			weeks:generateNotes("data/songs/senpai/senpai-chart" .. (hasErect and "-erect" or "") .. ".json", "data/songs/senpai/senpai-metadata" .. (hasErect and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/senpai/senpai-chart" .. songExt .. ".json", "data/songs/senpai/senpai-metadata" .. songExt .. ".json", difficulty)
 			if storyMode and not died then
 				dialogue.set("data/songs/senpai/senpaiDialogue.txt")
 

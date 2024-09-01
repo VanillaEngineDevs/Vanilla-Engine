@@ -20,14 +20,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 local hauntedHouse
 
 return {
-	enter = function(self, from, songNum, songAppend, isErect)
+	enter = function(self, from, songNum, songAppend, _songExt)
 		weeks:enter()
 
 		stages["hauntedHouse"]:enter()
 
 		song = songNum
 		difficulty = songAppend
-		erectMode = isErect
+		songExt = _songExt
 
 		camera.zoom = 1.1
 		camera.defaultZoom = 1.1
@@ -48,17 +48,17 @@ return {
 
 			enemyIcon = icon.newIcon(icon.imagePath("monster"))
 
-			inst = love.audio.newSource("songs/monster/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/monster/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/monster/Voices-monster" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/monster/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/monster/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/monster/Voices-monster" .. songExt .. ".ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/south/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/south/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/south/Voices-spooky" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/south/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/south/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/south/Voices-spooky" .. songExt .. ".ogg", "stream")
 		else
-			inst = love.audio.newSource("songs/spookeez/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/spookeez/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/spookeez/Voices-spooky" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/spookeez/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/spookeez/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/spookeez/Voices-spooky" .. songExt .. ".ogg", "stream")
 		end
 		
 		weeks:load()
@@ -73,11 +73,11 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/songs/monster/monster-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/monster/monster-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/monster/monster-chart" .. songExt .. ".json", "data/songs/monster/monster-metadata" .. songExt .. ".json", difficulty)
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/south/south-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/south/south-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/south/south-chart" .. songExt .. ".json", "data/songs/south/south-metadata" .. songExt .. ".json", difficulty)
 		else
-			weeks:generateNotes("data/songs/spookeez/spookeez-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/spookeez/spookeez-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/spookeez/spookeez-chart" .. songExt .. ".json", "data/songs/spookeez/spookeez-metadata" .. songExt .. ".json", difficulty)
 		end
 	end,
 

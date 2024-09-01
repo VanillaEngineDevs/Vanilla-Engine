@@ -7,6 +7,9 @@ return {
             graphics.cache[path] = love.graphics.newImage(path)
         end
         local img = graphics.cache[path]
+        if path:find("-pixel") then
+            img:setFilter("nearest")
+        end
         local frameData = {
             {
                 x = 0, y = 0, 

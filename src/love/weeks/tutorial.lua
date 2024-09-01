@@ -23,12 +23,12 @@ local zoomTimer
 local zoom = {}
 
 return {
-	enter = function(self, from, songNum, songAppend, isErect)
+	enter = function(self, from, songNum, songAppend, _songExt)
 		weeks:enter()
 
 		difficulty = songAppend
 		song = songNum
-		erectMode = isErect
+		songExt = _songExt
 
 		stageBack = graphics.newImage(graphics.imagePath("week1/stage-back"))
 		stageFront = graphics.newImage(graphics.imagePath("week1/stage-front"))
@@ -50,9 +50,9 @@ return {
 
 		zoom[1] = 1
 
-		inst = love.audio.newSource("songs/tutorial/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-		voicesBF = love.audio.newSource("songs/tutorial/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-		voicesEnemy = love.audio.newSource("songs/tutorial/Voices-gf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+		inst = love.audio.newSource("songs/tutorial/Inst" .. songExt .. ".ogg", "stream")
+		voicesBF = love.audio.newSource("songs/tutorial/Voices-bf" .. songExt .. ".ogg", "stream")
+		voicesEnemy = love.audio.newSource("songs/tutorial/Voices-gf" .. songExt .. ".ogg", "stream")
 
 		self:initUI()
 
@@ -62,7 +62,7 @@ return {
 	initUI = function(self)
 		weeks:initUI()
 
-		weeks:generateNotes("data/songs/tutorial/tutorial-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/tutorial/tutorial-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+		weeks:generateNotes("data/songs/tutorial/tutorial-chart" .. songExt .. ".json", "data/songs/tutorial/tutorial-metadata" .. songExt .. ".json", difficulty)
 	end,
 
 	update = function(self, dt)

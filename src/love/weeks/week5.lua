@@ -24,7 +24,7 @@ local topBop, bottomBop, santa
 local scaryIntro = false
 
 return {
-	enter = function(self, from, songNum, songAppend, isErect)
+	enter = function(self, from, songNum, songAppend, _songExt)
 		weeks:enter()
 
 		stages["mall"]:enter()
@@ -37,7 +37,7 @@ return {
 
 		song = songNum
 		difficulty = songAppend
-		erectMode = isErect
+		songExt = _songExt
 
 		self:load()
 	end,
@@ -61,17 +61,17 @@ return {
 
 			enemyIcon = icon.newIcon(icon.imagePath("monster"))
 
-			inst = love.audio.newSource("songs/winter-horrorland/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/winter-horrorland/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/winter-horrorland/Voices-monster" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/winter-horrorland/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/winter-horrorland/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/winter-horrorland/Voices-monster" .. songExt .. ".ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/eggnog/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/eggnog/Voices-bf" .. (erectMode and "-christmas-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/eggnog/Voices-parents-christmas" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/eggnog/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/eggnog/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/eggnog/Voices-parents-christmas" .. songExt .. ".ogg", "stream")
 		else
 			inst = love.audio.newSource("songs/cocoa/Inst.ogg", "stream")
-			voicesBF = love.audio.newSource("songs/cocoa/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/cocoa/Voices-parents-christmas" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/cocoa/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/cocoa/Voices-parents-christmas" .. songExt .. ".ogg", "stream")
 		end
 		
 		weeks:load()
@@ -102,11 +102,11 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/songs/winter-horrorland/winter-horrorland-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/winter-horrorland/winter-horrorland-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/winter-horrorland/winter-horrorland-chart" .. songExt .. ".json", "data/songs/winter-horrorland/winter-horrorland-metadata" .. songExt .. ".json", difficulty)
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/eggnog/eggnog-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/eggnog/eggnog-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/eggnog/eggnog-chart" .. songExt .. ".json", "data/songs/eggnog/eggnog-metadata" .. songExt .. ".json", difficulty)
 		else
-			weeks:generateNotes("data/songs/cocoa/cocoa-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/cocoa/cocoa-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/cocoa/cocoa-chart" .. songExt .. ".json", "data/songs/cocoa/cocoa-metadata" .. songExt .. ".json", difficulty)
 		end
 	end,
 

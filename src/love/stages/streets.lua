@@ -94,6 +94,7 @@ return {
             girlfriend:draw()
 
             enemy:draw()
+            boyfriend:draw()
 
             stageImages["spraycanPile"]:draw()
 		love.graphics.pop()

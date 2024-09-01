@@ -9,6 +9,7 @@ function Character:new(luaPath)
     self.shearX, self.shearY = 0, 0
     self.optionsTable = self.spr.optionsTable
     self.icon = self.optionsTable.icon
+    self.flipX, self.flipY = false, false
     self.holdTimer = 0
     self.maxHoldTimer = self.spr.maxHoldTimer
 
@@ -23,6 +24,7 @@ function Character:update(dt)
     self.spr.sizeX, self.spr.sizeY = self.sizeX, self.sizeY
     self.spr.offsetX, self.spr.offsetY = self.spr.offsetX, self.spr.offsetY
     self.spr.shearX, self.spr.shearY = self.shearX, self.shearY
+    self.spr.flipX, self.spr.flipY = self.flipX, self.flipY
 
     self.spr.holdTimer = self.holdTimer
 end

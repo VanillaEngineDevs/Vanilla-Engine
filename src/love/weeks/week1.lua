@@ -20,14 +20,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 local stageBack, stageFront, curtains
 
 return {
-	enter = function(self, from, songNum, songAppend, isErect)
+	enter = function(self, from, songNum, songAppend, _songExt)
 		weeks:enter()
 
 		stages["stage"]:enter()
 
 		song = songNum
 		difficulty = songAppend
-		erectMode = isErect
+		songExt = _songExt
 
 		self:load()
 	end,
@@ -37,17 +37,17 @@ return {
 		stages["stage"]:load()
 
 		if song == 3 then
-			inst = love.audio.newSource("songs/dadbattle/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/dadbattle/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/dadbattle/Voices-dad" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/dadbattle/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/dadbattle/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/dadbattle/Voices-dad" .. songExt .. ".ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/fresh/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/fresh/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/fresh/Voices-dad" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/fresh/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/fresh/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/fresh/Voices-dad" .. songExt .. ".ogg", "stream")
 		else
-			inst = love.audio.newSource("songs/bopeebo/Inst" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/bopeebo/Voices-bf" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/bopeebo/Voices-dad" .. (erectMode and "-erect" or "") .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/bopeebo/Inst" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/bopeebo/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/bopeebo/Voices-dad" .. songExt .. ".ogg", "stream")
 		end
 
 		self:initUI()
@@ -58,11 +58,11 @@ return {
 	initUI = function(self)
 		weeks:initUI()
 		if song == 3 then
-			weeks:generateNotes("data/songs/dadbattle/dadbattle-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/dadbattle/dadbattle-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/dadbattle/dadbattle-chart" .. songExt .. ".json", "data/songs/dadbattle/dadbattle-metadata" .. songExt .. ".json", difficulty)
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/fresh/fresh-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/fresh/fresh-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/fresh/fresh-chart" .. songExt .. ".json", "data/songs/fresh/fresh-metadata" .. songExt .. ".json", difficulty)
 		else
-			weeks:generateNotes("data/songs/bopeebo/bopeebo-chart" .. (erectMode and "-erect" or "") .. ".json", "data/songs/bopeebo/bopeebo-metadata" .. (erectMode and "-erect" or "") .. ".json", difficulty)
+			weeks:generateNotes("data/songs/bopeebo/bopeebo-chart" .. songExt .. ".json", "data/songs/bopeebo/bopeebo-metadata" .. songExt .. ".json", difficulty)
 		end
 	end,
 
