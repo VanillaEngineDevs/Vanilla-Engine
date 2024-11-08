@@ -27,7 +27,7 @@ jobs:
           make win64
 
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: funkin-rewritten-win64
           path: build/win64
@@ -50,7 +50,7 @@ jobs:
           make win32
 
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: funkin-rewritten-win32
           path: build/win32
@@ -71,7 +71,7 @@ jobs:
           make macos
 
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: funkin-rewritten-macos
           path: build/macos
@@ -88,7 +88,7 @@ jobs:
           make lovefile
 
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: funkin-rewritten-lovefile
           path: build/lovefile
