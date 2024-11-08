@@ -23,12 +23,13 @@ local zoomTimer
 local zoom = {}
 
 return {
-	enter = function(self, from, songNum, songAppend, _songExt)
+	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter()
 
 		difficulty = songAppend
 		song = songNum
 		songExt = _songExt
+		audioAppend = _audioAppend
 
 		stageBack = graphics.newImage(graphics.imagePath("week1/stage-back"))
 		stageFront = graphics.newImage(graphics.imagePath("week1/stage-front"))
@@ -51,7 +52,7 @@ return {
 		zoom[1] = 1
 
 		inst = love.audio.newSource("songs/tutorial/Inst" .. songExt .. ".ogg", "stream")
-		voicesBF = love.audio.newSource("songs/tutorial/Voices-bf" .. songExt .. ".ogg", "stream")
+		voicesBF = love.audio.newSource("songs/tutorial/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 		voicesEnemy = love.audio.newSource("songs/tutorial/Voices-gf" .. songExt .. ".ogg", "stream")
 
 		self:initUI()

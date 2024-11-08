@@ -491,6 +491,7 @@ end
 		chart = chartData.notes[difficulty]
 
 		local metadata = json.decode(love.filesystem.read(metadata))
+		Conductor.mapBPMChanges(metadata)
 
 		SONGNAME = metadata.songName
 		CURDIFF = difficulty
@@ -778,6 +779,7 @@ end
 		end
 		if inCutscene then return end
 		beatHandler.update(dt)
+		Conductor.update(dt)
 
 		oldMusicThres = musicThres
 		if countingDown or love.system.getOS() == "Web" then -- Source:tell() can't be trusted on love.js!
@@ -905,7 +907,7 @@ end
 			end
 		end
 
-		if (beatHandler.onBeat() and beatHandler.getBeat() % camera.camBopInterval == 0 and camera.zooming and camera.zoom < 1.35 and not camera.locked) then 
+		if (Conductor.onBeat and Conductor.curBeat % camera.camBopInterval == 0 and camera.zooming and camera.zoom < 1.35 and not camera.locked) then 
 			camera.zoom = camera.zoom + 0.015 * camera.camBopIntensity
 			uiCam.zoom = uiCam.zoom + 0.03 * camera.camBopIntensity
 		end
@@ -919,10 +921,10 @@ end
 		if enemy then enemy:update(dt) end
 		if boyfriend then boyfriend:update(dt) end
 
-		if beatHandler.onBeat() then
-			if boyfriend then boyfriend:beat(beatHandler.getBeat()) end
-			if enemy then enemy:beat(beatHandler.getBeat()) end
-			if girlfriend then girlfriend:beat(beatHandler.getBeat()) end
+		if Conductor.onBeat then
+			if boyfriend then boyfriend:beat(Conductor.curBeat) end
+			if enemy then enemy:beat(Conductor.curBeat) end
+			if girlfriend then girlfriend:beat(Conductor.curBeat) end
 		end
 	end,
 
@@ -1336,7 +1338,7 @@ end
 		enemyIcon.x = 425 - healthLerp * 500
 		boyfriendIcon.x = 585 - healthLerp * 500
 
-		if beatHandler.onBeat() then
+		if Conductor.onBeat then
 			enemyIcon.sizeX, enemyIcon.sizeY = 1.75, 1.75
 			boyfriendIcon.sizeX, boyfriendIcon.sizeY = -1.75, 1.75
 		end

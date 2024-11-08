@@ -187,8 +187,8 @@ return {
 				uitextColored(spriteAnims[i], 0, (i - 1) * 20, 0, nil, (i == selection and {1, 1, 0} or {1, 1, 1}))
 				graphics.setColor(1, 1, 1)
 
-				uitextColored("X: " .. tostring(overlaySprite:getCurrentAnim().offsetX + (sprite.x - overlaySprite.x)), 0, (#spriteAnims + 1) * 20)
-				uitextColored("Y: " .. tostring(overlaySprite:getCurrentAnim().offsetY - (sprite.y - overlaySprite.y)), 0, (#spriteAnims + 2) * 20)
+				uitextColored("X: " .. tostring((sprite.x - overlaySprite.x)), 0, (#spriteAnims + 1) * 20)
+				uitextColored("Y: " .. tostring((sprite.y - overlaySprite.y)), 0, (#spriteAnims + 2) * 20)
 				uitextColored("Frame: " .. tostring(overlaySprite:getFrameFromCurrentAnim()), 0, (#spriteAnims + 3) * 20)
 			end
 		else

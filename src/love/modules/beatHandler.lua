@@ -1,3 +1,5 @@
+---@deprecated 
+---This module is deprecated and will no longer be updated. Please consider using the `Conductor` class instead as this is here simply for compatibility reasons.
 beatHandler = {}
 beatHandler.beat = 0
 beatHandler.beatTime = 0

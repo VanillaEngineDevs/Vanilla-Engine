@@ -17,37 +17,53 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
-local stageBack, stageFront, curtains
+local stage
 
 return {
-	enter = function(self, from, songNum, songAppend, _songExt)
+	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter()
 
-		stages["stage"]:enter()
+		stage = stages["stage.base"]
+
+		if _songExt == "-erect" or _songExt == "-pico" then
+			stage = stages["stage.erect"]
+		end
+
+		stage:enter(_songExt)
 
 		song = songNum
 		difficulty = songAppend
 		songExt = _songExt
+		audioAppend = _audioAppend
 
 		self:load()
 	end,
 
 	load = function(self)
 		weeks:load()
-		stages["stage"]:load()
+		stage:load()
 
 		if song == 3 then
 			inst = love.audio.newSource("songs/dadbattle/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/dadbattle/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/dadbattle/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/dadbattle/Voices-dad" .. songExt .. ".ogg", "stream")
+			if girlfriend.name and girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/dadbattle/Inst" .. songExt .. ".ogg")
+			end
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/fresh/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/fresh/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/fresh/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/fresh/Voices-dad" .. songExt .. ".ogg", "stream")
+			if girlfriend.name and girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/fresh/Inst" .. songExt .. ".ogg")
+			end
 		else
 			inst = love.audio.newSource("songs/bopeebo/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/bopeebo/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/bopeebo/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/bopeebo/Voices-dad" .. songExt .. ".ogg", "stream")
+			if girlfriend.name and girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/bopeebo/Inst" .. songExt .. ".ogg")
+			end
 		end
 
 		self:initUI()
@@ -68,7 +84,7 @@ return {
 
 	update = function(self, dt)
 		weeks:update(dt)
-		stages["stage"]:update(dt)
+		stage:update(dt)
 
 		weeks:checkSongOver()
 
@@ -80,14 +96,14 @@ return {
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
-			stages["stage"]:draw()
+			stage:draw()
 		love.graphics.pop()
 
 		weeks:drawUI()
 	end,
 
 	leave = function(self)
-		stages["stage"]:leave()
+		stage:leave()
 
 		enemy = nil
 		boyfriend = nil

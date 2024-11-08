@@ -24,11 +24,19 @@ import sys
 
 import xml.etree.ElementTree as ET
 
+import re, random
+
 xmlname = os.path.split(sys.argv[1])[1]
 sheetxml = ET.parse(xmlname).getroot()
 
-lua = ('\t-- Automatically generated from ' + xmlname + '\n'
-       '\t{\n')
+imgFile = sheetxml.attrib.get('imagePath', '')
+
+animLists = {}
+
+lua = ('return graphics.newSprite(\n'
+       f'\tgraphics.imagePath("{imgFile.replace(".png", "")}"),\n'
+       '\t{\n'
+       )
 c = 0
 for SubTexture in sheetxml.findall('SubTexture'):
     c += 1
@@ -57,8 +65,37 @@ for SubTexture in sheetxml.findall('SubTexture'):
 
     lua += '\t\t{x = ' + x + ', y = ' + y + ', width = ' + width + ', height = ' + height + ', offsetX = ' + offsetx + ', offsetY = ' + offsety + ', offsetWidth = ' + offsetWidth + ', offsetHeight = ' + offsetHeight + ', rotated = ' + rotated + '}, -- ' + str(c) + ': ' + name + '\n'
 
-lua = lua[:len(lua) - (len(str(c)) + len(name) + 9)] + '} -- ' + str(c) + ': ' + name + '\n'
+    realName = re.sub(r'\d+$', '', name)
+
+    if realName in animLists:
+        curAnim = animLists[realName]
+    else:
+        curAnim = {}
+        animLists[realName] = curAnim
+        curAnim["start"] = str(c) 
+
+    curAnim["stop"] = str(c)
+    curAnim["speed"] = str(24)
+    curAnim["offsetX"] = str(0)
+    curAnim["offsetY"] = str(0)
+    curAnim["name"] = realName
+
 lua += '\t},\n'
 
-with open('output.txt', 'w') as f:
+lua += "\t{\n"
+
+for animName, animData in animLists.items():
+    lua += '\t\t["' + animData["name"] + '"] = {start = ' + str(animData["start"]) + ', stop = ' + str(animData['stop']) + ', speed = ' + str(animData["speed"]) + ', offsetX = ' + str(animData["offsetX"]) + ', offsetY = ' + str(animData["offsetY"]) + '},\n'
+
+lua += '\t},\n'
+
+lua += f'\t"{random.choice(list(animLists.values()))["name"]}",\n'
+lua += f'\tfalse\n'
+
+lua += ")"
+
+# remove .xml from xmlname
+luaFile = xmlname.replace('.xml', '') + '.lua'
+
+with open(luaFile, 'w') as f:
     f.write(lua)

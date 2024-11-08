@@ -4,7 +4,7 @@ return {
 	enter = function(self, from)
 		weeks:enter()
 
-		stages["stage"]:enter()
+		stages["stage.base"]:enter()
         enemy = nil
         love.graphics.setDefaultFilter("nearest", "nearest")
         enemy = BaseCharacter("sprites/characters/boyfriend-pixel.lua")
@@ -23,7 +23,7 @@ return {
 
 	load = function(self)
 		weeks:load()
-		stages["stage"]:load()
+		stages["stage.base"]:load()
 
 	    inst = love.audio.newSource("songs/test/Inst.ogg", "stream")
 		voicesBF = love.audio.newSource("songs/test/Voices-bf.ogg", "stream")
@@ -106,7 +106,7 @@ return {
 
 	update = function(self, dt)
 		weeks:update(dt)
-		stages["stage"]:update(dt)
+		stages["stage.base"]:update(dt)
 
         for i = 1, 4 do
             local strumline = boyfriendArrows[i]
@@ -141,14 +141,14 @@ return {
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
-			stages["stage"]:draw()
+			stages["stage.base"]:draw()
 		love.graphics.pop()
 
 		weeks:drawUI()
 	end,
 
 	leave = function(self)
-		stages["stage"]:leave()
+		stages["stage.base"]:leave()
 
 		enemy = nil
 		boyfriend = nil

@@ -123,7 +123,7 @@ function importMods.getStageFileFromName(name)
             return love.filesystem.load(mod.path .. "/stages/" .. name .. ".lua")
         end
     end
-    return nil
+    return love.filesystem.load("stages/" .. name .. ".lua")
 end
 
 -- now sprites/ stuffs
@@ -163,6 +163,9 @@ end
 
 function importMods.setupScripts()
     local currentMod = importMods.getCurrentMod()
+    if not currentMod then
+        return
+    end
 
     if importMods.storedModsScripts[currentMod.name] then
         for _, script in ipairs(importMods.storedModsScripts[currentMod.name]) do
@@ -255,6 +258,9 @@ end
 
 function loadLuaFile(path)
     local currentMod = importMods.getCurrentMod()
+    if not currentMod then
+        return love.filesystem.load(path)
+    end
 
     if love.filesystem.getInfo(currentMod.path .. "/" .. path) then
         return love.filesystem.load(currentMod.path .. "/" .. path)
@@ -265,6 +271,10 @@ end
 
 function loadAudioFile(path)
     local currentMod = importMods.getCurrentMod()
+
+    if not currentMod then
+        return love.audio.newSource(path, "stream")
+    end
 
     if love.filesystem.getInfo(currentMod.path .. "/" .. path) then
         return love.audio.newSource(currentMod.path .. "/" .. path, "stream")

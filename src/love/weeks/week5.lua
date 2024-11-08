@@ -24,10 +24,10 @@ local topBop, bottomBop, santa
 __scaryIntro = false
 
 return {
-	enter = function(self, from, songNum, songAppend, _songExt)
+	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter()
 
-		stages["mall"]:enter()
+		stages["mall.base"]:enter()
 
 		camera.zoom = 0.7
 		camera.defaultZoom = 0.7
@@ -38,6 +38,7 @@ return {
 		song = songNum
 		difficulty = songAppend
 		songExt = _songExt
+		audioAppend = _audioAppend
 
 		self:load()
 	end,
@@ -62,20 +63,20 @@ return {
 			enemyIcon = icon.newIcon(icon.imagePath("monster"))
 
 			inst = love.audio.newSource("songs/winter-horrorland/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/winter-horrorland/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/winter-horrorland/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/winter-horrorland/Voices-monster" .. songExt .. ".ogg", "stream")
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/eggnog/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/eggnog/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/eggnog/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/eggnog/Voices-parents-christmas" .. songExt .. ".ogg", "stream")
 		else
 			inst = love.audio.newSource("songs/cocoa/Inst.ogg", "stream")
-			voicesBF = love.audio.newSource("songs/cocoa/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/cocoa/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/cocoa/Voices-parents-christmas" .. songExt .. ".ogg", "stream")
 		end
 		
 		weeks:load()
-		stages["mall"]:load()
+		stages["mall.base"]:load()
 
 
 		self:initUI()
@@ -123,7 +124,7 @@ return {
 	update = function(self, dt)
 		if not __scaryIntro then
 			weeks:update(dt)
-			stages["mall"]:update(dt)
+			stages["mall.base"]:update(dt)
 
 			if not (__scaryIntro or countingDown or graphics.isFading()) and not (inst:isPlaying() and voicesBF:isPlaying()) and not paused then
 				if storyMode and song < 3 then
@@ -166,7 +167,7 @@ return {
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
-			stages["mall"]:draw()
+			stages["mall.base"]:draw()
 		love.graphics.pop()
 
 		if not __scaryIntro then
@@ -182,7 +183,7 @@ return {
 
 		graphics.clearCache()
 
-		stages["mall"]:leave()
+		stages["mall.base"]:leave()
 		weeks:leave()
 	end
 }

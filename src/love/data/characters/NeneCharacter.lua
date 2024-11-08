@@ -10,9 +10,13 @@ local vizFrameWidth = 0
 function Nene:new()
     self.abot = graphics.newImage(graphics.imagePath("weekend1/abot"))
     self.abotBack = graphics.newImage(graphics.imagePath("weekend1/stereoBG"))
+    self.soundData = nil
+    self.bars = {0, 0, 0, 0, 0, 0, 0}
 
     abotVisualizers = {}
     BaseCharacter.new(self, "sprites/characters/nene.lua")
+
+    self.name = "nene"
 
     self.STATE_DEFAULT = 0
     self.STATE_PRE_RAISE = 1
@@ -50,6 +54,31 @@ function Nene:update(dt)
 
     for i = 1, MAX_ABOT_VIZ do
         abotVisualizers[i].x, abotVisualizers[i].y = self.x + -180 + (vizFrameWidth + 25) * i, self.y + 270
+    end
+
+    if self.soundData and love.system.getOS() ~= "NX" then
+        local curSample = math.floor(inst:tell("samples"))
+        local totalSamples = self.soundData:getSampleCount()
+        local count = 0
+        local samplesPerBarInv = 1 / 5
+        for i = 1, MAX_ABOT_VIZ do
+            local averageAmplitude = 0
+            local baseSample = curSample + i * 5
+            for j = 1, 50 do
+                local sample = (baseSample + j) % totalSamples
+                local sampleIndex = sample * 2
+
+                local leftSample = self.soundData:getSample(sampleIndex) or 0
+                local rightSample = self.soundData:getSample(sampleIndex + 1) or 0
+
+                averageAmplitude = averageAmplitude + math.abs(leftSample + rightSample) * 0.5
+            end
+
+            averageAmplitude = averageAmplitude * samplesPerBarInv
+            self.bars[i] = (self.bars[i] + 0.03 * (averageAmplitude - self.bars[i]))
+            count = count + 1
+
+        end
     end
 end
 
@@ -108,7 +137,7 @@ end
 function Nene:beat(beat)
     local beat = math.floor(beat) or 0
 
-    if beatHandler.onBeat() then
+    if Conductor.onBeat then
         if beat % self.spr.danceSpeed == 0 then 
             self.spr.danced = not self.spr.danced
             
@@ -133,38 +162,21 @@ function Nene:beat(beat)
     end
 end
 
-function Nene:draw()
+function Nene:draw(debug)
     if not self.visible then return end
 
     self.abotBack:draw()
-    if curOS ~= "NX" then
-        local fftArray = lovefftINST:get()
-        local bfFFTArray, enemyFFTArray = {}, {}
-        local time = inst:tell()
-        if deltaCurTime > VIS_TIME_MAX then
-            deltaCurTime = 0
-            --print("Time: " .. time)
-            lovefftINST:updatePlayTime(time)
-        end
-        -- we only have 7 bars
-        local MAX_BARS = 7
-        local forEach = #fftArray / MAX_BARS
-        local index = 1
-        for i = 1, #fftArray, forEach do
-            local i = math.floor(i)
-            -- 7 bars
-            local barHeight = fftArray[i] * 720*100
-            --print(index, i, barHeight)
-            -- convert bar height from a number from 1-6
-            local animNum = math.floor(math.remap(barHeight, 0, 720, 1, 6))
-            --print(index, i, animNum)
-            abotVisualizers[index]:animate(tostring(index) .. "_" .. tostring(animNum), false)
-            abotVisualizers[index]:draw()
-            index = index + 1
+    if curOS ~= "NX" and not debug and self.soundData then
+        for i = 1, MAX_ABOT_VIZ do
+            local barHeight = self.bars[i]
+            local animNum = math.floor(math.remap(math.remap(barHeight, 0, 6, 0, 1), 0, 1, 1, 6))
+            abotVisualizers[i]:animate(tostring(i) .. "_" .. tostring(animNum), false)
+            abotVisualizers[i]:draw()
         end
     end
     graphics.setColor(1, 1, 1, 1)
-    love.graphics.rectangle("fill", -315, 30, 120, 60)
+    ---12, -270
+    love.graphics.rectangle("fill", self.x + -327, self.y + 300, 120, 60)
     self.abot:draw()
 
     self.spr:draw()

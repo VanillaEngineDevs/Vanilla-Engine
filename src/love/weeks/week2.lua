@@ -17,17 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
-local hauntedHouse
+local stage
 
 return {
-	enter = function(self, from, songNum, songAppend, _songExt)
+	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter()
 
-		stages["hauntedHouse"]:enter()
+		stage = stages["hauntedHouse.base"]
+
+		if _songExt == "-erect" or _songExt == "-pico" then
+			stage = stages["hauntedHouse.erect"]
+		end
+
+		stage:enter()
 
 		song = songNum
 		difficulty = songAppend
 		songExt = _songExt
+		audioAppend = _audioAppend
 
 		camera.zoom = 1.1
 		camera.defaultZoom = 1.1
@@ -49,20 +56,20 @@ return {
 			enemyIcon = icon.newIcon(icon.imagePath("monster"))
 
 			inst = love.audio.newSource("songs/monster/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/monster/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/monster/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/monster/Voices-monster" .. songExt .. ".ogg", "stream")
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/south/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/south/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/south/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/south/Voices-spooky" .. songExt .. ".ogg", "stream")
 		else
 			inst = love.audio.newSource("songs/spookeez/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/spookeez/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/spookeez/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/spookeez/Voices-spooky" .. songExt .. ".ogg", "stream")
 		end
 		
 		weeks:load()
-		stages["hauntedHouse"]:load()
+		stage:load()
 
 		self:initUI()
 
@@ -83,7 +90,7 @@ return {
 
 	update = function(self, dt)
 		weeks:update(dt)
-		stages["hauntedHouse"]:update(dt)
+		stage:update(dt)
 
 		if beatHandler.onBeat() then
 			if enemy:getAnimName() == "idle" then
@@ -101,15 +108,13 @@ return {
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
-			stages["hauntedHouse"]:draw()
+			stage:draw()
 		love.graphics.pop()
 
 		weeks:drawUI()
 	end,
 
 	leave = function(self)
-		stages["hauntedHouse"]:leave()
-
 		graphics.clearCache()
 
 		weeks:leave()

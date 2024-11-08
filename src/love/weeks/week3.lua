@@ -17,17 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
-local sky, city, cityWindows, behindTrain, street
-
+local stage
 return {
-	enter = function(self, from, songNum, songAppend, _songExt)
+	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter()
 
-		stages["city"]:enter()
+		stage = stages["city.base"]
+		if _songExt == "-erect" or _songExt == "-pico" then
+			stage = stages["city.erect"]
+		end
+
+		stage:enter(_songExt)
 
 		song = songNum
 		difficulty = songAppend
 		songExt = _songExt
+		audioAppend = _audioAppend
 
 		camera.zoom = 1
 		camera.defaultZoom = 1
@@ -37,20 +42,20 @@ return {
 
 	load = function(self)
 		weeks:load()
-		stages["city"]:load()
+		stage:load()
 
 		if song == 3 then
 			inst = love.audio.newSource("songs/blammed/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/blammed/Voices-bf" .. songExt .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/blammed/Voices-pico" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/blammed/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/blammed/Voices-pico-enemy" .. songExt .. ".ogg", "stream")
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/philly-nice/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/philly-nice/Voices-bf" .. songExt .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/philly-nice/Voices-pico" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/philly-nice/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/philly-nice/Voices-pico-enemy" .. songExt .. ".ogg", "stream")
 		else
 			inst = love.audio.newSource("songs/pico/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/pico/Voices-bf" .. songExt .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/pico/Voices-pico" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/pico/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
+			voicesEnemy = love.audio.newSource("songs/pico/Voices-pico-enemy" .. songExt .. ".ogg", "stream")
 		end
 
 		self:initUI()
@@ -72,7 +77,7 @@ return {
 
 	update = function(self, dt)
 		weeks:update(dt)
-		stages["city"]:update(dt)
+		stage:update(dt)
 
 		weeks:checkSongOver()
 
@@ -86,14 +91,14 @@ return {
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
-			stages["city"]:draw()
+			stage:draw()
 		love.graphics.pop()
 
 		weeks:drawUI()
 	end,
 
 	leave = function(self)
-		stages["city"]:leave()
+		stage:leave()
 
 		graphics.clearCache()
 

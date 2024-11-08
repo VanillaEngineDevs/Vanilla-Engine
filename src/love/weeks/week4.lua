@@ -20,35 +20,42 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 local sunset
 
 local bgLimo, limoDancer, limo
-
+local stage
 return {
-	enter = function(self, from, songNum, songAppend, _songExt)
+	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter()
 
-		stages["sunset"]:enter()
+		stage = stages["sunset.base"]
+
+		if _songExt == "-erect" or _songExt == "-pico" then
+			stage = stages["sunset.erect"]
+		end
+
+		stage:enter(_songExt)
 
 		song = songNum
 		difficulty = songAppend
 		songExt = _songExt
+		audioAppend = _audioAppend
 
 		self:load()
 	end,
 
 	load = function(self)
 		weeks:load()
-		stages["sunset"]:load()
+		stage:load()
 
 		if song == 3 then
 			inst = love.audio.newSource("songs/milf/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/milf/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/milf/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/milf/Voices-mom" .. songExt .. ".ogg", "stream")
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/high/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/high/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/high/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/high/Voices-mom" .. songExt .. ".ogg", "stream")
 		else
 			inst = love.audio.newSource("songs/satin-panties/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/satin-panties/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/satin-panties/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/satin-panties/Voices-mom" .. songExt .. ".ogg", "stream")
 		end
 
@@ -71,7 +78,7 @@ return {
 
 	update = function(self, dt)
 		weeks:update(dt)
-		stages["sunset"]:update(dt)
+		stage:update(dt)
 
 		-- Hardcoded M.I.L.F camera scaling
 		if song == 3 and musicTime > 56000 and musicTime < 67000 and musicThres ~= oldMusicThres and math.fmod(absMusicTime, 60000 / bpm) < 100 then
@@ -101,14 +108,14 @@ return {
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
-			stages["sunset"]:draw()
+			stage:draw()
 		love.graphics.pop()
 
 		weeks:drawUI()
 	end,
 
 	leave = function()
-		stages["sunset"]:leave()
+		stage:leave()
 
 		graphics.clearCache()
 

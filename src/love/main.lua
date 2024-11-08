@@ -186,6 +186,7 @@ function love.load()
 	icon = require "modules.Icon"
 	camera = require "modules.camera"
 	beatHandler = require "modules.beatHandler"
+	Conductor = require "modules.Conductor"
 	util = require "modules.util"
 	cutscene = require "modules.cutscene"
 	dialogue = require "modules.dialogue"
@@ -203,6 +204,8 @@ function love.load()
 	-- Load Characters
 	BaseCharacter = require "data.characters.BaseCharacter"
 	NeneCharacter = require "data.characters.NeneCharacter"
+	BFDarkCharacter = require "data.characters.BFDarkCharacter"
+	GFDarkCharacter = require "data.characters.GFDarkCharacter"
 
 	-- Modding
 	importMods = require "modding.importMods"
@@ -238,15 +241,21 @@ function love.load()
 
 	-- Load stages
 	stages = {
-		["stage"] = require "stages.stage",
-		["hauntedHouse"] = require "stages.hauntedHouse",
-		["city"] = require "stages.city",
-		["sunset"] = require "stages.sunset",
-		["mall"] = require "stages.mall",
-		["school"] = require "stages.school",
-		["evilSchool"] = require "stages.evilSchool",
-		["tank"] = require "stages.tank",
-		["streets"] = require "stages.streets"
+		["stage.base"] = require "stages.base.stage",
+		["hauntedHouse.base"] = require "stages.base.hauntedHouse",
+		["city.base"] = require "stages.base.city",
+		["sunset.base"] = require "stages.base.sunset",
+		["mall.base"] = require "stages.base.mall",
+		["school.base"] = require "stages.base.school",
+		["evilSchool.base"] = require "stages.base.evilSchool",
+		["tank.base"] = require "stages.base.tank",
+		["streets.base"] = require "stages.base.streets",
+
+		["stage.erect"] = require "stages.erect.stage",
+		["hauntedHouse.erect"] = require "stages.erect.hauntedHouse",
+		["city.erect"] = require "stages.erect.city",
+		["sunset.erect"] = require "stages.erect.sunset",
+		["streets.erect"] = require "stages.erect.streets"
 	}
 
 	-- Load Note types

@@ -24,16 +24,23 @@ function WEEKEND1_getNextCanWithState(state)
 end ]]
 local lastSaveDataBool = false
 local alternates = {false, false}
-
+local stage
 return {
-	enter = function(self, from, songNum, songAppend, _songExt)
+	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter()
 
-		stages["streets"]:enter()
+		stage = stages["streets.base"]
+
+		if _songExt == "-erect" or _songExt == "-bf" then
+			stage = stages["streets.erect"]
+		end
+
+		stage:enter(_songExt)
 
 		song = songNum
 		difficulty = songAppend
 		songExt = _songExt
+		audioAppend = _audioAppend
 
 		if love.system.getOS() ~= "NX" then 
 			gameCanvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
@@ -48,7 +55,7 @@ return {
 
 	load = function(self)
 		weeks:load()
-		stages["streets"]:load()
+		stage:load()
 
 		if song == 4 then
 			inst = love.audio.newSource("songs/blazin/Inst" .. songExt .. ".ogg", "stream") 
@@ -68,7 +75,7 @@ return {
 				lovefftINST:init(1024)
 				lovefftINST:setSoundData("songs/2hot/Inst" .. songExt .. ".ogg")
 			end
-			voicesBF = love.audio.newSource("songs/2hot/Voices-pico" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/2hot/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/2hot/Voices-darnell" .. songExt .. ".ogg", "stream")
 			rainShaderStartIntensity = 0.2
 			rainShaderEndIntensity = 0.4
@@ -78,7 +85,7 @@ return {
 				lovefftINST:init(1024)
 				lovefftINST:setSoundData("songs/lit-up/Inst" .. songExt .. ".ogg")
 			end
-			voicesBF = love.audio.newSource("songs/lit-up/Voices-pico" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/lit-up/Voices-pico" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/lit-up/Voices-darnell" .. songExt .. ".ogg", "stream")
 
 			rainShaderStartIntensity = 0.1
@@ -89,7 +96,7 @@ return {
 				lovefftINST:init(1024)
 				lovefftINST:setSoundData("songs/darnell/Inst" .. songExt .. ".ogg")
 			end
-			voicesBF = love.audio.newSource("songs/darnell/Voices-pico" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/darnell/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/darnell/Voices-darnell" .. songExt .. ".ogg", "stream")
 
 			rainShaderStartIntensity = 0
@@ -274,7 +281,7 @@ return {
 			shaders["rain"]:send("uIntensity", intensity)
 		end
 		weeks:update(dt)
-		stages["streets"]:update(dt)
+		stage:update(dt)
 
 		weeks:checkSongOver()
 
@@ -286,22 +293,23 @@ return {
             video:draw()
             return
         end
-		-- The switch is too weak for shaders :(
+
+		-- The switch is too weak for shaders like this :(
 		local lastCanvas = love.graphics.getCanvas()
 		if love.system.getOS() ~= "NX" then 
-			love.graphics.setCanvas(gameCanvas) 
+			love.graphics.setCanvas(gameCanvas)
+		end
 
-			end
 		love.graphics.push()
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
-			stages["streets"]:draw()
+			stage:draw()
 		love.graphics.pop()
-		if love.system.getOS() ~= "NX" then 
-			love.graphics.setCanvas(lastCanvas) 
 
-			end
+		if love.system.getOS() ~= "NX" then 
+			love.graphics.setCanvas(lastCanvas)
+		end
 
 		if love.system.getOS() ~= "NX" then 
 			love.graphics.setShader(shaders["rain"])
@@ -319,7 +327,7 @@ return {
 	end,
 
 	leave = function(self)
-		stages["streets"]:leave()
+		stage:leave()
 
 		enemy = nil
 		boyfriend = nil

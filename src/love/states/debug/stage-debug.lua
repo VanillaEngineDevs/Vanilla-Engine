@@ -200,19 +200,18 @@ return {
 				if love.filesystem.getInfo(curDir .. "/" .. dirTable[selection], isDir) then
 					isDir = love.filesystem.getInfo(curDir .. "/" .. dirTable[selection]).type == "directory"
 				end
-				if isDir then
-                    fileStr = dirTable[selection]
-                    fileStr = fileStr:sub(1, -5)
 
-                    selection = 1
+				if isDir then
+                    fileStr = curDir .. "/" .. dirTable[selection]
+
 					self:stageViewerSearch(dirTable[selection])
+					selection = 1
 				else
-                    fileStr = dirTable[selection]
-                    fileStr = fileStr:sub(1, -5)
+                    fileStr = curDir .. "/" .. dirTable[selection]
                     boyfriend = love.filesystem.load("sprites/characters/boyfriend.lua")()
                     girlfriend = love.filesystem.load("sprites/characters/girlfriend.lua")()
-					if love.filesystem.getInfo("stages/" .. fileStr .. ".lua") then
-						curStage = love.filesystem.load("stages/" .. fileStr .. ".lua")()
+					if love.filesystem.getInfo(fileStr) then
+						curStage = love.filesystem.load(fileStr)()
 					else
 						importMods.setCurrentMod(importMods.getModFromStage(fileStr))
 						curStage = importMods.getStageFileFromName(fileStr)()
@@ -254,7 +253,7 @@ return {
 			love.graphics.push()
 				love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 				love.graphics.scale(camera.zoom, camera.zoom)
-                curStage:draw()
+                curStage:draw(true)
 			love.graphics.pop()
 
 			if curChanging == "stage" then

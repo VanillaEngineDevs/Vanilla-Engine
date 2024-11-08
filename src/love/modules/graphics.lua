@@ -471,7 +471,7 @@ local graphics = {
 						if (not self:isAnimated() and util.startsWith(self:getAnimName(), "sing")) or (self:getAnimName() == "idle" or self:getAnimName() == "idle loop") then
 							if beat % self.danceSpeed == 0 then 
 								if self.lastHit > 0 then
-									if beat % math.max(self.danceSpeed, 2) == 0 and self.lastHit + beatHandler.stepCrochet * self.singDuration <= musicTime then
+									if beat % math.max(self.danceSpeed, 2) == 0 and self.lastHit + Conductor.stepCrotchet * self.singDuration <= musicTime then
 										self:animate("idle", false, function()
 											if self:isAnimName("idle loop") then 
 												self:animate("idle loop", true)

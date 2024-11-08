@@ -8,25 +8,25 @@ return { -- Add/remove weeks here
     {
         "Week 1",
         {
-            {"Bopeebo",   erect=true},
-            {"Fresh",     erect=true},
-            {"Dadbattle", erect=true}
+            {"Bopeebo",   erect=true, pico=true},
+            {"Fresh",     erect=true, pico=true},
+            {"Dadbattle", erect=true, pico=true}
         }
     },
     {
         "Week 2",
         {
-            {"Spookeez",  erect=true},
-            {"South",     erect=true},
+            {"Spookeez",  erect=true, pico=true},
+            {"South",     erect=true, pico=true},
             {"Monster"}
         }
     },
     {
         "Week 3",
         {
-            {"Pico",        erect=true},
-            {"Philly Nice", erect=true},
-            {"Blammed",     erect=true}
+            {"Pico",        erect=true, pico=true},
+            {"Philly Nice", erect=true, pico=true},
+            {"Blammed",     erect=true, pico=true}
         }
     },
     {
@@ -40,8 +40,8 @@ return { -- Add/remove weeks here
     {
         "Week 5",
         {
-            {"Cocoa"},
-            {"Eggnog", erect=true},
+            {"Cocoa",  erect=true},
+            {"Eggnog", erect=true, pico=true},
             {"Winter Horrorland"}
         }
     },
@@ -56,25 +56,25 @@ return { -- Add/remove weeks here
     {
         "Week 7",
         {
-            {"Ugh"},
-            {"Guns"},
+            {"Ugh",  erect=true,  pico=true},
+            {"Guns", erect=false, pico=true},
             {"Stress"}
         }
     },
     {
         "Weekend 1",
         {
-            {"Darnell"},
-            {"Lit Up"},
-            {"2hot"},
-            {"Blazin"},
+            {"Darnell", diffs = {{"easy", nil, nil, "-pico"}, {"normal", nil, nil, "-pico"}, {"hard", nil, nil, "-pico"}, {"BF Easy", "-bf", "easy", "-bf"}, {"BF Normal", "-bf", "normal", "-bf"}, {"BF Hard", "-bf", "hard", "-bf"}}},
+            {"Lit Up", diffs = {{"easy", nil, nil, "-pico"}, {"normal", nil, nil, "-pico"}, {"hard", nil, nil, "-pico"}}},
+            {"2hot", diffs = {{"easy", nil, nil, "-pico"}, {"normal", nil, nil, "-pico"}, {"hard", nil, nil, "-pico"}}},
+            {"Blazin", diffs = {{"easy", nil, nil, "-pico"}, {"normal", nil, nil, "-pico"}, {"hard", nil, nil, "-pico"}}},
             {"Cutscene", show=false}
         }
     },
     {
         "Test",
         {
-            {"Test", diffs = {{"normal", ext=""}}}, -- Test only has a "normal" difficulty with no extension.
+            {"Test", diffs = {{"normal", ""}}}, -- Test only has a "normal" difficulty with no extension.
         }
     },
 }

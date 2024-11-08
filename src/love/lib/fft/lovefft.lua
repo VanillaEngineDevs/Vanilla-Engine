@@ -4,7 +4,7 @@
 
 local loveFFT = {}
 
-function loveFFT:init(fftSize) -- The number of samples used to calculate FFT, must be a power of 2
+function loveFFT:init(fftSize, smoothing) -- The number of samples used to calculate FFT, must be a power of 2
     if fftSize == nil then
         fftSize = 2048
     end
@@ -16,6 +16,7 @@ function loveFFT:init(fftSize) -- The number of samples used to calculate FFT, m
     self.threadFFT:start(fftSize)
     self.channelFFT = love.thread.getChannel("fft")
     self.channelToFFT = love.thread.getChannel("toFFT")
+    self.smoothing = smoothing or 0.03 -- lower = smoother, higher = more responsive
 end
 
 function loveFFT:setFFTSize(fftSize) -- Usually, avoid setting FFTSize in run time to save you from chores

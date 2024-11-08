@@ -26,6 +26,8 @@ function Character:update(dt)
     self.spr.shearX, self.spr.shearY = self.shearX, self.shearY
     self.spr.flipX, self.spr.flipY = self.flipX, self.flipY
 
+    self.spr.shader = self.shader
+
     self.spr.holdTimer = self.holdTimer
 end
 
@@ -46,6 +48,18 @@ end
 
 function Character:animate(...)
     self.spr:animate(...)
+end
+
+function Character:isAnimated()
+    return self.spr:isAnimated()
+end
+
+function Character:getAnimName()
+    return self.spr:getAnimName()
+end
+
+function Character:setAnimSpeed(speed)
+    self.spr:setAnimSpeed(speed)
 end
 
 return Character

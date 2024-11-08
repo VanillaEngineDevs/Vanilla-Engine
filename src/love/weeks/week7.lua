@@ -1,8 +1,8 @@
 return {
-    enter = function(self, from, songNum, songAppend, _songExt)
+    enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter() 
 
-		stages["tank"]:enter()
+		stages["tank.base"]:enter()
 
 		week = 7
 
@@ -15,6 +15,7 @@ return {
 		song = songNum
 		difficulty = songAppend
 		songExt = _songExt
+		audioAppend = _audioAppend
     
 		self:load()
 
@@ -25,7 +26,7 @@ return {
 
 	load = function(self)
 		weeks:load()
-		stages["tank"]:load()
+		stages["tank.base"]:load()
 
 		if song == 3 then
 			girlfriend = BaseCharacter("sprites/characters/picoSpeaker.lua")
@@ -40,11 +41,11 @@ return {
 			end
 
 			inst = love.audio.newSource("songs/stress/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/stress/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/stress/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/stress/Voices-tankman" .. songExt .. ".ogg", "stream")
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/guns/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/guns/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/guns/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/guns/Voices-tankman" .. songExt .. ".ogg", "stream")
 			if storyMode and not died then
 				video = cutscene.video("videos/gunsCutscene.ogv")
@@ -52,7 +53,7 @@ return {
 			end
 		else
 			inst = love.audio.newSource("songs/ugh/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/ugh/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/ugh/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/ugh/Voices-tankman" .. songExt .. ".ogg", "stream")
 			if storyMode and not died then
 				video = cutscene.video("videos/ughCutscene.ogv")
@@ -115,7 +116,7 @@ return {
 
 	update = function(self, dt)
 		weeks:update(dt)
-		stages["tank"]:update(dt)
+		stages["tank.base"]:update(dt)
 
 		if inCutscene then
 			if not video:isPlaying() then 
@@ -169,7 +170,7 @@ return {
         love.graphics.push()
             love.graphics.translate(graphics.getWidth()/2, graphics.getHeight()/2)
             love.graphics.scale(camera.zoom, camera.zoom)
-            stages["tank"]:draw()
+            stages["tank.base"]:draw()
         love.graphics.pop()
 
         weeks:drawUI()
@@ -179,7 +180,7 @@ return {
 		song = 1
         died = false
         inCutscene = false
-        stages["tank"]:leave()
+        stages["tank.base"]:leave()
 		weeks:leave()
 	end
 }

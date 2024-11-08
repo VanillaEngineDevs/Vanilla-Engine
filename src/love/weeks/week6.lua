@@ -18,11 +18,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return {
-	enter = function(self, from, songNum, songAppend, _songExt)
+	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		love.graphics.setDefaultFilter("nearest")
 		weeks:enter("pixel")
 
-		stages["school"]:enter()
+		stages["school.base"]:enter()
 
 		camera.defaultZoom = 0.85
 		camera.zoom = 0.85
@@ -36,6 +36,7 @@ return {
 		song = songNum
 		difficulty = songAppend
 		songExt = _songExt
+		audioAppend = _audioAppend
 
 		self:load()
 
@@ -50,31 +51,31 @@ return {
 		if song == 3 then
 			school = love.filesystem.load("sprites/week6/evil-school.lua")()
 			enemy = BaseCharacter("sprites/characters/spirit.lua")
-			stages["evilSchool"]:enter()
-			stages["evilSchool"]:load()
-			stages["school"]:leave()
+			stages["evilSchool.base"]:enter()
+			stages["evilSchool.base"]:load()
+			stages["school.base"]:leave()
 		elseif song == 2 then
 			enemy = BaseCharacter("sprites/characters/senpai-angry.lua")
 
-			stages["school"]:load()
+			stages["school.base"]:load()
 		else
 			enemy = BaseCharacter("sprites/characters/senpai.lua")
-			stages["school"]:load()
+			stages["school.base"]:load()
 		end
 		
 		weeks:load()
 
 		if song == 3 then
 			inst = love.audio.newSource("songs/thorns/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/thorns/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/thorns/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/thorns/Voices-spirit" .. songExt .. ".ogg", "stream")
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/roses/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/roses/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/roses/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/roses/Voices-senpai" .. songExt .. ".ogg", "stream")
 		else
 			inst = love.audio.newSource("songs/senpai/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/senpai/Voices-bf" .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/senpai/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/senpai/Voices-senpai" .. songExt .. ".ogg", "stream")
 		end
 		enemy.x, enemy.y = -340, -20
@@ -155,9 +156,9 @@ return {
 		end
 		weeks:update(dt)
 		if song ~= 3 then
-			stages["school"]:update(dt)
+			stages["school.base"]:update(dt)
 		else
-			stages["evilSchool"]:update(dt)
+			stages["evilSchool.base"]:update(dt)
 		end
 
 		if not countingDown and not inCutscene then
@@ -190,9 +191,9 @@ return {
 			love.graphics.scale(camera.zoom, camera.zoom)
 
 			if song ~= 3 then
-				stages["school"]:draw()
+				stages["school.base"]:draw()
 			else
-				stages["evilSchool"]:draw()
+				stages["evilSchool.base"]:draw()
 			end
 		love.graphics.pop()
 
@@ -219,8 +220,8 @@ return {
 		graphics.clearCache()
 
 		weeks:leave()
-		stages["school"]:leave()
-		stages["evilSchool"]:leave()
+		stages["school.base"]:leave()
+		stages["evilSchool.base"]:leave()
 		status.setNoResize(false)
 
 		love.graphics.setDefaultFilter("linear")

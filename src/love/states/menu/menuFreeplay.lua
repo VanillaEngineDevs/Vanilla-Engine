@@ -10,6 +10,16 @@ local songDifficulty = 2
 
 local ratingText
 
+function table.print(t)
+    for k, v in pairs(t) do
+        if type(v) == "table" then
+            table.print(v)
+        else
+            print(k, v)
+        end
+    end
+end
+
 local function CreateWeek(weekIndex, hasErect)
     local week = {
         name = weekMeta[weekIndex][1],
@@ -20,23 +30,32 @@ local function CreateWeek(weekIndex, hasErect)
         if type(song) == "table" then
             local hasErect, hasPico = song.erect, song.pico
             if not song.show then goto continue end
-            local song = {
+            local newSong = {
                 name = song[1],
-                diffs = util.cloneTable(song.diffs)
+                diffs = {}
             }
+            for _, diff in ipairs(song.diffs or {}) do
+                table.insert(newSong.diffs, {diff[1] or "???", diff[2] or "", diff[3] or diff[1] or "???", diff[4] or ""})
+            end
 
-            table.insert(song.diffs, (hasErect and {"erect", ext="-erect"} or nil))
-            table.insert(song.diffs, (hasErect and {"nightmare", ext="-erect"} or nil))
-            table.insert(song.diffs, (hasPico and {"pico", ext="-pico"} or nil))
+            if hasErect then
+                table.insert(newSong.diffs, {"erect", "-erect", "erect", "-bf"})
+                table.insert(newSong.diffs, {"nightmare", "-erect", "nightmare", "-bf"})
+            end
+            if hasPico then
+                table.insert(newSong.diffs, {"easy-Pico", "-pico", "easy", "-pico"})
+                table.insert(newSong.diffs, {"normal-Pico", "-pico", "normal", "-pico"})
+                table.insert(newSong.diffs, {"hard-Pico", "-pico", "hard", "-pico"})
+            end
 
-            table.insert(week.songs, song)
+            table.insert(week.songs, newSong)
         elseif type(song) == "string" then
             local song = {
                 name = song,
                 diffs = {
-                    {"easy", ext=""},
-                    {"normal", ext=""},
-                    {"hard", ext=""}
+                    {"easy", "", "easy", "-bf"},
+                    {"normal", "", "normal", "-bf"},
+                    {"hard", "", "hard", "-bf"}
                 }
             }
 
@@ -191,14 +210,13 @@ return {
                 graphics:fadeOutWipe(
                     0.7,
                     function()
-                        songAppend = allWeeks[weekNum].songs[songNum].diffs[songDifficulty][1]
                         importMods.inMod = weekNum > modWeekPlacement
     
                         storyMode = false
     
                         music:stop()
     
-                        Gamestate.switch(weekData[weekNum], songNum, songAppend, allWeeks[weekNum].songs[songNum].diffs[songDifficulty].ext)
+                        Gamestate.switch(weekData[weekNum], songNum, allWeeks[weekNum].songs[songNum].diffs[songDifficulty][3], allWeeks[weekNum].songs[songNum].diffs[songDifficulty][2], allWeeks[weekNum].songs[songNum].diffs[songDifficulty][4])
     
                         status.setLoading(false)
                     end
