@@ -177,19 +177,11 @@ return {
 		self.useBuiltinGameover = true
 		P1HealthColors = {0, 1, 0}
 		P2HealthColors = {1, 0, 0}
-		botplayY = 0
-		botplayAlpha = {1}
 		paused = false
 		pauseMenuSelection = 1
 		healthGainMult = 1
 		healthLossMult = 1
 		self.ignoreHealthClamping = false
-		function botPlayAlphaChange()
-			Timer.tween(1.25, botplayAlpha, {0}, "in-out-cubic", function()
-				Timer.tween(1.25, botplayAlpha, {1}, "in-out-cubic", botPlayAlphaChange)
-			end)
-		end
-		botPlayAlphaChange()
 		pauseBG = graphics.newImage(graphics.imagePath("pause/pause_box"))
 		pauseShadow = graphics.newImage(graphics.imagePath("pause/pause_shadow"))
 		useAltAnims = false
@@ -988,11 +980,6 @@ end
 			if not enemyArrow:isAnimated() then
 				enemyArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i], false)
 			end
-			if settings.botPlay then
-				if not boyfriendArrow:isAnimated() then
-					boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i], false)
-				end
-			end
 
 			if #enemyNote > 0 then
 				for j = 1, #enemyNote do
@@ -1082,76 +1069,7 @@ end
 				end
 			end
 
-			if settings.botPlay then 
-				if #boyfriendNote > 0 then
-					for j = 1, #boyfriendNote do
-						local ableTohit = true
-						if boyfriendNote[j].hitNote ~= nil then
-							ableTohit = boyfriendNote[j].hitNote
-						end
-						if (boyfriendNote[j].time - musicTime <= 0) and not boyfriendNote.causesMiss and ableTohit then
-							if voicesBF then voicesBF:setVolume(j) end
-
-							boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
-
-							if boyfriendNote[j]:getAnimName() == "hold" or boyfriendNote[j]:getAnimName() == "end" then
-								if boyfriendNote[j]:getAnimName() == "hold" then
-									HoldCover:show(i, 1, boyfriendNote[j].x, boyfriendNote[j].y)
-								else
-									HoldCover:hide(i, 1)
-								end
-								if boyfriend and boyfriend.holdTimer >= boyfriend.maxHoldTimer then boyfriend:animate(curAnim, false) end
-							else
-								if boyfriend then boyfriend:animate(curAnim, false) end
-							end
-
-							if boyfriend then boyfriend.lastHit = musicTime end
-
-							if boyfriendNote[j]:getAnimName() ~= "hold" and boyfriendNote[1]:getAnimName() ~= "end" then 
-								noteCounter = noteCounter + 1
-								combo = combo + 1
-								if combo > maxCombo then maxCombo = combo end
-
-								numbers[1]:animate(tostring(math.floor(combo / 100 % 10)), false)
-								numbers[2]:animate(tostring(math.floor(combo / 10 % 10)), false)
-								numbers[3]:animate(tostring(math.floor(combo % 10)), false)
-
-								for i = 1, 5 do
-									if ratingTimers[i] then Timer.cancel(ratingTimers[i]) end
-								end
-
-								rating.y = 300 - 50 + (settings.downscroll and 0 or -490)
-								for i = 1, 3 do
-									numbers[i].y = 300 + 50 + (settings.downscroll and 0 or -490)
-								end
-
-								ratingVisibility[1] = 1
-								ratingTimers[1] = Timer.tween(2, ratingVisibility, {0}, "linear")
-								ratingTimers[2] = Timer.tween(2, rating, {y = 300 + (settings.downscroll and 0 or -490) - 100}, "out-elastic")
-
-								ratingTimers[3] = Timer.tween(2, numbers[1], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
-								ratingTimers[4] = Timer.tween(2, numbers[2], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
-								ratingTimers[5] = Timer.tween(2, numbers[3], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
-								health = health + (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper("sick")] or 0) * healthGainMult  * boyfriendNote[j].healthGainMult
-								score = score + 500
-
-								self:calculateRating()
-							else
-								health = health + 0.0125 * healthGainMult * boyfriendNote[j].healthGainMult
-							end
-
-							table.remove(boyfriendNote, 1)
-						elseif boyfriendNote[j].time - musicTime <= 0 and not boyfriendNote[j].didHit and not boyfriendNote[j].causesMiss and not ableTohit then
-							boyfriendNote[j].didHit = true
-							Gamestate.onNoteHit(boyfriend, boyfriendNote[j].ver, "BoyfriendHit", i)
-						end
-					end
-				end
-			end
-
 			if input:pressed(curInput) then
-				-- if settings.botPlay is true, break our the if statement
-				if settings.botPlay then break end
 				local success = false
 				local didHitNote = false
 
@@ -1573,12 +1491,6 @@ end
 			else
 				self:healthbarText("Score: " .. score .. " | Misses: " .. misses .. " | Accuracy: " .. ((math.floor(ratingPercent * 10000) / 100)) .. "%")
 			end
-
-			--[[ if settings.botPlay then
-				botplayY = botplayY + math.sin(love.timer.getTime()) * 0.15
-				uitext("BOTPLAY", -85, botplayY, 0, 2, 2, 0, 0, 0, 0, botplayAlpha[1])
-				graphics.setColor(1, 1, 1)
-			end ]]
 		love.graphics.pop()
 	end,
 
