@@ -206,6 +206,132 @@ local graphics = {
 		return object
 	end,
 
+	newCanvas = function(width, height, optionsTable)
+		-- like new image
+		local canvas = love.graphics.newCanvas(width, height)
+
+		local object = {
+			x = 0,
+			y = 0,
+			orientation = 0,
+			sizeX = 1,
+			sizeY = 1,
+			offsetX = 0,
+			offsetY = 0,
+			shearX = 0,
+			shearY = 0,
+
+			scrollX = 1,
+			scrollY = 1,
+
+			visible = true,
+			alpha = 1,
+
+			setCanvas = function(self, canvas)
+				canvas = canvas
+				width = canvas:getWidth()
+				height = canvas:getHeight()
+			end,
+
+			renderTo = function(self, func)
+				local last = love.graphics.getCanvas()
+				love.graphics.push()
+				love.graphics.setCanvas(canvas)
+				love.graphics.translate(canvas:getWidth() / 2, canvas:getHeight() / 2)
+				love.graphics.scale(self.sizeX, self.sizeY)
+				love.graphics.translate(-canvas:getWidth() / 2, -canvas:getHeight() / 2)
+				love.graphics.translate(self.x/2, self.y/2)
+				func()
+				love.graphics.pop()
+				love.graphics.setCanvas(last)
+			end,
+
+			getCanvas = function(self)
+				return canvas
+			end,
+
+			getWidth = function(self)
+				return width
+			end,
+
+			getHeight = function(self)
+				return height
+			end,
+
+			setScale = function(self, scale)
+				self.sizeX, self.sizeY = scale, scale
+			end,
+
+			draw = function(self)
+				local x = self.x
+				local y = self.y
+
+				if options and options.floored then
+					x = math.floor(x)
+					y = math.floor(y)
+				end
+
+				local lastColor = {love.graphics.getColor()}
+				graphics.setColor(lastColor[1], lastColor[2], lastColor[3], lastColor[4] * self.alpha)
+
+				if self.visible then
+					love.graphics.draw(
+						canvas,
+						self.x,
+						self.y,
+						self.orientation,
+						self.sizeX,
+						self.sizeY,
+						math.floor(width / 2) + self.offsetX,
+						math.floor(height / 2) + self.offsetY,
+						self.shearX,
+						self.shearY
+					)
+				end
+
+				love.graphics.setColor(lastColor[1], lastColor[2], lastColor[3])
+			end,
+
+			udraw = function(self, sx, sy)
+				local sx = sx or 7
+				local sy = sy or sx 
+				local x = self.x
+				local y = self.y
+
+				if options and options.floored then
+					x = math.floor(x)
+					y = math.floor(y)
+				end
+
+				local lastColor = {love.graphics.getColor()}
+				graphics.setColor(lastColor[1], lastColor[2], lastColor[3], lastColor[4] * self.alpha)
+
+				if self.visible then
+					love.graphics.draw(
+						canvas,
+						self.x,
+						self.y,
+						self.orientation,
+						sx,
+						sy,
+						math.floor(width / 2) + self.offsetX,
+						math.floor(height / 2) + self.offsetY,
+						self.shearX,
+						self.shearY
+					)
+				end
+				
+				love.graphics.setColor(lastColor[1], lastColor[2], lastColor[3])
+			end
+		}
+
+		object:setCanvas(canvas)
+
+		options = optionsTable
+
+		return object
+	end,
+
 	newSprite = function(imageData, frameData, animData, animName, loopAnim, optionsTable)
 		local sheet, sheetWidth, sheetHeight
 
@@ -354,6 +480,13 @@ local graphics = {
 			end,
 			isLooped = function(self)
 				return isLooped
+			end,
+
+			setAnimFrame = function(self, frame)
+				frame = frame
+			end,
+			getAnimFrame = function(self)
+				return frame
 			end,
 
 			setOptions = function(self, optionsTable)

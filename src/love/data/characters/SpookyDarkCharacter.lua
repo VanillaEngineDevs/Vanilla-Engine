@@ -1,13 +1,13 @@
-local BFDark = BaseCharacter:extend()
+local SpookyDarkCharacter = BaseCharacter:extend()
 
-function BFDark:new()
-    BaseCharacter.new(self, "sprites/characters/boyfriend-dark.lua")
+function SpookyDarkCharacter:new()
+    BaseCharacter.new(self, "sprites/characters/skid-and-pump-dark.lua")
 
-    self.child = love.filesystem.load("sprites/characters/boyfriend.lua")()
+    self.child = love.filesystem.load("sprites/characters/skid-and-pump.lua")()
     self.child.alpha = 1
 end
 
-function BFDark:update(dt)
+function SpookyDarkCharacter:update(dt)
     BaseCharacter.update(self, dt)
     
     self.child:update(dt)
@@ -24,41 +24,41 @@ function BFDark:update(dt)
     self.child.holdTimer = self.holdTimer
 end
 
-function BFDark:draw()
+function SpookyDarkCharacter:draw()
     if not self.visible then return end
 
     self.child:draw()
     self.spr:draw()
 end
 
-function BFDark:udraw(sx, sy)
+function SpookyDarkCharacter:udraw(sx, sy)
     if not self.visible then return end
 
     self.child:udraw(sx, sy)
     self.spr:udraw(sx, sy)
 end
 
-function BFDark:beat(beat)
+function SpookyDarkCharacter:beat(beat)
     self.child:beat(beat)
     self.spr:beat(beat)
 end
 
-function BFDark:animate(...)
+function SpookyDarkCharacter:animate(...)
     self.child:animate(...)
     self.spr:animate(...)
 end
 
-function BFDark:isAnimated()
+function SpookyDarkCharacter:isAnimated()
     return self.spr:isAnimated()
 end
 
-function BFDark:getAnimName()
+function SpookyDarkCharacter:getAnimName()
     return self.spr:getAnimName()
 end
 
-function BFDark:setAnimSpeed(speed)
+function SpookyDarkCharacter:setAnimSpeed(speed)
     self.child:setAnimSpeed(speed)
     self.spr:setAnimSpeed(speed)
 end
 
-return BFDark
+return SpookyDarkCharacter

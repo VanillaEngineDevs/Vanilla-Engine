@@ -206,6 +206,7 @@ function love.load()
 	NeneCharacter = require "data.characters.NeneCharacter"
 	BFDarkCharacter = require "data.characters.BFDarkCharacter"
 	GFDarkCharacter = require "data.characters.GFDarkCharacter"
+	SpookyDarkCharacter = require "data.characters.SpookyDarkCharacter"
 
 	-- Modding
 	importMods = require "modding.importMods"

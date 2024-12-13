@@ -29,6 +29,8 @@ function Character:update(dt)
     self.spr.shader = self.shader
 
     self.spr.holdTimer = self.holdTimer
+
+    self.spr.alpha = self.alpha or 1
 end
 
 function Character:draw()

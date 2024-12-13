@@ -34,9 +34,6 @@ end
 local ratingTimers = {}
 
 local useAltAnims
-local option = "normal"
-
-local countNum = 4 -- Used for countdown
 
 healthLerp = 1
 
@@ -942,8 +939,7 @@ end
 				return CONSTANTS.WEEKS.MAX_SCORE
 			else
 				local factor = 1 - 1 / (1 + math.exp(-CONSTANTS.WEEKS.SCORING_SLOPE * (msTiming - CONSTANTS.WEEKS.SCORING_OFFSET)))
-				--var score = funkin_play_scoring_Scoring.PBOT1_MAX_SCORE * factor + funkin_play_scoring_Scoring.PBOT1_MIN_SCORE | 0;
-				local score = bit.bxor(CONSTANTS.WEEKS.MAX_SCORE * factor + CONSTANTS.WEEKS.MIN_SCORE, 0)
+				local score = math.floor(CONSTANTS.WEEKS.MAX_SCORE * factor + CONSTANTS.WEEKS.MIN_SCORE)
 				return score
 			end
 		end
@@ -971,8 +967,6 @@ end
 			local curAnim = CONSTANTS.WEEKS.ANIM_LIST[i]
 			local curInput = CONSTANTS.WEEKS.INPUT_LIST[i]
 			local gfNote = gfNotes[i]
-
-			local noteNum = i
 
 			enemyArrow:update(dt)
 			boyfriendArrow:update(dt)

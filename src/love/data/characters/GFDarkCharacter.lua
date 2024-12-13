@@ -4,7 +4,7 @@ function GFDark:new()
     BaseCharacter.new(self, "sprites/characters/girlfriend-dark.lua")
 
     self.child = love.filesystem.load("sprites/characters/girlfriend.lua")()
-    self.child.alpha = 0
+    self.child.alpha = 1
 end
 
 function GFDark:update(dt)
@@ -22,6 +22,8 @@ function GFDark:update(dt)
     self.child.shader = self.shader
 
     self.child.holdTimer = self.holdTimer
+
+    self.child:setAnimFrame(self.spr:getAnimFrame())
 end
 
 function GFDark:draw()

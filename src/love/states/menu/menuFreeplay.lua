@@ -35,7 +35,7 @@ local function CreateWeek(weekIndex, hasErect)
                 diffs = {}
             }
             for _, diff in ipairs(song.diffs or {}) do
-                table.insert(newSong.diffs, {diff[1] or "???", diff[2] or "", diff[3] or diff[1] or "???", diff[4] or ""})
+                table.insert(newSong.diffs, {diff[1] or "???", diff[2] or "", diff[3] or diff[1] or "???", diff[4] or "-bf"})
             end
 
             if hasErect then

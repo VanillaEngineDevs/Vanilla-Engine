@@ -309,7 +309,7 @@ return graphics.newSprite(
 		["songLEFT miss"] = {start = 101, stop = 134, speed = 24, offsetX = 21, offsetY = 11},
 		["singRIGHT"] = {start = 135, stop = 196, speed = 24, offsetX = -43, offsetY = -1},
 		["singRIGHT miss"] = {start = 197, stop = 242, speed = 24, offsetX = -39, offsetY = 13},
-		["singUP"] = {start = 243, stop = 257, speed = 24, offsetX = -32, offsetY = 17},
+		["singUP"] = {start = 243, stop = 257, speed = 24, offsetX = -27, offsetY = 17},
 		["singUP miss"] = {start = 258, stop = 281, speed = 24, offsetX = -25, offsetY = 10},
 		["idle"] = {start = 282, stop = 295, speed = 24, offsetX = 0, offsetY = 0},
 		["shaking"] = {start = 296, stop = 299, speed = 24, offsetX = -4, offsetY = 0},

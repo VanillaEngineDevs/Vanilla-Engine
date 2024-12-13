@@ -10,6 +10,8 @@ return graphics.newSprite(
 		{x = 2849, y = 1291, width = 698, height = 657, offsetX = -2, offsetY = -0, offsetWidth = 703, offsetHeight = 657, rotated = false}, -- 7: GF Cheer0001
 		{x = 2140, y = 1300, width = 698, height = 654, offsetX = -2, offsetY = -3, offsetWidth = 703, offsetHeight = 657, rotated = false}, -- 8: GF Cheer0004
 		{x = 1427, y = 1302, width = 698, height = 654, offsetX = -2, offsetY = -3, offsetWidth = 703, offsetHeight = 657, rotated = false}, -- 9: GF Cheer0005
+
+		{x = 2848, y = 1958, width = 698, height = 642, offsetX = -2, offsetY = -6, offsetWidth = 703, offsetHeight = 648, rotated = false}, -- 39: GF Dancing Beat0029
 		{x = 5, y = 3278, width = 698, height = 634, offsetX = -2, offsetY = -14, offsetWidth = 703, offsetHeight = 648, rotated = false}, -- 10: GF Dancing Beat0000
 		{x = 2857, y = 5, width = 703, height = 634, offsetX = -0, offsetY = -14, offsetWidth = 703, offsetHeight = 648, rotated = false}, -- 11: GF Dancing Beat0001
 		{x = 2857, y = 649, width = 703, height = 632, offsetX = -0, offsetY = -16, offsetWidth = 703, offsetHeight = 648, rotated = false}, -- 12: GF Dancing Beat0002
@@ -39,7 +41,7 @@ return graphics.newSprite(
 		{x = 5, y = 1980, width = 698, height = 642, offsetX = -2, offsetY = -6, offsetWidth = 703, offsetHeight = 648, rotated = false}, -- 36: GF Dancing Beat0026
 		{x = 5, y = 1980, width = 698, height = 642, offsetX = -2, offsetY = -6, offsetWidth = 703, offsetHeight = 648, rotated = false}, -- 37: GF Dancing Beat0027
 		{x = 2848, y = 1958, width = 698, height = 642, offsetX = -2, offsetY = -6, offsetWidth = 703, offsetHeight = 648, rotated = false}, -- 38: GF Dancing Beat0028
-		{x = 2848, y = 1958, width = 698, height = 642, offsetX = -2, offsetY = -6, offsetWidth = 703, offsetHeight = 648, rotated = false}, -- 39: GF Dancing Beat0029
+		
 		{x = 1427, y = 1302, width = 698, height = 654, offsetX = -2, offsetY = -3, offsetWidth = 703, offsetHeight = 657, rotated = false}, -- 40: GF Cheer0006
 		{x = 1427, y = 1302, width = 698, height = 654, offsetX = -2, offsetY = -3, offsetWidth = 703, offsetHeight = 657, rotated = false}, -- 41: GF Cheer0007
 		{x = 1427, y = 1302, width = 698, height = 654, offsetX = -2, offsetY = -3, offsetWidth = 703, offsetHeight = 657, rotated = false}, -- 42: GF Cheer0008
@@ -60,8 +62,8 @@ return graphics.newSprite(
 	{
 		["cheer"] = {start = 40, stop = 55, speed = 24, offsetX = 0, offsetY = 5},
 		["fear"] = {start = 3, stop = 6, speed = 24, offsetX = 0, offsetY = -3},
-		["danceLeft"] = {start = 10, stop = 24, speed = 24, offsetX = 0, offsetY = 0},
-		["danceRight"] = {start = 25, stop = 39, speed = 24, offsetX = 0, offsetY = 0},
+		["danceLeft"] = {start = 10, stop = 25, speed = 24, offsetX = 0, offsetY = 0},
+		["danceRight"] = {start = 26, stop = 39, speed = 24, offsetX = 0, offsetY = 0},
 	},
 	"danceLeft",
 	false,

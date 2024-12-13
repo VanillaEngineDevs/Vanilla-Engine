@@ -1,3 +1,4 @@
+---@diagnostic disable: duplicate-set-field
 love._fps_cap = 60
 
 love.run = love.system.getOS() ~= "NX" and function()
@@ -57,4 +58,30 @@ end or love.run
 
 function love.setFpsCap(fps)
     love._fps_cap = fps or 60
+end
+
+local curTranslate = {x = 0, y = 0}
+local curScale = {x = 1, y = 1}
+
+local o_graphics_translate = love.graphics.translate
+local o_graphics_scale = love.graphics.scale
+
+function love.graphics.translate(x, y)
+    curTranslate.x = curTranslate.x + x
+    curTranslate.y = curTranslate.y + y
+    o_graphics_translate(x, y)
+end
+
+function love.graphics.scale(x, y)
+    curScale.x = x
+    curScale.y = y
+    o_graphics_scale(x, y)
+end
+
+function love.graphics.getTranslate()
+    return curTranslate.x, curTranslate.y
+end
+
+function love.graphics.getScale()
+    return curScale.x, curScale.y
 end
