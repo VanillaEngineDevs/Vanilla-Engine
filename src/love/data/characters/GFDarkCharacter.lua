@@ -45,9 +45,11 @@ function GFDark:beat(beat)
     self.spr:beat(beat)
 end
 
-function GFDark:animate(...)
-    self.child:animate(...)
-    self.spr:animate(...)
+function GFDark:animate(name, ...)
+    if name == "sad" then return end
+
+    self.child:animate(name, ...)
+    self.spr:animate(name,...)
 end
 
 function GFDark:isAnimated()
