@@ -158,6 +158,13 @@ function borderedText(text,x,y,r,sx,sy,ox,oy,kx,ky,alpha)
 	love.graphics.print(text,x,y,r,sx,sy,ox,oy,kx,ky)
 end
 
+function songNameToFolder(str)
+	str = str:gsub(" ", "-")
+	str = str:lower()
+	
+	return str
+end
+
 mainDrawing = true
 
 require "modules.overrides"

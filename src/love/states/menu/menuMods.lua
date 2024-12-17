@@ -268,8 +268,14 @@ return {
                                 graphics.setColor(1, 0, 0, 1)
                             end
                             love.graphics.rectangle("fill", -width / 2-150, graphics.getHeight() / 2 - 50, width-15, 40, 15, 15)
+                            graphics.setColor(0, 0, 0, 1)
+                            for x = -1, 1 do
+                                for y = -1, 1 do
+                                    love.graphics.printf(mod.enabled and "Enabled" or "Disabled", -width / 2-150 + x, graphics.getHeight() / 2 - 45 + y, width-15, "center")
+                                end
+                            end
                             graphics.setColor(1, 1, 1, 1)
-                            love.graphics.printf(mod.enabled and "Disable" or "Enable", -width / 2-150, graphics.getHeight() / 2 - 45, width-15, "center")
+                            love.graphics.printf(mod.enabled and "Enabled" or "Disabled", -width / 2-150, graphics.getHeight() / 2 - 45, width-15, "center")
                         love.graphics.pop()
                     end
                 end
