@@ -21,7 +21,7 @@ main: lovefile win64 switch macos
 
 all: lovefile desktop console
 
-desktop: lovefile win64 win32 macos
+desktop: lovefile win64 macos
 
 console: lovefile switch
 
@@ -55,25 +55,6 @@ win64: lovefile
 	@mkdir -p build/release
 	@rm -f build/release/funkin-vanilla-engine-win64.zip
 	@cd build/win64; zip -9 -r ../release/funkin-vanilla-engine-win64.zip .
-
-win32: lovefile
-	@rm -rf build/win32
-	@mkdir -p build/win32
-
-	@cp resources/win32/love/OpenAL32.dll build/win32
-	@cp resources/win32/love/SDL2.dll build/win32
-	@cp resources/win32/love/license.txt build/win32
-	@cp resources/win32/love/lua51.dll build/win32
-	@cp resources/win32/love/mpg123.dll build/win32
-	@cp resources/win32/love/love.dll build/win32
-	@cp resources/win32/love/msvcp120.dll build/win32
-	@cp resources/win32/love/msvcr120.dll build/win32
-
-	@cat resources/win32/love/love.exe build/lovefile/funkin-vanilla-engine.love > build/win32/funkin-vanilla-engine.exe
-
-	@mkdir -p build/release
-	@rm -f build/release/funkin-vanilla-engine-win32.zip
-	@cd build/win32; zip -9 -r ../release/funkin-vanilla-engine-win32.zip .
 
 macos: lovefile
 	@rm -rf build/macos
