@@ -29,7 +29,7 @@ return {
 			stage = stages["hauntedHouse.erect"]
 		end
 
-		stage:enter()
+		stage:enter(_songExt)
 
 		song = songNum
 		difficulty = songAppend
@@ -58,12 +58,19 @@ return {
 			inst = love.audio.newSource("songs/monster/Inst" .. songExt .. ".ogg", "stream")
 			voicesBF = love.audio.newSource("songs/monster/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/monster/Voices-monster" .. songExt .. ".ogg", "stream")
+
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/south/Inst" .. songExt .. ".ogg", "stream")
+			if girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/south/Inst" .. songExt .. ".ogg")
+			end
 			voicesBF = love.audio.newSource("songs/south/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/south/Voices-spooky" .. songExt .. ".ogg", "stream")
 		else
 			inst = love.audio.newSource("songs/spookeez/Inst" .. songExt .. ".ogg", "stream")
+			if girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/spookeez/Inst" .. songExt .. ".ogg")
+			end
 			voicesBF = love.audio.newSource("songs/spookeez/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/spookeez/Voices-spooky" .. songExt .. ".ogg", "stream")
 		end

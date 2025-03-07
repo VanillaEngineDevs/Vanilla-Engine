@@ -1,1 +1,1 @@
-v1.2.0-prerelease
+v1.2.0-prerelease.2

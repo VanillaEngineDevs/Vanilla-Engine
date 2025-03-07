@@ -46,14 +46,23 @@ return {
 
 		if song == 3 then
 			inst = love.audio.newSource("songs/blammed/Inst" .. songExt .. ".ogg", "stream")
+			if girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/blammed/Inst" .. songExt .. ".ogg")
+			end
 			voicesBF = love.audio.newSource("songs/blammed/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/blammed/Voices-pico-enemy" .. songExt .. ".ogg", "stream")
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/philly-nice/Inst" .. songExt .. ".ogg", "stream")
+			if girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/philly-nice/Inst" .. songExt .. ".ogg")
+			end
 			voicesBF = love.audio.newSource("songs/philly-nice/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/philly-nice/Voices-pico-enemy" .. songExt .. ".ogg", "stream")
 		else
 			inst = love.audio.newSource("songs/pico/Inst" .. songExt .. ".ogg", "stream")
+			if girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/pico/Inst" .. songExt .. ".ogg")
+			end
 			voicesBF = love.audio.newSource("songs/pico/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/pico/Voices-pico-enemy" .. songExt .. ".ogg", "stream")
 		end

@@ -14,6 +14,8 @@ function Character:new(luaPath)
     self.maxHoldTimer = self.spr.maxHoldTimer
 
     self.visible = true
+
+    self.name = ""
 end
 
 function Character:update(dt)

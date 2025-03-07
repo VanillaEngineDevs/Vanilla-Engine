@@ -22,7 +22,7 @@ local lightningStrikeOffset = 8
 
 local curStageStyle = "dark"
 return {
-    enter = function()
+    enter = function(self, songExt)
 		lightningStrikeBeat = 0
 		lightningStrikeOffset = 8
         stageImages = {
@@ -35,10 +35,19 @@ return {
         }
         
 		enemy = SpookyDarkCharacter()
-		boyfriend = BFDarkCharacter()
-		girlfriend = GFDarkCharacter()
+		if songExt == "-pico" then
+            boyfriend = PicoDarkCharacter()
+            girlfriend = NeneDarkCharacter()
+		else
+			boyfriend = BFDarkCharacter()
+			girlfriend = GFDarkCharacter()
+        end
+		
 
 		girlfriend.x, girlfriend.y = 134, 12
+		if songExt == "-pico" then
+			girlfriend.y = girlfriend.y - 75
+		end
 		enemy.x, enemy.y = -337, 140
 		boyfriend.x, boyfriend.y = 482, 207
 

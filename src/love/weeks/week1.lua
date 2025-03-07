@@ -47,22 +47,25 @@ return {
 			inst = love.audio.newSource("songs/dadbattle/Inst" .. songExt .. ".ogg", "stream")
 			voicesBF = love.audio.newSource("songs/dadbattle/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/dadbattle/Voices-dad" .. songExt .. ".ogg", "stream")
-			if girlfriend.name and girlfriend.name == "nene" then
+			if girlfriend.name == "nene" then
 				girlfriend.soundData = love.sound.newSoundData("songs/dadbattle/Inst" .. songExt .. ".ogg")
+				girlfriend.multiplier = 3
 			end
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/fresh/Inst" .. songExt .. ".ogg", "stream")
 			voicesBF = love.audio.newSource("songs/fresh/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/fresh/Voices-dad" .. songExt .. ".ogg", "stream")
-			if girlfriend.name and girlfriend.name == "nene" then
+			if girlfriend.name == "nene" then
 				girlfriend.soundData = love.sound.newSoundData("songs/fresh/Inst" .. songExt .. ".ogg")
+				girlfriend.multiplier = 3
 			end
 		else
 			inst = love.audio.newSource("songs/bopeebo/Inst" .. songExt .. ".ogg", "stream")
 			voicesBF = love.audio.newSource("songs/bopeebo/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/bopeebo/Voices-dad" .. songExt .. ".ogg", "stream")
-			if girlfriend.name and girlfriend.name == "nene" then
+			if girlfriend.name == "nene" then
 				girlfriend.soundData = love.sound.newSoundData("songs/bopeebo/Inst" .. songExt .. ".ogg")
+				girlfriend.multiplier = 3
 			end
 		end
 

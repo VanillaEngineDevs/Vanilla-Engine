@@ -71,9 +71,8 @@ return {
 			enemy.x = 350
 		elseif song == 3 then
 			inst = love.audio.newSource("songs/2hot/Inst" .. songExt .. ".ogg", "stream")
-			if curOS ~= "NX" then
-				lovefftINST:init(1024)
-				lovefftINST:setSoundData("songs/2hot/Inst" .. songExt .. ".ogg")
+			if girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/2hot/Inst" .. songExt .. ".ogg")
 			end
 			voicesBF = love.audio.newSource("songs/2hot/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/2hot/Voices-darnell" .. songExt .. ".ogg", "stream")
@@ -81,20 +80,18 @@ return {
 			rainShaderEndIntensity = 0.4
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/lit-up/Inst" .. songExt .. ".ogg", "stream")
-			if curOS ~= "NX" then
-				lovefftINST:init(1024)
-				lovefftINST:setSoundData("songs/lit-up/Inst" .. songExt .. ".ogg")
+			if girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/lit-up/Inst" .. songExt .. ".ogg")
 			end
-			voicesBF = love.audio.newSource("songs/lit-up/Voices-pico" .. audioAppend .. songExt .. ".ogg", "stream")
+			voicesBF = love.audio.newSource("songs/lit-up/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/lit-up/Voices-darnell" .. songExt .. ".ogg", "stream")
 
 			rainShaderStartIntensity = 0.1
 			rainShaderEndIntensity = 0.2
 		else
 			inst = love.audio.newSource("songs/darnell/Inst" .. songExt .. ".ogg", "stream")
-			if curOS ~= "NX" then
-				lovefftINST:init(1024)
-				lovefftINST:setSoundData("songs/darnell/Inst" .. songExt .. ".ogg")
+			if girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/darnell/Inst" .. songExt .. ".ogg")
 			end
 			voicesBF = love.audio.newSource("songs/darnell/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/darnell/Voices-darnell" .. songExt .. ".ogg", "stream")

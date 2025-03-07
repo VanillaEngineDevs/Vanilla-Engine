@@ -14,7 +14,7 @@ function Nene:new()
     self.bars = {0, 0, 0, 0, 0, 0, 0}
 
     abotVisualizers = {}
-    BaseCharacter.new(self, "sprites/characters/nene.lua")
+    BaseCharacter.new(self, "sprites/characters/nene-dark.lua")
 
     self.name = "nene"
 
@@ -28,7 +28,6 @@ function Nene:new()
     self.MIN_BLINK_DELAY = 3
     self.MAX_BLINK_DELAY = 7
     self.blinkCountdown = self.MIN_BLINK_DELAY
-    self.multiplier = 1
 
     self.animationFinished = false
 
@@ -43,10 +42,26 @@ function Nene:new()
         --print(viz.x)
         table.insert(abotVisualizers, viz)
     end
+
+    self.child = love.filesystem.load("sprites/characters/nene.lua")()
+    self.child.alpha = 1
 end
 
 function Nene:update(dt)
     BaseCharacter.update(self, dt)
+
+    self.child:update(dt)
+
+    self.child.x, self.child.y = self.x, self.y
+    self.child.orientation = self.orientation
+    self.child.sizeX, self.child.sizeY = self.sizeX, self.sizeY
+    self.child.offsetX, self.child.offsetY = self.child.offsetX, self.child.offsetY
+    self.child.shearX, self.child.shearY = self.shearX, self.shearY
+    self.child.flipX, self.child.flipY = self.flipX, self.flipY
+
+    self.child.shader = self.shader
+
+    self.child.holdTimer = self.holdTimer
 
     deltaCurTime = deltaCurTime + dt
 
@@ -72,12 +87,11 @@ function Nene:update(dt)
                 local leftSample = self.soundData:getSample(sampleIndex) or 0
                 local rightSample = self.soundData:getSample(sampleIndex + 1) or 0
 
-                averageAmplitude = averageAmplitude + math.abs(leftSample + rightSample) * 0.5 * self.multiplier
+                averageAmplitude = averageAmplitude + math.abs(leftSample + rightSample) * 0.5
             end
 
             averageAmplitude = averageAmplitude * samplesPerBarInv
             self.bars[i] = (self.bars[i] + 0.03 * (averageAmplitude - self.bars[i]))
-            print("Nene:update: self.bars[" .. i .. "] = " .. self.bars[i])
             count = count + 1
         end
     end
@@ -135,6 +149,11 @@ function Nene:updateOverride(dt)
     end
 end
 
+function Nene:animate(...)
+    self.child:animate(...)
+    self.spr:animate(...)
+end
+
 function Nene:beat(beat)
     local beat = math.floor(beat) or 0
 
@@ -150,6 +169,7 @@ function Nene:beat(beat)
                 end	
             elseif self.currentState == self.STATE_PRE_RAISE then
                 self:animate("danceLeft")
+                self.child:animate("danceLeft")
                 self.spr.danced = true
             elseif self.currentState == self.STATE_READY then
                 if self.blinkCountdown == 0 then
@@ -165,7 +185,7 @@ end
 
 function Nene:draw(debug)
     if not self.visible then return end
-
+    graphics.setColor(0.5, 0.5, 0.5, 1)
     self.abotBack:draw()
     if curOS ~= "NX" and not debug and self.soundData then
         for i = 1, MAX_ABOT_VIZ do
@@ -175,11 +195,14 @@ function Nene:draw(debug)
             abotVisualizers[i]:draw()
         end
     end
-    graphics.setColor(1, 1, 1, 1)
+    graphics.setColor(0.6, 0.6, 0.6, 1)
     ---12, -270
     love.graphics.rectangle("fill", self.x + -327, self.y + 300, 120, 60)
+    graphics.setColor(0.5, 0.5, 0.5, 1)
     self.abot:draw()
+    graphics.setColor(1, 1, 1, 1)
 
+    self.child:draw()
     self.spr:draw()
 end
 
