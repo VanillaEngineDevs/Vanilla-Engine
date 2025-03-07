@@ -38,6 +38,13 @@ function cutscene.video(path)
             end
         end,
 
+        onConfirmPressed = function(self, func)
+            -- force finish
+            self.finished = true
+            if func then func() end
+            self.video:pause()
+        end,
+
         isPlaying = function(self, func)
             return self.video:isPlaying()
         end,

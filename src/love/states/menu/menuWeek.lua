@@ -161,8 +161,21 @@ return {
 					songAppend = difficultyStrs[songDifficulty]
 
 					storyMode = true
+					local charAppend = "-bf"
+					for _, song in ipairs(weekMeta[weekNum][2]) do
+						if type(song) == "table" then
+							if song.diffs then
+								for _, diff in ipairs(song.diffs) do
+									if diff[4] then
+										charAppend = diff[4]
+										break
+									end
+								end
+							end
+						end
+					end
 
-					Gamestate.switch(weekData[weekNum], songNum, songAppend, "", "-bf")
+					Gamestate.switch(weekData[weekNum], songNum, songAppend, "", charAppend)
 
 					status.setLoading(false)
 				end
