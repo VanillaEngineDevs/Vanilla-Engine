@@ -295,7 +295,6 @@ return {
 		if inCutscene then 
             video:draw()
 
-			-- sine between 0-1 with "Press (enter if pc, a if switch) to skip" text
 			local currentControl = input:getActiveDevice()
 			local input = "[ENTER]"
 			if currentControl == "joy" then
@@ -304,7 +303,6 @@ return {
 
 			local alpha = math.abs(math.sin(love.timer.getTime() * 2))
 			graphics.setColor(1, 1, 1, alpha)
-			--[[ love.graphics.print("Press " .. input .. " to skip", 10, 10) ]]
 			uitext("Press " .. input .. " to skip", 5, love.graphics.getHeight() - 30)
 
 			graphics.setColor(1, 1, 1, 1)
