@@ -29,8 +29,10 @@ function love.run()
     local a, b
     local dt = 0
     local love_load, love_update, love_draw = love.load, love.update, love.draw
+    ---@diagnostic disable-next-line: undefined-field
     local love_quit, a_parseGameArguments = love.quit, love.arg.parseGameArguments
     local collectgarbage = collectgarbage
+    ---@diagnostic disable-next-line: undefined-field
     local love_handlers = love.handlers
     local math = math
     local math_min, math_max = math.min, math.max

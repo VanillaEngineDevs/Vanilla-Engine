@@ -23,8 +23,7 @@ function m_graphics:enter()
 end
 
 function m_graphics:leave()
-    settings.fpsCap = self.optionsArray[1]:getValue()
-    settings.hardwareCompression = self.optionsArray[2]:getValue()
+    settings.hardwareCompression = self.optionsArray[1]:getValue()
 
     self.super.leave(self)
 end

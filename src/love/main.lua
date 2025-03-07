@@ -534,8 +534,6 @@ function love.touchmoved(id, x, y, dx, dy, pressure)
 end
 
 function love.update(dt)
-	dt = math.min(dt, 1 / 30)
-
 	if volFade > 0 then
 		volFade = volFade - 1 * dt
 	end

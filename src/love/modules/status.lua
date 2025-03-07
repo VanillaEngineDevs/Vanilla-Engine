@@ -41,19 +41,16 @@ return {
 		local stats = love.graphics.getStats()
 		if type == "detailed" then
 			debugStr = "UPS: " .. tostring(love.timer.getFPS()) .. " | DPS: " .. tostring(love.timer.getDrawFPS()) ..
-			"\nLUA MEM USAGE (KB): " .. tostring(math.floor(collectgarbage("count"))) ..
-			"\nGRAPHICS MEM USAGE (MB): " .. tostring(math.floor(stats.texturememory / 1048576)) ..
+			"\nLua Memory: " .. tostring(math.floor(collectgarbage("count"))) .. "KB" ..
+			"\nGraphics Memory: " .. tostring(math.floor(stats.texturememory / 1048576)) .. "MB" ..
 			"\nLoaded Images: " .. tostring(stats.images) ..
 			"\nLoaded Fonts: " .. tostring(stats.fonts) ..
 			"\nDraw Calls: " .. tostring(stats.drawcalls) ..
 
-			"\n\nsettings.hardwareCompression: " .. tostring(settings.hardwareCompression) ..
-			"\ngraphics.getImageType(): " .. tostring(graphics.getImageType()) ..
-
-			"\n\nmusicTime: " .. tostring(math.floor(musicTime)) ..  -- Floored for readability
-			"\nhealth: " .. tostring(health)
+			"\n\nmusicTime: " .. string.format("%.2f", musicTime) ..
+			"\nhealth: " .. string.format("%.2f", health)
 		else
-			debugStr = "FPS: " .. tostring(love.timer.getFPS()) .. " | DPS: " .. tostring(love.timer.getDrawFPS())
+			debugStr = "UPS: " .. tostring(love.timer.getFPS()) .. " | DPS: " .. tostring(love.timer.getDrawFPS())
 		end
 
 		return debugStr
