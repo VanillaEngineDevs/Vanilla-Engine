@@ -1,7 +1,7 @@
 local m_graphics = OptionsMenu:extend()
 
 function m_graphics:enter()
-    local o = Option:new(
+    --[[ local o = Option:new(
         "Fps Limit",
         "How many frames per second the game will run at",
         settings.fpsCap,
@@ -9,7 +9,7 @@ function m_graphics:enter()
     )
     o.minValue = debug and 1 or 30
     o.maxValue = 500
-    self:addOption(o)
+    self:addOption(o) ]]
     self:addOption(
         Option:new(
             "Hardware Compression",

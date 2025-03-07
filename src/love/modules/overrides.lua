@@ -1,60 +1,145 @@
 ---@diagnostic disable: duplicate-set-field
-love._fps_cap = 60
+---@diagnostic disable: redundant-parameter, missing-parameter, inject-field
+local threadEvent = love.thread.newThread("threads/eventThread.lua")
 
-love.run = love.system.getOS() ~= "NX" and function()
-    if love.math then
-        love.math.setRandomSeed(os.time())
-    end
+local channel_event = love.thread.getChannel("thread.event")
+local channel_active = love.thread.getChannel("thread.event.active")
 
-    if love.event then
-        love.event.pump()
-    end
 
-    if love.load then love.load(arg) end
+love._framerate = 165
 
-    -- We don't want the first frame's dt to include time taken by love.load.
-    if love.timer then love.timer.step() end
+love._currentFPS = 0
+love._currentTPS = 0
 
+love._drawDT = 0
+
+local _
+local _, _, flags = love.window.getMode()
+love._framerate = flags.refreshrate or 60
+
+function love.run()
+    local love = love
+    local arg = arg
+    
+    local g_origin, g_clear, g_present = love.graphics.origin, love.graphics.clear, love.graphics.present
+    local g_active, g_getBGColour = love.graphics.isActive, love.graphics.getBackgroundColor
+    local e_pump, e_poll, t = love.event.pump, love.event.poll, {}
+    local t_step = love.timer.step
+    local t_getTime = love.timer.getTime
+    local a, b
     local dt = 0
+    local love_load, love_update, love_draw = love.load, love.update, love.draw
+    local love_quit, a_parseGameArguments = love.quit, love.arg.parseGameArguments
+    local collectgarbage = collectgarbage
+    local love_handlers = love.handlers
+    local math = math
+    local math_min, math_max = math.min, math.max
+    local unpack = unpack
 
-    -- Main loop time.
-    while true do
-        local m1 = love.timer.getTime() -- measure the time at the beginning of the main iteration
-        -- Process events.
-        if love.event then
-            love.event.pump()
-            for e,a,b,c,d in love.event.poll() do
-                if e == "quit" then
-                    if not love.quit or not love.quit() then
-                        if love.audio then
-                            love.audio.stop()
-                        end
-                        return
-                    end
+    local channel_active_clear = channel_active.clear
+    local channel_active_push = channel_active.push
+    local channel_event_pop = channel_event.pop
+    local channel_event_demand = channel_event.demand
+
+	love_load(a_parseGameArguments(arg), arg)
+
+	t_step()
+    t_step()
+    collectgarbage()
+
+    ---@diagnostic disable-next-line: redefined-local
+    local function event(name, a, ...)
+        if name == "quit" and not love_quit() then
+            channel_active_clear(channel_active)
+            channel_active_clear(channel_active)
+            channel_active_push(channel_active, 0)
+
+            return a or 0, ...
+        end
+
+        return love_handlers[name](a, ...)
+    end
+
+    local drawTmr = 999999
+    local lastDraw = 0
+    local draws = 0
+    local fpsTimer = 0.0
+
+	return function()
+		if threadEvent:isRunning() then
+            channel_active_clear(channel_active)
+            channel_active_push(channel_active, 1)
+            a = channel_event_pop()
+
+            while a do
+                b = channel_event_demand()
+                for i =  1, b do
+                    t[i] = channel_event_demand()
                 end
-                love.handlers[e](a,b,c,d)
+                _, a, b = b, event(a, unpack(t, 1, b))
+                if a then
+                    e_pump()
+                    return a, b
+                end
+                a = channel_event_pop()
             end
         end
 
-        -- Update dt, as we'll be passing it to update
-        if love.timer then
-            love.timer.step()
-            dt = love.timer.getDelta()
+        e_pump()
+
+        ---@diagnostic disable-next-line: redefined-local
+        for name, a, b, c, d, e, f in e_poll() do
+           a, b = event(name, a, b, c, d, e, f)
+           if a then return a, b end
         end
 
-        -- Call update and draw
-        if love.update then love.update(dt) end -- will pass 0 if love.timer is disabled
+        local cap = love._framerate
+        local capDT = 1 / cap
 
-        if love.window and love.graphics and love.window.isOpen() then
-            love.graphics.clear()
-            love.graphics.origin()
-            if love.draw then love.draw() end
-            love.graphics.present()
+        -- Cap the minimum delta time to 1/30 (30 FPS)
+        dt = math_min(t_step(), math_max(capDT, 1 / 30))
+
+        love_update(dt)
+        drawTmr = drawTmr + dt
+        
+        if drawTmr >= capDT then
+            if g_active() then
+                g_origin()
+                g_clear(g_getBGColour())
+
+                love_draw(love._drawDT or 0)
+
+                g_present()
+
+                love._drawDT = t_getTime() - lastDraw
+                draws = draws + 1
+
+                fpsTimer = fpsTimer + love._drawDT
+
+                if fpsTimer > 1 then
+                    love._currentFPS = draws
+                    love._draws = draws
+                    fpsTimer = fpsTimer % 1
+                    draws = 0
+                end
+                lastDraw = t_getTime()
+            end
+            drawTmr = drawTmr % capDT
         end
-	    local delta1 = love.timer.getTime() - m1 -- measure the time at the end of the main iteration and calculate delta
-        if love.timer then love.timer.sleep(1/love._fps_cap-delta1) end
+
+        collectgarbage("step")
     end
-end or love.run
+end
+
+local o_timer_getFPS = love.timer.getFPS
+function love.timer.getFPS()
+    return o_timer_getFPS()
+end
+
+function love.timer.getDrawFPS()
+    -- use love._drawDT instead of love._currentFPS
+    return love._currentFPS
+end
 
 function love.setFpsCap(fps)
     love._fps_cap = fps or 60

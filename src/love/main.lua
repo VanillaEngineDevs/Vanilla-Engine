@@ -557,7 +557,7 @@ function love.update(dt)
 	Timer.update(dt)
 end
 
-function love.draw()
+function love.draw(dt) -- love.draw has its own delta time
 	love.graphics.setFont(font)
 	graphics.screenBase(push:getWidth(), push:getHeight())
 
@@ -565,7 +565,7 @@ function love.draw()
 		if not status.getNoResize() then
 			push:start()
 				graphics.setColor(1, 1, 1) -- Fade effect on
-				Gamestate.draw()
+				Gamestate.draw(dt)
 				love.graphics.setColor(1, 1, 1) -- Fade effect off
 				love.graphics.setFont(font)
 				if status.getLoading() then
