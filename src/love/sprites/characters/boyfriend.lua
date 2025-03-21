@@ -520,6 +520,7 @@ return graphics.newSprite(
 	},
 	-- TODO: Add missing animations "pre-attack", "attack", and "dodge"
 	{
+		-- SHEET 1
 		["dead"] = {start = 1, stop = 34, speed = 24, offsetX = 14, offsetY = -12},
 		["dead confirm"] = {start = 35, stop = 68, speed = 24, offsetX = 14, offsetY = 20},
 		["hey"] = {start = 69, stop = 94, speed = 24, offsetX = 0, offsetY = 0},
@@ -533,13 +534,19 @@ return graphics.newSprite(
 		["singUP miss"] = {start = 326, stop = 349, speed = 24, offsetX = -18, offsetY = 11},
 		["dies"] = {start = 350, stop = 407, speed = 24, offsetX = 14, offsetY = -11},
 		["idle"] = {start = 427, stop = 440, speed = 24, offsetX = 0, offsetY = 0},
-		["shaking"] = {start = 441, stop = 444, speed = 24, offsetX = 0, offsetY = 0}
+		["shaking"] = {start = 441, stop = 444, speed = 24, offsetX = 0, offsetY = 0},
+
+		-- SHEET 2
+		["cheer"] = {start = 1, stop = 9, speed = 24, offsetX = 0, offsetY = 0, sheet = 2},
 	},
 	"idle",
 	false,
 	{
 		sing_duration = 4,
 		isCharacter = true,
-		icon = "bf"
+		icon = "bf",
+		sheets = {
+			love.filesystem.load("sprites/characters/extraSheets/BFCheer.lua")() -- Sheet 2
+		}
 	}
 )

@@ -185,7 +185,7 @@ end
 
 function Nene:draw(debug)
     if not self.visible then return end
-    graphics.setColor(0.5, 0.5, 0.5, 1)
+    graphics.setColor(0.2, 0.2, 0.2, 1)
     self.abotBack:draw()
     if curOS ~= "NX" and not debug and self.soundData then
         for i = 1, MAX_ABOT_VIZ do
@@ -198,7 +198,7 @@ function Nene:draw(debug)
     graphics.setColor(0.6, 0.6, 0.6, 1)
     ---12, -270
     love.graphics.rectangle("fill", self.x + -327, self.y + 300, 120, 60)
-    graphics.setColor(0.5, 0.5, 0.5, 1)
+    graphics.setColor(0.2, 0.2, 0.2, 1)
     self.abot:draw()
     graphics.setColor(1, 1, 1, 1)
 

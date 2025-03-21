@@ -30,6 +30,14 @@ local fadeTimer
 
 local screenWidth, screenHeight
 
+local function tblPush(t, v, pos)
+	if pos then
+		table.insert(t, pos, v)
+	else
+		table.insert(t, v)
+	end
+end
+
 local graphics = {
 	screenBase = function(width, height)
 		screenWidth, screenHeight = width, height
@@ -333,7 +341,7 @@ local graphics = {
 	end,
 
 	newSprite = function(imageData, frameData, animData, animName, loopAnim, optionsTable)
-		local sheet, sheetWidth, sheetHeight
+		local sheets = {}
 
 		if type(imageData) ~= "userdata" and type(imageData) == "string" then
 			if not graphics.cache[imageData] then 
@@ -355,7 +363,8 @@ local graphics = {
 			stop = nil,
 			speed = nil,
 			offsetX = nil,
-			offsetY = nil
+			offsetY = nil,
+			sheet = 1
 		}
 
 		local isAnimated
@@ -363,6 +372,10 @@ local graphics = {
 		local forceFrameStart
 
 		local options
+
+		optionsTable = optionsTable or {}
+
+		local lastAnimWasForced = false
 
 		local object = {
 			x = 0,
@@ -392,16 +405,15 @@ local graphics = {
 
 			alpha = 1,
 
-			icon = optionsTable and optionsTable.icon or "boyfriend",
+			icon = optionsTable.icon or "boyfriend",
 
-			flipX = optionsTable and optionsTable.flipX or false,
+			flipX = optionsTable.flipX or false,
 
-			singDuration = optionsTable and optionsTable.singDuration or 4,
-			isCharacter = optionsTable and optionsTable.isCharacter or false,
-			danceSpeed = optionsTable and optionsTable.danceSpeed or 2,
-			danceIdle = optionsTable and optionsTable.danceIdle or false,
-			maxHoldTimer = optionsTable and optionsTable.maxHoldTimer or 0.1,
-			align = optionsTable and optionsTable.align or "center",
+			singDuration = optionsTable.singDuration or 4,
+			isCharacter = optionsTable.isCharacter or false,
+			danceSpeed = optionsTable.danceSpeed or 2,
+			danceIdle = optionsTable.danceIdle or false,
+			maxHoldTimer = optionsTable.maxHoldTimer or 0.1,
 
 			visible = true,
 
@@ -412,60 +424,23 @@ local graphics = {
 
 			setSheet = function(self, imageData)
 				sheet = imageData
-				sheetWidth = sheet:getWidth()
-				sheetHeight = sheet:getHeight()
+				if #sheets == 0 then
+					tblPush(sheets, self, 1)
+				end
 			end,
 
 			getSheet = function(self)
-				return sheet
+				return imageData
 			end,
 
 			isAnimName = function(self, name)
 				return anims[name] ~= nil
 			end,
 
-			animate = function(self, animName, loopAnim, func, forceSpecial, frameOverride, keepFrameOverride)
-				-- defaults forceSpecial to true
-				forceSpecial = forceSpecial == nil and true or forceSpecial
-				self.holdTimer = 0
-				if not self:isAnimName(animName) then
-					return
-				end
-				if self.flipX and self.isCharacter then 
-					if animName == "singLEFT" then 
-						animName = "singRIGHT"
-					elseif animName == "singRIGHT" then
-						animName = "singLEFT"
-					end
-				end
-				anim.name = animName
-				anim.start = anims[animName].start
-				anim.stop = anims[animName].stop
-				anim.speed = anims[animName].speed
-				anim.offsetX = anims[animName].offsetX
-				anim.offsetY = anims[animName].offsetY
-
-				if not (util.startsWith(animName, "sing") or self:getAnimName() == "idle") and forceSpecial then -- its a special anim
-					self.heyTimer = 0.6
-					self.specialAnim = true
-				else
-					self.heyTimer = 0
-					self.specialAnim = false
-				end
-
-				self.func = func
-				
-				frame = frameOverride or anim.start
-				isLooped = loopAnim
-
-				isAnimated = true
-
-				if not keepFrameOverride then
-					forceFrameStart = nil
-				else
-					forceFrameStart = frameOverride
-				end
+			getAnim = function(self, name)
+				return anims[name]
 			end,
+
 			getAnims = function(self)
 				return anims
 			end,
@@ -549,32 +524,87 @@ local graphics = {
 			end,
 
 			getAllFrames = function(self)
+				return frameData
+			end,
+
+			getAllFrameQuads = function(self)
 				return frames
 			end,
 
-			animateFromFrame = function(self, frame_, loopAnim)
-				if frame_ < 1 or frame_ > #frames then
+			animateFromFrame = function(self, frame_, loopAnim, sheet)
+				frame = frame_
+				isAnimated = true
+				isLooped = loopAnim
+				anim.sheet = sheet or 1
+				anim.start = frame_
+				anim.stop = frame_
+			end,
+
+			animate = function(self, animName, loopAnim, func, forceSpecial, frameOverride, keepFrameOverride, forced)
+				if lastAnimWasForced and isAnimated then
 					return
 				end
-
+				lastAnimWasForced = forced or false
+				forceSpecial = forceSpecial == nil and true or forceSpecial
 				self.holdTimer = 0
-				anim.name = table.getKey(anims, frame_)
-				anim.start = 1
-				anim.stop = #frames
-				anim.speed = 1
-				anim.offsetX = 0
-				anim.offsetY = 0
+				if not self:isAnimName(animName) then
+					return
+				end
+				if self.flipX and self.isCharacter then
+					if animName == "singLEFT" then
+						animName = "singRIGHT"
+					elseif animName == "singRIGHT" then
+						animName = "singLEFT"
+					end
+				end
+				local a = self:getAnim(animName)
+				anim.name = animName
+				anim.start = a.start
+				anim.stop = a.stop
+				anim.speed = a.speed
+				anim.offsetX = a.offsetX
+				anim.offsetY = a.offsetY
+				anim.sheet = a.sheet or 1
 
-				frame = frame_
+				if not (util.startsWith(animName, "sing") or self:getAnimName() == "idle") and forceSpecial then -- its a special anim
+					self.heyTimer = 0.6
+					self.specialAnim = true
+				else
+					self.heyTimer = 0
+					self.specialAnim = false
+				end
+
+				self.func = func
+				
+				frame = frameOverride or anim.start
 				isLooped = loopAnim
 
 				isAnimated = true
+
+				if not keepFrameOverride then
+					forceFrameStart = nil
+				else
+					forceFrameStart = frameOverride
+				end
 			end,
 
-			getFrameData = function(self, curFrame)
-				curFrame = curFrame or self.curFrame
+			getFrameQuad = function(self, frame, sheet)
+				local sheet = sheets[sheet or anim.sheet]
 
-				return frameData[curFrame]
+				return sheet:getAllFrameQuads()[frame]
+			end,
+
+			getFrameData = function(self, curFrame, sheet)
+				-- get frame data from the current frame and sheet
+				local sheet = sheets[sheet or anim.sheet]
+
+				return sheet:getAllFrames()[curFrame]
+			end,
+
+			getFrameDatas = function(self, sheet)
+				local sheet = sheets[sheet or anim.sheet]
+
+				return sheet:getAllFrames()
 			end,
 
 			getAnimStart = function(self)
@@ -635,13 +665,13 @@ local graphics = {
 					end
 				end
 			end,
-			
+
 			draw = function(self)
 				if not self.visible then
 					return
 				end
 				self.curFrame = math.floor(frame or 1)
-
+				anim = self:getCurrentAnim()
 				if self.curFrame <= anim.stop then
 					local x = self.x
 					local y = self.y
@@ -653,9 +683,9 @@ local graphics = {
 						y = math.floor(y)
 					end
 
-					if self.clipRect then 
+					if self.clipRect then
 						self.stencilInfo = {
-							x = self.clipRect.x,	
+							x = self.clipRect.x,
 							y = self.clipRect.y,
 							width = self.clipRect.width,
 							height = self.clipRect.height
@@ -673,6 +703,7 @@ local graphics = {
 
 					local ox, oy = 0, 0
 
+					local frameData = self:getFrameDatas()
 					if options and options.noOffset then
 						if frameData[self.curFrame].offsetWidth ~= 0 then
 							width = frameData[self.curFrame].offsetX
@@ -723,10 +754,9 @@ local graphics = {
 					graphics.setColor(lastColor[1], lastColor[2], lastColor[3], lastColor[4] * self.alpha)
 
 					if self.visible then
-						--love.graphics.rotate((frameData[self.curFrame].rotated and -math.rad(90) or 0))
 						love.graphics.draw(
-							sheet,
-							frames[self.curFrame],
+							sheets[anim.sheet]:getSheet(),
+							sheets[anim.sheet]:getFrameQuad(self.curFrame),
 							x + self.offsetX2,
 							y + self.offsetY2,
 							self.orientation + (frameData[self.curFrame].rotated and -math.rad(90) or 0),
@@ -737,7 +767,6 @@ local graphics = {
 							self.shearX,
 							self.shearY
 						)
-						--love.graphics.rotate((frameData[self.curFrame].rotated and math.rad(90) or 0))
 					end
 
 					if self.clipRect then 
@@ -766,6 +795,7 @@ local graphics = {
 						y = math.floor(y)
 					end
 
+					local frameData = self:getFrameDatas()
 					if options and options.noOffset then
 						if frameData[self.curFrame].offsetWidth ~= 0 then
 							width = frameData[self.curFrame].offsetX
@@ -788,8 +818,8 @@ local graphics = {
 
 					if self.visible then
 						love.graphics.draw(
-							sheet,
-							frames[self.curFrame],
+							sheets[anim.sheet]:getSheet(),
+							sheets[anim.sheet]:getFrameQuad(self.curFrame),
 							self.x,
 							self.y,
 							self.orientation,
@@ -810,8 +840,14 @@ local graphics = {
 		}
 
 		object:setSheet(imageData)
+		if optionsTable.sheets then
+			for _, sheet in ipairs(optionsTable.sheets) do
+				table.insert(sheets, sheet)
+			end
+		end
 
 		for i = 1, #frameData do
+			local sw, sh = sheets[frameData[i].sheet or 1]:getSheet():getDimensions()
 			table.insert(
 				frames,
 				love.graphics.newQuad(
@@ -819,8 +855,8 @@ local graphics = {
 					frameData[i].y,
 					frameData[i].width,
 					frameData[i].height,
-					sheetWidth,
-					sheetHeight
+					sw,
+					sh
 				)
 			)
 		end
@@ -1054,7 +1090,6 @@ function graphics:doStickerTrans(func)
 	end
 
 	table.shuffle(self.stickerGroup.members)
-	print(#self.stickerGroup.members)
 
 	for i, sticker in ipairs(self.stickerGroup.members) do
 		sticker.timing = math.remap(i, 0, #self.stickerGroup.members, 0, 0.9)

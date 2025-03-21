@@ -847,8 +847,13 @@ end
 						end
 					end
 				elseif event.name == "PlayAnimation" then
-					if event.value.target == "bf" then
-						boyfriend:animate(event.value.anim, false)
+					print(event.value.target)
+					if event.value.target == "bf" or event.value.target == "boyfriend" then
+						boyfriend:animate(event.value.anim, false, nil, nil, nil, event.value.force)
+					elseif event.value.target == "gf" or event.value.target == "girlfriend" then
+						girlfriend:animate(event.value.anim, false, nil, nil, nil, event.value.force)
+					elseif event.value.target == "dad" then
+						enemy:animate(event.value.anim, false, nil, nil, nil, event.value.force)
 					end
 				elseif event.name == "ZoomCamera" then
 					if type(event.value) == "number" then
