@@ -2,7 +2,7 @@ return {
     enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter() 
 
-		stages["tank.base"]:enter()
+		stages["tank.base"]:enter(_songExt)
 
 		week = 7
 

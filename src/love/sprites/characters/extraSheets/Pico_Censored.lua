@@ -62,11 +62,8 @@ return graphics.newSprite(
 		{x = 3526, y = 948, width = 432, height = 490, offsetX = -1, offsetY = -5, offsetWidth = 433, offsetHeight = 495, rotated = false}, -- 59: pico swear up0013
 	},
 	{
-		["pico swear down"] = {start = 1, stop = 11, speed = 24, offsetX = 0, offsetY = 0},
-		["pico swear left"] = {start = 12, stop = 28, speed = 24, offsetX = 0, offsetY = 0},
-		["pico swear right"] = {start = 29, stop = 45, speed = 24, offsetX = 0, offsetY = 0},
-		["pico swear up"] = {start = 46, stop = 59, speed = 24, offsetX = 0, offsetY = 0},
+		
 	},
-	"pico swear right",
+	"singDOWN swear",
 	false
 )

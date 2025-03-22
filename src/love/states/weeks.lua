@@ -514,6 +514,8 @@ end
 			speed = settings.customScrollSpeed
 		end
 
+		speed = speed * 1.06
+
 		for _, noteData in ipairs(chart) do
 			local data = noteData.d % 4 + 1
 			local time = noteData.t

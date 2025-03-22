@@ -1,5 +1,5 @@
 return {
-    enter = function()
+    enter = function(self, songExt)
         stageImages = {
             ["Sky"] = graphics.newImage(graphics.imagePath("week7/tankSky")), -- tankSky
 		    ["Ground"] = graphics.newImage(graphics.imagePath("week7/tankGround")), -- tankGround
@@ -13,6 +13,11 @@ return {
         end
         girlfriend = BaseCharacter("sprites/characters/gfTankmen.lua")
 		enemy = BaseCharacter("sprites/characters/tankmanCaptain.lua")
+        if songExt == "-pico" then
+            boyfriend = BaseCharacter("sprites/characters/pico-player.lua")
+            girlfriend = NeneCharacter()
+            girlfriend.y = -80
+        end
         stageImages["Tank 1"].x, stageImages["Tank 1"].y = -1000, 603
 		stageImages["Tank 2"].x, stageImages["Tank 2"].y = -675, 739
 		stageImages["Tank 3"].x, stageImages["Tank 3"].y = -250, 614
@@ -24,7 +29,7 @@ return {
         stageImages["Ground"].sizeX, stageImages["Ground"].sizeY = 1.3, 1.3
         stageImages["Ground"].y = 100
 
-		girlfriend.x, girlfriend.y = 15, 190
+		girlfriend.x, girlfriend.y = 15, girlfriend.y + 190
 		enemy.x, enemy.y = -560, 340
 		boyfriend.x, boyfriend.y = 460, 423
 

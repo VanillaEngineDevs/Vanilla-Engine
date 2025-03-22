@@ -77,6 +77,7 @@ return graphics.newSprite(
 		{x = 897, y = 1495, width = 432, height = 490, offsetX = -1, offsetY = -5, offsetWidth = 433, offsetHeight = 495} -- 73: pico Up note0013
 	},
 	{
+		-- SHEET 1
 		["singDOWN"] = {start = 1, stop = 11, speed = 24, offsetX = -38, offsetY = -43},
 		["idle"] = {start = 12, stop = 25, speed = 24, offsetX = 0, offsetY = 0},
 		["singLEFT"] = {start = 26, stop = 42, speed = 24, offsetX = 83, offsetY = -5},
@@ -92,6 +93,12 @@ return graphics.newSprite(
 		["Pico Hit Can"] = {start = 1, stop = 15, speed = 24, offsetX = -66, offsetY = -6, sheet = 3},
 		["Pico Reload"] = {start = 16, stop = 30, speed = 24, offsetX = 15, offsetY = -14, sheet = 3},
 		["Pico Shoot Hip Full"] = {start = 31, stop = 37, speed = 24, offsetX = 171, offsetY = 111, sheet = 3},
+
+		-- SHEET 4
+		["singDOWN swear"] = {start = 1, stop = 11, speed = 24, offsetX = -46, offsetY = -41, sheet = 4},
+		["singLEFT swear"] = {start = 12, stop = 28, speed = 24, offsetX = 81, offsetY = -6, sheet = 4},
+		["singRIGHT swear"] = {start = 29, stop = 45, speed = 24, offsetX = -52, offsetY = 0, sheet = 4},
+		["singUP swear"] = {start = 46, stop = 59, speed = 24, offsetX = 0, offsetY = 26, sheet = 4},
 	},
 	"idle",
 	false,
@@ -102,6 +109,7 @@ return graphics.newSprite(
 		sheets = {
 			love.filesystem.load("sprites/characters/extraSheets/Pico_Burps.lua")(),
 			love.filesystem.load("sprites/characters/extraSheets/Pico_Shooting.lua")(),
+			love.filesystem.load("sprites/characters/extraSheets/Pico_Censored.lua")(),
 		}
 	}
 )

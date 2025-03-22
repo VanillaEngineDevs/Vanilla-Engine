@@ -17,6 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
+local animations = {
+	"singLEFT",
+	"singDOWN",
+	"singUP",
+	"singRIGHT",
+	"singLEFT",
+	"singDOWN",
+	"singUP",
+	"singRIGHT"
+}
 local stage
 return {
 	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
@@ -81,6 +91,14 @@ return {
 			weeks:generateNotes("data/songs/philly-nice/philly-nice-chart" .. songExt .. ".json", "data/songs/philly-nice/philly-nice-metadata" .. songExt .. ".json", difficulty)
 		else
 			weeks:generateNotes("data/songs/pico/pico-chart" .. songExt .. ".json", "data/songs/pico/pico-metadata" .. songExt .. ".json", difficulty)
+		end
+	end,
+
+	onNoteHit = function(self, character, noteType, rating, id)
+		if noteType == "censor" then
+			local animName = animations[id] .. " swear"
+			character:animate(animName)
+			return true
 		end
 	end,
 

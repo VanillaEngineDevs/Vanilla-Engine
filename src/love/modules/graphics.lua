@@ -364,7 +364,9 @@ local graphics = {
 			speed = nil,
 			offsetX = nil,
 			offsetY = nil,
-			sheet = 1
+			sheet = 1,
+			flipX = false,
+			flipY = false,
 		}
 
 		local isAnimated
@@ -565,6 +567,8 @@ local graphics = {
 				anim.offsetX = a.offsetX
 				anim.offsetY = a.offsetY
 				anim.sheet = a.sheet or 1
+				anim.flipX = a.flipX or false
+				anim.flipY = a.flipY or false
 
 				if not (util.startsWith(animName, "sing") or self:getAnimName() == "idle") and forceSpecial then -- its a special anim
 					self.heyTimer = 0.6
@@ -760,8 +764,8 @@ local graphics = {
 							x + self.offsetX2,
 							y + self.offsetY2,
 							self.orientation + (frameData[self.curFrame].rotated and -math.rad(90) or 0),
-							self.sizeX * (self.flipX and -1 or 1),
-							self.sizeY,
+							self.sizeX * (self.flipX and -1 or 1) * (anim.flipX and -1 or 1),
+							self.sizeY * (self.flipY and -1 or 1) * (anim.flipY and -1 or 1),
 							ox,
 							oy,
 							self.shearX,
@@ -823,8 +827,8 @@ local graphics = {
 							self.x,
 							self.y,
 							self.orientation,
-							sx * (self.flipX and -1 or 1),
-							sy,
+							sx * (self.flipX and -1 or 1) * (anim.flipX and -1 or 1),
+							sy * (self.flipY and -1 or 1) * (anim.flipY and -1 or 1),
 							width + anim.offsetX + self.offsetX,
 							height + anim.offsetY + self.offsetY,
 							self.shearX,
