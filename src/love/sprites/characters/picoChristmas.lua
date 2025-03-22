@@ -183,5 +183,10 @@ return graphics.newSprite(
 		["singUP"] = {start = 160, stop = 173, speed = 24, offsetX = 27, offsetY = 14},
 	},
 	"idle",
-	false
+	false,
+	{
+		sing_duration = 4,
+		isCharacter = true,
+		icon = "pico"
+	}
 )
