@@ -40,7 +40,6 @@ function Nene:new()
         vizFrameWidth = viz:getFrameWidth()/2
         viz.x = -170 + (vizFrameWidth + 25) * i
         viz.y = 0--stageImages["abot"].y + 120
-        --print(viz.x)
         table.insert(abotVisualizers, viz)
     end
 end
@@ -77,7 +76,6 @@ function Nene:update(dt)
 
             averageAmplitude = averageAmplitude * samplesPerBarInv
             self.bars[i] = (self.bars[i] + 0.03 * (averageAmplitude - self.bars[i]))
-            print("Nene:update: self.bars[" .. i .. "] = " .. self.bars[i])
             count = count + 1
         end
     end

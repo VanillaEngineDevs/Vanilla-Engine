@@ -159,13 +159,29 @@ return {
 		if rating == "EnemyHit" then
 			if noteType == "weekend-1-lightcan" then
 				character:animate("light-can")
+				return true
 			elseif noteType == "wekend-1-kickcan" then
 				character:animate("kick-can")
+				return true
 			elseif noteType == "weekend-1-kneecan" then
 				character:animate("knee-forward")
+				return true
 			end
 		else
+			if noteType == "weekend-1-cockgun" then
+				character:animate("Pico Reload")
 
+				return true
+			elseif noteType == "weekend-1-firegun" then
+				if rating == "bad" or rating == "shit" then
+					character:animate("Pico Hit Can")
+					health = health - 0.25
+				else
+					character:animate("Pico Shoot Hip Full")
+				end
+
+				return true
+			end
 		end
 
 		-- blazin
@@ -246,6 +262,15 @@ return {
 			elseif noteType == "weekend-1-reversefakeout" then
 				enemy:animate("fake out")
 			end
+
+			return true
+		end
+	end,
+
+	onNoteMiss = function(self, character, noteType, rating, id)
+		if noteType == "weekend-1-firegun" then
+			character:animate("Pico Hit Can")
+			health = health - 0.25
 
 			return true
 		end

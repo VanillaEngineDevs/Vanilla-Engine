@@ -81,13 +81,27 @@ return graphics.newSprite(
 		["idle"] = {start = 12, stop = 25, speed = 24, offsetX = 0, offsetY = 0},
 		["singLEFT"] = {start = 26, stop = 42, speed = 24, offsetX = 83, offsetY = -5},
 		["singRIGHT"] = {start = 43, stop = 59, speed = 24, offsetX = -50, offsetY = 0},
-		["singUP"] = {start = 60, stop = 73, speed = 24, offsetX = 27, offsetY = 10}
+		["singUP"] = {start = 60, stop = 73, speed = 24, offsetX = 27, offsetY = 10},
+
+		-- SHEET 2
+		["burpShit"] = {start = 1, stop = 48, speed = 24, offsetX = 21, offsetY = -1, sheet = 2},
+		["burpSmile"] = {start = 49, stop = 80, speed = 24, offsetX = 3, offsetY = -1, sheet = 2},
+		["shit"] = {start = 81, stop = 100, speed = 24, offsetX = 5, offsetY = -1, sheet = 2},
+
+		-- SHEET 3
+		["Pico Hit Can"] = {start = 1, stop = 15, speed = 24, offsetX = -66, offsetY = -6, sheet = 3},
+		["Pico Reload"] = {start = 16, stop = 30, speed = 24, offsetX = 15, offsetY = -14, sheet = 3},
+		["Pico Shoot Hip Full"] = {start = 31, stop = 37, speed = 24, offsetX = 171, offsetY = 111, sheet = 3},
 	},
 	"idle",
 	false,
 	{
 		sing_duration = 4,
 		isCharacter = true,
-		icon = "pico"
+		icon = "pico",
+		sheets = {
+			love.filesystem.load("sprites/characters/extraSheets/Pico_Burps.lua")(),
+			love.filesystem.load("sprites/characters/extraSheets/Pico_Shooting.lua")(),
+		}
 	}
 )

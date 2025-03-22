@@ -18,6 +18,8 @@ return {
         }
         settings.lastDEBUGOption = settings.showDebug
         settings.showDebug = false
+
+        love.audio.stop()
     end,
     
     keypressed = function(self, key)

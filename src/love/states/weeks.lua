@@ -1049,19 +1049,21 @@ end
 			if #boyfriendNote > 0 then
 				if (boyfriendNote[1].time - musicTime <= -200) and not boyfriendNote[1].causesMiss then
 					if voicesBF then voicesBF:setVolume(0) end
-
+					local continue
 					if boyfriendNote[1]:getAnimName() ~= "hold" and boyfriendNote[1]:getAnimName() ~= "end" then 
 						health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult * boyfriendNote[1].healthLossMult
 						misses = misses + 1
 					else
 						health = health - (CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * 0.1) * healthLossMult * boyfriendNote[1].healthLossMult
-						Gamestate.onNoteMiss(boyfriend, boyfriendNote[1].ver, "BoyfriendMiss", i)
+						continue = Gamestate.onNoteMiss(boyfriend, boyfriendNote[1].ver, "BoyfriendMiss", i)
 					end
 
 					table.remove(boyfriendNote, 1)
 
-					if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
-
+					if not continue then
+						if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
+					end
+					
 					if combo >= 5 and girlfriend then girlfriend:animate("sad", false) end
 
 					combo = 0
