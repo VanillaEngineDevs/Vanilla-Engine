@@ -1,3 +1,4 @@
+---@diagnostic disable: param-type-mismatch
 --[[----------------------------------------------------------------------------
 Friday Night Funkin' Rewritten v1.1.0 beta 2
 
@@ -265,6 +266,7 @@ function love.load()
 		["hauntedHouse.erect"] = require "stages.erect.hauntedHouse",
 		["city.erect"] = require "stages.erect.city",
 		["sunset.erect"] = require "stages.erect.sunset",
+		["mall.erect"] = require "stages.erect.mall",
 		["streets.erect"] = require "stages.erect.streets"
 	}
 

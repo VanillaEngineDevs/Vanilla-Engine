@@ -23,11 +23,28 @@ local topBop, bottomBop, santa
 
 __scaryIntro = false
 
+local stage
+local animations = {
+	"singLEFT",
+	"singDOWN",
+	"singUP",
+	"singRIGHT",
+	"singLEFT",
+	"singDOWN",
+	"singUP",
+	"singRIGHT"
+}
 return {
 	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter()
 
-		stages["mall.base"]:enter()
+		stage = stages["mall.base"]
+
+		if _songExt == "-erect" or _songExt == "-pico" then
+			stage = stages["mall.erect"]
+		end
+
+		stage:enter(_songExt)
 
 		camera.zoom = 0.7
 		camera.defaultZoom = 0.7
@@ -76,7 +93,7 @@ return {
 		end
 		
 		weeks:load()
-		stages["mall.base"]:load()
+		stage:load()
 
 
 		self:initUI()
@@ -119,12 +136,18 @@ return {
 				weeks:setAltAnims(true)
 			end
 		end
+
+		if noteType == "censor" then
+			local animName = animations[id] .. " swear"
+			character:animate(animName)
+			return true
+		end
 	end,
 
 	update = function(self, dt)
 		if not __scaryIntro then
 			weeks:update(dt)
-			stages["mall.base"]:update(dt)
+			stage:update(dt)
 
 			if not (__scaryIntro or countingDown or graphics.isFading()) and not (inst:isPlaying() and voicesBF:isPlaying()) and not paused then
 				if storyMode and song < 3 then
@@ -167,7 +190,7 @@ return {
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
-			stages["mall.base"]:draw()
+			stage:draw()
 		love.graphics.pop()
 
 		if not __scaryIntro then
@@ -183,7 +206,7 @@ return {
 
 		graphics.clearCache()
 
-		stages["mall.base"]:leave()
+		stage:leave()
 		weeks:leave()
 	end
 }

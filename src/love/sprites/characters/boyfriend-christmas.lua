@@ -327,7 +327,10 @@ return graphics.newSprite(
         ["singRIGHT miss"] = {start = 197, stop = 242, speed = 24, offsetX = -41, offsetY = 10},
         ["singUP"] = {start = 243, stop = 257, speed = 24, offsetX = -21, offsetY = 13},
         ["singUP miss"] = {start = 258, stop = 281, speed = 24, offsetX = -18, offsetY = 11},
-        ["idle"] = {start = 282, stop = 295, speed = 24, offsetX = 0, offsetY = 0}
+        ["idle"] = {start = 282, stop = 295, speed = 24, offsetX = 0, offsetY = 0},
+
+		["singDOWN swear"] = {start = 1, stop = 14, speed = 24, offsetX = 1, offsetY = -25, sheet = 2},
+		["singRIGHT swear"] = {start = 15, stop = 28, speed = 24, offsetX = -49, offsetY = -2, sheet = 2},
     },
 	"idle",
 	false,
@@ -335,5 +338,8 @@ return graphics.newSprite(
 		sing_duration = 4,
 		isCharacter = true,
 		icon = "bf",
+		sheets = {
+			love.filesystem.load("sprites/characters/extraSheets/bfChristmas_Censored.lua")(),
+		}
 	}
 )

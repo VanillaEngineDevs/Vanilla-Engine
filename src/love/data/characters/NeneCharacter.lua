@@ -7,14 +7,15 @@ local VIS_TIME_MAX = 0.033333333333333333
 local deltaCurTime = 0
 local vizFrameWidth = 0
 
-function Nene:new()
+function Nene:new(variation)
     self.abot = graphics.newImage(graphics.imagePath("weekend1/abot"))
     self.abotBack = graphics.newImage(graphics.imagePath("weekend1/stereoBG"))
     self.soundData = nil
     self.bars = {0, 0, 0, 0, 0, 0, 0}
 
     abotVisualizers = {}
-    BaseCharacter.new(self, "sprites/characters/nene.lua")
+    local path = "sprites/characters/nene-" .. (variation or "default") .. ".lua"
+    BaseCharacter.new(self, path)
 
     self.name = "nene"
 
@@ -36,10 +37,9 @@ function Nene:new()
 
     for i = 1, MAX_ABOT_VIZ do
         local viz = love.filesystem.load("sprites/weekend1/abotViz.lua")()
-        --viz:animate(tostring(i) .. "_1", false)
         vizFrameWidth = viz:getFrameWidth()/2
         viz.x = -170 + (vizFrameWidth + 25) * i
-        viz.y = 0--stageImages["abot"].y + 120
+        viz.y = 0
         table.insert(abotVisualizers, viz)
     end
 end
@@ -174,7 +174,7 @@ function Nene:draw(debug)
         end
     end
     graphics.setColor(1, 1, 1, 1)
-    ---12, -270
+
     love.graphics.rectangle("fill", self.x + -327, self.y + 300, 120, 60)
     self.abot:draw()
 
