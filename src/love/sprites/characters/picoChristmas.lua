@@ -176,11 +176,11 @@ return graphics.newSprite(
 		{x = 461, y = 382, width = 491, height = 435, offsetX = -49, offsetY = -5, offsetWidth = 488, offsetHeight = 496, rotated = true}, -- 173: pico Up note xmas0014.png
 	},
 	{
-		["singDOWN"] = {start = 26, stop = 36, speed = 24, offsetX = 43, offsetY = -35},
+		["singDOWN"] = {start = 26, stop = 36, speed = 24, offsetX = 46, offsetY = -37},
 		["idle"] = {start = 37, stop = 50, speed = 24, offsetX = 0, offsetY = 0},
-		["singLEFT"] = {start = 76, stop = 92, speed = 24, offsetX = 70, offsetY = -3},
-		["singRIGHT"] = {start = 118, stop = 134, speed = 24, offsetX = 0, offsetY = -76},
-		["singUP"] = {start = 160, stop = 173, speed = 24, offsetX = 27, offsetY = 14},
+		["singLEFT"] = {start = 76, stop = 92, speed = 24, offsetX = 71, offsetY = -3},
+		["singRIGHT"] = {start = 118, stop = 134, speed = 24, offsetX = -73, offsetY = -2},
+		["singUP"] = {start = 160, stop = 173, speed = 24, offsetX = 25, offsetY = -12},
 	},
 	"idle",
 	false,
