@@ -28,6 +28,11 @@ local animations = {
 	"singRIGHT"
 }
 local stage
+
+local inPicoCutscene = false
+
+previousFrameTime = 0
+
 return {
 	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter()
@@ -35,6 +40,10 @@ return {
 		stage = stages["city.base"]
 		if _songExt == "-erect" or _songExt == "-pico" then
 			stage = stages["city.erect"]
+		end
+
+		if _songExt == "-pico" then
+			--inPicoCutscene = true
 		end
 
 		stage:enter(_songExt)
@@ -79,7 +88,9 @@ return {
 
 		self:initUI()
 
-		weeks:setupCountdown()
+		if not inPicoCutscene then
+			weeks:setupCountdown()
+		end
 	end,
 
 	initUI = function(self)
@@ -112,8 +123,6 @@ return {
 	end,
 
 	draw = function(self)
-		local curWinColor = winColors[winColor]
-
 		love.graphics.push()
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)

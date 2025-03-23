@@ -43,7 +43,7 @@ function Nene:new()
         table.insert(abotVisualizers, viz)
     end
 
-    self.child = love.filesystem.load("sprites/characters/nene.lua")()
+    self.child = love.filesystem.load("sprites/characters/nene-default.lua")()
     self.child.alpha = 1
 end
 
