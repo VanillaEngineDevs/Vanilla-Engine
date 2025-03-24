@@ -26,21 +26,6 @@ local function ARGBToRGBA(rgb) -- converts to r, g, b, a
     return r / 255, g / 255, b / 255, a / 255
 end
 
-local addBlendShader = love.graphics.newShader [[
-extern Image texture2;
-vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-    vec4 src = Texel(texture, texture_coords);
-    // dst is the pixel UNDER the texture
-    vec4 dst = Texel(texture2, texture_coords);
-
-    //src.rgb = src.rgb * color.rgb;
-    vec4 res = dst;
-
-    return res;
-}
-
-]]
-
 local colorShader = love.graphics.newShader("shaders/adjustColor.glsl")
 
 return {
@@ -145,10 +130,9 @@ return {
     end,
 
     update = function(self, dt)
-        
     end,
 
-    draw = function(self, inDebug)
+    draw = function(self, inDebug, dt)
         stageImages["skybox"]:draw()
         love.graphics.push()
 			love.graphics.translate(camera.x * 0.2, camera.y * 0.2)
@@ -194,19 +178,20 @@ return {
                             stageImages["mist" .. i].curX = 0
                         end
                         local realWidth = stageImages["mist" .. i]:getWidth()/2 -- image is centered origin
-                        stageImages["mist" .. i].curX = stageImages["mist" .. i].curX + (stageImages["mist" .. i].vx * love.timer.getDelta())
+                        stageImages["mist" .. i].curX = stageImages["mist" .. i].curX + (stageImages["mist" .. i].vx * dt)
                         if stageImages["mist" .. i].curX > realWidth or stageImages["mist" .. i].curX < -realWidth then
                             stageImages["mist" .. i].curX = 0
                         end
                         stageImages["mist" .. i].x = stageImages["mist" .. i].curX + (realWidth * j)
 
-                        --graphics.setColor(stageImages["mist" .. i].color[1], stageImages["mist" .. i].color[2], stageImages["mist" .. i].color[3])
-                        love.graphics.setBlendMode("add")
+                        graphics.setColor(stageImages["mist" .. i].color[1], stageImages["mist" .. i].color[2], stageImages["mist" .. i].color[3], 0.15)
+                        love.graphics.setBlendMode("add", "premultiplied")
                         stageImages["mist" .. i]:draw()
-                        love.graphics.setBlendMode(lastBlendMode, lastAlphaMode)
+                        graphics.setColor(1, 1, 1, 1)
                     end
                 love.graphics.pop()
-            end ]] -- CURSE YOU LOVE2D
+            end
+            love.graphics.setBlendMode(lastBlendMode, lastAlphaMode) ]]
 		love.graphics.pop()
     end,
 

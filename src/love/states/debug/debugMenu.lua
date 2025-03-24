@@ -14,6 +14,10 @@ return {
             {
                 text = "Frame Offset Viewer",
                 state = frameDebug
+            },
+            {
+                text = "Stage Builder",
+                state = stageBuilder
             }
         }
         settings.lastDEBUGOption = settings.showDebug

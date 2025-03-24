@@ -92,7 +92,7 @@ local graphics = {
 
 	newImage = function(image, optionsTable)
 		local pathStr = image
-		if not graphics.cache[pathStr] then 
+		if not graphics.cache[pathStr] and image then
 			if love.filesystem.getInfo(pathStr) then
 				graphics.cache[pathStr] = love.graphics.newImage(pathStr)
 			else
@@ -122,8 +122,8 @@ local graphics = {
 			visible = true,
 			alpha = 1,
 
-			setImage = function(self, image)
-				image = image
+			setImage = function(self, imageData)
+				image = imageData
 				width = image:getWidth()
 				height = image:getHeight()
 			end,
@@ -157,18 +157,20 @@ local graphics = {
 				graphics.setColor(lastColor[1], lastColor[2], lastColor[3], lastColor[4] * self.alpha)
 
 				if self.visible then
-					love.graphics.draw(
-						image,
-						self.x,
-						self.y,
-						self.orientation,
-						self.sizeX,
-						self.sizeY,
-						math.floor(width / 2) + self.offsetX,
-						math.floor(height / 2) + self.offsetY,
-						self.shearX,
-						self.shearY
-					)
+					if image then
+						love.graphics.draw(
+							image,
+							self.x,
+							self.y,
+							self.orientation,
+							self.sizeX,
+							self.sizeY,
+							math.floor(width / 2) + self.offsetX,
+							math.floor(height / 2) + self.offsetY,
+							self.shearX,
+							self.shearY
+						)
+					end
 				end
 
 				love.graphics.setColor(lastColor[1], lastColor[2], lastColor[3])
@@ -207,7 +209,9 @@ local graphics = {
 			end
 		}
 
-		object:setImage(image)
+		if image then
+			object:setImage(image)
+		end
 
 		options = optionsTable
 

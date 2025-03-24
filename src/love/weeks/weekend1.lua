@@ -313,7 +313,7 @@ return {
 		weeks:updateUI(dt)
 	end,
 
-	draw = function(self)
+	draw = function(self, dt)
 		if inCutscene then 
             video:draw()
 
@@ -342,7 +342,7 @@ return {
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
-			stage:draw()
+			stage:draw(false, dt)
 		love.graphics.pop()
 
 		if love.system.getOS() ~= "NX" then 

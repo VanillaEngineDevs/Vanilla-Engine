@@ -245,6 +245,7 @@ function love.load()
 	spriteDebug = require "states.debug.sprite-debug"
 	stageDebug = require "states.debug.stage-debug"
 	frameDebug = require "states.debug.frame-debug"
+	stageBuilder = require "states.debug.stage-builder"
 
 	-- Sounds
 	selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
@@ -403,13 +404,17 @@ function love.load()
 
 	--[[ graphics:initStickerData() ]]
 
-	Gamestate.switch(menu)
+	Gamestate.switch(stageBuilder)
 
 	love.setFpsCap(settings.fpsCap)
 end
 
 function love.resize(width, height)
 	push.resize(width, height)
+end
+
+function love.filedropped(file)
+	Gamestate.filedropped(file)
 end
 
 function love.keypressed(key)
@@ -513,6 +518,10 @@ function love.mousepressed(x, y, button, istouch, presses)
 			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/screenshots")
 		end
 	end
+end
+
+function love.mousereleased(x, y, button, istouch, presses)
+	Gamestate.mousereleased(x, y, button, istouch, presses)
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)
@@ -652,7 +661,7 @@ function love.draw(dt) -- love.draw has its own delta time
 		Gamestate.draw()
 	end
 	-- Debug output
-	if settings.showDebug then
+	if settings.showDebug and Gamestate.current() ~= stageBuilder then
 		borderedText(status.getDebugStr(settings.showDebug), 5, 5, nil, 0.6, 0.6)
 	end
 end
