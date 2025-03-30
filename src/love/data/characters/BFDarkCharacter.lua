@@ -1,7 +1,7 @@
 local BFDark = BaseCharacter:extend()
 
 function BFDark:new()
-    BaseCharacter.new(self, "sprites/characters/boyfriend-dark.lua")
+    BaseCharacter.new(self, "sprites/characters/boyfriend-dark.lua", "data/characters/resultsData/boyfriend.lua")
 
     self.child = love.filesystem.load("sprites/characters/boyfriend.lua")()
     self.child.alpha = 1

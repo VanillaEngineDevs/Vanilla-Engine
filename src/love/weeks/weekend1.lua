@@ -368,7 +368,6 @@ return {
 		stage:leave()
 
 		enemy = nil
-		boyfriend = nil
 		girlfriend = nil
 
 		graphics.clearCache()

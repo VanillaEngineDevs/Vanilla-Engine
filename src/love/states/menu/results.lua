@@ -13,7 +13,7 @@ _resultsCache = {
     --[[ ratingsPopin = love.graphics.newImage(graphics.imagePath("resultsScreen/ratingsPopin")), ]]
 }
 local resultsVariation = "NORMAL"
-local resultsGF, resultsBF, soundSystem
+local resultsGF, resultsPLAYER, soundSystem
 local letterOrder = "AaBbCcDdEeFfGgHhiIJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789:1234567890"
 local resultsFont = {quads={}, img=nil}
 
@@ -24,6 +24,8 @@ local curDiff
 
 local thePosEverX = 0
 local thePosEverY = {0}
+
+local resultsMusicSecondary
 
 local function printResultsFont(x, y, text, scale)
     local text = text or "UNDEFINED"
@@ -57,15 +59,63 @@ local scoreNumbers = {
             local char = paddedStr:sub(i, i)
             if char == "_" then
                 self.sprites[i]:animate("DISABLED", false)
+                if i == #paddedStr then
+                    self.sprites[i]:animate("0", false)
+                end
             else
                 self.sprites[i].visible = true
                 self.sprites[i]:animate(char, false)
             end
         end
     end
-} -- 10 numbers max, AKA 9999999999 max score to be displayed
+} 
+-- 10 numbers max, AKA 9999999999 max score to be displayed
 local tallies = {}
 local resultsMusic
+
+local dontLoopPlaySecondLoop = false
+
+local function calculateRank(scoreData)
+    if scoreData == nil or scoreData.totalNotes == 0 then
+        return nil
+    end
+
+    local isPerfectGold = scoreData.sickCount == scoreData.totalNotes
+    if isPerfectGold then
+        return "PERFECT_GOLD"
+    end
+
+    local grade = (scoreData.sickCount + scoreData.goodCount) / scoreData.totalNotes
+    --local clear = scoreData.totalNotesHit / scoreData.totalNotes
+    
+    if grade == CONSTANTS.RANK_PERFECT_THRESHOLD then
+        return "PERFECT"
+    elseif grade >= CONSTANTS.RANK_EXCELLENT_THRESHOLD then
+        return "EXCELLENT"
+    elseif grade >= CONSTANTS.RANK_GREAT_THRESHOLD then
+        return "GREAT"
+    elseif grade >= CONSTANTS.RANK_GOOD_THRESHOLD then
+        return "GOOD"
+    else
+        return "SHIT"
+    end
+end
+
+local function getMusicDelay(rank)
+    if rank == "PERFECT_GOLD" or rank == "PERFECT" then
+        return 95 / 24
+    elseif rank == "EXCELLENT" then
+        return 0
+    elseif rank == "GREAT" then
+        return 5 / 24
+    elseif rank == "GOOD" then
+        return 3 / 24
+    elseif rank == "SHIT" then
+        return 2 / 24
+    end
+
+    return 3.5
+end
 
 return {
     enter = function(self, last, scoreData_)
@@ -75,17 +125,17 @@ return {
         soundSystem.visible = false
         soundSystem.x, soundSystem.y = 425, 300
 
-        resultsGF = love.filesystem.load("sprites/resultsScreen/resultGirlfriend" .. variationToFile[resultsVariation] .. ".lua")()
+       --[[  resultsGF = love.filesystem.load("sprites/resultsScreen/resultGirlfriend" .. variationToFile[resultsVariation] .. ".lua")()
         resultsGF.visible = false
-        resultsGF.x, resultsGF.y = 760, 500
+        resultsGF.x, resultsGF.y = 760, 500 ]]
+        --[[ 
+        resultsPLAYER = love.filesystem.load("sprites/resultsScreen/resultBoyfriend" .. variationToFile[resultsVariation] .. ".lua")()
+        resultsPLAYER.visible = false
+        resultsPLAYER.x, resultsPLAYER.y = 965, 265 ]]
 
-        resultsBF = love.filesystem.load("sprites/resultsScreen/resultBoyfriend" .. variationToFile[resultsVariation] .. ".lua")()
-        resultsBF.visible = false
-        resultsBF.x, resultsBF.y = 965, 265
-
-        resultsMusic = love.audio.newSource("music/results/results" .. resultsVariation .. ".ogg", "stream")
-        resultsMusic:setLooping(true)
-        resultsMusic:play()
+        --[[ resultsMusic = love.audio.newSource("music/results/results" .. resultsVariation .. ".ogg", "stream") ]]
+        --[[ resultsMusic:setLooping(true)
+        resultsMusic:play() ]]
 
         resultsFont.quads = {}
         resultsFont.img = love.graphics.newImage(graphics.imagePath("resultsScreen/tardlingSpritesheet"))
@@ -116,7 +166,10 @@ return {
         resultsAnim = love.filesystem.load("sprites/resultsScreen/resultsAnim.lua")()
         resultsAnim.x = 1280/2 - resultsAnim:getFrameWidth()/2
         resultsAnim.y = resultsAnim:getFrameHeight() + 35
-        resultsAnim:animate("idle", false)
+        Timer.after(6/24, function()
+            resultsAnim.visible = true
+            resultsAnim:animate("idle", false)
+        end)
 
         _resultsCache.ratingsPopin = love.graphics.newImage(graphics.imagePath("resultsScreen/ratingsPopin"))
         _resultsCache.scorePopin = love.graphics.newImage(graphics.imagePath("resultsScreen/scorePopin"))
@@ -142,8 +195,32 @@ return {
         scores = scoreData.scores
         artist = scoreData.artist
 
-        scores.totalNotes = scores.sickCount + scores.goodCount + scores.badCount + scores.shitCount + scores.missedCount
+        if not boyfriend then boyfriend = {data={}} end
+        if not boyfriend.data.results then 
+            boyfriend.data = love.filesystem.load("data/characters/resultsData/boyfriend.lua")()
+        end
 
+        scores.totalNotes = scores.sickCount + scores.goodCount + scores.badCount + scores.shitCount + scores.missedCount
+        scores.totalNotesHit = scores.sickCount + scores.goodCount + scores.badCount + scores.shitCount
+        local rank = calculateRank(scores)
+
+        resultsMusic = love.audio.newSource("music/" .. boyfriend.data.results.music[rank] .. ".ogg", "stream")
+        if util.endsWith(boyfriend.data.results.music[rank], "intro") then
+            resultsMusic:setLooping(false)
+            --resultsMusic:play()
+            dontLoopPlaySecondLoop = true
+            resultsMusicSecondary = love.audio.newSource("music/" .. boyfriend.data.results.music[rank]:gsub("-intro", "") .. ".ogg", "stream")
+            resultsMusicSecondary:setLooping(true)
+        else
+            resultsMusic:setLooping(true)
+            --resultsMusic:play()
+        end
+
+        resultsPLAYER = love.filesystem.load("sprites/results/" .. boyfriend.data.results[rank] .. ".lua")()
+        if boyfriend.data.results[rank].secondary then
+            resultsPLAYER.backSprite = love.filesystem.load("sprites/results/" .. boyfriend.data.results[rank].secondary .. ".lua")()
+        end
+        
         -- Tallies (Dogshit code ahead)
         for i = 1, 7 do 
             tallies[i] = {sprites={},colour={1, 1, 1},num=0,curNum=0,displayedNums=1,storedX={},flippedSprites={},visibleSprites={},visible=false}
@@ -297,15 +374,23 @@ return {
             end
         end
 
-        Timer.after(0.5, function()
+        Timer.after(21/24, function()
             ratingsPopin:animate("idle", false, function()
-                scorePopin.visible = true
-                scorePopin:animate("idle", false, function()
-                    scoreNumbers.visible = true
-                    scoreNumbers:animateNumbers()
-                end)
+                
             end)
             ratingsPopin.visible = true
+        end)
+
+        Timer.after(36 / 24, function()
+            scorePopin.visible = true
+            scorePopin:animate("idle", false, function()
+                
+            end)
+        end)
+
+        Timer.after(37/24, function()
+            scoreNumbers.visible = true
+            scoreNumbers:animateNumbers()
         end)
 
         Timer.after(
@@ -317,17 +402,16 @@ return {
 
         Timer.after(
             (1/24) * 22, function()
-                resultsGF:animate("idle", false, function()
+                --[[ resultsGF:animate("idle", false, function()
                     resultsGF:animate("idle", true, nil, false, 10, true)
                 end)
-                --[[ resultsGF:animate("idle", true, nil, false, 10) ]]
-                resultsGF.visible = true
+                resultsGF.visible = true ]]
             end
         )
 
         for i = 1, #tallies do
             Timer.after(
-                0.3 * i + 0.55, function()
+                0.3 * i + 1.2, function()
                     tallies[i].visible = true
                     Timer.tween(0.5, tallies[i], {
                         curNum = tallies[i].num
@@ -340,21 +424,31 @@ return {
             )
         end
 
-        resultsBF.visible = true
-        resultsBF:animate("idle", false, function()
-            resultsBF:animate("idle", true, nil, false, 15, true)
+        playedMusic = false
+        Timer.after(getMusicDelay(rank), function()
+            resultsMusic:play()
+            playedMusic = true
+        end)
+
+        resultsPLAYER.visible = true
+        resultsPLAYER:animate("intro", false, function()
+            resultsPLAYER:animate("idle", true)
         end)
     end,
 
     update = function(self, dt)
-        resultsGF:update(dt)
-        resultsBF:update(dt)
+        resultsPLAYER:update(dt)
         soundSystem:update(dt)
 
         resultsAnim:update(dt)
 
         ratingsPopin:update(dt)
         scorePopin:update(dt)
+
+        if dontLoopPlaySecondLoop and not resultsMusic:isPlaying() and playedMusic then
+            resultsMusicSecondary:play()
+            dontLoopPlaySecondLoop = false
+        end
 
         if thePosEverY[1] == 160 and not textTween then
             thePosEverX = thePosEverX - 5 * dt * 100
@@ -440,8 +534,7 @@ return {
                 graphics.setColor(1, 1, 1)
             love.graphics.pop()
 
-            resultsGF:draw()
-            resultsBF:draw()
+            resultsPLAYER:draw()
             soundSystem:draw()
 
             topBarBlack:draw()
@@ -473,8 +566,7 @@ return {
     leave = function(self)
         tallies = {}
         scoreNumbers.sprites = {}
-        resultsGF = nil
-        resultsBF = nil
+        resultsPLAYER = nil
         soundSystem = nil
         ratingsPopin = nil
         scorePopin = nil

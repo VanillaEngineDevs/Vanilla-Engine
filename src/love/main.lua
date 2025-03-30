@@ -404,7 +404,7 @@ function love.load()
 
 	--[[ graphics:initStickerData() ]]
 
-	Gamestate.switch(stageBuilder)
+	Gamestate.switch(menu)
 
 	love.setFpsCap(settings.fpsCap)
 end
@@ -476,7 +476,7 @@ function love.keypressed(key)
 			lastAudioVolume = love.audio.getVolume()
 			love.audio.setVolume(0)
 		end
-	--[[ elseif key == "-" and love.keyboard.isDown("lalt") then
+	elseif key == "-" and love.keyboard.isDown("lalt") then
 		Gamestate.switch(resultsScreen, {
 			diff = "hard",
 			song = "High Erect",
@@ -488,9 +488,11 @@ function love.keypressed(key)
 				shitCount = 25,
 				missedCount = 30,
 				maxCombo = 384,
-				score = 192000
+				score = 192000,
+				totalNotes = 10+15+20+25+30,
+				totalNotesHit = 10+15+20+25,
 			}
-		}) ]]
+		})
 	elseif key == "-" then
 		volFade = 1
 		if fixVol > 0 then

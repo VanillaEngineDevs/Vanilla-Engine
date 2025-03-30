@@ -1,7 +1,7 @@
 local PicoDark = BaseCharacter:extend()
 
 function PicoDark:new()
-    BaseCharacter.new(self, "sprites/characters/pico-player-dark.lua")
+    BaseCharacter.new(self, "sprites/characters/pico-player-dark.lua", "data/characters/resultsData/pico.lua")
 
     self.child = love.filesystem.load("sprites/characters/pico-player.lua")()
     self.child.alpha = 1

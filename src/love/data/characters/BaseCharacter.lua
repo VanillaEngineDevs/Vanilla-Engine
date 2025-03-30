@@ -1,7 +1,12 @@
 local Character = Object:extend()
 
-function Character:new(luaPath)
+function Character:new(luaPath, resultsLuaPath)
     self.spr = love.filesystem.load(luaPath)()
+    if resultsLuaPath then
+        self.data = love.filesystem.load(resultsLuaPath)()
+    else
+        self.data = {}
+    end
     self.x, self.y = 0, 0
     self.orientation = 0
     self.sizeX, self.sizeY = 1, 1

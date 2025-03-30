@@ -478,6 +478,9 @@ local graphics = {
 			end,
 
 			update = function(self, dt)
+				if self.backSprite and self.backSprite.update then
+					self.backSprite:update(dt)
+				end
 				if self.updateOverride then 
 					self:updateOverride(dt)
 				end
@@ -636,6 +639,9 @@ local graphics = {
 			end,
 
 			beat = function(self, beat)
+				if self.backsprite and self.backsprite.beat then
+					self.backsprite:beat(beat)
+				end
 				local beat = math.floor(beat) or 0
 				if self.isCharacter then
 					if not self.danceIdle then
@@ -677,6 +683,9 @@ local graphics = {
 			draw = function(self)
 				if not self.visible then
 					return
+				end
+				if self.backSprite and self.backSprite.draw then
+					self.backSprite:draw()
 				end
 				self.curFrame = math.floor(frame or 1)
 				anim = self:getCurrentAnim()
