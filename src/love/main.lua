@@ -268,6 +268,8 @@ function love.load()
 		["city.erect"] = require "stages.erect.city",
 		["sunset.erect"] = require "stages.erect.sunset",
 		["mall.erect"] = require "stages.erect.mall",
+		["school.erect"] = require "stages.erect.school",
+		["evilSchool.erect"] = require "stages.erect.evilSchool",
 		["streets.erect"] = require "stages.erect.streets"
 	}
 
@@ -279,8 +281,9 @@ function love.load()
 
 	shaders = {}
 	if love.system.getOS() ~= "NX" then 
-		shaders["rain"] = love.graphics.newShader("shaders/rain.glsl")	
+		shaders["rain"] = love.graphics.newShader("shaders/rain.glsl")
 	end
+	shaders["wiggle"] = love.graphics.newShader("shaders/wiggle.glsl")
 
 	-- Load Menus
 	menu = require "states.menu.menu"
@@ -404,7 +407,7 @@ function love.load()
 
 	--[[ graphics:initStickerData() ]]
 
-	Gamestate.switch(stageBuilder)
+	Gamestate.switch(menu)
 
 	love.setFpsCap(settings.fpsCap)
 end

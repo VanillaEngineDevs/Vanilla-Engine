@@ -17,12 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
+local stage
+
 return {
 	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		love.graphics.setDefaultFilter("nearest")
 		weeks:enter("pixel")
 
-		stages["school.base"]:enter()
+		stage = stages["school.base"]
+		if _songExt == "-erect" or _songExt == "-pico" then
+			stage = stages["school.erect"]
+		end
+
+		stage:enter(_songExt)
 
 		camera.defaultZoom = 0.85
 		camera.zoom = 0.85
@@ -51,16 +58,20 @@ return {
 		if song == 3 then
 			school = love.filesystem.load("sprites/week6/evil-school.lua")()
 			enemy = BaseCharacter("sprites/characters/spirit.lua")
-			stages["evilSchool.base"]:enter()
-			stages["evilSchool.base"]:load()
-			stages["school.base"]:leave()
+			stage:leave()
+			stage = stages["evilSchool.base"]
+			if songExt == "-erect" or songExt == "-pico" then
+				stage = stages["evilSchool.erect"]
+			end
+			stage:enter()
+			stage:load()
 		elseif song == 2 then
 			enemy = BaseCharacter("sprites/characters/senpai-angry.lua")
 
-			stages["school.base"]:load()
+			stage:load()
 		else
 			enemy = BaseCharacter("sprites/characters/senpai.lua")
-			stages["school.base"]:load()
+			stage:load()
 		end
 		
 		weeks:load()
@@ -155,11 +166,7 @@ return {
 			graphics.screenBase(256, 144)
 		end
 		weeks:update(dt)
-		if song ~= 3 then
-			stages["school.base"]:update(dt)
-		else
-			stages["evilSchool.base"]:update(dt)
-		end
+		stage:update(dt)
 
 		if not countingDown and not inCutscene then
 		else
@@ -190,11 +197,7 @@ return {
 			love.graphics.translate(graphics.getWidth()/2, graphics.getHeight()/2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
-			if song ~= 3 then
-				stages["school.base"]:draw()
-			else
-				stages["evilSchool.base"]:draw()
-			end
+			stage:draw()
 		love.graphics.pop()
 
 		if inCutscene then 
@@ -220,8 +223,7 @@ return {
 		graphics.clearCache()
 
 		weeks:leave()
-		stages["school.base"]:leave()
-		stages["evilSchool.base"]:leave()
+		stage:leave()
 		status.setNoResize(false)
 
 		love.graphics.setDefaultFilter("linear")

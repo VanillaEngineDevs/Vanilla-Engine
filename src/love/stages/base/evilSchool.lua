@@ -22,7 +22,8 @@ return {
 		pixel = true
 		love.graphics.setDefaultFilter("nearest")
         stageImages = {
-			["Evil School"] = love.filesystem.load("sprites/week6/evil-school.lua")() -- evil school
+			["Evil SchoolFG"] = graphics.newImage(graphics.imagePath("week6/evilSchoolFG")),
+			["Evil SchoolBG"] = graphics.newImage(graphics.imagePath("week6/evilSchoolBG"))
         }
         enemy = BaseCharacter("sprites/characters/spirit.lua")
 		enemy.x, enemy.y = -340, -20
@@ -30,6 +31,11 @@ return {
         girlfriend.x, girlfriend.y = 30, -50
 		boyfriend.x, boyfriend.y = 300, 190
 		fakeBoyfriend.x, fakeBoyfriend.y = 300, 190
+
+		--shaders["wiggle"]:send("effectType", 0)
+		shaders["wiggle"]:send("uSpeed", 2)
+		shaders["wiggle"]:send("uFrequency", 4)
+		shaders["wiggle"]:send("uWaveAmplitude", 0.017)
     end,
 
     load = function(self)
@@ -37,14 +43,18 @@ return {
     end,
 
     update = function(self, dt)
-		stageImages["Evil School"]:update(dt)
+		shaders["wiggle"]:send("uTime", love.timer.getTime())
     end,
 
     draw = function()
         love.graphics.push()
 			love.graphics.translate(camera.x * 0.9, camera.y * 0.9)
 
-			stageImages["Evil School"]:udraw()
+			local lastShader = love.graphics.getShader()
+			love.graphics.setShader(shaders["wiggle"])
+			stageImages["Evil SchoolBG"]:udraw()
+			love.graphics.setShader(lastShader)
+			stageImages["Evil SchoolFG"]:udraw()
 
 			girlfriend:udraw()
 		love.graphics.pop()

@@ -40,7 +40,7 @@ return { -- Add/remove weeks here
     {
         "Week 5",
         {
-            {"Cocoa",  erect=true},
+            {"Cocoa",  erect=true, pico=true},
             {"Eggnog", erect=true, pico=true},
             {"Winter Horrorland"}
         }
@@ -48,24 +48,24 @@ return { -- Add/remove weeks here
     {
         "Week 6",
         {
-            {"Senpai", erect=true},
-            {"Roses",  erect=true},
-            {"Thorns", erect=true}
+            {"Senpai", erect=true, pico=true},
+            {"Roses",  erect=true, pico=true},
+            {"Thorns", erect=true, pico=true}
         }
     },
     {
         "Week 7",
         {
-            {"Ugh",  erect=true,  pico=true},
-            {"Guns", erect=false, pico=true},
-            {"Stress"}
+            {"Ugh",   erect=true,  pico=true},
+            {"Guns",  erect=false, pico=true},
+            {"Stress",erect=false, pico=true}
         }
     },
     {
         "Weekend 1",
         {
             {"Darnell", diffs = {{"easy", nil, nil, "-pico"}, {"normal", nil, nil, "-pico"}, {"hard", nil, nil, "-pico"}, {"BF Easy", "-bf", "easy", "-bf"}, {"BF Normal", "-bf", "normal", "-bf"}, {"BF Hard", "-bf", "hard", "-bf"}}},
-            {"Lit Up", diffs = {{"easy", nil, nil, "-pico"}, {"normal", nil, nil, "-pico"}, {"hard", nil, nil, "-pico"}}},
+            {"Lit Up", diffs = {{"easy", nil, nil, "-pico"}, {"normal", nil, nil, "-pico"}, {"hard", nil, nil, "-pico"}, {"BF Easy", "-bf", "easy", "-bf"}, {"BF Normal", "-bf", "normal", "-bf"}, {"BF Hard", "-bf", "hard", "-bf"}}},
             {"2hot", diffs = {{"easy", nil, nil, "-pico"}, {"normal", nil, nil, "-pico"}, {"hard", nil, nil, "-pico"}}},
             {"Blazin", diffs = {{"easy", nil, nil, "-pico"}, {"normal", nil, nil, "-pico"}, {"hard", nil, nil, "-pico"}}},
             {"Cutscene", show=false}
