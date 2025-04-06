@@ -529,6 +529,20 @@ local graphics = {
 				return math.floor(frame)
 			end,
 
+			getFrame = function(self)
+				local sheet = sheets[anim.sheet or 1]
+				local frame = math.floor(frame or 1)
+				if frame > #sheet:getAllFrames() then
+					frame = #sheet:getAllFrames()
+				end
+				if frame < 1 then
+					frame = 1
+				end
+				local frameData = sheet:getAllFrames()[frame]
+				
+				return frameData.x, frameData.y, frameData.width, frameData.height
+			end,
+
 			getAllFrames = function(self)
 				return frameData
 			end,

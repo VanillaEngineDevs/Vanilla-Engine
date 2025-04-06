@@ -66,4 +66,12 @@ function Character:setAnimSpeed(speed)
     self.spr:setAnimSpeed(speed)
 end
 
+function Character:getFrame()
+    return self.spr:getFrame()
+end
+
+function Character:getSheet()
+    return self.spr:getSheet()
+end
+
 return Character

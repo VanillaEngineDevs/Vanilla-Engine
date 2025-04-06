@@ -17,8 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
+local rimShaderBF, rimShaderEnemy, rimShaderGF
+local abotSpeakerShader
+local hideDancers = false
+
 return {
-    enter = function()
+    enter = function(self, songExt)
+		songExt = songExt or ""
 		pixel = true
 		love.graphics.setDefaultFilter("nearest")
         stageImages = {
@@ -45,6 +50,57 @@ return {
 			fakeBoyfriend.x, fakeBoyfriend.y = 300, 190
 			enemy.x, enemy.y = -340, -20
 		end
+
+		rimShaderBF = love.graphics.newShader("shaders/dropShadow.glsl")
+
+		rimShaderBF:send("ang", math.rad(90))
+		rimShaderBF:send("altMask", love.graphics.newImage(graphics.imagePath("week6.erect/masks/bfPixel_mask")))
+		rimShaderBF:send("useMask", true)
+		rimShaderBF:send("thr2", 1)
+		rimShaderBF:send("dropColor", {hexToRGB(0xFF52351D)})
+		rimShaderBF:send("dist", 3)
+		rimShaderBF:send("brightness", -66)
+		rimShaderBF:send("hue", -10)
+		rimShaderBF:send("contrast", 24)
+		rimShaderBF:send("saturation", -23)
+		local sheet = boyfriend:getSheet()
+		local w, h = sheet:getDimensions()
+		rimShaderBF:send("textureSize", {w, h})
+
+		rimShaderEnemy = love.graphics.newShader("shaders/dropShadow.glsl")
+		rimShaderEnemy:send("ang", math.rad(90))
+		rimShaderEnemy:send("altMask", love.graphics.newImage(graphics.imagePath("week6.erect/masks/senpai_mask")))
+		rimShaderEnemy:send("useMask", true)
+		rimShaderEnemy:send("thr2", 1)
+		rimShaderEnemy:send("dropColor", {hexToRGB(0xFF52351D)})
+		rimShaderEnemy:send("dist", 3)
+		rimShaderEnemy:send("brightness", -66)
+		rimShaderEnemy:send("hue", -10)
+		rimShaderEnemy:send("contrast", 24)
+		rimShaderEnemy:send("saturation", -23)
+		sheet = enemy:getSheet()
+		w, h = sheet:getDimensions()
+		rimShaderEnemy:send("textureSize", {w, h})
+
+		rimShaderGF = love.graphics.newShader("shaders/dropShadow.glsl")
+		rimShaderGF:send("ang", math.rad(90))
+		if songExt == "-pico" then
+			-- use nene mask
+			rimShaderGF:send("altMask", love.graphics.newImage(graphics.imagePath("week6.erect/masks/nenePixel_mask")))
+		else
+			rimShaderGF:send("altMask", love.graphics.newImage(graphics.imagePath("week6.erect/masks/gfPixel_mask")))
+		end
+		rimShaderGF:send("useMask", true)
+		rimShaderGF:send("thr2", 1)
+		rimShaderGF:send("dropColor", {hexToRGB(0xFF52351D)})
+		rimShaderGF:send("dist", 3)
+		rimShaderGF:send("brightness", -66)
+		rimShaderGF:send("hue", -10)
+		rimShaderGF:send("contrast", 24)
+		rimShaderGF:send("saturation", -23)
+		sheet = girlfriend:getSheet()
+		w, h = sheet:getDimensions()
+		rimShaderGF:send("textureSize", {w, h})
     end,
 
     load = function(self)
@@ -85,13 +141,47 @@ return {
 					stageImages["Trees"]:udraw()
 					stageImages["Petals"]:udraw()
 				end
+
+				local lastShader = love.graphics.getShader()
+
+				local gfFrame = {girlfriend:getFrame()}
+				local gfSheet = girlfriend:getSheet()
+
+				local uvX, uvY = gfFrame[1] / gfSheet:getWidth(), gfFrame[2] / gfSheet:getHeight()
+				local uvW, uvH = gfFrame[1] + gfFrame[3], gfFrame[2] + gfFrame[4]
+				uvW, uvH = uvW / gfSheet:getWidth(), uvH / gfSheet:getHeight()
+				rimShaderGF:send("uFrameBounds", {uvX, uvY, uvW, uvH})
+
+				love.graphics.setShader(rimShaderGF)
 				girlfriend:udraw()
+				love.graphics.setShader(lastShader)
 			love.graphics.pop()
 			love.graphics.push()
 				love.graphics.translate(camera.x, camera.y)
+				local lastShader = love.graphics.getShader()
 
+				local bfFrame = {boyfriend:getFrame()}
+				local enemyFrame = {enemy:getFrame()}
+				local bfSheet = boyfriend:getSheet()
+				local enemySheet = enemy:getSheet()
+
+				local uvX, uvY = bfFrame[1] / bfSheet:getWidth(), bfFrame[2] / bfSheet:getHeight()
+				local uvW, uvH = bfFrame[1] + bfFrame[3], bfFrame[2] + bfFrame[4]
+				uvW, uvH = uvW / bfSheet:getWidth(), uvH / bfSheet:getHeight()
+
+				rimShaderBF:send("uFrameBounds", {uvX, uvY, uvW, uvH})
+
+				uvX, uvY = enemyFrame[1] / enemySheet:getWidth(), enemyFrame[2] / enemySheet:getHeight()
+				uvW, uvH = enemyFrame[1] + enemyFrame[3], enemyFrame[2] + enemyFrame[4]
+				uvW, uvH = uvW / enemySheet:getWidth(), uvH / enemySheet:getHeight()
+				rimShaderEnemy:send("uFrameBounds", {uvX, uvY, uvW, uvH})
+
+				love.graphics.setShader(rimShaderEnemy)
 				enemy:udraw()
+				love.graphics.setShader(rimShaderBF)
 				boyfriend:udraw()
+
+				love.graphics.setShader(lastShader)
 			love.graphics.pop()
 		else
 			love.graphics.push()
@@ -113,9 +203,14 @@ return {
 			love.graphics.pop()
 			love.graphics.push()
 				love.graphics.translate(camera.x, camera.y)
+				local lastShader = love.graphics.getShader()
 
+				love.graphics.setShader(rimShaderEnemy)
 				enemy:draw()
+				love.graphics.setShader(rimShaderBF)
 				boyfriend:draw()
+				
+				love.graphics.setShader(lastShader)
 			love.graphics.pop()
 		end
     end,

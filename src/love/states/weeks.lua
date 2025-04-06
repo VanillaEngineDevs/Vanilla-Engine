@@ -111,6 +111,8 @@ return {
 
 			girlfriend = BaseCharacter("sprites/characters/girlfriend.lua")
 			boyfriend = BaseCharacter("sprites/characters/boyfriend.lua")
+
+			countdown = love.filesystem.load("sprites/countdown.lua")()
 		else
 			pixel = true
 			love.graphics.setDefaultFilter("nearest", "nearest")
@@ -143,6 +145,8 @@ return {
 
 			girlfriend = BaseCharacter("sprites/characters/girlfriend-pixel.lua")
 			boyfriend = BaseCharacter("sprites/characters/boyfriend-pixel.lua")
+
+			countdown = love.filesystem.load("sprites/pixel/countdown.lua")()
 		end
 
 		numbers = {}
@@ -161,7 +165,6 @@ return {
 		end
 
 		countdownFade = {}
-		countdown = love.filesystem.load("sprites/countdown.lua")()
 	end,
 
 	load = function(self)

@@ -284,6 +284,7 @@ function love.load()
 		shaders["rain"] = love.graphics.newShader("shaders/rain.glsl")
 	end
 	shaders["wiggle"] = love.graphics.newShader("shaders/wiggle.glsl")
+	--[[ shaders["dropShadow"] = love.graphics.newShader("shaders/dropShadow.glsl") ]]
 
 	-- Load Menus
 	menu = require "states.menu.menu"
