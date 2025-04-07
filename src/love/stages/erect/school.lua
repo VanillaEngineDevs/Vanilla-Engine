@@ -1,22 +1,4 @@
---[[----------------------------------------------------------------------------
-This file is part of Friday Night Funkin' Vanilla Engine
-
-Copyright (C) 2024 VanillaEngineDevs & HTV04
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-------------------------------------------------------------------------------]]
-
+---@diagnostic disable: missing-fields
 local rimShaderBF, rimShaderEnemy, rimShaderGF
 local abotSpeakerShader
 local hideDancers = false
@@ -85,6 +67,7 @@ return {
 		rimShaderGF = love.graphics.newShader("shaders/dropShadow.glsl")
 		rimShaderGF:send("ang", math.rad(90))
 		if songExt == "-pico" then
+			hideDancers = true
 			-- use nene mask
 			rimShaderGF:send("altMask", love.graphics.newImage(graphics.imagePath("week6.erect/masks/nenePixel_mask")))
 		else
@@ -101,6 +84,11 @@ return {
 		sheet = girlfriend:getSheet()
 		w, h = sheet:getDimensions()
 		rimShaderGF:send("textureSize", {w, h})
+
+		if songExt == "-pico" then
+			girlfriend = PixelNeneCharacter()
+		end
+			
     end,
 
     load = function(self)
@@ -144,16 +132,18 @@ return {
 
 				local lastShader = love.graphics.getShader()
 
-				local gfFrame = {girlfriend:getFrame()}
-				local gfSheet = girlfriend:getSheet()
+				if hideDancers then -- its nene, just don't wanna make another variable -- wait im stupid, theres a girlfriend.name parameter
+					local gfFrame = {girlfriend:getFrame()}
+					local gfSheet = girlfriend:getSheet()
 
-				local uvX, uvY = gfFrame[1] / gfSheet:getWidth(), gfFrame[2] / gfSheet:getHeight()
-				local uvW, uvH = gfFrame[1] + gfFrame[3], gfFrame[2] + gfFrame[4]
-				uvW, uvH = uvW / gfSheet:getWidth(), uvH / gfSheet:getHeight()
-				rimShaderGF:send("uFrameBounds", {uvX, uvY, uvW, uvH})
+					local uvX, uvY = gfFrame[1] / gfSheet:getWidth(), gfFrame[2] / gfSheet:getHeight()
+					local uvW, uvH = gfFrame[1] + gfFrame[3], gfFrame[2] + gfFrame[4]
+					uvW, uvH = uvW / gfSheet:getWidth(), uvH / gfSheet:getHeight()
+					rimShaderGF:send("uFrameBounds", {uvX, uvY, uvW, uvH})
 
-				love.graphics.setShader(rimShaderGF)
-				girlfriend:udraw()
+					love.graphics.setShader(rimShaderGF)
+				end
+				girlfriend:udraw(nil, nil, rimShaderGF, abotSpeakerShader)
 				love.graphics.setShader(lastShader)
 			love.graphics.pop()
 			love.graphics.push()

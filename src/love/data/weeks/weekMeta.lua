@@ -50,7 +50,7 @@ return { -- Add/remove weeks here
         {
             {"Senpai", erect=true, pico=true},
             {"Roses",  erect=true, pico=true},
-            {"Thorns", erect=true, pico=true}
+            {"Thorns", erect=true, pico=false}
         }
     },
     {

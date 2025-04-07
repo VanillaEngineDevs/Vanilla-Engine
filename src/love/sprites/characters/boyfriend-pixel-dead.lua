@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("characters/boyfriend-pixel-dead")),
+	love.graphics.newImage(graphics.imagePath("characters/pixel/boyfriend-pixel-dead")),
 	-- Automatically generated from bfPixelsDEAD.xml
 	{
 		{x = 0, y = 0, width = 90, height = 81, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 1: BF Dies pixel0000

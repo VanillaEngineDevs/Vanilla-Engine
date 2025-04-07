@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 return graphics.newSprite(
-	love.graphics.newImage(graphics.imagePath("characters/boyfriend-pixel")),
+	love.graphics.newImage(graphics.imagePath("characters/pixel/boyfriend-pixel")),
 	-- Automatically generated from bfPixel.xml
 	{
 		{x = 166, y = 0, width = 73, height = 73, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0}, -- 1: BF DOWN instance MISS 10000

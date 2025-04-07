@@ -212,6 +212,7 @@ function love.load()
 	-- Load Characters
 	BaseCharacter = require "data.characters.BaseCharacter"
 	NeneCharacter = require "data.characters.NeneCharacter"
+	PixelNeneCharacter = require "data.characters.PixelNeneCharacter"
 	BFDarkCharacter = require "data.characters.BFDarkCharacter"
 	GFDarkCharacter = require "data.characters.GFDarkCharacter"
 	PicoDarkCharacter = require "data.characters.PicoDarkCharacter"

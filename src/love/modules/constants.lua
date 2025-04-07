@@ -40,7 +40,7 @@ CONSTANTS.MS_PER_SEC = 1000
 CONSTANTS.WEEKS = {
     STRUM_Y = -400,
     STRUM_X_OFFSET = 0,
-    PIXELS_PER_MS = 0.45, 
+    PIXELS_PER_MS = 0.55,
     ANIM_LIST = {
         "singLEFT",
         "singDOWN",
