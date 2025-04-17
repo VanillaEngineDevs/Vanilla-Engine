@@ -52,8 +52,8 @@ function Nene:update(dt)
 
     deltaCurTime = deltaCurTime + dt
 
-    self.abot.x, self.abot.y = self.x + 48, self.y + 250
-    self.abotBack.x, self.abotBack.y = self.x + 48, self.y + 250
+    self.abot.x, self.abot.y = self.x, self.y
+    self.abotBack.x, self.abotBack.y = self.x, self.y
 
     for i = 1, MAX_ABOT_VIZ do
         abotVisualizers[i].x, abotVisualizers[i].y = self.x + -180 + (vizFrameWidth + 25) * i, self.y + 270
@@ -164,28 +164,32 @@ function Nene:beat(beat)
     end
 end
 
-function Nene:draw(debug)
+function Nene:udraw(sx, sy, rimShaderGF, speakerShader)
     if not self.visible then return end
 
-    self.abotHead:draw()
-    self.abot:draw()
-    self.abotBack:draw()
+    local lastShader = love.graphics.getShader()
+    love.graphics.setShader(speakerShader)
+    --self.abotHead:udraw()
+    --self.abot:udraw()
+    --self.abotBack:udraw()
     if curOS ~= "NX" and not debug and self.soundData then
         for i = 1, MAX_ABOT_VIZ do
             local barHeight = self.bars[i]
             local animNum = math.floor(math.remap(math.remap(barHeight, 0, 6, 0, 1), 0, 1, 1, 6))
             abotVisualizers[i]:animate(tostring(i) .. "_" .. tostring(animNum), false)
-            abotVisualizers[i]:draw()
+            --abotVisualizers[i]:udraw()
         end
     end
-    self.abotSpeaker:draw()
-    self.abotBody:draw()
+    --self.abotSpeaker:udraw()
+    self.abotBody:udraw()
     
     graphics.setColor(1, 1, 1, 1)
 
     love.graphics.rectangle("fill", self.x + -327, self.y + 300, 120, 60)
 
-    self.spr:draw()
+    love.graphics.setShader(rimShaderGF)
+    self.spr:udraw()
+    love.graphics.setShader(lastShader)
 end
 
 function Nene:release()

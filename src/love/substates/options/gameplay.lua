@@ -39,6 +39,33 @@ function gameplay:enter()
         )
     )
 
+    self:addOption(
+        Option:new(
+            "Accuracy Mode",
+            "How accuracy is calculated. Complex means MS-Based",
+            settings.accuracyMode,
+            "string",
+            {
+                "Simple",
+                "Complex"
+            }
+        )
+    )
+
+    self:addOption(
+        Option:new(
+            "Scoring Type",
+            "How the scoring is displayed.",
+            settings.scoringType,
+            "string",
+            {
+                "KE",
+                "Psych",
+                "VSlice"
+            }
+        )
+    )
+
     --[[ self:addOption(
         Option:new(
             "Pixel Perfect",
@@ -84,9 +111,10 @@ function gameplay:leave()
     settings.middleScroll = self.optionsArray[2]:getValue()
     settings.ghostTapping = self.optionsArray[3]:getValue()
     settings.botPlay = self.optionsArray[4]:getValue()
-    --[[ settings.pixelPerfect = self.optionsArray[5]:getValue() ]]
-    settings.customScrollSpeed = self.optionsArray[5]:getValue()
-    settings.scrollUnderlayTrans = self.optionsArray[6]:getValue()
+    settings.accuracyMode = self.optionsArray[5]:getValue()
+    settings.scoringType = self.optionsArray[6]:getValue()
+    settings.customScrollSpeed = self.optionsArray[7]:getValue()
+    settings.scrollUnderlayTrans = self.optionsArray[8]:getValue()
     
 
     self.super.leave(self)

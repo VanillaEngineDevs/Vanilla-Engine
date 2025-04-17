@@ -42,16 +42,18 @@ if love.filesystem.getInfo("settings") then
         window = settings.window,
         fpsCap = settings.fpsCap,
         pixelPerfect = false,
+        scoringType = settings.scoringType,
+        accuracyMode = settings.accuracyMode,
         settingsVer = settingsVer
     }
     serialized = lume.serialize(settingdata)
     love.filesystem.write("settings", serialized)
 end
-if settingsVer ~= 3 then
+if settingsVer ~= 4 then
     love.window.showMessageBox("Uh Oh!", "Settings have been reset.", "warning")
     love.filesystem.remove("settings")
 end
-if not love.filesystem.getInfo("settings") or settingsVer ~= 3 then
+if not love.filesystem.getInfo("settings") or settingsVer ~= 4 then
     settings.hardwareCompression = true
     graphics.setImageType("dds")
     settings.setImageType = "dds"
@@ -68,6 +70,8 @@ if not love.filesystem.getInfo("settings") or settingsVer ~= 3 then
     settings.window = false
     settings.fpsCap = 60
     settings.pixelPerfect = false
+    settings.scoringType = "KE"
+    settings.accuracyMode = "Simple"
     --settings.noteSkins = 1
     customBindLeft = "a"
     customBindRight = "d"
@@ -75,7 +79,7 @@ if not love.filesystem.getInfo("settings") or settingsVer ~= 3 then
     customBindDown = "s"
 
     settings.flashinglights = false
-    settingsVer = 3
+    settingsVer = 4
     settingdata = {}
     settingdata = {
         hardwareCompression = settings.hardwareCompression,
@@ -92,6 +96,8 @@ if not love.filesystem.getInfo("settings") or settingsVer ~= 3 then
         scrollUnderlayTrans = settings.scrollUnderlayTrans,
         fpsCap = settings.fpsCap,
         pixelPerfect = false,
+        scoringType = settings.scoringType,
+        accuracyMode = settings.accuracyMode,
 
         customBindLeft = "a",
         customBindRight = "d",
@@ -140,6 +146,8 @@ function saveSettings(menu)
             customBindUp = customBindUp,
             customBindLeft = customBindLeft,
             customBindRight = customBindRight,
+            scoringType = settings.scoringType,
+            accuracyMode = settings.accuracyMode,
             settingsVer = settingsVer
         }
         serialized = lume.serialize(settingdata)
@@ -149,7 +157,7 @@ function saveSettings(menu)
     else
         settingdata = {}
         if settings.hardwareCompression then
-            imageTyppe = "dds" 
+            imageTyppe = "dds"
         else
             imageTyppe = "png"
         end
@@ -176,6 +184,8 @@ function saveSettings(menu)
 			window = settings.window,
 			fpsCap = settings.fpsCap,
             pixelPerfect = false,
+            scoringType = settings.scoringType,
+            accuracyMode = settings.accuracyMode,
 
             customBindDown = customBindDown,
             customBindUp = customBindUp,

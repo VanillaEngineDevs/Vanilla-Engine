@@ -41,6 +41,9 @@ local dying = false
 
 noteSprites = nil
 
+local nps = {}
+local maxNPS = 0
+
 local allStates = {
 	sickCounter = 0,
 	goodCounter = 0,
@@ -51,9 +54,62 @@ local allStates = {
 	score = 0
 }
 
+local function commaFormat(n)
+	local str = tostring(n)
+	local x = str:find("%.")
+	if x then
+		str = str:sub(1, x - 1) .. str:sub(x)
+	end
+	return str:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
+end
+
 modEvents = {}
 
 local sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
+
+local function getWife3Condition(acc)
+	if acc >= 99.9935 then return 1 end -- AAAAA
+	if acc >= 99.980 then return 2 end -- AAAA:
+	if acc >= 99.970 then return 3 end -- AAAA.
+	if acc >= 99.955 then return 4 end -- AAAA
+	if acc >= 99.90 then return 5 end -- AAA:
+	if acc >= 99.80 then return 6 end -- AAA.
+	if acc >= 99.70 then return 7 end -- AAA
+	if acc >= 99 then return 8 end -- AA:
+	if acc >= 96.50 then return 9 end -- AA.
+	if acc >= 93 then return 10 end -- AA
+	if acc >= 90 then return 11 end -- A:
+	if acc >= 85 then return 12 end -- A.
+	if acc >= 80 then return 13 end -- A
+	if acc >= 70 then return 14 end -- B
+	if acc >= 60 then return 15 end -- C
+
+	return 16 -- D rank or worse
+end
+
+local function getRatingName(acc)
+	if acc <= 0.2 then
+		return "You Suck!"
+	elseif acc <= 0.4 then
+		return "Shit"
+	elseif acc <= 0.5 then
+		return "Bad"
+	elseif acc <= 0.6 then
+		return "Bruh"
+	elseif acc <= 0.69 then
+		return "Meh"
+	elseif acc <= 0.7 then
+		return "Nice"
+	elseif acc <= 0.8 then
+		return "Good"
+	elseif acc <= 0.9 then
+		return "Great"
+	elseif acc <= 1 then
+		return "Sick!"
+	else
+		return "Perfect!!"
+	end
+end
 
 return {
 	enter = function(self, option)
@@ -265,11 +321,27 @@ end
 	end,
 
 	calculateRating = function(self)
-		ratingPercent = score / ((noteCounter + misses) * 500)
-		if ratingPercent == nil or ratingPercent < 0 then 
-			ratingPercent = 0
-		elseif ratingPercent > 1 then
-			ratingPercent = 1
+		local mode = settings.accuracyMode
+		if mode == "Complex" then
+			ratingPercent = score / ((noteCounter + misses) * 500)
+			if ratingPercent == nil or ratingPercent < 0 then
+				ratingPercent = 0
+			elseif ratingPercent > 1 then
+				ratingPercent = 1
+			end
+		elseif mode == "Simple" then
+			local sickRating = 1
+			local goodRating = 0.85
+			local badRating = 0.67
+			local shitRating = 0.5
+
+			local totalHit = sickCounter + goodCounter + badCounter + shitCounter + missCounter
+
+			ratingPercent = (sickCounter * sickRating +
+				goodCounter * goodRating +
+				badCounter * badRating +
+				shitCounter * shitRating) /
+				totalHit
 		end
 	end,
 
@@ -517,6 +589,8 @@ end
 			speed = settings.customScrollSpeed
 		end
 
+		print(_speed)
+
 		speed = speed * 1.06
 
 		for _, noteData in ipairs(chart) do
@@ -706,7 +780,8 @@ end
 						beatHandler.reset(0)
 
 						if inst then inst:play() end
-						if voicesBF then voicesBF:play() end
+						if voicesBF then 
+							voicesBF:play() end
 						if voicesEnemy then voicesEnemy:play() end
 						beatHandler.setBeat(0)
 						if func then func() end
@@ -774,6 +849,13 @@ end
 		if inCutscene then return end
 		beatHandler.update(dt)
 		Conductor.update(dt)
+
+		-- nps table
+		for i, note in ipairs(nps) do
+			if note - love.timer.getTime() <= -1 then
+				table.remove(nps, i)
+			end
+		end
 
 		oldMusicThres = musicThres
 		if countingDown or love.system.getOS() == "Web" then -- Source:tell() can't be trusted on love.js!
@@ -1053,7 +1135,10 @@ end
 
 			if #boyfriendNote > 0 then
 				if (boyfriendNote[1].time - musicTime <= -200) and not boyfriendNote[1].causesMiss then
-					if voicesBF then voicesBF:setVolume(0) end
+					if voicesBF then 
+						print("setting vocals to 0")
+						voicesBF:setVolume(0)
+					end
 					local continue
 					if boyfriendNote[1]:getAnimName() ~= "hold" and boyfriendNote[1]:getAnimName() ~= "end" then 
 						health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult * boyfriendNote[1].healthLossMult
@@ -1100,6 +1185,8 @@ end
 								if boyfriend then boyfriend.lastHit = musicTime end
 
 								ratingAnim = self:judgeNote(notePos)
+								table.insert(nps, love.timer.getTime())
+								maxNPS = math.max(maxNPS, #nps)
 								score = score + self:scoreNote(notePos)
 								if ratingAnim == "sick" then
 									sickCounter = sickCounter + 1
@@ -1449,9 +1536,109 @@ end
 		local offsetX = offsetX or 0
 		local offsetY = offsetY or 0
 
-		uitextfColored(text, -600+offsetX, 400+downscrollOffset+offsetY, 1200, "center", colourOutline, colourInline)
+		local x = -600+offsetX
+		local y = 400+downscrollOffset+offsetY
+		local format = "center"
+
+		local mode = settings.scoringType
+
+		if mode == "VSlice" then
+			x = 250+offsetX
+			y = 400+downscrollOffset+offsetY
+			format = "left"
+		end
+
+		uitextfColored(text, x, y, 1200, format, colourOutline, colourInline)
 
 		self:drawRating()
+	end,
+	
+	generateScoringText = function(self, visibility)
+		-- KE
+		local mode = settings.scoringType
+
+		local returnStr = ""
+		if mode == "KE" then
+			local ranking = "N/A"
+			if misses == 0 and badCounter == 0 and shitCounter == 0 and goodCounter == 0 then
+				ranking = "(MFC)"
+			elseif misses == 0 and badCounter == 0 and shitCounter == 0 and goodCounter >= 1 then
+				ranking = "(GFC)"
+			elseif misses == 0 then
+				ranking = "(FC)"
+			elseif misses < 10 then
+				ranking = "(SDCB)"
+			else
+				ranking = "(Clear)"
+			end
+
+			-- Wife3 rating
+			local condition = getWife3Condition(ratingPercent*100)
+			if condition == 1 then
+				ranking = ranking .. " AAAAA"
+			elseif condition == 2 then
+				ranking = ranking .. " AAAA:"
+			elseif condition == 3 then
+				ranking = ranking .. " AAAA."
+			elseif condition == 4 then
+				ranking = ranking .. " AAAA"
+			elseif condition == 5 then
+				ranking = ranking .. " AAA:"
+			elseif condition == 6 then
+				ranking = ranking .. " AAA."
+			elseif condition == 7 then
+				ranking = ranking .. " AAA"
+			elseif condition == 8 then
+				ranking = ranking .. " AA:"
+			elseif condition == 9 then
+				ranking = ranking .. " AA."
+			elseif condition == 10 then
+				ranking = ranking .. " AA"
+			elseif condition == 11 then
+				ranking = ranking .. " A:"
+			elseif condition == 12 then
+				ranking = ranking .. " A."
+			elseif condition == 13 then
+				ranking = ranking .. " A"
+			elseif condition == 14 then
+				ranking = ranking .. " B"
+			elseif condition == 15 then
+				ranking = ranking .. " C"
+			else
+				ranking = ranking .. " D"
+			end
+
+			if ratingPercent == 0 then
+				ranking = "N/A"
+			end
+
+			returnStr = "NPS: " .. #nps .. " (Max " .. maxNPS .. ") | Score: " .. math.floor(score) .. " | Combo Breaks: " .. misses .. " | Accuracy: " .. ((math.floor(ratingPercent * 10000) / 100)) .. "% | " .. ranking
+		elseif mode == "Psych" then
+			local phrase = "?"
+			if misses == 0 then
+				if badCounter > 0 or shitCounter > 0 then phrase = "FC"
+				elseif goodCounter > 0 then phrase = "GFC"
+				elseif sickCounter > 0 then phrase = "SFC"
+				end
+			else
+				if misses < 10 then 
+					phrase = "SDCB"
+				else
+					phrase = "Clear"
+				end
+			end
+
+			local ratingStr = getRatingName(ratingPercent) .. " (" .. ((math.floor(ratingPercent * 10000) / 100)) .. "%)" .. " - " .. phrase
+			if phrase == "?" then
+				ratingStr = "?"
+			end
+
+			returnStr = "Score: " .. math.floor(score) .. " | Misses: " .. misses .. " | Rating: " .. ratingStr
+		elseif mode == "VSlice" then
+			returnStr = "Score: " .. commaFormat(score)
+		end
+
+		return returnStr
 	end,
 
 	drawHealthbar = function(self, visibility)
@@ -1495,7 +1682,8 @@ end
 			if self.overrideHealthbarText then
 				self:overrideHealthbarText(score, misses, ((math.floor(ratingPercent * 10000) / 100)) .. "%")
 			else
-				self:healthbarText("Score: " .. score .. " | Misses: " .. misses .. " | Accuracy: " .. ((math.floor(ratingPercent * 10000) / 100)) .. "%")
+				local text = self:generateScoringText()
+				self:healthbarText(text)
 			end
 		love.graphics.pop()
 	end,

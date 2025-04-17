@@ -339,7 +339,7 @@ function love.load()
 	modWeekPlacement = #weekMeta-1 -- everything after the main weeks is a mod folder.
 
 	require "modules.extras"
-	
+
 	__VERSION__ = love.filesystem.getInfo("version.txt") and love.filesystem.read("version.txt") or "vUnknown"
 
 	-- LÖVE init
@@ -370,7 +370,7 @@ function love.load()
 			return {r, g, b}
 		end
 	end
-	
+
 	-- Variables
 	font = love.graphics.newFont("fonts/vcr.ttf", 24)
 	optionsFont = love.graphics.newFont("fonts/vcr.ttf", 32)

@@ -19,28 +19,26 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 return {
     enter = function(self, songExt)
-        if song ~= 3 then
-            stageImages = {
-                ["Walls"] = graphics.newImage(graphics.imagePath("week5.erect/bgWalls")), -- walls
-			    ["Escalator"] = graphics.newImage(graphics.imagePath("week5.erect/bgEscalator")), -- escalator
-			    ["Christmas Tree"] = graphics.newImage(graphics.imagePath("week5.erect/christmasTree")), -- christmas tree
-			    ["Snow"] = graphics.newImage(graphics.imagePath("week5/snow")), -- snow
-				["White"] = graphics.newImage(graphics.imagePath("week5.erect/white")),
-            }
+		stageImages = {
+			["Walls"] = graphics.newImage(graphics.imagePath("week5.erect/bgWalls")), -- walls
+			["Escalator"] = graphics.newImage(graphics.imagePath("week5.erect/bgEscalator")), -- escalator
+			["Christmas Tree"] = graphics.newImage(graphics.imagePath("week5.erect/christmasTree")), -- christmas tree
+			["Snow"] = graphics.newImage(graphics.imagePath("week5/snow")), -- snow
+			["White"] = graphics.newImage(graphics.imagePath("week5.erect/white")),
+		}
 
-			stageImages["Escalator"].x, stageImages["Escalator"].y = -205, -53
-			stageImages["Christmas Tree"].x = 75
-			stageImages["Snow"].y = 850
-			stageImages["Snow"].sizeX, stageImages["Snow"].sizeY = 2, 2
+		stageImages["Escalator"].x, stageImages["Escalator"].y = -205, -53
+		stageImages["Christmas Tree"].x = 75
+		stageImages["Snow"].y = 850
+		stageImages["Snow"].sizeX, stageImages["Snow"].sizeY = 2, 2
 
-			stageImages["Top Bop"] = love.filesystem.load("sprites/week5.erect/upperBop.lua")() -- top-bop
-			stageImages["Bottom Bop"] = love.filesystem.load("sprites/week5.erect/bottomBop.lua")() -- bottom-bop
-			stageImages["Santa"] = love.filesystem.load("sprites/week5/santa.lua")() -- santa
+		stageImages["Top Bop"] = love.filesystem.load("sprites/week5.erect/upperBop.lua")() -- top-bop
+		stageImages["Bottom Bop"] = love.filesystem.load("sprites/week5.erect/bottomBop.lua")() -- bottom-bop
+		stageImages["Santa"] = love.filesystem.load("sprites/week5/santa.lua")() -- santa
 
-			stageImages["Top Bop"].x, stageImages["Top Bop"].y = 60, -250
-			stageImages["Bottom Bop"].x, stageImages["Bottom Bop"].y = -75, 375
-			stageImages["Santa"].x, stageImages["Santa"].y = -1350, 410
-		end
+		stageImages["Top Bop"].x, stageImages["Top Bop"].y = 60, -250
+		stageImages["Bottom Bop"].x, stageImages["Bottom Bop"].y = -75, 375
+		stageImages["Santa"].x, stageImages["Santa"].y = -1350, 410
         girlfriend = BaseCharacter("sprites/characters/girlfriend-christmas.lua")
 		enemy = BaseCharacter("sprites/characters/dearest-duo.lua")
 		if songExt == "-pico" then

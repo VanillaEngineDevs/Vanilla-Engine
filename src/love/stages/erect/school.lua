@@ -140,7 +140,7 @@ return {
 					local uvW, uvH = gfFrame[1] + gfFrame[3], gfFrame[2] + gfFrame[4]
 					uvW, uvH = uvW / gfSheet:getWidth(), uvH / gfSheet:getHeight()
 					rimShaderGF:send("uFrameBounds", {uvX, uvY, uvW, uvH})
-
+				else
 					love.graphics.setShader(rimShaderGF)
 				end
 				girlfriend:udraw(nil, nil, rimShaderGF, abotSpeakerShader)
