@@ -16,6 +16,9 @@ local difficultyStrs = {
 
 return {
 	enter = function(self, previous)
+		if not music:isPlaying() then
+			music:play()
+		end
 		songNum = 0
 		weekNum = 1
 		theTracks = ""

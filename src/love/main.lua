@@ -170,6 +170,9 @@ mainDrawing = true
 
 require "modules.overrides"
 
+local mouseTimer = 0
+local mouseTimerReset = 0.5
+
 function love.load()
 	paused = false
 	settings = {}
@@ -539,6 +542,10 @@ function love.mousemoved(x, y, dx, dy, istouch)
 	if capturedScreenshot.img then
 		capturedScreenshot.hovered = x > capturedScreenshot.x and x < capturedScreenshot.x + 320 and y > capturedScreenshot.y and y < capturedScreenshot.y + 180
 	end
+
+	love.mouse.setVisible(true)
+	mouseTimer = 0
+	
 end
 
 function love.wheelmoved(x, y)
@@ -556,6 +563,12 @@ end
 function love.update(dt)
 	if volFade > 0 then
 		volFade = volFade - 1 * dt
+	end
+
+	mouseTimer = mouseTimer + dt
+
+	if mouseTimer > mouseTimerReset and love.mouse.isVisible() then
+		love.mouse.setVisible(false)
 	end
 
 	input:update()

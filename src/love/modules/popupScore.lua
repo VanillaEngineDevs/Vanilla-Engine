@@ -18,12 +18,26 @@ function popupScore:init(numbersSprite, ratingSprite)
     self.comboSprs = {}
     for i = 1, 4 do
         local spr = self.__numbersSprite()
-        spr.x = self.obj.x + (i - 1) * self.sep + 40
-        spr.y = self.obj.y + 25
+        spr.x = self.obj.x + (i - 1) * self.sep + 30
+        spr.y = self.obj.y + 35
         spr.sizeX, spr.sizeY = 0.725, 0.725
         table.insert(self.comboSprs, spr)
     end
     self.comboSprs[1].visible = false
+
+    self.placement = {x = 0, y = 375}
+end
+
+function popupScore:setPlacement(x, y)
+    self.placement.x = x
+    self.placement.y = y
+
+    self.obj.x = x
+    self.obj.y = y
+    for i, spr in ipairs(self.comboSprs) do
+        spr.x = x + (i - 1) * self.sep + 30
+        spr.y = y + 35
+    end
 end
 
 function popupScore:create(anim, combo)
@@ -32,12 +46,12 @@ function popupScore:create(anim, combo)
         local ratingObject = self.__ratingSprite() -- Creates a new instance
         ratingObject:animate(anim)
 
-        local placement = 0
+        local placement = self.placement.x
 
         ratingObject.x = placement
-        ratingObject.y = 375
+        ratingObject.y = self.placement.y
         ratingObject.accelerationY = 750
-        ratingObject.velocityX, ratingObject.velocityY = love.math.random(0, 10), -love.math.random(50, 75)
+        ratingObject.velocityX, ratingObject.velocityY = love.math.random(0, 25), -love.math.random(50, 75)
         ratingObject.alpha = 1
         ratingObject.sizeX, ratingObject.sizeY = 0.85, 0.85
         ratingObject.timerReference = self.__tweenObject:after((crochet or 1) * 0.001, function()
@@ -60,8 +74,8 @@ function popupScore:create(anim, combo)
 
         for i, score in ipairs(seperatedScore) do
             local num = self.__numbersSprite()
-            num.x = ratingObject.x + (i - 1) * self.sep + 40
-            num.y = ratingObject.y + 25 + love.math.random(-5, 5)
+            num.x = ratingObject.x + (i - 1) * self.sep + 30
+            num.y = ratingObject.y + 35 + love.math.random(-5, 5)
             num.accelerationY = 750
             num.velocityX, num.velocityY = love.math.random(0, 10), -love.math.random(50, 75)
             num.alpha = 1

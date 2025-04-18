@@ -219,6 +219,7 @@ return {
 	end,
 
 	load = function(self)
+		quitPressed = false
 		camera.camBopIntensity = 1
 		camera.camBopInterval = 4
 		dying = false
@@ -390,20 +391,28 @@ end
 				graphics:fadeOutWipe(
 					0.7,
 					function()
-						Gamestate.switch(resultsScreen, {
-							diff = string.lower(CURDIFF or "normal"),
-							song = not storyMode and SONGNAME or weekDesc[weekNum],
-							artist = not storyMode and ARTIST or nil,
-							scores = {
-								sickCount = allStates.sickCounter,
-								goodCount = allStates.goodCounter,
-								badCount = allStates.badCounter,
-								shitCount = allStates.shitCounter,
-								missedCount = allStates.missCounter,
-								maxCombo = allStates.maxCombo,
-								score = allStates.score
-							}
-						})
+						if not quitPressed then
+							Gamestate.switch(resultsScreen, {
+								diff = string.lower(CURDIFF or "normal"),
+								song = not storyMode and SONGNAME or weekDesc[weekNum],
+								artist = not storyMode and ARTIST or nil,
+								scores = {
+									sickCount = allStates.sickCounter,
+									goodCount = allStates.goodCounter,
+									badCount = allStates.badCounter,
+									shitCount = allStates.shitCounter,
+									missedCount = allStates.missCounter,
+									maxCombo = allStates.maxCombo,
+									score = allStates.score
+								}
+							})
+						else
+							if storyMode then
+								Gamestate.switch(menuWeek)
+							else
+								Gamestate.switch(menuFreeplay)
+							end
+						end
 
 						status.setLoading(false)
 					end
@@ -573,7 +582,7 @@ end
 			speed = settings.customScrollSpeed
 		end
 
-		print(_speed)
+		if not speed then speed = _speed end
 
 		speed = speed * 1.06
 
@@ -648,7 +657,6 @@ end
 				notesTable[data][#notesTable[data]]:animate("end")
 				if settings.downscroll and pixel then
 					notesTable[data][#notesTable[data]].flipY = true
-					print("downscroll")
 				end
 			end
 		end
@@ -828,7 +836,6 @@ end
 					if inst then inst:stop() end
 					if voicesBF then voicesBF:stop() end
 					if voicesEnemy then voicesEnemy:stop() end
-					storyMode = false
 					quitPressed = true
 				end
 			end
@@ -888,14 +895,14 @@ end
 						if event.value == 0 then -- Boyfriend
 							camera:moveToPoint(1.25, "boyfriend")
 							if girlfriend and girlfriend.name == "nene" and girlfriend.isPixel then
-								if girlfriend.abotHead:getAnimName() ~= "toright" then
+								if girlfriend.abotHead and girlfriend.abotHead:getAnimName() ~= "toright" then
 									girlfriend.abotHead:animate("toright")
 								end
 							end
 						elseif event.value == 1 then -- Enemy
 							camera:moveToPoint(1.25, "enemy")
 							if girlfriend and girlfriend.name == "nene" and girlfriend.isPixel then
-								if girlfriend.abotHead:getAnimName() ~= "toleft" then
+								if girlfriend.abotHead and girlfriend.abotHead:getAnimName() ~= "toleft" then
 									girlfriend.abotHead:animate("toleft")
 								end
 							end
@@ -905,17 +912,17 @@ end
 						local point = 0
 						if event.value.char == 0 then
 							point = camera:getPoint("boyfriend")
-							if girlfriend.abotHead:getAnimName() ~= "toright" then
+							if girlfriend.abotHead and girlfriend.abotHead:getAnimName() ~= "toright" then
 								girlfriend.abotHead:animate("toright")
 							end
 						elseif event.value.char == 1 then
 							point = camera:getPoint("enemy")
-							if girlfriend.abotHead:getAnimName() ~= "toleft" then
+							if girlfriend.abotHead and girlfriend.abotHead:getAnimName() ~= "toleft" then
 								girlfriend.abotHead:animate("toleft")
 							end
 						elseif event.value.char == 2 then
 							point = camera:getPoint("girlfriend")
-							if girlfriend.abotHead:getAnimName() ~= "toright" then
+							if girlfriend.abotHead and girlfriend.abotHead:getAnimName() ~= "toright" then
 								girlfriend.abotHead:animate("toright")
 							end
 						end
@@ -1017,13 +1024,13 @@ end
 	end,
 
 	judgeNote = function(self, msTiming)
-		if msTiming <= CONSTANTS.WEEKS.JUDGE_THRES.SICK_THRES then
+		if msTiming <= CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].SICK_THRES then
 			return "sick"
-		elseif msTiming < CONSTANTS.WEEKS.JUDGE_THRES.GOOD_THRES then
+		elseif msTiming < CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].GOOD_THRES then
 			return "good"
-		elseif msTiming < CONSTANTS.WEEKS.JUDGE_THRES.BAD_THRES then
+		elseif msTiming < CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].BAD_THRES then
 			return "bad"
-		elseif msTiming < CONSTANTS.WEEKS.JUDGE_THRES.SHIT_THRES then
+		elseif msTiming < CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].SHIT_THRES then
 			return "shit"
 		else
 			return "miss"
@@ -1031,10 +1038,10 @@ end
 	end,
 
 	scoreNote = function(self, msTiming)
-		if msTiming > CONSTANTS.WEEKS.JUDGE_THRES.MISS_THRES then
+		if msTiming > CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].MISS_THRES then
 			return CONSTANTS.WEEKS.MISS_SCORE
 		else
-			if msTiming < CONSTANTS.WEEKS.JUDGE_THRES.PERFECT_THRES then
+			if msTiming < CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].PERFECT_THRES then
 				return CONSTANTS.WEEKS.MAX_SCORE
 			else
 				local factor = 1 - 1 / (1 + math.exp(-CONSTANTS.WEEKS.SCORING_SLOPE * (msTiming - CONSTANTS.WEEKS.SCORING_OFFSET)))
@@ -1190,7 +1197,7 @@ end
 				if #boyfriendNote > 0 then
 					for j = 1, #boyfriendNote do
 						if boyfriendNote[j] and boyfriendNote[j]:getAnimName() == "on" then
-							if (boyfriendNote[j].time - musicTime <= CONSTANTS.WEEKS.JUDGE_THRES.MISS_THRES and ((boyfriendNote[j].causesMiss and boyfriendNote[j].time - musicTime > 0) or true)) and not boyfriendNote[j].didHit then
+							if (boyfriendNote[j].time - musicTime <= CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].MISS_THRES and ((boyfriendNote[j].causesMiss and boyfriendNote[j].time - musicTime > 0) or true)) and not boyfriendNote[j].didHit then
 								local notePos
 								local ratingAnim
 
@@ -1215,7 +1222,7 @@ end
 								end
 
 								if settings.scoringType == "Psych" then
-									ratingTextScale = 1.025
+									ratingTextScale = 1.075
 								end
 
 								if ratingAnim == "sick" then
@@ -1555,7 +1562,7 @@ end
 		else
 			love.graphics.setFont(scoringFont)
 		end
-		uitextfColored(text, x, y, 1200, format, colourOutline, colourInline, 0, ratingTextScale, ratingTextScale)
+		uitextfColored(text, x, y, 1300, format, colourOutline, colourInline, 0, ratingTextScale, ratingTextScale)
 		love.graphics.pop()
 		love.graphics.setFont(lastFont)
 		self:drawRating()

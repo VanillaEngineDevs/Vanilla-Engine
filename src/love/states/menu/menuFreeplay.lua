@@ -102,6 +102,9 @@ end
 
 return {
     enter = function(self)
+        if not music:isPlaying() then
+			music:play()
+		end
         menuBG = graphics.newImage(graphics.imagePath("menu/fp_bg"))
         songSelect = graphics.newImage(graphics.imagePath("menu/fp_songSelect"))
         songStats = graphics.newImage(graphics.imagePath("menu/fp_songStats"))

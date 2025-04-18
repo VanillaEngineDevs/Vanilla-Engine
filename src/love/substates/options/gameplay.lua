@@ -79,14 +79,15 @@ function gameplay:enter()
         )
     )
 
-    --[[ self:addOption(
+    self:addOption(
         Option:new(
-            "Pixel Perfect",
-            "If checked, pixel weeks will be pixel perfect. Mod developers may force-disable this option",
-            settings.pixelPerfect,
-            "bool"
+            "Judge Preset",
+            "The judgement timings for the game.",
+            settings.judgePreset,
+            "string",
+            CONSTANTS.WEEKS.JUDGE_PRESETS
         )
-    ) ]]
+    )
 
     local o = Option:new(
         "Scrollspeed",
@@ -119,7 +120,7 @@ function gameplay:enter()
 end
 
 function gameplay:leave()
-    -- set the settings
+    -- Save the settings
     settings.downscroll = self.optionsArray[1]:getValue()
     settings.middleScroll = self.optionsArray[2]:getValue()
     settings.ghostTapping = self.optionsArray[3]:getValue()
@@ -127,9 +128,9 @@ function gameplay:leave()
     settings.accuracyMode = self.optionsArray[5]:getValue()
     settings.scoringType = self.optionsArray[6]:getValue()
     settings.popupScoreMode = self.optionsArray[7]:getValue()
-    settings.customScrollSpeed = self.optionsArray[8]:getValue()
-    settings.scrollUnderlayTrans = self.optionsArray[9]:getValue()
-    
+    settings.judgePreset = self.optionsArray[8]:getValue()
+    settings.customScrollSpeed = self.optionsArray[9]:getValue()
+    settings.scrollUnderlayTrans = self.optionsArray[10]:getValue()
 
     self.super.leave(self)
 end

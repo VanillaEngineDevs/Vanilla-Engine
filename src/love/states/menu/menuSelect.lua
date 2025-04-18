@@ -5,7 +5,9 @@ local menuButton
 
 return {
 	enter = function(self, previous)
-        
+        if not music:isPlaying() then
+			music:play()
+		end
 		menuButton = 1
 		songNum = 0
         selectBGRandom = love.math.random(0, 200)

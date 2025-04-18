@@ -412,7 +412,11 @@ return {
 
         if input:pressed("confirm") and scoreNumbers.visible then
             resultsMusic:stop()
-            Gamestate.switch(menuSelect)
+            if storyMode then
+                Gamestate.switch(menuWeek)
+            else
+                Gamestate.switch(menuFreeplay)
+            end
             music:play()
         end
     end,

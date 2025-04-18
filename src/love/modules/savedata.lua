@@ -45,16 +45,17 @@ if love.filesystem.getInfo("settings") then
         scoringType = settings.scoringType,
         accuracyMode = settings.accuracyMode,
         popupScoreMode = settings.popupScoreMode,
+        judgePreset = settings.judgePreset,
         settingsVer = settingsVer
     }
     serialized = lume.serialize(settingdata)
     love.filesystem.write("settings", serialized)
 end
-if settingsVer ~= 5 then
+if settingsVer ~= 6 then
     love.window.showMessageBox("Uh Oh!", "Settings have been reset.", "warning")
     love.filesystem.remove("settings")
 end
-if not love.filesystem.getInfo("settings") or settingsVer ~= 5 then
+if not love.filesystem.getInfo("settings") or settingsVer ~= 6 then
     settings.hardwareCompression = true
     graphics.setImageType("dds")
     settings.setImageType = "dds"
@@ -74,6 +75,7 @@ if not love.filesystem.getInfo("settings") or settingsVer ~= 5 then
     settings.scoringType = "KE"
     settings.accuracyMode = "Simple"
     settings.popupScoreMode = "Stack" -- Simple and Stack
+    settings.judgePreset = "PBot1"
     --settings.noteSkins = 1
     customBindLeft = "a"
     customBindRight = "d"
@@ -81,7 +83,7 @@ if not love.filesystem.getInfo("settings") or settingsVer ~= 5 then
     customBindDown = "s"
 
     settings.flashinglights = false
-    settingsVer = 5
+    settingsVer = 6
     settingdata = {}
     settingdata = {
         hardwareCompression = settings.hardwareCompression,
@@ -101,6 +103,7 @@ if not love.filesystem.getInfo("settings") or settingsVer ~= 5 then
         scoringType = settings.scoringType,
         accuracyMode = settings.accuracyMode,
         popupScoreMode = settings.popupScoreMode,
+        judgePreset = settings.judgePreset,
 
         customBindLeft = "a",
         customBindRight = "d",
@@ -152,6 +155,7 @@ function saveSettings(menu)
             scoringType = settings.scoringType,
             accuracyMode = settings.accuracyMode,
             popupScoreMode = settings.popupScoreMode,
+            judgePreset = settings.judgePreset,
             settingsVer = settingsVer
         }
         serialized = lume.serialize(settingdata)
@@ -191,6 +195,7 @@ function saveSettings(menu)
             scoringType = settings.scoringType,
             accuracyMode = settings.accuracyMode,
             popupScoreMode = settings.popupScoreMode,
+            judgePreset = settings.judgePreset,
 
             customBindDown = customBindDown,
             customBindUp = customBindUp,

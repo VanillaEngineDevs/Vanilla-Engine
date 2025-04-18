@@ -125,6 +125,8 @@ return {
 				end
 			end
 
+			popupScore:setPlacement(525, 0)
+
 			if storyMode and not died then
 				video = cutscene.video("videos/2hotCutscene.ogv")
 				video:play()

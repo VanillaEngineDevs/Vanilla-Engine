@@ -103,6 +103,24 @@ function util.tryExcept(try, except)
     end
 end
 
+-- Chart helpers
+
+function util.generateDefaultCharts()
+    return {"easy"}, {"normal"}, {"hard"}
+end
+
+function util.generatePicoCharts1()
+    return {"easy-Pico", "-pico", "easy", "-pico"}, {"normal-Pico", "-pico", "normal", "-pico"}, {"hard-Pico", "-pico", "hard", "-pico"}
+end
+
+function util.generatePicoCharts2()
+    return {"easy", nil, nil, "-pico"}, {"normal", nil, nil, "-pico"}, {"hard", nil, nil, "-pico"}
+end
+
+function util.generateErectCharts()
+    return {"erect", "-erect", "erect", "-bf"}, {"nightmare", "-erect", "nightmare", "-bf"}
+end
+
 -- God like coding
 --[[
 function util.🍰(🥰, 🥵)

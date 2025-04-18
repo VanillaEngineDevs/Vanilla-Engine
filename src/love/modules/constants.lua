@@ -105,13 +105,50 @@ CONSTANTS.WEEKS = {
         "ready"
     },
     JUDGE_THRES = {
-        PERFECT_THRES = 5,
-        MISS_THRES = 160,
-        KILLER_THRES = 12.5,
-        SICK_THRES = 45,
-        GOOD_THRES = 90,
-        BAD_THRES = 135,
-        SHIT_THRES = 160
+        ["PBot1"] = {
+            PERFECT_THRES = 5,
+            KILLER_THRES = 12.5,
+            SICK_THRES = 45,
+            GOOD_THRES = 90,
+            BAD_THRES = 135,
+            SHIT_THRES = 160,
+            MISS_THRES = 160
+        },
+        ["Week7"] = {
+            LEGACY_HIT_WINDOW = (10 / 60) * 1000, -- ~166ms
+            PERFECT_THRES = 5,   -- Same as PBot1
+            KILLER_THRES = 12.5, -- Same as PBot1
+            SICK_THRES = ((10 / 60) * 1000) * 0.2,
+            GOOD_THRES = ((10 / 60) * 1000) * 0.55,
+            BAD_THRES = ((10 / 60) * 1000) * 0.8,
+            SHIT_THRES = (10 / 60) * 1000,
+            MISS_THRES = (10 / 60) * 1000
+        },
+        ["Legacy"] = {
+            LEGACY_HIT_WINDOW = (10 / 60) * 1000, -- ~166ms
+            PERFECT_THRES = 5,   -- Same as PBot1
+            KILLER_THRES = 12.5, -- Same as PBot1
+            SICK_THRES = ((10 / 60) * 1000) * 0.2,
+            GOOD_THRES = ((10 / 60) * 1000) * 0.75,
+            BAD_THRES = ((10 / 60) * 1000) * 0.9,
+            SHIT_THRES = (10 / 60) * 1000,
+            MISS_THRES = (10 / 60) * 1000
+        },
+        ["Judge7"] = {
+            PERFECT_THRES = 5,
+            KILLER_THRES = 12.5,
+            SICK_THRES = 22.5,
+            GOOD_THRES = 45,
+            BAD_THRES = 67.5,
+            SHIT_THRES = 135,
+            MISS_THRES = 160,
+        }
+    },
+    JUDGE_PRESETS = {
+        "PBot1",
+        "Week7",
+        "Legacy",
+        "Judge7" -- For people who like stricter inputs!
     },
     HEALTH = {
         MAX = 2,
