@@ -125,11 +125,6 @@ return {
 				end
 			end
 
-			rating.x = rating.x + 525
-			for i = 1, 3 do
-				numbers[i].x = numbers[i].x + 525
-			end
-
 			if storyMode and not died then
 				video = cutscene.video("videos/2hotCutscene.ogv")
 				video:play()

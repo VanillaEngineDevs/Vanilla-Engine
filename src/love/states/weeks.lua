@@ -646,6 +646,10 @@ end
 				end
 
 				notesTable[data][#notesTable[data]]:animate("end")
+				if settings.downscroll and pixel then
+					notesTable[data][#notesTable[data]].flipY = true
+					print("downscroll")
+				end
 			end
 		end
 
@@ -883,18 +887,37 @@ end
 					if type(event.value) == "number" then
 						if event.value == 0 then -- Boyfriend
 							camera:moveToPoint(1.25, "boyfriend")
+							if girlfriend and girlfriend.name == "nene" and girlfriend.isPixel then
+								if girlfriend.abotHead:getAnimName() ~= "toright" then
+									girlfriend.abotHead:animate("toright")
+								end
+							end
 						elseif event.value == 1 then -- Enemy
 							camera:moveToPoint(1.25, "enemy")
+							if girlfriend and girlfriend.name == "nene" and girlfriend.isPixel then
+								if girlfriend.abotHead:getAnimName() ~= "toleft" then
+									girlfriend.abotHead:animate("toleft")
+								end
+							end
 						end
 					elseif type(event.value) == "table" then
 						event.value.char = tonumber(event.value.char)
 						local point = 0
 						if event.value.char == 0 then
 							point = camera:getPoint("boyfriend")
+							if girlfriend.abotHead:getAnimName() ~= "toright" then
+								girlfriend.abotHead:animate("toright")
+							end
 						elseif event.value.char == 1 then
 							point = camera:getPoint("enemy")
+							if girlfriend.abotHead:getAnimName() ~= "toleft" then
+								girlfriend.abotHead:animate("toleft")
+							end
 						elseif event.value.char == 2 then
 							point = camera:getPoint("girlfriend")
+							if girlfriend.abotHead:getAnimName() ~= "toright" then
+								girlfriend.abotHead:animate("toright")
+							end
 						end
 						event.value.ease = event.value.ease or "CLASSIC"
 						if event.value.ease ~= "INSTANT" then
@@ -1277,6 +1300,8 @@ end
 				if boyfriend and boyfriend.holdTimer > boyfriend.maxHoldTimer then
 					if boyfriend then boyfriend:animate(curAnim, false) end
 				end
+
+				if boyfriend then boyfriend.lastHit = musicTime end
 
 				table.remove(boyfriendNote, 1)
 			end

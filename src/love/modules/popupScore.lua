@@ -9,6 +9,7 @@ function popupScore:init(numbersSprite, ratingSprite)
     self.combo = 0
     self.cooldown = 0.25
     self.ratingAnim = "sick"
+    self.sep = pixel and 50 or 65
 
     self.alpha = 1
     self.obj = self.__ratingSprite()
@@ -17,11 +18,12 @@ function popupScore:init(numbersSprite, ratingSprite)
     self.comboSprs = {}
     for i = 1, 4 do
         local spr = self.__numbersSprite()
-        spr.x = self.obj.x + (i - 1) * 65 + 40
+        spr.x = self.obj.x + (i - 1) * self.sep + 40
         spr.y = self.obj.y + 25
         spr.sizeX, spr.sizeY = 0.725, 0.725
         table.insert(self.comboSprs, spr)
     end
+    self.comboSprs[1].visible = false
 end
 
 function popupScore:create(anim, combo)
@@ -58,7 +60,7 @@ function popupScore:create(anim, combo)
 
         for i, score in ipairs(seperatedScore) do
             local num = self.__numbersSprite()
-            num.x = ratingObject.x + (i - 1) * 65 + 40
+            num.x = ratingObject.x + (i - 1) * self.sep + 40
             num.y = ratingObject.y + 25 + love.math.random(-5, 5)
             num.accelerationY = 750
             num.velocityX, num.velocityY = love.math.random(0, 10), -love.math.random(50, 75)
@@ -84,9 +86,7 @@ function popupScore:create(anim, combo)
 
         self.obj:animate(anim)
 
-        local hasThousand = false
         if combo >= 1000 then
-            hasThousand = true
             self.comboSprs[1]:animate(tostring(math.floor(combo / 1000) % 10))
             self.comboSprs[1].visible = true
         else
@@ -108,14 +108,14 @@ function popupScore:removeRatingMember(ratingObject)
 end
 
 function popupScore:drawStack()
-    for i, ratingObject in ipairs(self.__ratingMembers) do
+    for _, ratingObject in ipairs(self.__ratingMembers) do
         ratingObject:draw()
     end
 end
 
 function popupScore:drawSimple()
     self.obj:draw()
-    for i, spr in ipairs(self.comboSprs) do
+    for _, spr in ipairs(self.comboSprs) do
         if spr.visible then
             spr:draw()
         end
@@ -123,14 +123,14 @@ function popupScore:drawSimple()
 end
 
 function popupScore:udrawStack(sx, sy)
-    for i, ratingObject in ipairs(self.__ratingMembers) do
+    for _, ratingObject in ipairs(self.__ratingMembers) do
         ratingObject:udraw(sx, sy)
     end
 end
 
 function popupScore:udrawSimple(sx, sy)
     self.obj:udraw(sx, sy)
-    for i, spr in ipairs(self.comboSprs) do
+    for _, spr in ipairs(self.comboSprs) do
         if spr.visible then
             spr:udraw(sx, sy)
         end
@@ -176,7 +176,7 @@ function popupScore:update(dt)
         end
 
         self.obj.alpha = self.alpha
-        for i, spr in ipairs(self.comboSprs) do
+        for _, spr in ipairs(self.comboSprs) do
             spr.alpha = self.alpha
         end
     end

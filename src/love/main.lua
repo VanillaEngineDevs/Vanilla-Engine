@@ -413,6 +413,7 @@ function love.load()
 	--[[ graphics:initStickerData() ]]
 
 	Gamestate.switch(menu)
+	--Gamestate.switch(weekData[7], 1, "hard", "-pico", "-pico")
 
 	love.setFpsCap(settings.fpsCap)
 end

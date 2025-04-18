@@ -25,12 +25,12 @@ return {
 			girlfriend.x, girlfriend.y = 0, 0
 			boyfriend.x, boyfriend.y = 50, 30
 			fakeBoyfriend.x, fakeBoyfriend.y = 50, 30
-			enemy.x, enemy.y = -50, 0
+			enemy.x, enemy.y = -100, 0
 		else
 			girlfriend.x, girlfriend.y = 30, -50
 			boyfriend.x, boyfriend.y = 300, 190
 			fakeBoyfriend.x, fakeBoyfriend.y = 300, 190
-			enemy.x, enemy.y = -340, -20
+			enemy.x, enemy.y = -540, -20
 		end
 
 		rimShaderBF = love.graphics.newShader("shaders/dropShadow.glsl")
@@ -85,9 +85,25 @@ return {
 		w, h = sheet:getDimensions()
 		rimShaderGF:send("textureSize", {w, h})
 
+		abotSpeakerShader = love.graphics.newShader("shaders/dropShadow.glsl")
+		abotSpeakerShader:send("dropColor", {hexToRGB(0xFF52351D)})
+		abotSpeakerShader:send("brightness", -66)
+		abotSpeakerShader:send("hue", -10)
+		abotSpeakerShader:send("contrast", 24)
+		abotSpeakerShader:send("saturation", -23)
+
 		if songExt == "-pico" then
 			girlfriend = PixelNeneCharacter()
+			girlfriend.y = -125
+			girlfriend:setY()
+
+			boyfriend = BaseCharacter("sprites/characters/pico-pixel.lua")
+			rimShaderBF:send("altMask", love.graphics.newImage(graphics.imagePath("week6.erect/masks/picoPixel_mask")))
+			boyfriend.x, boyfriend.y = 500, 190
 		end
+
+		camera:addPoint("enemy", 250, 50)
+		camera:addPoint("boyfriend", -200, -65)
 			
     end,
 

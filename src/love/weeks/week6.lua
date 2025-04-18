@@ -80,16 +80,28 @@ return {
 			inst = love.audio.newSource("songs/thorns/Inst" .. songExt .. ".ogg", "stream")
 			voicesBF = love.audio.newSource("songs/thorns/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/thorns/Voices-spirit" .. songExt .. ".ogg", "stream")
+			if girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/bopeebo/Inst" .. songExt .. ".ogg")
+				girlfriend.multiplier = 3
+			end
 		elseif song == 2 then
 			inst = love.audio.newSource("songs/roses/Inst" .. songExt .. ".ogg", "stream")
 			voicesBF = love.audio.newSource("songs/roses/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/roses/Voices-senpai" .. songExt .. ".ogg", "stream")
+			if girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/bopeebo/Inst" .. songExt .. ".ogg")
+				girlfriend.multiplier = 3
+			end
 		else
 			inst = love.audio.newSource("songs/senpai/Inst" .. songExt .. ".ogg", "stream")
 			voicesBF = love.audio.newSource("songs/senpai/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/senpai/Voices-senpai" .. songExt .. ".ogg", "stream")
+			if girlfriend.name == "nene" then
+				girlfriend.soundData = love.sound.newSoundData("songs/bopeebo/Inst" .. songExt .. ".ogg")
+				girlfriend.multiplier = 3
+			end
 		end
-		enemy.x, enemy.y = -340, -20
+		enemy.x, enemy.y = -440, -20
 
 		self:initUI()
 	end,

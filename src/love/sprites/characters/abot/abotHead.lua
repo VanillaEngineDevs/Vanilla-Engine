@@ -17,11 +17,9 @@ return graphics.newSprite(
 		{x = 0, y = 0, width = 29, height = 40, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0, rotated = false}, -- 14: right0000
 	},
 	{
-		["toleft"] = {start = 1, stop = 6, speed = 24, offsetX = 0, offsetY = 0},
-		["left"] = {start = 7, stop = 7, speed = 24, offsetX = 0, offsetY = 0},
-		["toright"] = {start = 8, stop = 13, speed = 24, offsetX = 0, offsetY = 0},
-		["right"] = {start = 14, stop = 14, speed = 24, offsetX = 0, offsetY = 0},
+		["toleft"] = {start = 1, stop = 7, speed = 12, offsetX = 0, offsetY = 0},
+		["toright"] = {start = 8, stop = 14, speed = 12, offsetX = 0, offsetY = 0},
 	},
-	"left",
+	"toleft",
 	false
 )

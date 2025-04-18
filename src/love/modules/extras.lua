@@ -82,7 +82,7 @@ function weeks.legacyGenerateNotes(self, chart)
 			noteObject.shader:send("b", b)
 
             table.insert(notesTable[id], noteObject)
-            if holdLength > 0 then
+            if holdLength > 0 and pixel then
                 for k = 71 / speed, holdLength, 71 / speed do
                     local holdNote = noteSprites[id]()
                     holdNote.col = id
@@ -101,6 +101,9 @@ function weeks.legacyGenerateNotes(self, chart)
                 end
 
                 notesTable[id][#notesTable[id]]:animate("end")
+                if settings.downscroll then
+                    notesTable[id][#notesTable[id]].sizeY = -1
+                end
             end
 
             ::continue::
@@ -259,6 +262,9 @@ function weeks.cneGenerateNotes(self, chart, metadata)
                 end
 
                 notesTable[id][#notesTable[id]]:animate("end")
+                if settings.downscroll and pixel then
+                    notesTable[id][#notesTable[id]].sizeY = -1
+                end
             end
         end
 

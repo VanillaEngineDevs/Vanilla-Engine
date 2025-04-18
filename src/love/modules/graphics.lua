@@ -802,10 +802,13 @@ local graphics = {
 			end,
 
 			udraw = function(self, sx, sy)
-				local sx = sx or 7
-				local sy = sy or 7
-				self.curFrame = math.floor(frame)
-
+				sx = sx or 7
+				sy = sy or sx
+				if not self.visible then
+					return
+				end
+				self.curFrame = math.floor(frame or 1)
+				anim = self:getCurrentAnim()
 				if self.curFrame <= anim.stop then
 					local x = self.x
 					local y = self.y
@@ -817,6 +820,8 @@ local graphics = {
 						y = math.floor(y)
 					end
 
+					local ox, oy = 0, 0
+
 					local frameData = self:getFrameDatas()
 					if options and options.noOffset then
 						if frameData[self.curFrame].offsetWidth ~= 0 then
@@ -826,33 +831,60 @@ local graphics = {
 							height = frameData[self.curFrame].offsetY
 						end
 					else
-						if frameData[self.curFrame].offsetWidth == 0 then
-							width = math.floor(frameData[self.curFrame].width / 2)
+						-- erm... what the sigma?
+						if not frameData[self.curFrame].rotated then
+							if frameData[self.curFrame].offsetWidth == 0 then
+								width = math.floor(frameData[self.curFrame].width / 2)
+							else
+								width = math.floor(frameData[self.curFrame].offsetWidth / 2) + frameData[self.curFrame].offsetX
+							end
+							if frameData[self.curFrame].offsetHeight == 0 then
+								height = math.floor(frameData[self.curFrame].height / 2)
+							else
+								height = math.floor(frameData[self.curFrame].offsetHeight / 2) + frameData[self.curFrame].offsetY
+							end
 						else
-							width = math.floor(frameData[self.curFrame].offsetWidth / 2) + frameData[self.curFrame].offsetX
-						end
-						if frameData[self.curFrame].offsetHeight == 0 then
-							height = math.floor(frameData[self.curFrame].height / 2)
-						else
-							height = math.floor(frameData[self.curFrame].offsetHeight / 2) + frameData[self.curFrame].offsetY
+							if frameData[self.curFrame].offsetHeight == 0 then
+								width = math.floor(frameData[self.curFrame].height / 2)
+							else
+								width = math.floor(frameData[self.curFrame].offsetHeight / 2) +  frameData[self.curFrame].offsetY
+							end
+							if frameData[self.curFrame].offsetWidth == 0 then
+								height = math.floor(frameData[self.curFrame].width / 2)
+							else
+								height = math.floor(frameData[self.curFrame].offsetWidth / 2) + frameData[self.curFrame].offsetX
+							end
 						end
 					end
+
+					if not frameData[self.curFrame].rotated then
+						ox = width + anim.offsetX + self.offsetX
+						oy = height + anim.offsetY + self.offsetY
+					else
+						ox = width + anim.offsetY + self.offsetY
+						oy = height + anim.offsetX + self.offsetX
+					end
+					
+					local lastColor = {love.graphics.getColor()}
+					graphics.setColor(lastColor[1], lastColor[2], lastColor[3], lastColor[4] * self.alpha)
 
 					if self.visible then
 						love.graphics.draw(
 							sheets[anim.sheet]:getSheet(),
 							sheets[anim.sheet]:getFrameQuad(self.curFrame),
-							self.x,
-							self.y,
-							self.orientation,
+							x + self.offsetX2,
+							y + self.offsetY2,
+							self.orientation + (frameData[self.curFrame].rotated and -math.rad(90) or 0),
 							sx * (self.flipX and -1 or 1) * (anim.flipX and -1 or 1),
 							sy * (self.flipY and -1 or 1) * (anim.flipY and -1 or 1),
-							width + anim.offsetX + self.offsetX,
-							height + anim.offsetY + self.offsetY,
+							ox,
+							oy,
 							self.shearX,
 							self.shearY
 						)
 					end
+
+					love.graphics.setColor(lastColor)
 				end
 			end,
 

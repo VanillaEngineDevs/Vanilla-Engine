@@ -56,10 +56,17 @@ return graphics.newSprite(
 	},
 	{
 		["blink"] = {start = 1, stop = 8, speed = 24, offsetX = 0, offsetY = 0},
-		["idle"] = {start = 9, stop = 36, speed = 24, offsetX = 0, offsetY = 0},
+		["danceLeft"] = {start = 9, stop = 23, speed = 24, offsetX = 0, offsetY = 0},
+		["danceRight"] = {start = 24, stop = 36, speed = 24, offsetX = 0, offsetY = 0},
 		["lower"] = {start = 37, stop = 44, speed = 24, offsetX = 0, offsetY = 0},
 		["raise"] = {start = 45, stop = 52, speed = 24, offsetX = 0, offsetY = 0},
 	},
-	"raise",
-	false
+	"danceLeft",
+	false,
+	{
+		isCharacter = true,
+		danceSpeed = 1,
+		danceIdle = true,
+		icon = "nene"
+	}
 )

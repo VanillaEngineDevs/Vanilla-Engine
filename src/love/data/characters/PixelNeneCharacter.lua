@@ -21,6 +21,7 @@ function Nene:new()
     BaseCharacter.new(self, path)
 
     self.name = "nene"
+    self.isPixel = true
 
     self.STATE_DEFAULT = 0
     self.STATE_PRE_RAISE = 1
@@ -38,13 +39,22 @@ function Nene:new()
 
     ABOT_IMAGE = love.graphics.newImage(graphics.imagePath("weekend1/aBotViz"))
 
+    local viz = love.filesystem.load("sprites/characters/abot/aBotVizPixel.lua")
     for i = 1, MAX_ABOT_VIZ do
-        local viz = love.filesystem.load("sprites/characters/abot/aBotVizPixel.lua")()
-        vizFrameWidth = viz:getFrameWidth()/2
-        viz.x = -170 + (vizFrameWidth + 25) * i
-        viz.y = 0
-        table.insert(abotVisualizers, viz)
+        spr = viz()
+        spr:animate("viz" .. tostring(i) .. "_6", false)
+        vizFrameWidth = spr:getFrameWidth()/2
+        spr.x = 100 + (vizFrameWidth + 100) * i
+        spr.y = -5
+        table.insert(abotVisualizers, spr)
     end
+end
+
+function Nene:setY() 
+    self.abotBody.x, self.abotBody.y = self.x + 125, self.y + 245
+    self.abotBack.x, self.abotBack.y = self.x + 50, self.y + 250
+    self.abotSpeaker.x, self.abotSpeaker.y = self.x + 50, self.y + 265
+    self.abotHead.x, self.abotHead.y = self.x - 280, self.y + 320
 end
 
 function Nene:update(dt)
@@ -52,11 +62,19 @@ function Nene:update(dt)
 
     deltaCurTime = deltaCurTime + dt
 
-    self.abot.x, self.abot.y = self.x, self.y
-    self.abotBack.x, self.abotBack.y = self.x, self.y
+    self.abotBody:update(dt)
+    self.abotSpeaker:update(dt)
+    self.abotHead:update(dt)
 
+    abotVisualizers[1].x = self.x + -160 + (vizFrameWidth + 42) * 1
+    abotVisualizers[2].x = self.x + -160 + (vizFrameWidth + 42) * 2
+    abotVisualizers[3].x = self.x + -160 + (vizFrameWidth + 42) * 3
+    abotVisualizers[4].x = self.x + -160 + (vizFrameWidth + 46) * 4
+    abotVisualizers[5].x = self.x + -160 + (vizFrameWidth + 49) * 5
+    abotVisualizers[6].x = self.x + -160 + (vizFrameWidth + 49) * 6
+    abotVisualizers[7].x = self.x + -160 + (vizFrameWidth + 49) * 7
     for i = 1, MAX_ABOT_VIZ do
-        abotVisualizers[i].x, abotVisualizers[i].y = self.x + -180 + (vizFrameWidth + 25) * i, self.y + 270
+        abotVisualizers[i].y = self.y + 240
     end
 
     if self.soundData and love.system.getOS() ~= "NX" then
@@ -140,7 +158,10 @@ function Nene:beat(beat)
     local beat = math.floor(beat) or 0
 
     if Conductor.onBeat then
-        if beat % self.spr.danceSpeed == 0 then 
+        if beat % self.spr.danceSpeed == 0 then
+            -- animate abot
+            self.abotBody:animate("bop")
+            self.abotSpeaker:animate("bop")
             self.spr.danced = not self.spr.danced
             
             if self.currentState == self.STATE_DEFAULT then
@@ -169,23 +190,22 @@ function Nene:udraw(sx, sy, rimShaderGF, speakerShader)
 
     local lastShader = love.graphics.getShader()
     love.graphics.setShader(speakerShader)
-    --self.abotHead:udraw()
-    --self.abot:udraw()
-    --self.abotBack:udraw()
-    if curOS ~= "NX" and not debug and self.soundData then
+    self.abotSpeaker:udraw()
+    self.abotBack:udraw()
+    if curOS ~= "NX" and self.soundData then
         for i = 1, MAX_ABOT_VIZ do
             local barHeight = self.bars[i]
             local animNum = math.floor(math.remap(math.remap(barHeight, 0, 6, 0, 1), 0, 1, 1, 6))
-            abotVisualizers[i]:animate(tostring(i) .. "_" .. tostring(animNum), false)
-            --abotVisualizers[i]:udraw()
+            -- reverse it so its 6-1
+            animNum = 7 - animNum
+            abotVisualizers[i]:animate("viz" .. tostring(i) .. "_" .. tostring(animNum), false)
+            abotVisualizers[i]:udraw()
         end
     end
-    --self.abotSpeaker:udraw()
+    self.abotHead:udraw()
     self.abotBody:udraw()
     
     graphics.setColor(1, 1, 1, 1)
-
-    love.graphics.rectangle("fill", self.x + -327, self.y + 300, 120, 60)
 
     love.graphics.setShader(rimShaderGF)
     self.spr:udraw()

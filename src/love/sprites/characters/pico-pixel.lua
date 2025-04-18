@@ -224,18 +224,25 @@ return graphics.newSprite(
 	},
 	{
 		["idle"] = {start = 1, stop = 15, speed = 24, offsetX = 0, offsetY = 0},
-		["left"] = {start = 16, stop = 25, speed = 24, offsetX = 0, offsetY = 0},
-		["leftmiss"] = {start = 26, stop = 32, speed = 24, offsetX = 0, offsetY = 0},
-		["right"] = {start = 33, stop = 42, speed = 24, offsetX = 0, offsetY = 0},
-		["rightmiss"] = {start = 43, stop = 49, speed = 24, offsetX = 0, offsetY = 0},
-		["up"] = {start = 50, stop = 59, speed = 24, offsetX = 0, offsetY = 0},
-		["upmiss"] = {start = 60, stop = 66, speed = 24, offsetX = 0, offsetY = 0},
-		["down"] = {start = 67, stop = 76, speed = 24, offsetX = 0, offsetY = 0},
-		["downmiss"] = {start = 77, stop = 83, speed = 24, offsetX = 0, offsetY = 0},
+		["singLEFT"] = {start = 16, stop = 25, speed = 24, offsetX = 0, offsetY = 0},
+		["singLEFT miss"] = {start = 26, stop = 32, speed = 24, offsetX = 0, offsetY = 0},
+		["singRIGHT"] = {start = 33, stop = 42, speed = 24, offsetX = 0, offsetY = 0},
+		["singRIGHT miss"] = {start = 43, stop = 49, speed = 24, offsetX = 0, offsetY = 0},
+		["singUP"] = {start = 50, stop = 59, speed = 24, offsetX = 0, offsetY = 0},
+		["singUP miss"] = {start = 60, stop = 66, speed = 24, offsetX = 0, offsetY = 0},
+		["singDOWN"] = {start = 67, stop = 76, speed = 24, offsetX = 0, offsetY = 0},
+		["singDOWN miss"] = {start = 77, stop = 83, speed = 24, offsetX = 0, offsetY = 0},
 		["firstDeath"] = {start = 84, stop = 133, speed = 24, offsetX = 0, offsetY = 0},
 		["deathLoop"] = {start = 134, stop = 147, speed = 24, offsetX = 0, offsetY = 0},
 		["deathConfirm"] = {start = 148, stop = 220, speed = 24, offsetX = 0, offsetY = 0},
 	},
-	"downmiss",
-	false
+	"idle",
+	false,
+	{
+		sing_duration = 4,
+		isCharacter = true,
+		flipX = true,
+		icon = "pico-pixel",
+		scale = 5
+	}
 )
