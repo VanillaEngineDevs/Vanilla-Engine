@@ -324,7 +324,7 @@ end
 			local badRating = 0.67
 			local shitRating = 0.5
 
-			local totalHit = sickCounter + goodCounter + badCounter + shitCounter + missCounter
+			local totalHit = sickCounter + goodCounter + badCounter + shitCounter + misses
 
 			ratingPercent = (sickCounter * sickRating +
 				goodCounter * goodRating +

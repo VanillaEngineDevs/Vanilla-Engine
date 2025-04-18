@@ -142,13 +142,23 @@ CONSTANTS.WEEKS = {
             BAD_THRES = 67.5,
             SHIT_THRES = 135,
             MISS_THRES = 160,
+        },
+        ["Harmoni"] = {
+            PERFECT_THRES = 5,
+            KILLER_THRES = 12.5,
+            SICK_THRES = 26,
+            GOOD_THRES = 56,
+            BAD_THRES = 86,
+            SHIT_THRES = 106,
+            MISS_THRES = 160,
         }
     },
     JUDGE_PRESETS = {
         "PBot1",
         "Week7",
         "Legacy",
-        "Judge7" -- For people who like stricter inputs!
+        "Judge7", -- For people who like stricter inputs!
+        "Harmoni", -- They asked nicely
     },
     HEALTH = {
         MAX = 2,

@@ -545,7 +545,6 @@ function love.mousemoved(x, y, dx, dy, istouch)
 
 	love.mouse.setVisible(true)
 	mouseTimer = 0
-	
 end
 
 function love.wheelmoved(x, y)
