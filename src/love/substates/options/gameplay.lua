@@ -66,6 +66,19 @@ function gameplay:enter()
         )
     )
 
+    self:addOption(
+        Option:new(
+            "Popup Score Display",
+            "How the combo and rating gets displayed",
+            settings.popupScoreMode,
+            "string",
+            {
+                "Simple",
+                "Stack"
+            }
+        )
+    )
+
     --[[ self:addOption(
         Option:new(
             "Pixel Perfect",
@@ -113,8 +126,9 @@ function gameplay:leave()
     settings.botPlay = self.optionsArray[4]:getValue()
     settings.accuracyMode = self.optionsArray[5]:getValue()
     settings.scoringType = self.optionsArray[6]:getValue()
-    settings.customScrollSpeed = self.optionsArray[7]:getValue()
-    settings.scrollUnderlayTrans = self.optionsArray[8]:getValue()
+    settings.popupScoreMode = self.optionsArray[7]:getValue()
+    settings.customScrollSpeed = self.optionsArray[8]:getValue()
+    settings.scrollUnderlayTrans = self.optionsArray[9]:getValue()
     
 
     self.super.leave(self)

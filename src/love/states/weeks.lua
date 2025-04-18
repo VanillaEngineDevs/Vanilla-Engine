@@ -54,6 +54,8 @@ local allStates = {
 	score = 0
 }
 
+local ratingTextScale = 1
+
 local function commaFormat(n)
 	local str = tostring(n)
 	local x = str:find("%.")
@@ -161,9 +163,9 @@ return {
 				numbers = love.filesystem.load("sprites/numbers.lua"),
 			}
 
-			rating = love.filesystem.load("sprites/rating.lua")()
+			rating = love.filesystem.load("sprites/rating.lua")
 
-			rating.sizeX, rating.sizeY = 0.75, 0.75
+			--rating.sizeX, rating.sizeY = 0.75, 0.75
 
 			girlfriend = BaseCharacter("sprites/characters/girlfriend.lua")
 			boyfriend = BaseCharacter("sprites/characters/boyfriend.lua")
@@ -197,7 +199,7 @@ return {
 				numbers = love.filesystem.load("sprites/pixel/numbers.lua"),
 			}
 
-			rating = love.filesystem.load("sprites/pixel/rating.lua")()
+			rating = love.filesystem.load("sprites/pixel/rating.lua")
 
 			girlfriend = BaseCharacter("sprites/characters/girlfriend-pixel.lua")
 			boyfriend = BaseCharacter("sprites/characters/boyfriend-pixel.lua")
@@ -205,14 +207,7 @@ return {
 			countdown = love.filesystem.load("sprites/pixel/countdown.lua")()
 		end
 
-		numbers = {}
-		for i = 1, 3 do
-			numbers[i] = sprites.numbers()
-
-			if option ~= "pixel" then
-				numbers[i].sizeX, numbers[i].sizeY = 0.5, 0.5
-			end
-		end
+		popupScore:init(sprites.numbers, rating)
 
 		if settings.downscroll then
 			downscrollOffset = -750
@@ -249,17 +244,6 @@ return {
 		end
 
 		curWeekData = weekData[weekNum]
-
-		rating.x = 20
-		if not pixel then
-			for i = 1, 3 do
-				numbers[i].x = -100 + 50 * i
-			end
-		else
-			for i = 1, 3 do
-				numbers[i].x = -100 + 58 * i
-			end
-		end
 
 		ratingVisibility = {0}
 		combo = 0
@@ -1051,6 +1035,15 @@ end
 
 		healthLerp = util.coolLerp(healthLerp, health, 0.15)
 
+		popupScore:update(dt)
+
+		if ratingTextScale > 1 then
+			ratingTextScale = ratingTextScale - 0.1 * dt
+			if ratingTextScale < 1 then
+				ratingTextScale = 1
+			end
+		end
+
 		for i = 1, 4 do
 			local enemyArrow = enemyArrows[i]
 			local boyfriendArrow = boyfriendArrows[i]
@@ -1198,6 +1191,10 @@ end
 									shitCounter = shitCounter + 1
 								end
 
+								if settings.scoringType == "Psych" then
+									ratingTextScale = 1.025
+								end
+
 								if ratingAnim == "sick" then
 									NoteSplash:new(
 										{
@@ -1213,28 +1210,11 @@ end
 								if combo > maxCombo then maxCombo = combo end
 								noteCounter = noteCounter + 1
 
-								numbers[1]:animate(tostring(math.floor(combo / 100 % 10)), false)
-								numbers[2]:animate(tostring(math.floor(combo / 10 % 10)), false)
-								numbers[3]:animate(tostring(math.floor(combo % 10)), false)
-
-								rating:animate(ratingAnim)
+								popupScore:create(ratingAnim, combo)
 
 								for i = 1, 5 do
 									if ratingTimers[i] then Timer.cancel(ratingTimers[i]) end
 								end
-
-								rating.y = 300 - 50 + (settings.downscroll and 0 or -490)
-								for i = 1, 3 do
-									numbers[i].y = 300 + 50 + (settings.downscroll and 0 or -490)
-								end
-
-								ratingVisibility[1] = 1
-								ratingTimers[1] = Timer.tween(2, ratingVisibility, {0}, "linear")
-								ratingTimers[2] = Timer.tween(2, rating, {y = 300 + (settings.downscroll and 0 or -490) - 100}, "out-elastic")
-
-								ratingTimers[3] = Timer.tween(2, numbers[1], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
-								ratingTimers[4] = Timer.tween(2, numbers[2], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
-								ratingTimers[5] = Timer.tween(2, numbers[3], {y = 300 + (settings.downscroll and 0 or -490) + love.math.random(-10, 10)}, "out-elastic")
 
 								if not settings.ghostTapping or success then
 									boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
@@ -1362,18 +1342,12 @@ end
 		love.graphics.push()
 			--love.graphics.origin()
 			love.graphics.translate(0, -35)
-			graphics.setColor(1, 1, 1, ratingVisibility[1])
+			graphics.setColor(1, 1, 1)
 			if pixel and not settings.pixelPerfect then
 				love.graphics.translate(-16, 0)
-				rating:udraw(5.25, 5.25)
-				for i = 1, 3 do
-					numbers[i]:udraw(5, 5)
-				end
+				popupScore:udraw(5.25, 5.25)
 			else
-				rating:draw()
-				for i = 1, 3 do
-					numbers[i]:draw()
-				end
+				popupScore:draw()
 			end
 			graphics.setColor(1, 1, 1)
 		love.graphics.pop()
@@ -1548,8 +1522,17 @@ end
 			format = "left"
 		end
 
-		uitextfColored(text, x, y, 1200, format, colourOutline, colourInline)
-
+		local lastFont = love.graphics.getFont()
+		love.graphics.push()
+		if mode == "Psych" then
+			love.graphics.setFont(psychScoringFont)
+			love.graphics.translate(-(psychScoringFont:getWidth(text) * (ratingTextScale - 1))/2, -(psychScoringFont:getHeight(text) * (ratingTextScale - 1)))
+		else
+			love.graphics.setFont(scoringFont)
+		end
+		uitextfColored(text, x, y, 1200, format, colourOutline, colourInline, 0, ratingTextScale, ratingTextScale)
+		love.graphics.pop()
+		love.graphics.setFont(lastFont)
 		self:drawRating()
 	end,
 	

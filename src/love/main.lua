@@ -206,6 +206,7 @@ function love.load()
 	NoteSplash = require "modules.Splash"
 	HoldCover = require "modules.Cover"
 	waveform = require "modules.waveform"
+	popupScore = require "modules.popupScore"
 	loadSavedata()
 	settings.pixelPerfect = false
 
@@ -373,6 +374,8 @@ function love.load()
 
 	-- Variables
 	font = love.graphics.newFont("fonts/vcr.ttf", 24)
+	scoringFont = love.graphics.newFont("fonts/vcr.ttf", 26)
+	psychScoringFont = love.graphics.newFont("fonts/vcr.ttf", 36)
 	optionsFont = love.graphics.newFont("fonts/vcr.ttf", 32)
 	FNFFont = love.graphics.newFont("fonts/fnFont.ttf", 24)
 	credFont = love.graphics.newFont("fonts/fnFont.ttf", 32)   -- guglio is a bitch -- fuck you calling a bitch????
