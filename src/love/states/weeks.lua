@@ -65,6 +65,9 @@ local function commaFormat(n)
 	return str:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
 end
 
+local IS_CLASSIC_MOVEMENT = false
+CAM_LERP_POINT = {x = 0, y = 0}
+
 modEvents = {}
 
 local sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
@@ -115,6 +118,7 @@ end
 
 return {
 	enter = function(self, option)
+		IS_CLASSIC_MOVEMENT = false
 		allStates = {
 			sickCounter = 0,
 			goodCounter = 0,
@@ -927,7 +931,7 @@ end
 							end
 						end
 						event.value.ease = event.value.ease or "CLASSIC"
-						if event.value.ease ~= "INSTANT" then
+						if event.value.ease ~= "INSTANT" and event.value.ease ~= "CLASSIC" then
 							local time = (getStepLengthsMS(bpm) * (tonumber(event.value.duration) or 4)) / 1000
 							if camTween then 
 								Timer.cancel(camTween)
@@ -942,13 +946,18 @@ end
 								},
 								CONSTANTS.WEEKS.EASING_TYPES[event.value.ease or "CLASSIC"]
 							)
-						else
+						elseif event.value.ease ~= "CLASSIC" then
 							camera.x = point.x - tonumber(event.value.x or 0)
 							camera.y = point.y - tonumber(event.value.y or 0)
+						else
+							if camTween then 
+								Timer.cancel(camTween)
+							end
+							IS_CLASSIC_MOVEMENT = true
+							CAM_LERP_POINT.x, CAM_LERP_POINT.y = point.x - tonumber(event.value.x or 0), point.y - tonumber(event.value.y or 0)
 						end
 					end
 				elseif event.name == "PlayAnimation" then
-					print(event.value.target)
 					if event.value.target == "bf" or event.value.target == "boyfriend" then
 						boyfriend:animate(event.value.anim, false, nil, nil, nil, event.value.force)
 					elseif event.value.target == "gf" or event.value.target == "girlfriend" then
@@ -1058,6 +1067,12 @@ end
 	updateUI = function(self, dt)
 		if inCutscene then return end
 		if paused then return end
+
+		if IS_CLASSIC_MOVEMENT then
+			local adjustedLerp  = 1 - math.pow(1.0 - 0.04, dt * 60)
+			camera.x = camera.x + (CAM_LERP_POINT.x - camera.x) * adjustedLerp
+			camera.y = camera.y + (CAM_LERP_POINT.y - camera.y) * adjustedLerp
+		end
 
 		NoteSplash:update(dt)
 		HoldCover:update(dt)
