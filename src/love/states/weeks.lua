@@ -220,6 +220,18 @@ return {
 		end
 
 		countdownFade = {}
+
+		if settings.middleScroll then
+			if not settings.downscroll then
+				popupScore:setPlacement(-300, -400)
+			else
+				popupScore:setPlacement(-300, 400)
+			end
+		else
+			if not settings.downscroll then
+				popupScore:setPlacement(0, -400)
+			end
+		end
 	end,
 
 	load = function(self)
