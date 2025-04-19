@@ -15,7 +15,7 @@ love._drawDT = 0
 
 local _
 local _, _, flags = love.window.getMode()
-love._framerate = flags.refreshrate or 60
+love._framerate = (flags.refreshrate or 60) * 2
 
 function love.run()
     local love = love
