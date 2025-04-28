@@ -275,6 +275,7 @@ function love.load()
 		["mall.erect"] = require "stages.erect.mall",
 		["school.erect"] = require "stages.erect.school",
 		["evilSchool.erect"] = require "stages.erect.evilSchool",
+		["tank.erect"] = require "stages.erect.tank",
 		["streets.erect"] = require "stages.erect.streets"
 	}
 

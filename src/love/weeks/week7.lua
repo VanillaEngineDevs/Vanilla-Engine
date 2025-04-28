@@ -1,10 +1,16 @@
+local stage
+
 return {
     enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter() 
 
-		stages["tank.base"]:enter(_songExt)
+		stage = stages["tank.base"]
 
-		week = 7
+		if _songExt == "-erect" or _songExt == "-pico" then
+			stage = stages["tank.erect"]
+		end
+
+		stage:enter(_songExt)
 
 		if storyMode and not died then
 			musicPos = 0
@@ -26,15 +32,9 @@ return {
 
 	load = function(self)
 		weeks:load()
-		stages["tank.base"]:load()
+		stage:load()
 
 		if song == 3 then
-			girlfriend = BaseCharacter("sprites/characters/picoSpeaker.lua")
-			girlfriend.x, girlfriend.y = 105, 110
-			boyfriend = BaseCharacter("sprites/characters/bfAndGF.lua")
-			boyfriend.x, boyfriend.y = 460, 423
-			fakeBoyfriend = BaseCharacter("sprites/characters/bfAndGFdead.lua")
-			fakeBoyfriend.x, fakeBoyfriend.y = 460, 423
 			if not died and storyMode then
 				video = cutscene.video("videos/stressCutscene.ogv")
 				video:play()
@@ -116,7 +116,7 @@ return {
 
 	update = function(self, dt)
 		weeks:update(dt)
-		stages["tank.base"]:update(dt)
+		stage:update(dt)
 
 		if inCutscene then
 			if not video:isPlaying() then 
@@ -170,7 +170,7 @@ return {
         love.graphics.push()
             love.graphics.translate(graphics.getWidth()/2, graphics.getHeight()/2)
             love.graphics.scale(camera.zoom, camera.zoom)
-            stages["tank.base"]:draw()
+            stage:draw()
         love.graphics.pop()
 
         weeks:drawUI()
@@ -180,7 +180,7 @@ return {
 		song = 1
         died = false
         inCutscene = false
-        stages["tank.base"]:leave()
+        stage:leave()
 		weeks:leave()
 	end
 }

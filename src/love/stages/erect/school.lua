@@ -73,7 +73,7 @@ return {
 		else
 			rimShaderGF:send("altMask", love.graphics.newImage(graphics.imagePath("week6.erect/masks/gfPixel_mask")))
 		end
-		rimShaderGF:send("useMask", true)
+		rimShaderGF:send("useMask", false)
 		rimShaderGF:send("thr2", 1)
 		rimShaderGF:send("dropColor", {hexToRGB(0xFF52351D)})
 		rimShaderGF:send("dist", 3)

@@ -1312,7 +1312,9 @@ end
 						if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
 	
 						if didHitNote then
-							score = math.max(0, score - 10)
+							score = math.max(0, score - 100) -- if note was "missed" but hit, remove 100 points
+						else
+							score = math.max(0, score - 10)  -- If ghost tapped, remove 10 points
 						end
 						health = health - (CONSTANTS.WEEKS.HEALTH.MISS_PENALTY or 0.2) * (healthLossMult or 1) * (boyfriendNote[1].healthLossMult or 1)
 						misses = misses + 1
@@ -1379,7 +1381,7 @@ end
 		elseif health <= 0 and self.useBuiltinGameover then -- Game over
 			if not settings.practiceMode and not dying then
 				dying = true
-				self:onDeath() 
+				self:onDeath()
 			end
 		elseif health <= CONSTANTS.WEEKS.HEALTH.LOSING_THRESHOLD and boyfriendIcon:getCurFrame() == 1 then
 			boyfriendIcon:setFrame(2)

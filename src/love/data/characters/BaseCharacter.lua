@@ -28,6 +28,7 @@ function Character:update(dt)
     self.spr.shearX, self.spr.shearY = self.shearX, self.shearY
     self.spr.flipX, self.spr.flipY = self.flipX, self.flipY
 
+    self.spr.shaderEnabled = self.shaderEnabled
     self.spr.shader = self.shader
 
     self.spr.holdTimer = self.holdTimer
@@ -37,7 +38,6 @@ end
 
 function Character:draw()
     if not self.visible then return end
-
     self.spr:draw()
 end
 

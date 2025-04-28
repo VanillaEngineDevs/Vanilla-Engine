@@ -42,7 +42,14 @@ return {
     end,
 
     load = function()
-
+        if song == 3 then
+            girlfriend = BaseCharacter("sprites/characters/picoSpeaker.lua")
+			girlfriend.x, girlfriend.y = 105, 110
+			boyfriend = BaseCharacter("sprites/characters/bfAndGF.lua")
+			boyfriend.x, boyfriend.y = 460, 423
+			fakeBoyfriend = BaseCharacter("sprites/characters/bfAndGFdead.lua")
+			fakeBoyfriend.x, fakeBoyfriend.y = 460, 423
+        end
     end,
 
     update = function(self, dt)

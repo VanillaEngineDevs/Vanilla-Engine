@@ -76,10 +76,9 @@ float intensityPass(Image bitmap, vec2 fragCoord, float curThreshold, bool useMa
         maskIntensity = mix(0.0, 1.0, Texel(altMask, fragCoord).b);
     }
 
-    if(col.a == 0.0 || (col.r == 0.0 && col.g == 0.0 && col.b == 0.0)){
+    if(col.a == 0.0){
         return 0.0;
     }
-
 
     float intensity = dot(col.rgb, vec3(0.3098, 0.6078, 0.0823));
 
@@ -89,58 +88,35 @@ float intensityPass(Image bitmap, vec2 fragCoord, float curThreshold, bool useMa
 }
 
 float antialias(Image bitmap, vec2 fragCoord, float curThreshold, bool useMask) {
-    float center = intensityPass(bitmap, fragCoord, curThreshold, useMask);
-    
-    if (center < 0.5) return 0.0;
-
-    vec2 texelSize = 1.0 / textureSize;
-    vec2 lightDir = normalize(vec2(cos(ang), -sin(ang)));
-
-    const float edgeThreshold = 0.25;
-    const int maxSteps = 8;
-
-    float rimFactor = 0.0;
-
-    for (int i = 1; i <= maxSteps; i++) {
-        vec2 offsetCoord = fragCoord + lightDir * texelSize * float(i);
-        float sample = intensityPass(bitmap, offsetCoord, curThreshold, useMask);
-
-        float diff = center - sample;
-        if (diff > edgeThreshold) {
-            float falloff = clamp(diff / edgeThreshold, 0.0, 1.0);
-            rimFactor = max(rimFactor, falloff);
-            break;
-        }
-    }
-
-    if (rimFactor <= 0.0) return 0.0;
-
-    float AA_JITTER = 0.5;
     const int MAX_AA = 8;
-    const int totalPasses = MAX_AA * MAX_AA;
-    float result = center;
+    float AA_TOTAL_PASSES = AA_STAGES * AA_STAGES + 1.0;
+    float AA_JITTER = 0.5;
 
-    for (int i = 0; i < totalPasses; i++) {
+    float color = intensityPass(bitmap, fragCoord, curThreshold, useMask);
+    
+    for (int i = 0; i < MAX_AA * MAX_AA; i++) {
         int x = i / MAX_AA;
-        int y = i - (MAX_AA * int(x / MAX_AA));
+        int y = i - (MAX_AA * int(x/MAX_AA));
 
-        vec2 jitter = AA_JITTER * (2.0 * hash22(vec2(float(x), float(y))) - 1.0) / textureSize;
-        result += intensityPass(bitmap, fragCoord + jitter, curThreshold, useMask);
+        if (float(x) >= AA_STAGES || float(y) >= AA_STAGES) {
+            continue;
+        }
+
+        vec2 offset = AA_JITTER * (2.0 * hash22(vec2(float(x), float(y))) - 1.0) / textureSize;
+        color += intensityPass(bitmap, fragCoord + offset, curThreshold, useMask);
     }
-
-    result /= float(totalPasses + 1);
-
-    if (true == true) 
-        return 0.0; // Temporary until I can fix the rimlight issue
-
-    return mix(center, result, rimFactor);
+    
+    return color / AA_TOTAL_PASSES;
 }
 
 vec3 createDropShadow(Image bitmap, vec3 col, float curThreshold, bool useMask, vec2 fragCoord) {
     float intensity = antialias(bitmap, fragCoord, curThreshold, useMask);
     vec2 imageRatio = vec2(1.0 / love_ScreenSize.x, 1.0 / love_ScreenSize.y);
-    vec2 checkedPixel = vec2(fragCoord.x + (dist * cos(ang + angOffset) * imageRatio.x),
-                            fragCoord.y - (dist * sin(ang + angOffset) * imageRatio.y));
+
+    vec2 checkedPixel = vec2(
+        fragCoord.x + (dist * cos(ang + angOffset) * imageRatio.x),
+        fragCoord.y - (dist * sin(ang + angOffset) * imageRatio.y)
+    );
 
     float dropShadowAmount = 0.0;
     if(
