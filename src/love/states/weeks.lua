@@ -116,6 +116,15 @@ local function getRatingName(acc)
 	end
 end
 
+healthBar = {
+	x = -500,
+	y = not settings.downscroll and 350 or -400,
+	width = 1000,
+	height = 25
+}
+
+downscrollOffset = 0 -- for compatibility
+
 return {
 	enter = function(self, option)
 		IS_CLASSIC_MOVEMENT = false
@@ -128,17 +137,11 @@ return {
 			maxCombo = 0,
 			score = 0
 		}
-		
+
 		sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
 		playMenuMusic = false
 		beatHandler.reset()
 		option = option or "normal"
-
-		arrowAngles = {math.rad(180), math.rad(90), math.rad(270), math.rad(0)}
-		if settings.downscroll then
-			-- ezezezezezezezezezezezezez workaround lol
-			arrowAngles = {math.rad(180), math.rad(270), math.rad(90), math.rad(0)}
-		end
 
 		if option ~= "pixel" then
 			pixel = false
@@ -168,8 +171,6 @@ return {
 			}
 
 			rating = love.filesystem.load("sprites/rating.lua")
-
-			--rating.sizeX, rating.sizeY = 0.75, 0.75
 
 			girlfriend = BaseCharacter("sprites/characters/girlfriend.lua")
 			boyfriend = BaseCharacter("sprites/characters/boyfriend.lua")
@@ -213,15 +214,9 @@ return {
 
 		popupScore:init(sprites.numbers, rating)
 
-		if settings.downscroll then
-			downscrollOffset = -750
-		else
-			downscrollOffset = 0
-		end
-
 		countdownFade = {}
 
-		if settings.middleScroll then
+		if settings.middlescroll then
 			if not settings.downscroll then
 				popupScore:setPlacement(-300, -400)
 			else
@@ -290,33 +285,33 @@ return {
 			end
 		end
 
-		-- Function so people can override it if they want
-		-- Do some cool note effects or something!
-		function updateNotePos()
-		for i = 1, 4 do
-			for j, note in ipairs(boyfriendNotes[i]) do
-				if note.time - musicTime >= 15000 then break end
-				local strumlineY = boyfriendArrows[i].y
-				note.y = strumlineY - CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - note.time) * speed--[[ (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2))) ]]
-			end
-
-			for _, note in ipairs(enemyNotes[i]) do
-				if note.time - musicTime >= 15000 then break end
-				local strumlineY = enemyArrows[i].y
-				note.y = strumlineY - CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - note.time) * speed--[[ (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2))) ]]
-			end
+		function calculateNoteYPos(strumtime)
+			return CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - strumtime) * speed * (settings.downscroll and -1 or 1)
 		end
-end
 
 		enemyIcon = icon.newIcon(icon.imagePath((enemy and enemy.icon) and enemy.icon) or "dad", (enemy and enemy.optionsTable) and (enemy.optionsTable.scale or 1) or 1)
 		boyfriendIcon = icon.newIcon(icon.imagePath((boyfriend and boyfriend.icon) and boyfriend.icon) or "bf", (boyfriend and boyfriend.optionsTable) and (boyfriend.optionsTable.scale or 1) or 1)
 
-		enemyIcon.y = 350 + downscrollOffset
-		boyfriendIcon.y = 350 + downscrollOffset
 		enemyIcon.sizeX = 1.5
 		boyfriendIcon.sizeX = -1.5
 		enemyIcon.sizeY = 1.5
 		boyfriendIcon.sizeY = 1.5
+
+		healthBar = {
+			x = -500,
+			y = not settings.downscroll and 350 or -400,
+			width = 1000,
+			height = 25
+		}
+
+		if settings.downscroll then
+			downscrollOffset = -750
+		else
+			downscrollOffset = 0
+		end -- For compatibility
+
+		enemyIcon.y = healthBar.y
+		boyfriendIcon.y = healthBar.y
 
 		graphics:fadeInWipe(0.6)
 	end,
@@ -378,8 +373,6 @@ end
 				accuracy = ((math.floor(ratingPercent * 10000) / 100))
 			}
 		end
-
-		--print("Saved data for week " .. weekNum-1 .. ", song " .. song .. ", difficulty " .. diff)
 	end,
 
 	checkSongOver = function(self)
@@ -506,7 +499,7 @@ end
 				boyfriendArrows[i].shader:send("g", g)
 				boyfriendArrows[i].shader:send("b", b)
 			end
-			if settings.middleScroll then 
+			if settings.middlescroll then 
 				boyfriendArrows[i].x = -410 + 165 * i + CONSTANTS.WEEKS.STRUM_X_OFFSET
 				-- ew stuff
 				enemyArrows[1].x = -925 + 165 * 1 + CONSTANTS.WEEKS.STRUM_X_OFFSET
@@ -520,17 +513,16 @@ end
 
 			enemyArrows[i].y = CONSTANTS.WEEKS.STRUM_Y
 			boyfriendArrows[i].y = CONSTANTS.WEEKS.STRUM_Y
+			if settings.downscroll then
+				enemyArrows[i].y = -CONSTANTS.WEEKS.STRUM_Y
+				boyfriendArrows[i].y = -CONSTANTS.WEEKS.STRUM_Y
+			end
 
 			enemyArrows[i].finishedAlpha = 1
 			boyfriendArrows[i].finishedAlpha = 1
 
 			boyfriendArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
 			enemyArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
-
-			if settings.downscroll then 
-				enemyArrows[i].sizeY = -1
-				boyfriendArrows[i].sizeY = -1
-			end
 
 			enemyNotes[i] = {}
 			boyfriendNotes[i] = {}
@@ -571,7 +563,7 @@ end
 		ARTIST = metadata.artist
 
 		local events = {}
-		
+
 		for _, timeChange in ipairs(metadata.timeChanges) do
 			local time = timeChange.t
 			local bpm_ = timeChange.bpm
@@ -624,8 +616,6 @@ end
 			noteObject.time = time
 			noteObject:animate("on")
 
-			if settings.downscroll then noteObject.sizeY = -1 end
-
 			local enemyNote = noteData.d > 3
 			local notesTable = enemyNote and enemyNotes or boyfriendNotes
 			local arrowsTable = enemyNote and enemyArrows or boyfriendArrows
@@ -671,9 +661,7 @@ end
 				end
 
 				notesTable[data][#notesTable[data]]:animate("end")
-				if settings.downscroll and pixel then
-					notesTable[data][#notesTable[data]].flipY = true
-				end
+				notesTable[data][#notesTable[data]].sizeY = settings.downscroll and -1 or 1
 			end
 		end
 
@@ -727,7 +715,7 @@ end
 							boyfriendArrows[i],
 							{
 								alpha = boyfriendArrows[i].finishedAlpha,
-								y = CONSTANTS.WEEKS.STRUM_Y
+								y = CONSTANTS.WEEKS.STRUM_Y * (settings.downscroll and -1 or 1)
 							},
 							"out-circ",
 							function()
@@ -742,7 +730,7 @@ end
 							enemyArrows[i],
 							{
 								alpha = enemyArrows[i].finishedAlpha,
-								y = CONSTANTS.WEEKS.STRUM_Y
+								y = CONSTANTS.WEEKS.STRUM_Y * (settings.downscroll and -1 or 1)
 							},
 							"out-circ",
 							function()
@@ -1088,7 +1076,15 @@ end
 
 		NoteSplash:update(dt)
 		HoldCover:update(dt)
-		updateNotePos()
+		for i = 1, 4 do
+			for _, note in ipairs(enemyNotes[i]) do
+				note.y = enemyArrows[i].y - calculateNoteYPos(note.time)
+			end
+
+			for _, note in ipairs(boyfriendNotes[i]) do
+				note.y = boyfriendArrows[i].y - calculateNoteYPos(note.time)
+			end
+		end
 
 		healthLerp = util.coolLerp(healthLerp, health, 0.15)
 
@@ -1322,7 +1318,9 @@ end
 				end
 			end
 
-			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].y <= boyfriendArrow.y)) and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
+			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].time - musicTime <= 0))
+				and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
+
 				if boyfriendNote[1]:getAnimName() == "hold" then
 					HoldCover:show(i, 1, boyfriendNote[1].x, boyfriendNote[1].y)
 				else
@@ -1387,8 +1385,8 @@ end
 			boyfriendIcon:setFrame(2)
 		end
 
-		enemyIcon.x = 425 - healthLerp * 500
-		boyfriendIcon.x = 585 - healthLerp * 500
+		enemyIcon.x = healthBar.x + healthBar.width - 75 - healthLerp * 500
+		boyfriendIcon.x = healthBar.x + healthBar.width + 75 - healthLerp * 500
 
 		if Conductor.onBeat then
 			enemyIcon.sizeX, enemyIcon.sizeY = 1.75, 1.75
@@ -1432,7 +1430,6 @@ end
 					end
 					if pauseMenuSelection ~= 2 then
 						uitextflarge("Restart", -305, -75, 600, "center", false)
-						--  -600, 400+downscrollOffset, 1200, "center"
 					else
 						uitextflarge("Restart", -305, -75, 600, "center", true)
 					end
@@ -1453,18 +1450,14 @@ end
 		end
 		love.graphics.push()
 			love.graphics.translate(push:getWidth() / 2, push:getHeight() / 2)
-			if not settings.downscroll then
-				love.graphics.scale(0.7, 0.7)
-			else
-				love.graphics.scale(0.7, -0.7)
-			end
+			love.graphics.scale(0.7, 0.7)
 			love.graphics.scale(uiCam.zoom, uiCam.zoom)
 			love.graphics.translate(uiCam.x, uiCam.y)
 			graphics.setColor(1, 1, 1)
 
 			for i = 1, 4 do
 				if enemyArrows[i]:getAnimName() == "off" then
-					if not settings.middleScroll then
+					if not settings.middlescroll then
 						graphics.setColor(0.6, 0.6, 0.6, enemyArrows[i].alpha)
 					else
 						graphics.setColor(0.6, 0.6, 0.6, enemyArrows[i].alpha)
@@ -1473,21 +1466,13 @@ end
 					graphics.setColor(1, 1, 1, enemyArrows[i].alpha)
 				end
 				if pixel and not settings.pixelPerfect then
-					if not settings.downscroll then
-						enemyArrows[i]:udraw(8, 8)
-					else
-						enemyArrows[i]:udraw(8, -8)
-					end
+					enemyArrows[i]:udraw(8, 8)
 				else
 					enemyArrows[i]:draw()
 				end
 				graphics.setColor(1, 1, 1)
 				if pixel and not settings.pixelPerfect then
-					if not settings.downscroll then
-						boyfriendArrows[i]:udraw(8, 8)
-					else
-						boyfriendArrows[i]:udraw(8, -8)
-					end
+					boyfriendArrows[i]:udraw(8, 8)
 				else
 					boyfriendArrows[i]:draw()
 				end
@@ -1498,18 +1483,14 @@ end
 						for j = #enemyNotes[i], 1, -1 do
 							if enemyNotes[i][j].y+enemyNotes[i][j].offsetY2 <= 600 and enemyNotes[i][j].y+enemyNotes[i][j].offsetY2 >= -600 then
 								local animName = enemyNotes[i][j]:getAnimName()
-								if settings.middleScroll then
+								if settings.middlescroll then
 									graphics.setColor(1, 1, 1, 0.8 * enemyNotes[i][j].alpha)
 								else
 									graphics.setColor(1, 1, 1, 1 * enemyNotes[i][j].alpha)
 								end
 
 								if pixel and not settings.pixelPerfect then
-									if not settings.downscroll then
-										enemyNotes[i][j]:udraw(8, 8)
-									else
-										enemyNotes[i][j]:udraw(8, -8)
-									end
+									enemyNotes[i][j]:udraw(8, 8)
 								else
 									enemyNotes[i][j]:draw()
 								end
@@ -1521,14 +1502,14 @@ end
 						for j = #boyfriendNotes[i], 1, -1 do
 							if boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2 <= 600 and boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2 >= -600 then
 								local animName = boyfriendNotes[i][j]:getAnimName()
-								graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2)) / 75) * boyfriendNotes[i][j].alpha)
+								if not settings.downscroll then
+									graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2)) / 75) * boyfriendNotes[i][j].alpha)
+								else
+									graphics.setColor(1, 1, 1, math.min(1, (500 - (boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2)) / 75) * boyfriendNotes[i][j].alpha)
+								end
 
 								if pixel and not settings.pixelPerfect then
-									if not settings.downscroll then
-										boyfriendNotes[i][j]:udraw(8, 8)
-									else
-										boyfriendNotes[i][j]:udraw(8, -8)
-									end
+									boyfriendNotes[i][j]:udraw(8, 8)
 								else
 									boyfriendNotes[i][j]:draw()
 								end
@@ -1547,18 +1528,10 @@ end
 			end
 
 			graphics.setColor(1, 1, 1, countdownFade[1])
-			if not settings.downscroll then
-				if pixel and not settings.pixelPerfect then
-					countdown:udraw(6.75, 6.75)
-				else
-					countdown:draw()
-				end
+			if pixel and not settings.pixelPerfect then
+				countdown:udraw(6.75, 6.75)
 			else
-				if pixel and not settings.pixelPerfect then
-					countdown:udraw(6.75, -6.75)
-				else
-					countdown:udraw(1, -1)
-				end
+				countdown:draw()
 			end
 			graphics.setColor(1, 1, 1)
 		love.graphics.pop()
@@ -1568,18 +1541,18 @@ end
 		local text = text or "???"
 		local colourInline ={1, 1, 1, 1}
 		local colourOutline = {0, 0, 0, 1}
-		local offsetX = offsetX or 0
-		local offsetY = offsetY or 0
+		local offsetX = offsetX or -100
+		local offsetY = offsetY or 50
 
-		local x = -600+offsetX
-		local y = 400+downscrollOffset+offsetY
+		local x = healthBar.x+offsetX
+		local y = healthBar.y+offsetY
 		local format = "center"
 
 		local mode = settings.scoringType
 
 		if mode == "VSlice" then
 			x = 250+offsetX
-			y = 400+downscrollOffset+offsetY
+			y = 400+offsetY
 			format = "left"
 		end
 
@@ -1692,7 +1665,7 @@ end
 			love.graphics.scale(0.7, 0.7)
 			love.graphics.scale(uiCam.zoom, uiCam.zoom)
 			love.graphics.translate(uiCam.x, uiCam.y)
-			love.graphics.push()
+			--[[ love.graphics.push()
 				graphics.setColor(0,0,0,settings.scrollUnderlayTrans)
 				local baseX = boyfriendArrows[1].x - (boyfriendArrows[1]:getFrameWidth(CONSTANTS.WEEKS.NOTE_LIST[1])/2) * (pixel and 8 or 0) + (pixel and -15 or 0)
 				local scrollWidth = 0
@@ -1702,21 +1675,21 @@ end
 				end
 				scrollWidth = scrollWidth + 30 + (pixel and 95 or 0)
 
-				if settings.middleScroll and not settings.multiplayer then
+				if settings.middlescroll and not settings.multiplayer then
 					love.graphics.rectangle("fill", baseX, -550, scrollWidth, 1280)
 				else
 					love.graphics.rectangle("fill", baseX, -550, scrollWidth, 1280)
 				end
 				graphics.setColor(1,1,1,1)
-			love.graphics.pop()
+			love.graphics.pop() ]]
 			graphics.setColor(1, 1, 1, visibility)
 			graphics.setColor(P2HealthColors[1], P2HealthColors[2], P2HealthColors[3])
-			love.graphics.rectangle("fill", -500, 350+downscrollOffset, 1000, 25)
+			love.graphics.rectangle("fill", healthBar.x, healthBar.y, healthBar.width, healthBar.height)
 			graphics.setColor(P1HealthColors[1], P1HealthColors[2], P1HealthColors[3])
-			love.graphics.rectangle("fill", 500, 350+downscrollOffset, -healthLerp * 500, 25)
+			love.graphics.rectangle("fill", -healthBar.x, healthBar.y, -healthLerp * (healthBar.width/2), healthBar.height)
 			graphics.setColor(0, 0, 0)
 			love.graphics.setLineWidth(8)
-			love.graphics.rectangle("line", -500, 350+downscrollOffset, 1000, 25)
+			love.graphics.rectangle("line", healthBar.x, healthBar.y, healthBar.width, healthBar.height)
 			love.graphics.setLineWidth(1)
 			graphics.setColor(1, 1, 1)
 

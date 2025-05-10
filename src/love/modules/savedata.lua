@@ -29,7 +29,7 @@ if love.filesystem.getInfo("settings") then
         showDebug = settings.showDebug,
         setImageType = settings.setImageType,
         sideJudgements = settings.sideJudgements,
-        middleScroll = settings.middleScroll,
+        middlescroll = settings.middlescroll,
         practiceMode = settings.practiceMode,
         noMiss = settings.noMiss,
         customScrollSpeed = settings.customScrollSpeed,
@@ -51,16 +51,16 @@ if love.filesystem.getInfo("settings") then
     serialized = lume.serialize(settingdata)
     love.filesystem.write("settings", serialized)
 end
-if settingsVer ~= 6 then
+if settingsVer ~= 7 then
     love.window.showMessageBox("Uh Oh!", "Settings have been reset.", "warning")
     love.filesystem.remove("settings")
 end
-if not love.filesystem.getInfo("settings") or settingsVer ~= 6 then
+if not love.filesystem.getInfo("settings") or settingsVer ~= 7 then
     settings.hardwareCompression = true
     graphics.setImageType("dds")
     settings.setImageType = "dds"
     settings.downscroll = false
-    settings.middleScroll = false
+    settings.middlescroll = false
     settings.ghostTapping = true
     settings.showDebug = false
     settings.sideJudgements = false
@@ -83,7 +83,7 @@ if not love.filesystem.getInfo("settings") or settingsVer ~= 6 then
     customBindDown = "s"
 
     settings.flashinglights = false
-    settingsVer = 6
+    settingsVer = 7
     settingdata = {}
     settingdata = {
         hardwareCompression = settings.hardwareCompression,
@@ -92,7 +92,7 @@ if not love.filesystem.getInfo("settings") or settingsVer ~= 6 then
         showDebug = settings.showDebug,
         setImageType = settings.setImageType,
         sideJudgements = settings.sideJudgements,
-        middleScroll = settings.middleScroll,
+        middlescroll = settings.middlescroll,
         practiceMode = settings.practiceMode,
         noMiss = settings.noMiss,
         customScrollSpeed = settings.customScrollSpeed,
@@ -132,7 +132,7 @@ function saveSettings(menu)
             showDebug = settings.showDebug,
             setImageType = imageTyppe,
             sideJudgements = settings.sideJudgements,
-            middleScroll = settings.middleScroll,
+            middlescroll = settings.middlescroll,
             randomNotePlacements = settings.randomNotePlacements,
             practiceMode = settings.practiceMode,
             noMiss = settings.noMiss,
@@ -176,7 +176,7 @@ function saveSettings(menu)
             showDebug = settings.showDebug,
             setImageType = settings.setImageType,
             sideJudgements = settings.sideJudgements,
-            middleScroll = settings.middleScroll,
+            middlescroll = settings.middlescroll,
             randomNotePlacements = settings.randomNotePlacements,
             practiceMode = settings.practiceMode,
             noMiss = settings.noMiss,

@@ -16,7 +16,7 @@ function gameplay:enter()
         Option:new(
             "Middlescroll",
             "If checked, your notes get centered",
-            settings.middleScroll,
+            settings.middlescroll,
             "bool"
         )
     )
@@ -122,7 +122,7 @@ end
 function gameplay:leave()
     -- Save the settings
     settings.downscroll = self.optionsArray[1]:getValue()
-    settings.middleScroll = self.optionsArray[2]:getValue()
+    settings.middlescroll = self.optionsArray[2]:getValue()
     settings.ghostTapping = self.optionsArray[3]:getValue()
     settings.botPlay = self.optionsArray[4]:getValue()
     settings.accuracyMode = self.optionsArray[5]:getValue()

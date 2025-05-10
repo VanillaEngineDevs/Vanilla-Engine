@@ -111,7 +111,7 @@ return {
                         if settingSelect == 1 then
                             settings.downscroll = not settings.downscroll
                         elseif settingSelect == 2 then
-                            settings.middleScroll = not settings.middleScroll
+                            settings.middlescroll = not settings.middlescroll
                         elseif settingSelect == 3 then
                             settings.ghostTapping = not settings.ghostTapping
                         elseif settingSelect == 4 then
@@ -241,7 +241,7 @@ return {
                     love.graphics.print("\n\nNo Miss = " .. tostring(settings.noMiss), -628, -300)
                 elseif settingsMenuState == 2 then -- I need a better way for this lmfao
                     love.graphics.print("Downscroll = " .. tostring(settings.downscroll), -628, -300)
-                    love.graphics.print("\n\nMiddlescroll = " .. tostring(settings.middleScroll), -628, -300)
+                    love.graphics.print("\n\nMiddlescroll = " .. tostring(settings.middlescroll), -628, -300)
                     love.graphics.print("\n\n\n\nGhost Tapping = " .. tostring(settings.ghostTapping), -628, -300)
                     love.graphics.print("\n\n\n\n\n\nSide Judgements = " .. tostring(settings.sideJudgements), -628, -300)
                     love.graphics.print("\n\n\n\n\n\n\n\nBot Play = " .. tostring(settings.botPlay), -628, -300)

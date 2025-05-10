@@ -143,10 +143,6 @@ function love.timer.getDrawFPS()
     return love._currentFPS
 end
 
-function love.setFpsCap(fps)
-    love._fps_cap = fps or 60
-end
-
 local curTranslate = {x = 0, y = 0}
 local curScale = {x = 1, y = 1}
 

@@ -5,6 +5,7 @@ importMods.storedModsIncludingDisabled = {}
 importMods.inMod = false
 importMods.uiHealthbarMod = nil
 importMods.uiHealthbarTextMod = nil
+importMods.modsVersion = "1.1"
 
 function importMods.setup()
     if not love.filesystem.getInfo("mods") then
@@ -191,13 +192,19 @@ end
 function importMods.loadAllMods()
     local mods = love.filesystem.getDirectoryItems("mods")
     for i, mod in ipairs(mods) do
+        local outdated = false
         if love.filesystem.getInfo("mods/" .. mod .. "/meta.lua") then
             local meta = love.filesystem.load("mods/" .. mod .. "/meta.lua")()
-            if meta.enabled == nil or meta.enabled then
-                print("Loading mod: " .. mod)
+            if (meta.version and meta.version ~= importMods.modsVersion) or meta.version == nil then
+                outdated = true
+                love.window.showMessageBox("Outdated mod", "The mod " .. meta.name .. " is outdated and will not load. Please update it to the latest version.", {"OK"}, "info")
+            end
+            if (meta.enabled == nil or meta.enabled) and not outdated then
                 importMods.loadMod(mod)
             end
-            importMods.loadModToAllModsIncludingDisabled(meta, "mods/" .. mod)
+            if not outdated then
+                importMods.loadModToAllModsIncludingDisabled(meta, "mods/" .. mod)
+            end
         end
     end
 end
@@ -238,6 +245,7 @@ return {
     name = "]] .. mod.name .. [[",
     creator = "]] .. mod.creator .. [[",
     description = "]] .. mod.description .. [["
+    version = "]] .. mod.modsVersion .. [["
 }
         ]])
     end
@@ -247,7 +255,7 @@ function importMods.reloadAllMods()
     importMods.storedMods = {}
     importMods.storedModsScripts = {}
     importMods.storedModsIncludingDisabled = {}
-    -- update weekMeta, weekDesc, and weekData to remove all mods past modWeekPlacement
+
     for i = #weekMeta, modWeekPlacement + 1, -1 do
         table.remove(weekMeta, i)
         table.remove(weekDesc, i)

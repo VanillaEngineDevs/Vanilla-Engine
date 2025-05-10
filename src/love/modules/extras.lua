@@ -53,8 +53,6 @@ function weeks.legacyGenerateNotes(self, chart)
             noteObject.time = time
             noteObject:animate("on")
 
-            if settings.downscroll then noteObject.sizeY = -1 end
-
             local enemyNote = (mustHitSection and noteType >= 4) or (not mustHitSection and noteType < 4)
             local notesTable = enemyNote and enemyNotes or boyfriendNotes
             local arrowsTable = enemyNote and enemyArrows or boyfriendArrows
@@ -211,7 +209,6 @@ function weeks.cneGenerateNotes(self, chart, metadata)
             noteObject.time = time
             noteObject:animate("on")
 
-            if settings.downscroll then noteObject.sizeY = -1 end
 
             local dataStuff = {}
             if noteTypes[noteVer] then
