@@ -1,22 +1,3 @@
---[[----------------------------------------------------------------------------
-This file is part of Friday Night Funkin' Rewritten
-
-Copyright (C) 2021  HTV04
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-------------------------------------------------------------------------------]]
-
 local fromState
 
 return {
@@ -42,11 +23,7 @@ return {
 			{x = boyfriend and -boyfriend.x or 0, y = boyfriend and -boyfriend.y or 0, zoom = camera.defaultZoom},
 			"out-quad",
 			function()
-				if not pixel then
-					inst = love.audio.newSource("music/game-over.ogg", "stream")
-				else
-					inst = love.audio.newSource("music/pixel/game-over.ogg", "stream")
-				end
+				inst = love.audio.newSource("music/pixel/game-over.ogg", "stream")
 				inst:setLooping(true)
 				inst:play()
 
@@ -62,11 +39,7 @@ return {
 			pauseRestart = false
 			if inst then inst:stop() end -- In case inst is nil and "confirm" is pressed before game over music starts
 
-			if not pixel then
-				inst = love.audio.newSource("music/game-over-end.ogg", "stream")
-			else
-				inst = love.audio.newSource("music/pixel/game-over-end.ogg", "stream")
-			end
+			inst = love.audio.newSource("music/pixel/game-over-end.ogg", "stream")
 			inst:play()
 
 			Timer.clear()
@@ -120,11 +93,7 @@ return {
 				love.graphics.translate(camera.x, camera.y)
 
 				if boyfriend then
-					if not pixel then
-						boyfriend:draw()
-					else
-						boyfriend:udraw()
-					end
+					boyfriend:udraw()
 				end
 			love.graphics.pop()
 		love.graphics.pop()

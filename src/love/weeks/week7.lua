@@ -10,6 +10,8 @@ return {
 			stage = stages["tank.erect"]
 		end
 
+		boyfriend.gameOverState = gameOvers.week7Default
+
 		stage:enter(_songExt)
 
 		if storyMode and not died then

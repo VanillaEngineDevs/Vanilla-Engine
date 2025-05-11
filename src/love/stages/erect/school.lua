@@ -104,7 +104,6 @@ return {
 
 		camera:addPoint("enemy", 250, 50)
 		camera:addPoint("boyfriend", -200, -65)
-			
     end,
 
     load = function(self)

@@ -45,8 +45,6 @@ return {
 		boyfriend = BaseCharacter("sprites/characters/boyfriend-christmas.lua")
 		fakeBoyfriend = BaseCharacter("sprites/characters/boyfriend.lua") -- Used for game over
 
-		camera.defaultZoom = 0.9
-
 		girlfriend.x, girlfriend.y = -50, 410
 		enemy.x, enemy.y = -780, 410
 		boyfriend.x, boyfriend.y = 300, 620
@@ -54,27 +52,26 @@ return {
     end,
 
     load = function(self)
+		camera.defaultZoom = 0.9
         if song == 3 then
-            camera.defaultZoom = 0.9
-    
             if __scaryIntro then
                 camera.x, camera.y = -150, 750
                 camera.zoom = 2.5
-    
+
                 graphics.setFade(1)
             else
                 camera.zoom = 0.9 
             end
-    
+
             stageImages["Walls"] = graphics.newImage(graphics.imagePath("week5/evil-bg")) -- evil-bg
             stageImages["Christmas Tree"] = graphics.newImage(graphics.imagePath("week5/evil-tree")) -- evil-tree
             stageImages["Snow"] = graphics.newImage(graphics.imagePath("week5/evil-snow")) -- evil-snow
-    
+
             stageImages["Walls"].y = -250
             stageImages["Christmas Tree"].x = 75
             stageImages["Christmas Tree"].sizeX, stageImages["Christmas Tree"].sizeY = 0.5, 0.5
             stageImages["Snow"].x, stageImages["Snow"].y = -50, 770
-    
+
         end
     end,
 

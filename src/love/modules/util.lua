@@ -8,6 +8,23 @@ function util.coolLerp(a, b, t)
     return util.lerp(a, b, t * 60 * love.timer.getDelta())
 end
 
+local function lerp2(base, target, prog)
+    return base + prog * (target - base)
+end
+
+function util.smoothLerp(current, target, elapsed, duration, precision)
+    precision = precision or 0.01
+    if current == target then
+        return target
+    end
+
+    local result = lerp2(current, target, 1 - math.pow(precision, elapsed / duration))
+    if math.abs(result - target) < (precision * target) then
+        return target
+    end
+    return result
+end
+
 function util.clamp(x, min, max)
     return x < min and min or (x > max and max or x)
 end

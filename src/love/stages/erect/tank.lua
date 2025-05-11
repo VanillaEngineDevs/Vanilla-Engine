@@ -67,8 +67,7 @@ return {
         enemy.x, enemy.y = -586, 274
         girlfriend.x, girlfriend.y = -42, 134
 
-        camera.defaultZoom = 0.7
-        camera.zoom = 0.75
+        
 
         if songExt == "-pico" then
             girlfriend.y = girlfriend.y - 60
@@ -77,11 +76,12 @@ return {
     end,
 
     load = function(self, dt)
-        
+        camera.defaultZoom = 0.7
+        camera.zoom = 0.75
     end,
 
     update = function(self, dt)
-        
+
     end,
 
     draw = function(self)

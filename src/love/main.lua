@@ -309,7 +309,10 @@ function love.load()
 
 	-- Load substates
 	OptionsMenu = require "states.menu.options.OptionsMenu"
-	gameOver = require "substates.game-over"
+	gameOvers = {
+		default = require "substates.gameovers.boyfriend",
+		week7Default = require "substates.gameovers.boyfriend-week7",
+	}
 	settingsKeybinds = require "substates.settings-keybinds"
 	optionSubstates = {
 		["Gamemodes"] = require "substates.options.gamemodes",
@@ -342,6 +345,12 @@ function love.load()
 		end
 	end
 	modWeekPlacement = #weekMeta-1 -- everything after the main weeks is a mod folder.
+
+	gameOverSounds = {
+		boyfriend = {
+			firstDeath = love.audio.newSource("sounds/death.ogg", "static"),
+		}
+	}
 
 	require "modules.extras"
 

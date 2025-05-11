@@ -81,13 +81,12 @@ return {
         enemy.shader = colorShaderDad
         boyfriend.shader = colorShaderBF
         girlfriend.shader = colorShaderGF
-
-        camera.defaultZoom = 0.85
-        camera.zoom = 0.87
     end,
 
     load = function()
         camera:addPoint("enemy", 167, 11)
+        camera.defaultZoom = 0.85
+        camera.zoom = 0.87
     end,
 
     update = function(self, dt)

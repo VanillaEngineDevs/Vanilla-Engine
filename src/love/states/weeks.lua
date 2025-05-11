@@ -127,6 +127,7 @@ downscrollOffset = 0 -- for compatibility
 
 return {
 	enter = function(self, option)
+		self.gameoverType = "character" -- uses boyfriend.gameOverState
 		IS_CLASSIC_MOVEMENT = false
 		allStates = {
 			sickCounter = 0,
@@ -157,7 +158,6 @@ return {
 					love.audio.newSource("sounds/miss2.ogg", "static"),
 					love.audio.newSource("sounds/miss3.ogg", "static")
 				},
-				death = love.audio.newSource("sounds/death.ogg", "static"),
 				breakfast = love.audio.newSource("music/breakfast.ogg", "stream")
 			}
 
@@ -235,7 +235,7 @@ return {
 		camera.camBopInterval = 4
 		dying = false
 		function self:onDeath()
-			Gamestate.push(gameOver)
+			Gamestate.push((boyfriend and boyfriend.gameOverState) or gameOvers.default)
 		end
 		self.useBuiltinGameover = true
 		P1HealthColors = {0, 1, 0}

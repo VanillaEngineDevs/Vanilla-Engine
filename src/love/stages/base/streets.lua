@@ -50,16 +50,14 @@ return {
 
         camera:addPoint("boyfriend", -boyfriend.x + 400, -boyfriend.y + 75)
         camera:addPoint("enemy", -enemy.x - 450, -enemy.y + 75)
-
-        camera.defaultZoom = 0.85
     end,
 
     load = function()
-
+        camera.defaultZoom = 0.85
     end,
 
     update = function(self, dt)
-        
+
     end,
 
     draw = function(self, inDebug)

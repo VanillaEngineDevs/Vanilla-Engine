@@ -50,8 +50,6 @@ return {
 		end
 		fakeBoyfriend = BaseCharacter("sprites/characters/boyfriend.lua") -- Used for game over
 
-		camera.defaultZoom = 0.9
-
 		girlfriend.x, girlfriend.y = -50, girlfriend.y + 410
 		enemy.x, enemy.y = -780, 410
 		boyfriend.x, boyfriend.y = 300, 620
@@ -68,6 +66,7 @@ return {
     end,
 
     load = function(self)
+		camera.defaultZoom = 0.9
     end,
 
     update = function(self, dt)
