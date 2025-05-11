@@ -59,8 +59,8 @@ return {
 		self:load()
 	end,
 
-	load = function(self)
-		weeks:load()
+	load = function(self, DONT_GENERATE)
+		weeks:load(not DONT_GENERATE)
 		stage:load()
 
 		if song == 3 then
@@ -86,7 +86,9 @@ return {
 			voicesEnemy = love.audio.newSource("songs/pico/Voices-pico-enemy" .. songExt .. ".ogg", "stream")
 		end
 
-		self:initUI()
+		if not DONT_GENERATE then
+			self:initUI()
+		end
 
 		if not inPicoCutscene then
 			weeks:setupCountdown()

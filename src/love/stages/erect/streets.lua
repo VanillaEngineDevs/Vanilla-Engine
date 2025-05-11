@@ -159,10 +159,13 @@ return {
 
             stageImages["foreground"]:draw()
  
+            local lastShader = love.graphics.getShader()
+            love.graphics.setShader(colorShader)
             girlfriend:draw(inDebug)
 
             enemy:draw()
             boyfriend:draw()
+            love.graphics.setShader(lastShader)
 
             stageImages["spraycanPile"]:draw()
 

@@ -32,8 +32,8 @@ return {
 		tankAngle = util.randomFloat(-90, 45)
 	end,
 
-	load = function(self)
-		weeks:load()
+	load = function(self, DONT_GENERATE)
+		weeks:load(not DONT_GENERATE)
 		stage:load()
 
 		if song == 3 then
@@ -63,7 +63,9 @@ return {
 			end
 		end
 
-		self:initUI()
+		if not DONT_GENERATE then
+			self:initUI()
+		end
 
 		if not inCutscene then
 			weeks:setupCountdown()

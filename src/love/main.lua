@@ -312,6 +312,7 @@ function love.load()
 	gameOvers = {
 		default = require "substates.gameovers.boyfriend",
 		week7Default = require "substates.gameovers.boyfriend-week7",
+		pixelDefault = require "substates.gameovers.boyfriend-pixel",
 	}
 	settingsKeybinds = require "substates.settings-keybinds"
 	optionSubstates = {

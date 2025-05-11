@@ -44,6 +44,9 @@ noteSprites = nil
 local nps = {}
 local maxNPS = 0
 
+local isResetting = false
+local resettingTime = {0}
+
 local allStates = {
 	sickCounter = 0,
 	goodCounter = 0,
@@ -67,8 +70,11 @@ end
 
 local IS_CLASSIC_MOVEMENT = false
 CAM_LERP_POINT = {x = 0, y = 0}
+SMOOTH_RESET = true
 
 modEvents = {}
+local CURCHART = {
+}
 
 local sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
 
@@ -229,7 +235,11 @@ return {
 		end
 	end,
 
-	load = function(self)
+	load = function(self, wasntRestart)
+		if wasntRestart == nil then
+			wasntRestart = true
+		end
+		SMOOTH_RESET = true
 		quitPressed = false
 		camera.camBopIntensity = 1
 		camera.camBopInterval = 4
@@ -248,11 +258,19 @@ return {
 		pauseBG = graphics.newImage(graphics.imagePath("pause/pause_box"))
 		pauseShadow = graphics.newImage(graphics.imagePath("pause/pause_shadow"))
 		useAltAnims = false
+		health = CONSTANTS.WEEKS.HEALTH.STARTING
+		healthLerp = health
+		misses = 0
+		ratingPercent = 0.0
+		noteCounter = 0
+		sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
 
-		if boyfriend then
-			camera.x, camera.y = -boyfriend.x + 100, -boyfriend.y + 75
-		else
-			camera.x, camera.y = 0, 0
+		if wasntRestart then
+			if boyfriend then
+				camera.x, camera.y = -boyfriend.x + 100, -boyfriend.y + 75
+			else
+				camera.x, camera.y = 0, 0
+			end
 		end
 
 		curWeekData = weekData[weekNum]
@@ -286,7 +304,12 @@ return {
 		end
 
 		function calculateNoteYPos(strumtime)
-			return CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - strumtime) * speed * (settings.downscroll and -1 or 1)
+			--[[ return CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - strumtime) * speed * (settings.downscroll and -1 or 1) ]]
+			if not isResetting then
+				return CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - strumtime) * speed * (settings.downscroll and -1 or 1)
+			else
+				return CONSTANTS.WEEKS.PIXELS_PER_MS * (resettingTime[1] - strumtime) * speed * (settings.downscroll and -1 or 1)
+			end
 		end
 
 		enemyIcon = icon.newIcon(icon.imagePath((enemy and enemy.icon) and enemy.icon) or "dad", (enemy and enemy.optionsTable) and (enemy.optionsTable.scale or 1) or 1)
@@ -313,7 +336,11 @@ return {
 		enemyIcon.y = healthBar.y
 		boyfriendIcon.y = healthBar.y
 
-		graphics:fadeInWipe(0.6)
+		if wasntRestart then
+			graphics:fadeInWipe(0.6)
+		end
+
+		isResetting = false
 	end,
 
 	calculateRating = function(self)
@@ -378,7 +405,7 @@ return {
 	checkSongOver = function(self)
 		--if not (countingDown or graphics.isFading()) and not (inst and inst:isPlaying()) and not paused and not inCutscene then
 		-- use inst, if inst doesn't exist, use voices, else dont use anything
-		if not (countingDown or graphics.isFading()) and not ((inst and inst:isPlaying()) or (voicesBF and voicesBF:isPlaying())) and not paused and not inCutscene then
+		if not (countingDown or graphics.isFading()) and not ((inst and inst:isPlaying()) or (voicesBF and voicesBF:isPlaying())) and not paused and not inCutscene and not isResetting then
 			allStates.sickCounter = allStates.sickCounter + sickCounter
 			allStates.goodCounter = allStates.goodCounter + goodCounter
 			allStates.badCounter = allStates.badCounter + badCounter
@@ -677,10 +704,29 @@ return {
 				value = value
 			})
 		end
-	
+
 		for i = 1, 4 do
 			table.sort(enemyNotes[i], function(a, b) return a.y < b.y end)
 			table.sort(boyfriendNotes[i], function(a, b) return a.y < b.y end)
+		end
+
+		CURCHART = {}
+		CURCHART.BOYFRIEND = {}
+		CURCHART.ENEMY = {}
+		CURCHART.EVENTS = {}
+		for i = 1, 4 do
+			CURCHART.BOYFRIEND[i] = {}
+			CURCHART.ENEMY[i] = {}
+
+			for _, note in ipairs(boyfriendNotes[i]) do
+				table.insert(CURCHART.BOYFRIEND[i], note)
+			end
+			for _, note in ipairs(enemyNotes[i]) do
+				table.insert(CURCHART.ENEMY[i], note)
+			end
+		end
+		for _, event in ipairs(songEvents) do
+			table.insert(CURCHART.EVENTS, event)
 		end
 	end,
 
@@ -758,7 +804,7 @@ return {
 		if countNumVal == 4 then 
 			countdownFade[1] = 0
 			Timer.after(
-				(60/bpm), -- one beat
+				(60/bpm),
 				function()
 					self:setupCountdown(countNumVal - 1, func)
 				end
@@ -796,17 +842,17 @@ return {
 			if not graphics.isFading() then 
 				paused = true
 				pauseTime = musicTime
-				if paused then 
+				if paused then
 					if inst then inst:pause() end
 					if voicesBF then voicesBF:pause() end
 					if voicesEnemy then voicesEnemy:pause() end
 					love.audio.play(sounds.breakfast)
-					sounds.breakfast:setLooping(true) 
+					sounds.breakfast:setLooping(true)
 				end
 			end
 			return
 		end
-		if paused then 
+		if paused then
 			previousFrameTime = love.timer.getTime() * 1000
 			musicTime = pauseTime
 			if input:pressed("gameDown") then
@@ -825,16 +871,87 @@ return {
 				end
 			end
 			if input:pressed("confirm") then
-				love.audio.stop(sounds.breakfast) -- since theres only 3 options, we can make the sound stop without an else statement
+				love.audio.stop(sounds.breakfast)
 				if pauseMenuSelection == 1 then
 					if inst then inst:play() end
 					if voicesBF then voicesBF:play() end
 					if voicesEnemy then voicesEnemy:play() end
 					paused = false 
 				elseif pauseMenuSelection == 2 then
-					pauseRestart = true
-					dying = true
-					self:onDeath()
+					if not SMOOTH_RESET then
+						pauseRestart = true
+						dying = true
+						self:onDeath({SKIP_DEATH = true})
+					else
+						countingDown = false
+						paused = false
+						isResetting = true
+						resettingTime[1] = musicTime
+						for i = 1, 4 do
+							Timer.tween(
+								1,
+								boyfriendArrows[i],
+								{
+									alpha = 0,
+									y = boyfriendArrows[i].y - 50
+								},
+								"out-circ",
+								function()
+									boyfriendArrows[i].alpha = 0
+									boyfriendArrows[i].updateShaderAlpha = false
+								end
+							)
+
+							Timer.tween(
+								1,
+								enemyArrows[i],
+								{
+									alpha = 0,
+									y = enemyArrows[i].y - 50
+								},
+								"out-circ",
+								function()
+									enemyArrows[i].alpha = 0
+									enemyArrows[i].updateShaderAlpha = false
+								end
+							)
+						end
+						Timer.tween(
+							1,
+							resettingTime,
+							{
+								[1] = resettingTime[1] - 2500
+							},
+							"out-quad",
+							function()
+								for i = 1, 4 do
+									boyfriendArrows[i]:animate("off")
+									enemyArrows[i]:animate("off")
+									boyfriendNotes[i] = {}
+									enemyNotes[i] = {}
+
+									for _, note in ipairs(CURCHART.BOYFRIEND[i]) do
+										table.insert(boyfriendNotes[i], note)
+									end
+									for _, note in ipairs(CURCHART.ENEMY[i]) do
+										table.insert(enemyNotes[i], note)
+									end
+								end
+								songEvents = {}
+								for _, event in ipairs(CURCHART.EVENTS) do
+									table.insert(songEvents, event)
+								end
+
+								musicTime = 0
+								beatHandler.reset(0)
+								previousFrameTime = love.timer.getTime() * 1000
+								beatHandler.setBeat(0)
+
+								Gamestate.current():load(true)
+							end
+						)
+					end
+
 				elseif pauseMenuSelection == 3 then
 					paused = false
 					if inst then inst:stop() end
@@ -1119,6 +1236,9 @@ return {
 					if enemyNote[j].hitNote ~= nil then
 						ableTohit = enemyNote[j].hitNote
 					end
+					if isResetting then
+						ableTohit = false
+					end
 
 					if (enemyNote[j].time - musicTime <= 0) and ableTohit and not enemyNote[j].causesMiss then
 						enemyArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
@@ -1180,6 +1300,9 @@ return {
 			end
 
 			if #boyfriendNote > 0 then
+				if isResetting then
+					goto continue
+				end
 				if (boyfriendNote[1].time - musicTime <= -200) and not boyfriendNote[1].causesMiss then
 					if voicesBF then 
 						print("setting vocals to 0")
@@ -1204,9 +1327,11 @@ return {
 
 					combo = 0
 				end
+
+				::continue::
 			end
 
-			if input:pressed(curInput) then
+			if input:pressed(curInput) and not isResetting then
 				local success = false
 				local didHitNote = false
 
@@ -1304,9 +1429,9 @@ return {
 
 					if not success then
 						audio.playSound(sounds.miss[love.math.random(3)])
-	
+
 						if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
-	
+
 						if didHitNote then
 							score = math.max(0, score - 100) -- if note was "missed" but hit, remove 100 points
 						else
@@ -1361,6 +1486,7 @@ return {
 					boyfriendArrow.shaderEnabled = false
 				end
 			end
+		    ::continue::
 		end
 
 		-- Enemy
@@ -1417,27 +1543,25 @@ return {
 			love.graphics.push()
 				love.graphics.setFont(pauseFont)
 				love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
-				if paused then
-					graphics.setColor(0, 0, 0, 0.8)
-					love.graphics.rectangle("fill", -10000, -2000, 25000, 10000)
-					graphics.setColor(1, 1, 1)
-					pauseShadow:draw()
-					pauseBG:draw()
-					if pauseMenuSelection ~= 1 then
-						uitextflarge("Resume", -305, -275, 600, "center", false)
-					else
-						uitextflarge("Resume", -305, -275, 600, "center", true)
-					end
-					if pauseMenuSelection ~= 2 then
-						uitextflarge("Restart", -305, -75, 600, "center", false)
-					else
-						uitextflarge("Restart", -305, -75, 600, "center", true)
-					end
-					if pauseMenuSelection ~= 3 then
-						uitextflarge("Quit", -305, 125, 600, "center", false)
-					else
-						uitextflarge("Quit", -305, 125, 600, "center", true)
-					end
+				graphics.setColor(0, 0, 0, 0.8)
+				love.graphics.rectangle("fill", -10000, -2000, 25000, 10000)
+				graphics.setColor(1, 1, 1)
+				pauseShadow:draw()
+				pauseBG:draw()
+				if pauseMenuSelection ~= 1 then
+					uitextflarge("Resume", -305, -275, 600, "center", false)
+				else
+					uitextflarge("Resume", -305, -275, 600, "center", true)
+				end
+				if pauseMenuSelection ~= 2 then
+					uitextflarge("Restart", -305, -75, 600, "center", false)
+				else
+					uitextflarge("Restart", -305, -75, 600, "center", true)
+				end
+				if pauseMenuSelection ~= 3 then
+					uitextflarge("Quit", -305, 125, 600, "center", false)
+				else
+					uitextflarge("Quit", -305, 125, 600, "center", true)
 				end
 				love.graphics.setFont(font)
 			love.graphics.pop()

@@ -47,7 +47,8 @@ return {
 		self:load()
 	end,
 
-	load = function(self)
+	load = function(self, DONT_GENERATE)
+		weeks:load(not DONT_GENERATE)
 		if song == 3 then
 			enemy = BaseCharacter("sprites/characters/monster.lua")
 
@@ -74,11 +75,12 @@ return {
 			voicesBF = love.audio.newSource("songs/spookeez/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/spookeez/Voices-spooky" .. songExt .. ".ogg", "stream")
 		end
-		
-		weeks:load()
+
 		stage:load()
 
-		self:initUI()
+		if not DONT_GENERATE then
+			self:initUI()
+		end
 
 		weeks:setupCountdown()
 	end,

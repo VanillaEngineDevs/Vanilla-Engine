@@ -60,7 +60,7 @@ return {
 		self:load()
 	end,
 
-	load = function(self)
+	load = function(self, DONT_GENERATE)
 		if song == 3 then
 			camera.defaultZoom = 0.9
 
@@ -91,12 +91,13 @@ return {
 			voicesBF = love.audio.newSource("songs/cocoa/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 			voicesEnemy = love.audio.newSource("songs/cocoa/Voices-parents-christmas" .. songExt .. ".ogg", "stream")
 		end
-		
-		weeks:load()
+
+		weeks:load(not DONT_GENERATE)
 		stage:load()
 
-
-		self:initUI()
+		if not DONT_GENERATE then
+			self:initUI()
+		end
 
 		if __scaryIntro then
 			Timer.after(

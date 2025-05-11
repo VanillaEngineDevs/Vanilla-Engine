@@ -53,8 +53,8 @@ return {
 		self:load()
 	end,
 
-	load = function(self)
-		weeks:load()
+	load = function(self, DONT_GENERATE)
+		weeks:load(not DONT_GENERATE)
 		stage:load()
 
 		if song == 4 then
@@ -100,7 +100,11 @@ return {
 			rainShaderEndIntensity = 0.1
 		end
 
-		self:initUI()
+		if not DONT_GENERATE then
+			self:initUI()
+		else
+			weeks:setupCountdown()
+		end
 	end,
 
 	initUI = function(self)

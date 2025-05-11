@@ -41,8 +41,8 @@ return {
 		self:load()
 	end,
 
-	load = function(self)
-		weeks:load()
+	load = function(self, DONT_GENERATE)
+		weeks:load(not DONT_GENERATE)
 		stage:load()
 
 		if song == 3 then
@@ -59,7 +59,9 @@ return {
 			voicesEnemy = love.audio.newSource("songs/satin-panties/Voices-mom" .. songExt .. ".ogg", "stream")
 		end
 
-		self:initUI()
+		if not DONT_GENERATE then
+			self:initUI()
+		end
 
 		weeks:setupCountdown()
 	end,

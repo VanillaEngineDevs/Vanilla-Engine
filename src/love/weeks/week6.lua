@@ -31,9 +31,6 @@ return {
 
 		stage:enter(_songExt)
 
-		camera.defaultZoom = 0.85
-		camera.zoom = 0.85
-
 		fakeBoyfriend = BaseCharacter("sprites/characters/boyfriend-pixel-dead.lua")
 
 		fakeBoyfriend.x, fakeBoyfriend.y = 300, 190
@@ -54,7 +51,8 @@ return {
 		end
 	end,
 
-	load = function(self)
+	load = function(self, DONT_GENERATE)
+		camera.defaultZoom = 0.85
 		if song == 3 then
 			school = love.filesystem.load("sprites/week6/evil-school.lua")()
 			enemy = BaseCharacter("sprites/characters/spirit.lua")
@@ -73,8 +71,7 @@ return {
 			enemy = BaseCharacter("sprites/characters/senpai.lua")
 			stage:load()
 		end
-		
-		weeks:load()
+		boyfriend.gameOverState = gameOvers.pixelDefault
 
 		if song == 3 then
 			inst = love.audio.newSource("songs/thorns/Inst" .. songExt .. ".ogg", "stream")
@@ -103,7 +100,12 @@ return {
 		end
 		enemy.x, enemy.y = -440, -20
 
-		self:initUI()
+		weeks:load(not DONT_GENERATE)
+		if not DONT_GENERATE then
+			self:initUI()
+		else
+			weeks:setupCountdown()
+		end
 	end,
 
 	initUI = function(self)

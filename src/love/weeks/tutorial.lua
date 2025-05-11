@@ -46,8 +46,8 @@ return {
 		self:load()
 	end,
 
-	load = function(self)
-		weeks:load()
+	lload = function(self, DONT_GENERATE)
+		weeks:load(not DONT_GENERATE)
 
 		zoom[1] = 1
 
@@ -55,7 +55,9 @@ return {
 		voicesBF = love.audio.newSource("songs/tutorial/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
 		voicesEnemy = love.audio.newSource("songs/tutorial/Voices-gf" .. songExt .. ".ogg", "stream")
 
-		self:initUI()
+		if not DONT_GENERATE then
+			self:initUI()
+		end
 
 		weeks:setupCountdown()
 	end,

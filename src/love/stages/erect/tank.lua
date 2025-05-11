@@ -77,7 +77,6 @@ return {
 
     load = function(self, dt)
         camera.defaultZoom = 0.7
-        camera.zoom = 0.75
     end,
 
     update = function(self, dt)
