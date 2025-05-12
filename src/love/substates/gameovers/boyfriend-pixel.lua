@@ -2,6 +2,7 @@ local fromState
 
 return {
 	enter = function(self, from)
+		hasStartedAnimation, isEnding = false, false
 		graphics.setFade(1)
 		local boyfriend = fakeBoyfriend or boyfriend
 

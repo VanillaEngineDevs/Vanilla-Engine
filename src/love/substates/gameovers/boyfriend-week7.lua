@@ -7,6 +7,7 @@ local quoteTimer = 0
 local vol = {0.2}
 return {
 	enter = function(self, from)
+		hasStartedAnimation, isEnding = false, false
 		quoteLength = 0
 		quoteTimer = 0
 		vol = {0.2}

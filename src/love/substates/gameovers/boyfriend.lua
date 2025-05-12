@@ -2,6 +2,7 @@ local fromState, hasStartedAnimation, isEnding
 local deadBF
 return {
 	enter = function(self, from)
+		hasStartedAnimation, isEnding = false, false
 		hasStartedAnimation = false
 		graphics.setFade(1)
 		deadBF = fakeBoyfriend or boyfriend or BaseCharacter("sprites/characters/boyfriend.lua")
