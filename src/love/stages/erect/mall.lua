@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
-
+local colorShader
 return {
     enter = function(self, songExt)
 		stageImages = {
@@ -55,7 +55,7 @@ return {
 		boyfriend.x, boyfriend.y = 300, 620
 		fakeBoyfriend.x, fakeBoyfriend.y = 300, 620
 
-		local colorShader = love.graphics.newShader("shaders/adjustColor.glsl")
+		colorShader = love.graphics.newShader("shaders/adjustColor.glsl")
 		colorShader:send("hue", 5)
 		colorShader:send("saturation", 20)
 
@@ -82,6 +82,7 @@ return {
     end,
 
     draw = function()
+		local lastShader = love.graphics.getShader()
         love.graphics.push()
 			love.graphics.translate(camera.x * 0.5, camera.y * 0.5)
 
@@ -99,14 +100,18 @@ return {
 
 			stageImages["Snow"]:draw()
 
+			love.graphics.setShader(colorShader)
 			girlfriend:draw()
+			love.graphics.setShader(lastShader)
 		love.graphics.pop()
 		love.graphics.push()
 			love.graphics.translate(camera.x, camera.y)
 
+			love.graphics.setShader(colorShader)
 			stageImages["Santa"]:draw()
 			enemy:draw()
 			boyfriend:draw()
+			love.graphics.setShader(lastShader)
 		love.graphics.pop()
     end,
 

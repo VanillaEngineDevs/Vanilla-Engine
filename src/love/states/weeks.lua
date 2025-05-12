@@ -42,7 +42,7 @@ local dying = false
 noteSprites = nil
 
 local nps = {}
-local maxNPS = 0
+maxNPS = 0
 
 local isResetting = false
 local resettingTime = {0}
@@ -58,6 +58,7 @@ local allStates = {
 }
 
 local ratingTextScale = 1
+local hudFade = {0}
 
 local function commaFormat(n)
 	local str = tostring(n)
@@ -76,7 +77,7 @@ modEvents = {}
 local CURCHART = {
 }
 
-local sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
+sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
 
 local function getWife3Condition(acc)
 	if acc >= 99.9935 then return 1 end -- AAAAA
@@ -259,10 +260,12 @@ return {
 		pauseShadow = graphics.newImage(graphics.imagePath("pause/pause_shadow"))
 		useAltAnims = false
 		health = CONSTANTS.WEEKS.HEALTH.STARTING
-		healthLerp = health
 		misses = 0
 		ratingPercent = 0.0
 		noteCounter = 0
+		healthLerp = health
+		hudFade = {0}
+
 		sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
 
 		if wasntRestart then
@@ -314,6 +317,9 @@ return {
 
 		enemyIcon = icon.newIcon(icon.imagePath((enemy and enemy.icon) and enemy.icon) or "dad", (enemy and enemy.optionsTable) and (enemy.optionsTable.scale or 1) or 1)
 		boyfriendIcon = icon.newIcon(icon.imagePath((boyfriend and boyfriend.icon) and boyfriend.icon) or "bf", (boyfriend and boyfriend.optionsTable) and (boyfriend.optionsTable.scale or 1) or 1)
+
+		P1HealthColors = boyfriendIcon.mostCommonColour
+		P2HealthColors = enemyIcon.mostCommonColour
 
 		enemyIcon.sizeX = 1.5
 		boyfriendIcon.sizeX = -1.5
@@ -748,6 +754,14 @@ return {
 		local countNumVal = countNumVal or 4
 		if not storyMode and countNumVal == 4 then
 			-- strum spawning
+			Timer.tween(0.5,
+				hudFade,
+				{1},
+				"out-circ",
+				function()
+					hudFade[1] = 1
+				end
+			)
 			for i = 1, 4 do
 				boyfriendArrows[i].alpha = 0
 				boyfriendArrows[i].y = boyfriendArrows[i].y - 50
@@ -887,6 +901,26 @@ return {
 						paused = false
 						isResetting = true
 						resettingTime[1] = musicTime
+						Timer.tween(1,
+							hudFade,
+							{0},
+							"out-circ",
+							function()
+								hudFade[1] = 0
+							end
+						)
+						Timer.tween(
+							1,
+							_G,
+							{
+								score = 0,
+								ratingPercent = 0,
+								misses = 0,
+								health = CONSTANTS.WEEKS.HEALTH.STARTING,
+								maxNPS = 0
+							},
+							"out-quad"
+						)
 						for i = 1, 4 do
 							Timer.tween(
 								1,
@@ -917,16 +951,16 @@ return {
 							)
 						end
 						Timer.tween(
-							1,
+							1 * speed,
 							resettingTime,
 							{
-								[1] = resettingTime[1] - 2500
+								[1] = resettingTime[1] - 1000 * speed
 							},
 							"out-quad",
 							function()
 								for i = 1, 4 do
-									boyfriendArrows[i]:animate("off")
-									enemyArrows[i]:animate("off")
+									boyfriendArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
+									enemyArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
 									boyfriendNotes[i] = {}
 									enemyNotes[i] = {}
 
@@ -1668,6 +1702,9 @@ return {
 		local offsetX = offsetX or -100
 		local offsetY = offsetY or 50
 
+		colourOutline[4] = colourOutline[4] * hudFade[1]
+		colourInline[4] = colourInline[4] * hudFade[1]
+
 		local x = healthBar.x+offsetX
 		local y = healthBar.y+offsetY
 		local format = "center"
@@ -1693,7 +1730,7 @@ return {
 		love.graphics.setFont(lastFont)
 		self:drawRating()
 	end,
-	
+
 	generateScoringText = function(self, visibility)
 		-- KE
 		local mode = settings.scoringType
@@ -1753,7 +1790,7 @@ return {
 				ranking = "N/A"
 			end
 
-			returnStr = "NPS: " .. #nps .. " (Max " .. maxNPS .. ") | Score: " .. math.floor(score) .. " | Combo Breaks: " .. misses .. " | Accuracy: " .. ((math.floor(ratingPercent * 10000) / 100)) .. "% | " .. ranking
+			returnStr = "NPS: " .. #nps .. " (Max " .. (maxNPS < 0 and 0 or math.floor(maxNPS)) .. ") | Score: " .. (score < 0 and 0 or math.floor(score)) .. " | Combo Breaks: " .. math.floor(misses) .. " | Accuracy: " .. ((math.floor(ratingPercent * 10000) / 100)) .. "% | " .. ranking
 		elseif mode == "Psych" then
 			local phrase = "?"
 			if misses == 0 then
@@ -1774,7 +1811,7 @@ return {
 				ratingStr = "?"
 			end
 
-			returnStr = "Score: " .. math.floor(score) .. " | Misses: " .. misses .. " | Rating: " .. ratingStr
+			returnStr = "Score: " .. math.floor(score) .. " | Misses: " .. math.floor(misses) .. " | Rating: " .. ratingStr
 		elseif mode == "VSlice" then
 			returnStr = "Score: " .. commaFormat(score)
 		end
@@ -1806,16 +1843,16 @@ return {
 				end
 				graphics.setColor(1,1,1,1)
 			love.graphics.pop() ]]
-			graphics.setColor(1, 1, 1, visibility)
-			graphics.setColor(P2HealthColors[1], P2HealthColors[2], P2HealthColors[3])
+			graphics.setColor(1, 1, 1, visibility * hudFade[1])
+			graphics.setColor(P2HealthColors[1], P2HealthColors[2], P2HealthColors[3], hudFade[1])
 			love.graphics.rectangle("fill", healthBar.x, healthBar.y, healthBar.width, healthBar.height)
-			graphics.setColor(P1HealthColors[1], P1HealthColors[2], P1HealthColors[3])
+			graphics.setColor(P1HealthColors[1], P1HealthColors[2], P1HealthColors[3], hudFade[1])
 			love.graphics.rectangle("fill", -healthBar.x, healthBar.y, -healthLerp * (healthBar.width/2), healthBar.height)
-			graphics.setColor(0, 0, 0)
+			graphics.setColor(0, 0, 0, hudFade[1])
 			love.graphics.setLineWidth(8)
 			love.graphics.rectangle("line", healthBar.x, healthBar.y, healthBar.width, healthBar.height)
 			love.graphics.setLineWidth(1)
-			graphics.setColor(1, 1, 1)
+			graphics.setColor(1, 1, 1, hudFade[1])
 
 			boyfriendIcon:draw()
 			enemyIcon:draw()
@@ -1826,6 +1863,8 @@ return {
 				local text = self:generateScoringText()
 				self:healthbarText(text)
 			end
+
+			graphics.setColor(1, 1, 1)
 		love.graphics.pop()
 	end,
 

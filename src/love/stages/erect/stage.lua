@@ -117,11 +117,14 @@ return {
                 stageImages.lightRed:draw()
                 love.graphics.setBlendMode(lastBlendMode, lastAlphaMode)
 
+                local lastShader = love.graphics.getShader()
+                love.graphics.setShader(colorShaderGF)
                 girlfriend:draw()
-
+                love.graphics.setShader(colorShaderBF)
                 boyfriend:draw()
-
+                love.graphics.setShader(colorShaderDad)
                 enemy:draw()
+                love.graphics.setShader(lastShader)
 
                 love.graphics.setBlendMode("add")
                 stageImages.lightAbove:draw()

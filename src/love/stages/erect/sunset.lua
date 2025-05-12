@@ -95,9 +95,11 @@ return {
 
     draw = function()
         love.graphics.push()
-			love.graphics.translate(camera.x * 0.5, camera.y * 0.5)
-
-			stageImages["Sunset"]:draw()
+            love.graphics.translate(camera.x * 0.1, camera.y * 0.1)
+            stageImages["Sunset"]:draw()
+        love.graphics.pop()
+        love.graphics.push()
+			love.graphics.translate(camera.x * 0.4, camera.y * 0.4)
 
 			stageImages["BG Limo"]:draw()
 			for i = -475, 725, 400 do
@@ -110,10 +112,15 @@ return {
 			love.graphics.translate(camera.x, camera.y)
 
             stageImages["Fast Car"]:draw()
+            local lastShader = love.graphics.getShader()
+            love.graphics.setShader(colorShader)
 			girlfriend:draw()
+            love.graphics.setShader(lastShader)
 			stageImages["Limo"]:draw()
+            love.graphics.setShader(colorShader)
 			enemy:draw()
 			boyfriend:draw()
+            love.graphics.setShader(lastShader)
 		love.graphics.pop()
     end,
 

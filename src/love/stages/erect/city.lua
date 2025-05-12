@@ -143,6 +143,7 @@ return {
     end,
 
     draw = function()
+		local lastShader = love.graphics.getShader()
         local curWinColor = winColors[winColor]
 
         love.graphics.push()
@@ -164,13 +165,17 @@ return {
 			stageImages["Train"]:draw()
 			stageImages["Street"]:draw()
 
+			love.graphics.setShader(colorShader)
 			girlfriend:draw()
+			love.graphics.setShader(lastShader)
 		love.graphics.pop()
 		love.graphics.push()
 			love.graphics.translate(camera.x, camera.y)
 
+			love.graphics.setShader(colorShader)
 			enemy:draw()
 			boyfriend:draw()
+			love.graphics.setShader(lastShader)
 		love.graphics.pop()
     end,
 

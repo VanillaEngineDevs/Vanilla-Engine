@@ -214,7 +214,7 @@ return {
 				enemy:draw()
 				love.graphics.setShader(rimShaderBF)
 				boyfriend:draw()
-				
+
 				love.graphics.setShader(lastShader)
 			love.graphics.pop()
 		end
