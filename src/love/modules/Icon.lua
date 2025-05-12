@@ -91,7 +91,6 @@ return {
 
         -- find the most common colour
         local data = {}
-        -- IF ITS ALPHA 0 IGNORE OR IF RGB 0 IGNORE
         for i = 0, img:getWidth() - 1 do
             for j = 0, img:getHeight() - 1 do
                 local r, g, b, a = imgdata:getPixel(i, j)

@@ -88,6 +88,15 @@ function table.find(table, element)
     return nil
 end
 
+function table.includes(table, element)
+    for _, value in ipairs(table) do
+        if value == element then
+            return true
+        end
+    end
+    return false
+end
+
 function math.remap(value, low1, high1, low2, high2)
     return low2 + (value - low1) * (high2 - low2) / (high1 - low1)
 end

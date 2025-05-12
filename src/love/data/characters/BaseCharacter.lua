@@ -12,6 +12,7 @@ function Character:new(luaPath)
     self.flipX, self.flipY = false, false
     self.holdTimer = 0
     self.maxHoldTimer = self.spr.maxHoldTimer
+    self.playerInputs = false
 
     self.visible = true
 
@@ -34,6 +35,11 @@ function Character:update(dt)
     self.spr.holdTimer = self.holdTimer
 
     self.spr.alpha = self.alpha or 1
+
+    self.spr.playerInputs = self.playerInputs
+    self.spr.parent = self
+    self.spr.lastHit = self.lastHit or -1
+    self.spr.isCharacter = true
 end
 
 function Character:draw()

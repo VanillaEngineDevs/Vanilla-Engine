@@ -67,9 +67,9 @@ return {
 
                     if note.time >= 32130 and note.time <= 38400 then
                         if (math.floor((note.time - 32130) / (33130 - 32130)) % 2 == 0) then
-                            note.y = (-400 + 775 * (((note.time - 32130) % (33130 - 32130)) / (33130 - 32130)))
+                            note.y = (400 + 775 * (((note.time - 32130) % (33130 - 32130)) / (33130 - 32130)))
                         else
-                            note.y = (400 - 775 * (((note.time - 32130) % (33130 - 32130)) / (33130 - 32130)))
+                            note.y = (-400 - 775 * (((note.time - 32130) % (33130 - 32130)) / (33130 - 32130)))
                         end
                         if note.time - musicTime > (83535.91160220992 - 82209.94475138119) then
                             note.alpha = 0
@@ -116,15 +116,15 @@ return {
             local strumline2 = enemyArrows[i]
             if musicTime >= 32130 and musicTime <= 38400 then
                 if (math.floor((musicTime - 32130) / (33130 - 32130)) % 2 == 0) then
-                    strumline.y = -400 + 825 * ((musicTime - 32130) % (33130 - 32130)) / (33130 - 32130)
-                    strumline2.y = -400 + 825 * ((musicTime - 32130) % (33130 - 32130)) / (33130 - 32130)
+                    strumline.y = 400 + 825 * ((musicTime - 32130) % (33130 - 32130)) / (33130 - 32130)
+                    strumline2.y = 400 + 825 * ((musicTime - 32130) % (33130 - 32130)) / (33130 - 32130)
                 else
-                    strumline.y = 400 - 825 * ((musicTime - 32130) % (33130 - 32130)) / (33130 - 32130)
-                    strumline2.y = 400 - 825 * ((musicTime - 32130) % (33130 - 32130)) / (33130 - 32130)
+                    strumline.y = -400 - 825 * ((musicTime - 32130) % (33130 - 32130)) / (33130 - 32130)
+                    strumline2.y = -400 - 825 * ((musicTime - 32130) % (33130 - 32130)) / (33130 - 32130)
                 end
             else
-                strumline.y = -400
-                strumline2.y = -400
+                strumline.y = 400
+                strumline2.y = 400
             end
 
             if musicTime >= 63630 and musicTime <= 64000 then

@@ -428,6 +428,8 @@ local graphics = {
 			shader = nil,
 			shaderEnabled = true,
 
+			playerInputs = false,
+
 			setSheet = function(self, imageData)
 				sheet = imageData
 				if #sheets == 0 then
@@ -500,11 +502,32 @@ local graphics = {
 				self.holdTimer = self.holdTimer + dt
 
 				if self.specialAnim then 
-					self.heyTimer = self.heyTimer - dt 
-					if self.heyTimer <= 0 and not self:isAnimated() and not (self:getAnimName() == "dies" or self:getAnimName() == "dead" or self:getAnimName() == "dead confirm" or self:getAnimName() == "danceLeft" or self:getAnimName() == "danceRight") then 
-						self.heyTimer = 0 
+					self.heyTimer = self.heyTimer - dt
+
+					if self.heyTimer <= 0 and not self:isAnimated() and
+						not (self:getAnimName() == "dies" or self:getAnimName() == "dead" or
+						self:getAnimName() == "dead confirm" or self:getAnimName() == "danceLeft" or
+						self:getAnimName() == "danceRight")
+					then
+
+						self.heyTimer = 0
 						self.specialAnim = false
-						self:animate("idle", false) 
+						self:animate("idle", false)
+					end
+				end
+
+				local inputTbl = {}
+				if self.playerInputs then
+					table.insert(inputTbl, input:down("gameLeft"))
+					table.insert(inputTbl, input:down("gameRight"))
+					table.insert(inputTbl, input:down("gameUp"))
+					table.insert(inputTbl, input:down("gameDown"))
+				end
+				if self.lastHit > 0 and self.lastHit + (stepCrochet or 0) * self.singDuration < math.abs(musicTime) then
+					if not table.includes(inputTbl, true) then
+						self:dance()
+						self.lastHit = -1
+						if self.parent then self.parent.lastHit = -1 end
 					end
 				end
 			end,
@@ -596,6 +619,13 @@ local graphics = {
 					self.specialAnim = false
 				end
 
+				if not func then
+					func = function()
+						if self:isAnimName(self:getAnimName() .. " loop") then
+							self:animate(self:getAnimName() .. " loop", true)
+						end
+					end
+				end
 				self.func = func
 				
 				frame = frameOverride or anim.start
@@ -651,40 +681,21 @@ local graphics = {
 
 			beat = function(self, beat)
 				local beat = math.floor(beat) or 0
-				if self.isCharacter then
-					if not self.danceIdle then
-						if (not self:isAnimated() and util.startsWith(self:getAnimName(), "sing")) or (self:getAnimName() == "idle" or self:getAnimName() == "idle loop") then
-							if beat % self.danceSpeed == 0 then 
-								if self.lastHit > 0 then
-									if beat % math.max(self.danceSpeed, 2) == 0 and self.lastHit + Conductor.stepCrotchet * self.singDuration <= musicTime then
-										self:animate("idle", false, function()
-											if self:isAnimName("idle loop") then 
-												self:animate("idle loop", true)
-											end
-										end)
-										self.lastHit = 0
-									end
-								elseif beat % self.danceSpeed == 0 then
-									self:animate("idle", false, function()
-										if self:isAnimName("idle loop") then 
-											self:animate("idle loop", true)
-										end
-									end)
-								end
-							end
-						end
+				if self.lastHit <= 0 and beat % self.danceSpeed == 0 then
+					self:dance(self:isAnimName("danceLeft") and self:isAnimName("danceRight"))
+				end
+			end,
+
+			dance = function(self, isDanceIdle)
+				if isDanceIdle then
+					self.danced = not self.danced
+					if self.danced then
+						self:animate("danceRight")
 					else
-						if beat % self.danceSpeed == 0 then 
-							if (not self:isAnimated() and util.startsWith(self:getAnimName(), "sing")) or (self:getAnimName() == "danceLeft" or self:getAnimName() == "danceRight" or (not self:isAnimated() and self:getAnimName() == "sad")) then
-								self.danced = not self.danced
-								if not self.danced then
-									self:animate("danceRight", false)
-								else
-									self:animate("danceLeft", false)
-								end	
-							end
-						end
+						self:animate("danceLeft")
 					end
+				else
+					self:animate("idle")
 				end
 			end,
 

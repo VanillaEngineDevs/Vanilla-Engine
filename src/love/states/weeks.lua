@@ -347,6 +347,7 @@ return {
 		end
 
 		isResetting = false
+		if boyfriend then boyfriend.playerInputs = true end
 	end,
 
 	calculateRating = function(self)
