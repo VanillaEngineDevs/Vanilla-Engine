@@ -58,7 +58,7 @@ local allStates = {
 }
 
 local ratingTextScale = 1
-local hudFade = {0}
+local hudFade = {1}
 
 local function commaFormat(n)
 	local str = tostring(n)
@@ -264,7 +264,7 @@ return {
 		ratingPercent = 0.0
 		noteCounter = 0
 		healthLerp = health
-		hudFade = {0}
+		hudFade = {1}
 
 		sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
 
@@ -753,15 +753,6 @@ return {
 	setupCountdown = function(self, countNumVal, func)
 		local countNumVal = countNumVal or 4
 		if not storyMode and countNumVal == 4 then
-			-- strum spawning
-			Timer.tween(0.5,
-				hudFade,
-				{1},
-				"out-circ",
-				function()
-					hudFade[1] = 1
-				end
-			)
 			for i = 1, 4 do
 				boyfriendArrows[i].alpha = 0
 				boyfriendArrows[i].y = boyfriendArrows[i].y - 50
@@ -901,14 +892,6 @@ return {
 						paused = false
 						isResetting = true
 						resettingTime[1] = musicTime
-						Timer.tween(1,
-							hudFade,
-							{0},
-							"out-circ",
-							function()
-								hudFade[1] = 0
-							end
-						)
 						Timer.tween(
 							1,
 							_G,
@@ -1826,23 +1809,6 @@ return {
 			love.graphics.scale(0.7, 0.7)
 			love.graphics.scale(uiCam.zoom, uiCam.zoom)
 			love.graphics.translate(uiCam.x, uiCam.y)
-			--[[ love.graphics.push()
-				graphics.setColor(0,0,0,settings.scrollUnderlayTrans)
-				local baseX = boyfriendArrows[1].x - (boyfriendArrows[1]:getFrameWidth(CONSTANTS.WEEKS.NOTE_LIST[1])/2) * (pixel and 8 or 0) + (pixel and -15 or 0)
-				local scrollWidth = 0
-				-- determine the scrollWidth with the first 4 arrows
-				for i = 1, 4 do
-					scrollWidth = scrollWidth + boyfriendArrows[i]:getFrameWidth(CONSTANTS.WEEKS.NOTE_LIST[i]) * (pixel and 8 or 0)
-				end
-				scrollWidth = scrollWidth + 30 + (pixel and 95 or 0)
-
-				if settings.middlescroll and not settings.multiplayer then
-					love.graphics.rectangle("fill", baseX, -550, scrollWidth, 1280)
-				else
-					love.graphics.rectangle("fill", baseX, -550, scrollWidth, 1280)
-				end
-				graphics.setColor(1,1,1,1)
-			love.graphics.pop() ]]
 			graphics.setColor(1, 1, 1, visibility * hudFade[1])
 			graphics.setColor(P2HealthColors[1], P2HealthColors[2], P2HealthColors[3], hudFade[1])
 			love.graphics.rectangle("fill", healthBar.x, healthBar.y, healthBar.width, healthBar.height)
