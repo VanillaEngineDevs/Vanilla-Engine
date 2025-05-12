@@ -24,6 +24,7 @@ return {
                 icon = icon ~= nil and graphics.newImage(icon) or nil,
                 description = mod.description,
                 creator = mod.creator,
+                version = mod.version,
                 hovered = false,
                 selected = false,
                 enabled = mod.enabled,

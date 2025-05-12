@@ -85,6 +85,7 @@ function importMods.loadModToAllModsIncludingDisabled(modMeta, path)
         description = modMeta.description,
         enabled = modMeta.enabled,
         creator = modMeta.creator,
+        version = modMeta.version,
         path = path
     })
 end
@@ -238,14 +239,15 @@ function importMods.rewriteAllMetas(newModMetas)
         mod.description = newModMetas[i].description
         mod.enabled = newModMetas[i].enabled
         mod.creator = newModMetas[i].creator
+        mod.version = newModMetas[i].version
 
         love.filesystem.write(mod.path .. "/meta.lua", [[
 return {
     enabled = ]] .. tostring(mod.enabled) .. [[,
     name = "]] .. mod.name .. [[",
     creator = "]] .. mod.creator .. [[",
-    description = "]] .. mod.description .. [["
-    version = "]] .. mod.modsVersion .. [["
+    description = "]] .. mod.description .. [[",
+    version = "]] .. mod.version .. [["
 }
         ]])
     end
