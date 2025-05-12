@@ -1,5 +1,3 @@
-#pragma language glsl3
-
 extern vec4 uFrameBounds;
 extern float ang;
 extern float dist = 15;
