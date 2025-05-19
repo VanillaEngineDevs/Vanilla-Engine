@@ -67,7 +67,13 @@ return {
 			voicesEnemy = nil
 			rainShaderStartIntensity = 0.2
 			rainShaderEndIntensity = 0.4
-			enemy = love.filesystem.load("sprites/characters/darnell-fighting.lua")()
+			--[[ enemy = love.filesystem.load("sprites/characters/darnell-fighting.lua")() ]]
+			enemy = graphics.newAtlas("atlas/darnellBlazin")
+			enemy:addSymbol("idle", "Idle Fight Darnell")
+			enemy:addSymbol("pissed", "pissed darnell")
+			enemy:addSymbol("cringe", "cringe darnell")
+			enemy:addSymbol("fakeout", "fake out")
+			enemy:addSymbol("blocking", "Blocking Darnell")
 			enemy.x = 350
 		elseif song == 3 then
 			inst = love.audio.newSource("songs/2hot/Inst" .. songExt .. ".ogg", "stream")

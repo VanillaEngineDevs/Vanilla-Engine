@@ -934,6 +934,200 @@ local graphics = {
 		return object
 	end,
 
+	newAtlas = function(atlasPath, optionsTable)
+		optionsTable = optionsTable or {}
+		local object = {}
+		object.atlas = love.animate.newTextureAtlas()
+		object.atlas:load(atlasPath, object)
+
+		-- TODO: Wrapper for atlas
+
+		object.x, object.y = 0, 0
+		object.orientation = 0
+		object.sizeX, object.sizeY = 1, 1
+		object.offsetX, object.offsetY = 0, 0
+		object.shearX, object.shearY = 0, 0
+		object.scrollFactor = {x=1,y=1}
+
+		object.holdTimer = 2
+		object.lastHit = 0
+		object.heyTimer = 0
+		object.specialAnim = false
+		--object.clipRect = nil
+		--object.stencilInfo = nil
+
+		object.optionsTable = optionsTable
+		object.alpha = 1
+		object.alpha = 1
+		object.icon = optionsTable.icon or "boyfriend"
+		object.flipX = optionsTable.flipX or false
+
+		object.singDuration = optionsTable.singDuration or 4
+		object.isCharacter = optionsTable.isCharacter or false
+		object.danceSpeed = optionsTable.danceSpeed or 2
+		object.danceIdle = optionsTable.danceIdle or false
+		object.maxHoldTimer = optionsTable.maxHoldTimer or 0.1
+
+		object.visible = true
+		object.danced = true
+
+		-- shaders no worky rn
+		object.playerInputs = false
+
+		object._symbols = {}
+		function object:addSymbol(name, SN)
+			self._symbols[name] = SN
+		end
+
+		function object:animate(animName, _, func, forceSpecial, frameOverride, keepFrameOverride)
+			self.__currentAnim = animName
+
+			if self._symbols[animName] then
+				self.atlas:play(self._symbols[animName])
+			else
+				self.atlas:play(animName)
+			end
+
+			self.atlas._callback = func
+		end
+
+		function object:isAnimName(name)
+			return self.atlas:isSymbol(name)
+		end
+
+		function object:getAnim(name)
+			return nil
+		end
+
+		function object:getAnimName()
+			return self.__currentAnim
+		end
+		function object:isAnimated()
+			return self.atlas.playing
+		end
+		function object:isLooped()
+			-- too lazy
+		end
+
+		function object:setAnimFrame(frame)
+			---@diagnostic disable-next-line: invisible
+			self.atlas._frameTimer = 0
+			self.atlas.frame = frame or 0
+		end
+		function object:getAnimFrame()
+			return self.atlas.frame
+		end
+
+		function object:setOptions(optionsTable)
+			self.options = optionsTable
+		end
+		function object:getOptions()
+			return self.options
+		end
+
+		function object:update(dt)
+			if self.updateOverride then
+				self:updateOverride(dt)
+			end
+			self.atlas:update(dt)
+
+			self.holdTimer = self.holdTimer + dt
+			local inputTbl = {}
+			if self.playerInputs then
+				table.insert(inputTbl, input:down("gameLeft"))
+				table.insert(inputTbl, input:down("gameRight"))
+				table.insert(inputTbl, input:down("gameUp"))
+				table.insert(inputTbl, input:down("gameDown"))
+			end
+			if self.lastHit > 0 and self.lastHit + (stepCrochet or 0) * self.singDuration < math.abs(musicTime) then
+				if self.specialAnim then
+					self.heyTimer = self.heyTimer - dt
+
+					if self.heyTimer <= 0 and not self:isAnimated() and
+						not (self:getAnimName() == "dies" or self:getAnimName() == "dead" or
+						self:getAnimName() == "dead confirm" or self:getAnimName() == "danceLeft" or
+						self:getAnimName() == "danceRight")
+					then
+
+						self.heyTimer = 0
+						self.specialAnim = false
+						self.lastHit = -1
+						if self.parent then self.parent.lastHit = -1 end
+						self:dance()
+					end
+				else
+					if not table.includes(inputTbl, true) then
+						self:dance()
+						self.lastHit = -1
+						if self.parent then self.parent.lastHit = -1 end
+					end
+				end
+			end
+		end
+
+		function object:getFrameWidth(anim)
+			return 0
+		end
+		function object:getFrameHeight(anim)
+			return 0
+		end
+
+		function object:beat(beat)
+			local beat = math.floor(beat) or 0
+			if self.lastHit <= 0 and beat % self.danceSpeed == 0 then
+				self:dance(self:isAnimName("danceLeft") and self:isAnimName("danceRight"))
+			end
+		end
+
+		function object:dance(isDanceIdle)
+			if isDanceIdle then
+				self.danced = not self.danced
+				if self.danced then
+					self:animate("danceRight")
+				else
+					self:animate("danceLeft")
+				end
+			else
+				self:animate("idle")
+			end
+		end
+
+		function object:draw()
+			if not self.visible then
+				return
+			end
+
+			local x = self.x
+			local y = self.y
+
+			if options and options.floored then
+				x = math.floor(x)
+				y = math.floor(y)
+			end
+
+			local lastColor = {love.graphics.getColor()}
+			graphics.setColor(lastColor[1], lastColor[2], lastColor[3], lastColor[4] * self.alpha)
+
+			if self.visible then
+				self.atlas:draw(
+					self.x,
+					self.y,
+					self.orientation,
+					self.sizeX * (self.flipX and -1 or 1),
+					self.sizeY * (self.flipY and -1 or 1),
+					self.offsetX,
+					self.offsetY
+				)
+			end
+
+			love.graphics.setColor(lastColor[1], lastColor[2], lastColor[3])
+		end
+
+		print(object.addSymbol)
+
+		return object
+	end,
+
 	newGradient = function(...)
 		local colourLen, data = select("#", ...), {}
 

@@ -189,6 +189,7 @@ function love.load()
 	Object = require "lib.classic"
 	xml = require "lib.xml"
 	lovefftINST = require "lib.fft.lovefft"
+	require("lib.loveanimate")
 
 	-- Load modules
 	status = require "modules.status"
@@ -425,6 +426,8 @@ function love.load()
 	end
 
 	--[[ graphics:initStickerData() ]]
+
+	love.audio.setVolume(0.1)
 
 	Gamestate.switch(menu)
 	--Gamestate.switch(weekData[7], 1, "hard", "-pico", "-pico")

@@ -28,6 +28,9 @@ function love.conf(t)
 	t.console = _debug
 	t.window.vsync = false
 
+	t.window.width = 1280
+	t.window.height = 720
+
 	if _debug then
 		local major, minor, revision, codename = love.getVersion()
 		loveVer = major .. "." .. minor .. "." .. revision .. " " .. codename

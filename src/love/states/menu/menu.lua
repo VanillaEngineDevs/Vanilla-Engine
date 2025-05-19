@@ -62,8 +62,8 @@ return {
 		songNum = 0
 
 		if firstStartup then
-			graphics.setFade(0) 
-			graphics.fadeIn(0.5) 
+			graphics.setFade(0)
+			graphics.fadeIn(0.5)
 		else graphics:fadeInWipe(0.6) end
 
 		firstStartup = false

@@ -22,69 +22,25 @@ local curOS = love.system.getOS()
 local settingsStr = (curOS == "NX" and [[
 ; Friday Night Funkin' Rewritten Settings (Switch)
 
-[Video]
-; Use hardware-compressed image formats to save RAM, disabling this will make the game eat your RAM for breakfast (and increase load times)
-hardwareCompression=true
-
 [Audio]
 ; Master volume
 ; Possible values: 0.0-1.0
-volume=1.0
-
-; "Downscroll" makes arrows scroll down instead of up, and also moves some aspects of the UI around
-downscroll=false
-
-; "Kade Input" disables anti-spam, but counts "Shit" inputs as misses
-; NOTE: Currently unfinished, some aspects of this input mode still need to be implemented, like mash violations
-ghostTapping=false
-
-[Advanced]
-; Show debug info on the screen
-; Possible values: false, fps, detailed
-showDebug=false
+volume=0.5
 
 ; These variables are read by the game for internal purposes, don't edit these unless you want to risk losing your current settings!
 [Data]
-settingsVer=5-nx
+settingsVer=6-nx
 ]]) or (curOS ~= "Web" and [[
 ; Friday Night Funkin' Rewritten Settings
 
-[Video]
-; Screen/window width and height (you should change this to your device's screen resolution if you are using the "exclusive" fullscreen type)
-; NOTE: These settings will be ignored if using the "desktop" fullscreen type
-width=1280
-height=720
-
-; Fullscreen settings, if you don't want Vsync (60 FPS cap), set "fullscreenType" to "exclusive" and "vsync" to "0"
-fullscreen=false
-fullscreenType=desktop
-vsync=1
-
-; Use hardware-compressed image formats to save RAM, disabling this will make the game eat your RAM for breakfast (and increase load times)
-; WARNING: Don't disable this on 32-bit versions of the game, or the game will quickly run out of memory and crash (thanks to the 2 GB RAM cap)
-; NOTE: If hardware compression is not supported on your device, this option will be silently ignored
-hardwareCompression=true
-
 [Audio]
 ; Master volume
 ; Possible values: 0.0-1.0
-volume=1.0
-
-; "Downscroll" makes arrows scroll down instead of up, and also moves some aspects of the UI around
-downscroll=false
-
-; "Kade Input" disables anti-spam, but counts "Shit" inputs as misses
-; NOTE: Currently unfinished, some aspects of this input mode still need to be implemented, like mash violations
-ghostTapping=false
-
-[Advanced]
-; Show debug info on the screen
-; Possible values: false, fps, detailed
-showDebug=false
+volume=0.5
 
 ; These variables are read by the game for internal purposes, don't edit these unless you want to risk losing your current settings!
 [Data]
-settingsVer=5
+settingsVer=6
 ]])
 
 local settingsIni
@@ -106,15 +62,6 @@ if curOS == "NX" then
 	end
 
 	settingsIni = ini.load("settings.ini") or ini.loadString(settingsStr)
-
-	if ini.readKey(settingsIni, "Video", "hardwareCompression") == "true" then
-		settings.hardwareCompression = true
-
-		graphics.setImageType("dds")
-	else
-		settings.hardwareCompression = false
-	end
-
 	love.audio.setVolume(tonumber(ini.readKey(settingsIni, "Audio", "volume")))
 
 elseif curOS == "Web" then -- For love.js, we won't bother creating and reading a settings file that can't be edited, we'll just preset some settings
@@ -153,43 +100,7 @@ else
 
 	settingsIni = ini.load("settings.ini")
 
-	if ini.readKey(settingsIni, "Video", "fullscreen") == "true" then
-		love.window.setMode(
-			ini.readKey(settingsIni, "Video", "width"),
-			ini.readKey(settingsIni, "Video", "height"),
-			{
-				fullscreen = true,
-				fullscreentype = ini.readKey(settingsIni, "Video", "fullscreenType"),
-				vsync = tonumber(ini.readKey(settingsIni, "Video", "vsync"))
-			}
-		)
-	else
-		love.window.setMode(
-			ini.readKey(settingsIni, "Video", "width"),
-			ini.readKey(settingsIni, "Video", "height"),
-			{
-				vsync = tonumber(ini.readKey(settingsIni, "Video", "vsync")),
-				resizable = true
-			}
-		)
-	end
-	if ini.readKey(settingsIni, "Video", "hardwareCompression") == "true" then
-		settings.hardwareCompression = true
-
-		if love.graphics.getImageFormats()["DXT5"] then
-			graphics.setImageType("dds")
-		end
-	else
-		settings.hardwareCompression = false
-	end
-
 	love.audio.setVolume(tonumber(ini.readKey(settingsIni, "Audio", "volume")))
-
-	if ini.readKey(settingsIni, "Advanced", "showDebug") == "fps" or ini.readKey(settingsIni, "Advanced", "showDebug") == "detailed" then
-		settings.showDebug = ini.readKey(settingsIni, "Advanced", "showDebug")
-	else
-		settings.showDebug = false
-	end
 end
 
 return settings
