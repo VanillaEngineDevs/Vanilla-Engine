@@ -65,10 +65,12 @@ return {
 		stageImages["Limo Dancer"]:update(dt)
 		stageImages["Limo"]:update(dt)
 
-        if beatHandler.onBeat() and beatHandler.getBeat() % 2 == 0 then
-			stageImages["Limo Dancer"]:animate("anim", false)
-
-			stageImages["Limo Dancer"]:setAnimSpeed(14.4 / (60 / bpm))
+        if Conductor.onBeat then
+            if Conductor.curBeat % 2 == 0 then
+                stageImages["Limo Dancer"]:animate("anim1", false)
+            else
+                stageImages["Limo Dancer"]:animate("anim2", true)
+            end
 		end
 
         --[[ if love.math.random(4000) == 100 and stageImages["Fast Car"].canDrive then

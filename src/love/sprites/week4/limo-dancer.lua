@@ -53,8 +53,9 @@ return graphics.newSprite(
 		{x = 264, y = 824, width = 254, height = 361, offsetX = -139, offsetY = -49, offsetWidth = 517, offsetHeight = 410} -- 30: bg dancer sketch PINK0029
 	},
 	{
-		["anim"] = {start = 1, stop = 30, speed = 24, offsetX = 0, offsetY = 0}
+		["anim2"] = {start = 1, stop = 15, speed = 24, offsetX = 0, offsetY = 0},
+		["anim1"] = {start = 16, stop = 30, speed = 24, offsetX = 0, offsetY = 0},
 	},
-	"anim",
+	"anim1",
 	false
 )
