@@ -67,14 +67,11 @@ return {
 			voicesEnemy = nil
 			rainShaderStartIntensity = 0.2
 			rainShaderEndIntensity = 0.4
-			--[[ enemy = love.filesystem.load("sprites/characters/darnell-fighting.lua")() ]]
-			enemy = graphics.newAtlas("atlas/darnellBlazin")
-			enemy:addSymbol("idle", "Idle Fight Darnell")
-			enemy:addSymbol("pissed", "pissed darnell")
-			enemy:addSymbol("cringe", "cringe darnell")
-			enemy:addSymbol("fakeout", "fake out")
-			enemy:addSymbol("blocking", "Blocking Darnell")
+			enemy = love.filesystem.load("sprites/characters/darnell-fighting.lua")()
 			enemy.x = 350
+
+			boyfriend = love.filesystem.load("sprites/characters/pico-fighting.lua")()
+			boyfriend.x = 450
 		elseif song == 3 then
 			inst = love.audio.newSource("songs/2hot/Inst" .. songExt .. ".ogg", "stream")
 			if girlfriend.name == "nene" then
@@ -165,26 +162,26 @@ return {
 
 		if rating == "EnemyHit" then
 			if noteType == "weekend-1-lightcan" then
-				character:animate("light-can")
+				enemy:animate("light-can")
 				return true
 			elseif noteType == "wekend-1-kickcan" then
-				character:animate("kick-can")
+				enemy:animate("kick-can")
 				return true
 			elseif noteType == "weekend-1-kneecan" then
-				character:animate("knee-forward")
+				enemy:animate("knee-forward")
 				return true
 			end
 		else
 			if noteType == "weekend-1-cockgun" then
-				character:animate("Pico Reload")
+				enemy:animate("Pico Reload")
 
 				return true
 			elseif noteType == "weekend-1-firegun" then
 				if rating == "bad" or rating == "shit" then
-					character:animate("Pico Hit Can")
+					enemy:animate("Pico Hit Can")
 					health = health - 0.25
 				else
-					character:animate("Pico Shoot Hip Full")
+					enemy:animate("Pico Shoot Hip Full")
 				end
 
 				return true
@@ -197,77 +194,177 @@ return {
 
 			if noteType == "weekend-1-blockhigh" then
 				alternates[1] = not alternates[1]
-				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+				alternates[2] = not alternates[2]
+				if character == enemy then
+					enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+					boyfriend:animate("blocking")
+				else
+					boyfriend:animate("punch high" .. (alternates[2] and " 2" or ""))
+					enemy:animate("blocking")
+				end
 			elseif noteType == "weekend-1-blocklow" then
 				alternates[1] = not alternates[1]
-				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+				alternates[2] = not alternates[2]
+				--[[ enemy:animate("punch low" .. (alternates[1] and " 2" or "")) ]]
+				if character == enemy then
+					enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+					boyfriend:animate("blocking")
+				else
+					boyfriend:animate("punch low" .. (alternates[2] and " 2" or ""))
+					enemy:animate("blocking")
+				end
 			elseif noteType == "weekend-1-blockspin" then
 				alternates[1] = not alternates[1]
-				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
-
+				alternates[2] = not alternates[2]
+				--[[ enemy:animate("punch high" .. (alternates[1] and " 2" or "")) ]]
+				if character == enemy then
+					enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+					boyfriend:animate("blocking")
+				else
+					boyfriend:animate("punch high" .. (alternates[2] and " 2" or ""))
+					enemy:animate("blocking")
+				end
 			elseif noteType == "weekend-1-punchlow" then
 				alternates[1] = not alternates[1]
-				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+				alternates[2] = not alternates[2]
+				if character == enemy then
+					enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+					boyfriend:animate("blocking")
+				else
+					boyfriend:animate("punch low" .. (alternates[2] and " 2" or ""))
+					enemy:animate("blocking")
+				end
 			elseif noteType == "weekend-1-punchlowblocked" then
 				alternates[1] = not alternates[1]
-				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+				alternates[2] = not alternates[2]
+				if character == enemy then
+					enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+					boyfriend:animate("blocking")
+				else
+					boyfriend:animate("punch low" .. (alternates[2] and " 2" or ""))
+					enemy:animate("blocking")
+				end
 			elseif noteType == "weekend-1-punchlowdodged" then
 				alternates[1] = not alternates[1]
-				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+				alternates[2] = not alternates[2]
+				if character == enemy then
+					enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+					boyfriend:animate("dodged")
+				else
+					boyfriend:animate("punch low" .. (alternates[2] and " 2" or ""))
+					enemy:animate("dodged")
+				end
 			elseif noteType == "weekend-1-punchlowspin" then
 				alternates[1] = not alternates[1]
-				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+				alternates[2] = not alternates[2]
+				if character == enemy then
+					enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+					boyfriend:animate("spin")
+				else
+					boyfriend:animate("punch low" .. (alternates[2] and " 2" or ""))
+					enemy:animate("spin")
+				end
 
 			elseif noteType == "weekend-1-punchhigh" then
-				enemy:animate("hit high")
-			elseif noteType == "weekend-1-punchhighblocked" then
-				enemy:animate("blocking")
+				character:animate("hit high")
+			--[[ elseif noteType == "weekend-1-punchhighblocked" then
+				enemy:animate("blocking") ]]
 			elseif noteType == "weekend-1-punchhighdodged" then
-				enemy:animate("dodge")
+				--[[ enemy:animate("dodge") ]]
+				character:animate("dodge")
 			elseif noteType == "weekend-1-punchhighspin" then
-				enemy:animate("spin")
+				--[[ enemy:animate("spin") ]]
+				character:animate("spin")
 
 			elseif noteType == "weekend-1-dodgehigh" then
 				alternates[1] = not alternates[1]
-				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+				alternates[2] = not alternates[2]
+				if character == enemy then
+					enemy:animate("dodge high" .. (alternates[1] and " 2" or ""))
+					boyfriend:animate("dodged")
+				else
+					boyfriend:animate("dodge high" .. (alternates[2] and " 2" or ""))
+					enemy:animate("dodged")
+				end
 			elseif noteType == "weekend-1-dodgelow" then
 				alternates[1] = not alternates[1]
-				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+				alternates[2] = not alternates[2]
+				if character == enemy then
+					enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+					boyfriend:animate("blocking")
+				else
+					boyfriend:animate("punch low" .. (alternates[2] and " 2" or ""))
+					enemy:animate("blocking")
+				end
 			elseif noteType == "weekend-1-dodgespin" then
 				alternates[1] = not alternates[1]
-				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
-
+				alternates[2] = not alternates[2]
+				--[[ enemy:animate("punch high" .. (alternates[1] and " 2" or "")) ]]
+				if character == enemy then
+					enemy:animate("dodge high" .. (alternates[1] and " 2" or ""))
+					boyfriend:animate("dodged")
+				else
+					boyfriend:animate("dodge high" .. (alternates[2] and " 2" or ""))
+					enemy:animate("dodged")
+				end
 			elseif noteType == "weekend-1-hithigh" then
 				alternates[1] = not alternates[1]
-				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+				alternates[2] = not alternates[2]
+				--[[ enemy:animate("punch high" .. (alternates[1] and " 2" or "")) ]]
+				if character == enemy then
+					enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+					boyfriend:animate("hit high")
+				else
+					boyfriend:animate("punch high" .. (alternates[2] and " 2" or ""))
+					enemy:animate("hit high")
+				end
 			elseif noteType == "weekend-1-hitlow" then
 				alternates[1] = not alternates[1]
-				enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+				alternates[2] = not alternates[2]
+
+				--[[ enemy:animate("punch low" .. (alternates[1] and " 2" or "")) ]]
+				if character == enemy then
+					enemy:animate("punch low" .. (alternates[1] and " 2" or ""))
+					boyfriend:animate("hit low")
+				else
+					boyfriend:animate("punch low" .. (alternates[2] and " 2" or ""))
+					enemy:animate("hit low")
+				end
 
 			elseif noteType == "weekend-1-hitspin" then
 				alternates[1] = not alternates[1]
-				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+				alternates[2] = not alternates[2]
+				--[[ enemy:animate("punch high" .. (alternates[1] and " 2" or "")) ]]
+				if character == enemy then
+					enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+					boyfriend:animate("spin")
+				else
+					boyfriend:animate("punch high" .. (alternates[2] and " 2" or ""))
+					enemy:animate("spin")
+				end
 			elseif noteType == "weekend-1-picouppercutprep" then
-				alternates[1] = not alternates[1]
-				enemy:animate("punch high" .. (alternates[1] and " 2" or ""))
+				boyfriend:animate("pre-uppercut")
 			elseif noteType == "weekend-1-picouppercut" then
-				
-
+				boyfriend:animate("uppercut")
+				enemy:animate("hit high")
 			elseif noteType == "weekend-1-darnelluppercutprep" then
 				alternates[1] = not alternates[1]
 				enemy:animate("pre-uppercut")
 			elseif noteType == "weekend-1-darnelluppercut" then
 				enemy:animate("uppercut")
+				boyfriend:animate("uppercut hit")
 			elseif noteType == "weekend-1-idle" then
 				enemy:animate("idle")
 			elseif noteType == "weekend-1-fakeout" then
 				enemy:animate("fake out")
 			elseif noteType == "weekend-1-taunt" then
-				enemy:animate("cringe")
+				enemy:animate("taunt")
+				boyfriend:animate("taunt")
 			elseif noteType == "weekend-1-tauntforce" then
-				enemy:animate("pissed")
+				enemy:animate("tauntforce")
+				boyfriend:animate("tauntforce")
 			elseif noteType == "weekend-1-reversefakeout" then
-				enemy:animate("fake out")
+				boyfriend:animate("fake out")
 			end
 
 			return true
@@ -276,7 +373,7 @@ return {
 
 	onNoteMiss = function(self, character, noteType, rating, id)
 		if noteType == "weekend-1-firegun" then
-			character:animate("Pico Hit Can")
+			enemy:animate("Pico Hit Can")
 			health = health - 0.25
 
 			return true

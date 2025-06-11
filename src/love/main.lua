@@ -429,6 +429,8 @@ function love.load()
 
 	love.audio.setVolume(0.1)
 
+	local test, params = string.match("bpm:1, 2", "^(%a+):([%d%s,]+)$")
+	print(test, params)
 	Gamestate.switch(menu)
 	--Gamestate.switch(weekData[7], 1, "hard", "-pico", "-pico")
 end

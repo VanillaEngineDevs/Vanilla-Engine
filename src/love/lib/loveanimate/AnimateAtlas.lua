@@ -180,6 +180,16 @@ end
 function AnimateAtlas:play(symbol)
     self.frame = 0
     self.symbol = symbol or ""
+    -- does the symbol exist? if not, find the first one that starts with the symbol
+    if symbol and not self.libraries[symbol] then
+        for key, value in pairs(self.libraries) do
+            if string.startsWith(key, symbol) then
+                self.symbol = key
+                print("Symbol '" .. symbol .. "' not found, using '" .. key .. "' instead.")
+                break
+            end
+        end
+    end
 
     self.playing = true
     self._frameTimer = 0.0

@@ -9,7 +9,7 @@ local SparrowAtlas = Classic:extend()
 --[[ local json = require("loveanimate.libs.Json")
 local xml = require("loveanimate.libs.Xml")
 require("loveanimate.libs.StringUtil") ]]
-xml = require(baseDirectory .. "libs.Xml")
+local xml = require(baseDirectory .. "libs.Xml")
 require(baseDirectory .. "libs.StringUtil")
 
 local function fileExists(path)

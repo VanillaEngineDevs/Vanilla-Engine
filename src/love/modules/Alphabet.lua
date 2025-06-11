@@ -40,14 +40,13 @@ function CreateText(text, isBold)
                 if char ~= " " then
                     table.insert(self.text, Sprite())
                     self.text[#self.text]:setFrames(getSparrow(graphics.imagePath("alphabet")))
-                    -- check if its isNumber or in symbols
                     if not isNumber and not table.contains(symbols, char) then
-                        self.text[#self.text]:addAnimByPrefix("anim", char .. (isBold and " bold" or (isLowercase and " lowercase" or " uppercase")), 24, true)
+                        self.text[#self.text]:addAnimByPrefix("anim", char .. (isBold and " bold" or (isLowercase and " lowercase" or " uppercase")) .. " instance 1", 24, true)
                     else
                         if char == "<" then char = "left" end
                         if char == ">" then char = "right" end
                         if char == "." then char = "period" end
-                        self.text[#self.text]:addAnimByPrefix("anim", char .. (isBold and " bold" or " normal"), 24, true)
+                        self.text[#self.text]:addAnimByPrefix("anim", char .. (isBold and " bold" or " normal") .. " instance 1", 24, true)
                     end
                     self.text[#self.text]:play("anim", true)
                     self.text[#self.text]:updateHitbox()

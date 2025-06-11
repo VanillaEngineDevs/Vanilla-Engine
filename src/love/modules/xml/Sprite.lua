@@ -1,8 +1,9 @@
 -- For XML's
 
 function getImage(key)
-    local key = key .. ".png"
-    -- does it exist? if not, try remove ".png"
+    if not key:endsWith(".png") and not key:endsWith(".dds") then
+        key = key .. ".png"
+    end
     if not love.filesystem.getInfo(key) then
         key = key:gsub(".png", "")
     end
@@ -20,7 +21,11 @@ function getSparrow(key)
     local ip, xp = key, key .. ".xml"
     -- remove ".dds" from the key
     xp = xp:gsub(".dds.xml", ".xml")
+    xp = xp:gsub(".png.xml", ".xml")
     local i = getImage(ip)
+    if not love.filesystem.getInfo(xp) then
+        xp = xp:gsub("/dds/", "/png/")
+    end
     if love.filesystem.getInfo(xp) then
         local o = Sprite.getFramesFromSparrow(i, love.filesystem.read(xp))
         return o
@@ -63,7 +68,7 @@ function Sprite.newFrame(name, x, y, w, h, sw, sh, ox, oy, ow, oh)
 end 
 
 function Sprite.getFramesFromSparrow(tex, desc)
-    if type(tex) == "string" then tex = love.graphics.newImage(tex) end
+    if type(tex) == "string" then tex = getImage(tex) end
 
     local f = {texture=tex, frames={}}
     local sw, sh = tex:getWidth(), tex:getHeight()
@@ -100,7 +105,7 @@ function Sprite:new(x, y, tex)
     self.antialiasing = true
 
     self.camera = nil
-    
+
     self.origin = {x=0,y=0}
     self.offset = {x=0,y=0}
     self.scale = {x=1,y=1}
@@ -127,13 +132,17 @@ function Sprite:new(x, y, tex)
     self.holdTimer = 0
     self.singDuration = 4
     self.cameraPosition = {x = 0, y = 0}
+    self.danceSpeed = 2
+    self.lastHit = 0
+
+    self.danced = false
 
     if tex then self:load(tex) end
 end
 
 function Sprite:load(tex, w, h)
     if type(tex) == "string" then
-        tex = love.graphics.newImage(tex)
+        tex = getImage(tex)
     end
     self.tex = tex
 
@@ -149,7 +158,7 @@ end
 
 function Sprite:loadGraphic(tex, frameW, frameH) -- just used for icons lol!!!!!
     if type(tex) == "string" then
-        tex = love.graphics.newImage(tex)
+        tex = getImage(tex)
     end
     self.tex = tex
 
@@ -381,31 +390,21 @@ end
 
 function Sprite:beat(beat)
     local beat = math.floor(beat) or 0
-    local curAnimName = self:getAnimName()
-    if not curAnimName then return end
-    if beatHandler.onBeat() then
-        if self:isAnimName("idle") then
-            if (not self:isAnimated() and util.startsWith(self:getAnimName(), "sing")) or (self:getAnimName() == "idle" or self:getAnimName() == "idle loop") then
-                if self.lastHit ~= nil and self.lastHit > 0 then
-                    if beat % 2 == 0 and self.lastHit + beatHandler.stepCrochet * self.singDuration <= musicTime then
-                        self:animate("idle", true)
-                    end
-                elseif beat % 2 == 0 then
-                    self:animate("idle", true)
-                end
-            end
+    if self.lastHit <= 0 and beat % self.danceSpeed == 0 then
+        self:dance(self:isAnimName("danceLeft") and self:isAnimName("danceRight"))
+    end
+end
+
+function Sprite:dance(isDanceIdle)
+    if isDanceIdle then
+        self.danced = not self.danced
+        if self.danced then
+            self:animate("danceRight")
         else
-            if beat % 1 == 0 then
-                if (not self:isAnimated() and util.startsWith(self:getAnimName(), "sing")) or (self:getAnimName() == "danceLeft" or self:getAnimName() == "danceRight" or (not self:isAnimated() and self:getAnimName() == "sad")) then
-                    self.danced = not self.danced or false
-                    if self.danced then
-                        self:animate("danceLeft", true)
-                    else
-                        self:animate("danceRight", true)
-                    end
-                end
-            end
+            self:animate("danceLeft")
         end
+    else
+        self:animate("idle")
     end
 end
 

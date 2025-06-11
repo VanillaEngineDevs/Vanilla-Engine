@@ -50,10 +50,10 @@ for %%f in (*) do (
 )
 
 rem go throug the png folder and check if there are .xml files, if so, simply just copy them over
-for %%f in (*) do (
-	if exist %%~nf.xml (
-		copy %%~nf.xml ..\dds\%%~nf.xml
-	)
-)
+rem for %%f in (*) do (
+rem 	if exist %%~nf.xml (
+rem 		copy %%~nf.xml ..\dds\%%~nf.xml
+rem 	)
+rem )
 
 popd
