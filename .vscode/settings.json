@@ -1,0 +1,12 @@
+{
+    "Lua.runtime.version": "LuaJIT",
+    "Lua.diagnostics.disable": [
+        "param-type-mismatch",
+        "lowercase-global",
+        "undefined-field",
+        "duplicate-set-field",
+        "need-check-nil"
+    ],
+
+    "pixelbyte.love2d.srcDir": "./src/"
+}
