@@ -5,8 +5,14 @@
         "lowercase-global",
         "undefined-field",
         "duplicate-set-field",
-        "need-check-nil"
+        "need-check-nil",
+        "undefined-global",
+        "duplicate-doc-alias"
     ],
 
-    "pixelbyte.love2d.srcDir": "./src/"
+    "pixelbyte.love2d.srcDir": "./src/",
+    "Lua.diagnostics.globals": [
+        "DataAssets",
+        "Paths"
+    ]
 }
