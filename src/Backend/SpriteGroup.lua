@@ -154,8 +154,12 @@ function SpriteGroup:sort(func, order)
     return self.group:sort(func, order)
 end
 
-function Sprite:refresh()
+function SpriteGroup:refresh()
     return self.group:refresh()
+end
+
+function SpriteGroup:clear()
+    self.group:clear()
 end
 
 return SpriteGroup

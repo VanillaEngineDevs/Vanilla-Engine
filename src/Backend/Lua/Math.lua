@@ -40,6 +40,7 @@ end
 ---@param y2 number
 ---@return number
 function math.angle(x1, y1, x2, y2)
+    ---@diagnostic disable-next-line: redundant-parameter
     return math.atan(y2 - y1, x2 - x1)
 end
 

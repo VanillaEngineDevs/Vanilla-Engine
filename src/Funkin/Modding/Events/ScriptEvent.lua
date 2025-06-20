@@ -28,11 +28,12 @@ end
 SongLoadScriptEvent = ScriptEvent:extend("SongLoadScriptEvent")
 
 function SongLoadScriptEvent:new(id, difficulty, notes, events)
+    print("SongLoadScriptEvent created with id: " .. id .. ", difficulty: " .. difficulty)
     SongLoadScriptEvent.super.new(self, "SONG_LOADED")
-    
     self.id = id
     self.difficulty = difficulty
     self.notes = notes
+    oPrint(#self.notes .. " notes loaded for song " .. id .. " with difficulty " .. difficulty)
     self.events = events
 end
 

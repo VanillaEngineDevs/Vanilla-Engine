@@ -269,6 +269,7 @@ function Song:cacheCharts(force)
         if version == nil then
             goto continue
         end
+        oPrint(self.id, variation, version)
         local chart = SongRegistry:parseEntryChartDataWithMigration(self.id, variation, version)
         if chart == nil then
             goto continue
@@ -282,14 +283,14 @@ function Song:applyChartData(chartData, variation)
     for diffId, chartNotes in pairs(chartData.notes) do
         local nullDiff = self:getDifficulty(diffId, variation)
         local difficulty = nullDiff or SongDifficulty(self, diffId, variation)
-    
+
         if nullDiff == nil then
             local metadata = self._metadata[variation]
             local d = self.difficulties[variation]
             if d then
                 d:set(diffId, difficulty)
             end
-    
+
             if metadata ~= nil then
                 difficulty.songName = metadata.songName
                 difficulty.songArtist = metadata.artist
@@ -300,21 +301,20 @@ function Song:applyChartData(chartData, variation)
                 difficulty.looped = metadata.looped
                 difficulty.generatedBy = metadata.generatedBy
                 difficulty.offsets = metadata.offsets or SongOffsets()
-    
+
                 difficulty.stage = metadata.playData.stage
                 difficulty.noteStyle = metadata.playData.noteStyle
                 difficulty.characters = metadata.playData.characters
             end
         end
-    
+
         difficulty.notes = chartNotes or {}
         difficulty.scrollSpeed = chartData:getScrollSpeed(diffId) or 1.0
-    
+
         difficulty.events = chartData.events
     end
-    
 end
-  
+
 function Song:getDifficulty(diffId, variation, variations)
     diffId = diffId or self:listDifficulties(variation, variations)[1]
     variation = variation or Constants.DEFAULT_VARIATION
@@ -324,13 +324,14 @@ function Song:getDifficulty(diffId, variation, variations)
         if not currentVariation or currentVariation == "default" then currentVariation = Constants.DEFAULT_VARIATION end
         local variationSuffix = currentVariation ~= Constants.DEFAULT_VARIATION and "-" .. currentVariation.variation or ""
         if self.difficulties[diffId .. variationSuffix] then
+            --table.print(self.difficulties[diffId .. variationSuffix])
             return self.difficulties[diffId .. variationSuffix]
         end
     end
 
     return nil
 end
-  
+
 function Song:listDifficulties(variation, variations)
     variations = variations or {variation}
 

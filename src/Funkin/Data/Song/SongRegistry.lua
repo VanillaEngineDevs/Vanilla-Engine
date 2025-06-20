@@ -153,6 +153,7 @@ function SongRegistry:parseEntryChartData(id, variation)
 
     local real = SongChartData(data.scrollSpeed, data.events, data.notes)
     real.version = data.version
+    oPrint("BALLS", real.notes.normal)
 
     return self:cleanChartData(real, variation)
 end

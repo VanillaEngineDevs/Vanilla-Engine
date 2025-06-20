@@ -56,7 +56,6 @@ end
 function SongChartData:serialize(pretty)
     self:updateVersionToLatest()
 
-    
 end
 
 function SongChartData:updateVersionToLatest()

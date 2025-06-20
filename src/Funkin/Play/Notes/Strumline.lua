@@ -70,7 +70,6 @@ function Strumline:new(noteStyle, isPlayer)
         child.x = child.x + self:getXPos(table.find(Strumline.DIRECTIONS, i - 1))
         child.x = child.x + self.INITIAL_OFFSET
         child.y = 0
-        print("child.x: " .. child.x, "child.y: " .. child.y, child.scale.x, child.scale.y)
         self.strumlineNotes:add(child)
     end
 
@@ -95,6 +94,18 @@ function Strumline:getXPos(dir)
     end
 end
 
+local function compareNoteData(a, b)
+    return a.t < b.t
+end
+
+function Strumline:applyNoteData(data)
+    self.notes:clear()
+
+    self.noteData = table.copy(data)
+    self.nextNoteIndex = 1
+    table.sort(self.noteData, compareNoteData)
+end
+
 function Strumline:resetScrollSpeed()
     local speed = 1
     if PlayState.instance then
@@ -105,6 +116,113 @@ function Strumline:resetScrollSpeed()
     end
 
     self.scrollSpeed = speed
+end
+
+function Strumline:update(dt)
+    SpriteGroup.update(self, dt)
+
+    self:updateNotes()
+end
+
+function Strumline:updateNotes()
+    if #self.noteData == 0 then
+        return
+    end
+
+    local songStart = PlayState.instance.startTimestamp or 0
+    local hitWindowStart = self.conductorInUse.songPosition - Constants.HIT_WINDOW_MS
+    local renderWindowStart = self.conductorInUse.songPosition - self:_getRenderDistanceMS()
+
+    for i = self.nextNoteIndex, #self.noteData do
+        local note = self.noteData[i]
+
+        if not note then
+            goto continue
+        end
+
+        if note.t < songStart or note.t < hitWindowStart then
+            -- Note is in the past, skip it.
+            print("Strumline:updateNotes: Skipping note in the past: ", note.t, " < ", songStart, " or ", note.t, " < ", hitWindowStart)
+            self.nextNoteIndex = i + 1
+            goto continue
+        end
+
+        if note.t > renderWindowStart then
+            break
+        end
+
+        local noteSprite = self:buildNoteSprite(note)
+        --[[
+            if note.length > 0 then
+                noteSprite.holdNoteSprite = self:buildHoldNoteSprite(note)
+            end
+        ]]
+
+        self.nextNoteIndex = i + 1
+
+        self.onNoteIncoming:dispatch(noteSprite)
+
+        ::continue::
+    end
+
+    for _, note in ipairs(self.notes) do
+        if not note or not note.alive then
+            goto continue
+        end
+
+        if not note.customPositionData then
+            note.y = self.y - self.INITIAL_OFFSET + self:calculateNoteYPos(note.strumTime) + note.yOffset
+        end
+
+        local isOffscreen = Preferences.downscroll and note.y > Game.height or not Preferences.downscroll and note.y < -note.height
+        if note.handledMiss and isOffscreen then
+            self:killNote(note)
+        end
+
+        ::continue::
+    end
+end
+
+function Strumline:killNote(note)
+end
+
+function Strumline:buildNoteSprite(note)
+    local noteSprite = self:constructNoteSprite()
+
+    if not noteSprite then
+        return nil
+    end
+
+    local noteKindStyle = NoteKindManager:getNoteStyle(note.kind, self.noteStyle.id) or self.noteStyle
+    noteSprite:setupNoteGraphic(noteKindStyle)
+
+    noteSprite.direction = --[[ note:getDirection() ]]note.d % 4
+    noteSprite.noteData = note
+
+    noteSprite.x = self.x
+    noteSprite.x = noteSprite.x + self:getXPos(note:getDirection())
+    noteSprite.x = noteSprite.x - (noteSprite.width - Strumline.STRUMLINE_SIZE) / 2 -- Center it
+    noteSprite.x = noteSprite.x - Strumline.NUDGE
+    noteSprite.y = -9999
+
+    printf("Strumline:buildNoteSprite: x = %s, y = %s", noteSprite.x, noteSprite.y)
+
+    return noteSprite
+end
+
+function Strumline:constructNoteSprite()
+    local result
+
+    result = self.notes:getFirstAvailable(StrumlineNote)
+
+    if result ~= nil then
+        result:reset()
+    else
+        result = StrumlineNote(self.noteStyle)
+        self.notes:add(result)
+    end
+
+    return result
 end
 
 return Strumline

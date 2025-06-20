@@ -81,6 +81,8 @@ function PlayState:new(params)
     self.overrideMusic = params.overrideMusic or false
     self.previousCameraFollowPoint = params.cameraFollowPoint or Object(0, 0)
 
+    self.curChart = nil
+
     MusicBeatState.new(self)
 end
 
@@ -148,11 +150,15 @@ end
 
 function PlayState:get_currentChart()
     if not self.currentSong or not self.currentDifficulty then
-        print("No song or difficulty")
+        print("NO SONG OR DIFFICULTY SELECTED")
         return {}
     end
 
-    return self.currentSong:getDifficulty(self.currentDifficulty, self.currentVariation)
+    --[[ local curChart = self.currentSong:getDifficulty(self.currentDifficulty, self.currentVariation) ]]
+    if not self.curChart then
+        self.curChart = self.currentSong:getDifficulty(self.currentDifficulty, self.currentVariation)
+    end
+    return self.curChart
 end
 
 function PlayState:get_currentStageId()
@@ -372,6 +378,9 @@ function PlayState:regenNoteData(startTime)
     startTime = startTime or 0
 
     local currentChart = self:get_currentChart()
+    if #currentChart.notes == 0 then
+        currentChart.notes = Json.decode(love.filesystem.read(Paths.json("songs/bopeebo/bopeebo-chart"))).notes[self.currentDifficulty]
+    end
     local event = SongLoadScriptEvent(currentChart.song.id, currentChart.difficulty, table.copy(currentChart.notes)--[[ , table.copy(currentChart:getEvents() ]])
 
     self:dispatchEvent(event)
@@ -388,17 +397,17 @@ function PlayState:regenNoteData(startTime)
     local opponentNoteData = {}
 
     for i, songNote in ipairs(builtNoteData) do
-        local strumTime = songNote.time
+        local strumTime = songNote.t
         if strumTime < startTime then goto continue end
 
-        local noteData = songNote:getDirection()
+        local noteData = songNote.d % 4
         local playerNote = true
 
         if noteData > 3 then
             playerNote = false
         end
 
-        local strumIndex = songNote:getStrumlineIndex()
+        local strumIndex = math.floor(noteData / 4)
         if strumIndex == 0 then
             table.insert(playerNoteData, songNote)
         elseif strumIndex == 1 then
@@ -407,8 +416,8 @@ function PlayState:regenNoteData(startTime)
         ::continue::
     end
 
-    --self.playerStrumline:applyNoteData(playerNoteData)
-    --self.opponentStrumline:applyNoteData(opponentNoteData)
+    self.playerStrumline:applyNoteData(playerNoteData)
+    self.opponentStrumline:applyNoteData(opponentNoteData)
 end
 
 function PlayState:processSongEvents()

@@ -90,9 +90,10 @@ end
 ---Copies a table
 ---@param tbl table
 ---@return table
-function table.copy(tbl)
+function table.copy(tbl, log)
     local newTable = {}
     for k, v in pairs(tbl) do
+        if log then oPrint("Copying key: " .. tostring(k) .. " with value: " .. tostring(v)) end
         newTable[k] = v
     end
 
