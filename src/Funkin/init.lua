@@ -35,6 +35,7 @@ FunkinSprite = r("Graphics.FunkinSprite")
 NoteDirection = r("Play.Notes.NoteDirection")
 Strumline = r("Play.Notes.Strumline")
 StrumlineNote = r("Play.Notes.StrumlineNote")
+NoteSprite = r("Play.Notes.NoteSprite")
 NoteStyle = r("Play.Notes.Notestyle.NoteStyle")
 
 r("Modding.Events.ScriptEvent")

@@ -31,6 +31,7 @@ function Strumline:new(noteStyle, isPlayer)
 
     self.notes = SpriteGroup()
     self.notes.zIndex = 30
+    self:add(self.notes)
 
     self.holdNotes = SpriteGroup()
     self.holdNotes.zIndex = 20
@@ -131,7 +132,8 @@ function Strumline:updateNotes()
 
     local songStart = PlayState.instance.startTimestamp or 0
     local hitWindowStart = self.conductorInUse.songPosition - Constants.HIT_WINDOW_MS
-    local renderWindowStart = self.conductorInUse.songPosition - self:_getRenderDistanceMS()
+    local renderWindowStart = self.conductorInUse.songPosition + self:_getRenderDistanceMS()
+    --printf("Strumline:updateNotes: songStart = %s, hitWindowStart = %s, renderWindowStart = %s", songStart, hitWindowStart, renderWindowStart)
 
     for i = self.nextNoteIndex, #self.noteData do
         local note = self.noteData[i]
@@ -151,6 +153,8 @@ function Strumline:updateNotes()
             break
         end
 
+        --printf("Strumline:updateNotes: Adding note at index %d with time %s", i, note.t)
+
         local noteSprite = self:buildNoteSprite(note)
         --[[
             if note.length > 0 then
@@ -165,7 +169,7 @@ function Strumline:updateNotes()
         ::continue::
     end
 
-    for _, note in ipairs(self.notes) do
+    for _, note in ipairs(self.notes:getObjects()) do
         if not note or not note.alive then
             goto continue
         end
@@ -174,13 +178,24 @@ function Strumline:updateNotes()
             note.y = self.y - self.INITIAL_OFFSET + self:calculateNoteYPos(note.strumTime) + note.yOffset
         end
 
-        local isOffscreen = Preferences.downscroll and note.y > Game.height or not Preferences.downscroll and note.y < -note.height
+        local isOffscreen = note.y < -note.height
         if note.handledMiss and isOffscreen then
             self:killNote(note)
         end
 
         ::continue::
     end
+end
+
+--[[
+ public function calculateNoteYPos(strumTime:Float):Float
+  {
+    return
+      Constants.PIXELS_PER_MS * (conductorInUse.songPosition - strumTime - Conductor.instance.inputOffset) * scrollSpeed * (Preferences.downscroll ? 1 : -1);
+  }]]
+
+function Strumline:calculateNoteYPos(strumTime)
+    return Constants.PIXELS_PER_MS * (self.conductorInUse.songPosition - strumTime) * self.scrollSpeed * (-1)
 end
 
 function Strumline:killNote(note)
@@ -193,17 +208,22 @@ function Strumline:buildNoteSprite(note)
         return nil
     end
 
-    local noteKindStyle = NoteKindManager:getNoteStyle(note.kind, self.noteStyle.id) or self.noteStyle
-    noteSprite:setupNoteGraphic(noteKindStyle)
+    --[[ local noteKindStyle = NoteKindManager:getNoteStyle(note.kind, self.noteStyle.id) or self.noteStyle
+    noteSprite:setupNoteGraphic(noteKindStyle) ]]
+    noteSprite:setupNoteGraphic(self.noteStyle)
 
-    noteSprite.direction = --[[ note:getDirection() ]]note.d % 4
-    noteSprite.noteData = note
+    noteSprite:setData(note)
+    noteSprite.isEnemy = noteSprite.noteData.d >= 4
 
-    noteSprite.x = self.x
-    noteSprite.x = noteSprite.x + self:getXPos(note:getDirection())
+    noteSprite.x = self:getXPos(noteSprite.direction)
+    if noteSprite.isEnemy then
+        noteSprite.x = noteSprite.x - 1280/2
+    end
+    --[[ noteSprite.x = noteSprite.x + self:getXPos(note.direction)
     noteSprite.x = noteSprite.x - (noteSprite.width - Strumline.STRUMLINE_SIZE) / 2 -- Center it
-    noteSprite.x = noteSprite.x - Strumline.NUDGE
-    noteSprite.y = -9999
+    noteSprite.x = noteSprite.x - Strumline.NUDGE ]]
+    noteSprite.y = self:calculateNoteYPos(note.t)
+    --noteSprite.printIfDrawing = true
 
     printf("Strumline:buildNoteSprite: x = %s, y = %s", noteSprite.x, noteSprite.y)
 
@@ -213,14 +233,11 @@ end
 function Strumline:constructNoteSprite()
     local result
 
-    result = self.notes:getFirstAvailable(StrumlineNote)
+    result = NoteSprite(self.noteStyle, 0)
 
-    if result ~= nil then
-        result:reset()
-    else
-        result = StrumlineNote(self.noteStyle)
-        self.notes:add(result)
-    end
+    self.notes:add(result)
+
+    print(#self.notes.group.members, "notes in Strumline")
 
     return result
 end

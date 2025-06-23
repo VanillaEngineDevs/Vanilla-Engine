@@ -74,10 +74,10 @@ function Group:add(member)
         return nil
     end
 
-    if table.contains(self.members, member) ~= -1 then
+    --[[ if table.contains(self.members, member) ~= -1 then
         print("Member already in group")
         return member
-    end
+    end ]]
 
     if self.maxSize > 0 and self.length >= self.maxSize then
         print("Attempted to add member to filled Group (Size: " .. self.maxSize .. ")")
@@ -280,6 +280,10 @@ function Group:clear()
     end
 
     self.length = 0
+end
+
+function Group:getObjects()
+    return self.members
 end
 
 return Group

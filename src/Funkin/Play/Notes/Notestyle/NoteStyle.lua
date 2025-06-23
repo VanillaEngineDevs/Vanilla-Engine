@@ -35,12 +35,12 @@ function NoteStyle:buildNoteSprite(target)
         error("Could not load spritesheet for note style: " .. self.id)
     end
 
-    target:setFrames(atlas.frames)
+    target:setFrames(atlas)
     target.antialiasing = not (self._data.assets and self._data.assets.note and self._data.assets.note.isPixel or false)
 
     self:buildNoteAnimations(target)
 
-    local scale = self:getNoteScale()
+    local scale = self._data.assets.note and self._data.assets.note.scale or 1.0
     target.scale.x = scale
     target.scale.y = scale
     target.scale.x, target.scale.y = target.scale.x * 0.7, target.scale.y * 0.7

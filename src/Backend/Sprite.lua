@@ -321,12 +321,14 @@ function Sprite:render(camera)
         oy = oy + curFrame.offset.y
     end
 
+	if self.printIfDrawing then printf("Drawing sprite %s at (%d, %d) with rotation %.2f and scale (%.2f, %.2f)", self._label or "unknown", x, y, rot, sx, sy) end
+
     if not curFrame then
         love.graphics.draw(self.graphic, x, y, rot, sx, sy, ox, oy)
     else
         love.graphics.draw(self.graphic, curFrame.quad, x, y, rot, sx, sy, ox, oy)
     end
-	
+
 	love.graphics.pop()
 end
 

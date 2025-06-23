@@ -150,12 +150,20 @@ function SpriteGroup:replace(old, new)
     return self.group:replace(old, new)
 end
 
+function SpriteGroup:getFirstAvailable(spriteClass)
+    return self.group:getFirstAvailable(spriteClass)
+end
+
 function SpriteGroup:sort(func, order)
     return self.group:sort(func, order)
 end
 
 function SpriteGroup:refresh()
     return self.group:refresh()
+end
+
+function SpriteGroup:getObjects()
+    return self.group:getObjects()
 end
 
 function SpriteGroup:clear()

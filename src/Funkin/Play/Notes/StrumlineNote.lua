@@ -51,6 +51,7 @@ function StrumlineNote:setup(noteStyle)
     end
 
     noteStyle:applyStrumlineFrames(self)
+    print("StrumlineNote:direction", self.direction)
     noteStyle:applyStrumlineAnimations(self, self.direction)
     self:play("static", true)
 
