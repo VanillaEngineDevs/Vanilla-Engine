@@ -8,7 +8,7 @@ local SONG_METADATA_VERSION_RULE = "2.2.x"
 function SongRegistry:loadEntries()
     self:clearEntries()
 
-    local entryIdList = DataAssets:listDataFilesInPath("songs/", "-metadata.json"):map(function(songDataPath)
+    local entryIdList = DataAssets:listSongDataFilesInPath("songs/", "-metadata.json"):map(function(songDataPath)
         return songDataPath:split("/")[1]
     end)
 

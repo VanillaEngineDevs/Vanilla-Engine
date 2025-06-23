@@ -7,6 +7,7 @@ function PlayState:new(params)
     self.currentDifficulty = Constants.DEFAULT_DIFFICULTY
     self.currentVariation = Constants.DEFAULT_VARIATION
     self.currentInstrumental = ""
+    self.currentStage = nil
     self.needsReset = false
     self.deathCounter = 0
     self.health = Constants.HEALTH_STARTING
@@ -182,8 +183,13 @@ end
 function PlayState:initCameras()
     self.camHUD = Camera()
 
+    Game.cameras:reset()
+    Game.cameras:add(self.camHUD)
 
-
+    if self.previousCameraFollowPoint ~= nil then
+        --self.cameraFollowPoint:setPosition(self.previousCameraFollowPoint.x, self.previousCameraFollowPoint.y)
+        self.previousCameraFollowPoint = nil
+    end
 end
 
 function PlayState:initHealthbar()
@@ -226,7 +232,7 @@ function PlayState:initPreciseInputs()
 end
 
 function PlayState:loadStage(id)
-    self.currentStage = SongRegistry:fetchEntry(id)
+    --self.currentStage = StageRegistry:fetchEntry(id)
 
     if self.currentStage ~= nil then
         self.currentStage:revive()
@@ -255,14 +261,14 @@ function PlayState:resetCamera(resetZoom, cancelTweens, snap)
         --
     end
 
-    --Game.camera.follow(self.cameraFollowPoint, 1, 1, 0, 0)
-    --Game.camera.targetOffset:set()
+    Game.camera.follow(self.cameraFollowPoint, 1, 1, 0, 0)
+    Game.camera.targetOffset:set()
 
     if resetZoom then
         self:resetCameraZoom()
     end
-    
-    --if snap then Game.camera.focusOn(self.cameraFollowPoint) end
+
+    if snap then Game.camera:focusOn(self.cameraFollowPoint) end
 end
 
 function PlayState:startCountdown()
@@ -273,6 +279,85 @@ end
 function PlayState:update(dt)
     MusicBeatState.update(self, dt)
 
+    local list = Game.sound.list
+    --self:updateHealthbar()
+    --self:updateScoreText()
+
+    if self.needsReset then
+        self.prevScrollTargets = {}
+        self.previousDifficulty = self.currentDifficulty
+        self:resetCamera()
+
+        local fromDeathState = self.isPlayerDying
+        self.persistentUpdate = true
+        self.persistentDraw = true
+        
+        self.startingSong = true
+        self.isPlayerDying = false
+
+        if Game.sound.music ~= nil then
+            Game.sound.music.time = self.startTimestamp - (Conductor.combinedOffset or 0)
+            Game.sound.music.pitch = self.playbackRate
+            Game.sound.music:pause()
+        end
+
+        if not self.overrideMusic then
+            if self.vocals ~= nil then
+                self.vocals:stop()
+            end
+
+            self.vocals = self:get_currentChart():buildVocals()
+
+            if #self.vocals.members == 0 then
+                print("WARN: No vocals found for song")
+            end
+        end
+
+        vocals:pause()
+        vocals.time = 0 - (Conductor.combinedOffset or 0)
+        vocals.volume = 1
+        vocals.playerVolume = 1
+        vocals.opponentVolume = 1
+
+        if self.currentStage then
+            self.currentStage:resetStage()
+        end
+
+        if not self.fromDeathState then
+            self.playerStrumline:vwooshNotes()
+            self.opponentStrumline:vwooshNotes()
+        end
+
+        self.playerStrumline:clean()
+        self.opponentStrumline:clean()
+
+        self:regenNoteData()
+
+        Conductor:update(-5000, false)
+
+        self.cameraBopIntensity = Constants.DEFAULT_BOP_INTENSITY
+        self.hudCameraZoomIntensity = (self.cameraBopIntensity - 1) * 2
+        self.cameraZoomRate = Constants.DEFAULT_ZOOM_RATE
+
+        self.health = Constants.HEALTH_STARTING
+        self.songScore = 0
+
+        -- vwoosh stuff
+
+        --
+
+        if self.currentStage then
+            if self.currentStage:getBoyfriend() then
+                self.currentStage:getBoyfriend():initHealthIcon(false)
+            end
+            if self.currentStage:getDad() then
+                self.currentStage:getDad():initHealthIcon(false)
+            end
+        end
+
+        self.needsReset = false
+    end
+
     if self.startingSong then
         if self.isInCountdown then
             Conductor:update(Conductor.songPosition + dt * 1000, false)
@@ -282,9 +367,17 @@ function PlayState:update(dt)
         end
     else
         Conductor:update(Conductor.songPosition + dt * 1000, false)
+
+        --[[
+        if Conductor.songPosition >= (Game.sound.music.endTime or Game.sound.music.length) then
+            if self.mayPauseGame then self:endSong() end
+        end
+        ]]
     end
 
-    -- if pause
+    -- pause
+
+    --
 
     if self.health > Constants.HEALTH_MAX then self.health = Constants.HEALTH_MAX end
     if self.health < Constants.HEALTH_MIN then self.health = Constants.HEALTH_MIN end
@@ -292,7 +385,7 @@ function PlayState:update(dt)
     if self.subState == nil and self.cameraZoomRate > 0 then
         self.cameraBopMultiplier = math.lerp(1, self.cameraBopMultiplier, 0.95)
         local zoomPlusBop = self.currentCameraZoom * self.cameraBopMultiplier
-        --Game.camera.zoom = zoomPlusBop
+        Game.camera.zoom = zoomPlusBop
         self.camHUD.zoom = math.lerp(self.defaultHUDCameraZoom, self.camHUD.zoom, 0.95)
     end
 
@@ -302,8 +395,12 @@ function PlayState:update(dt)
     if self.health <= Constants.HEALTH_MIN and not self.isPracticeMode and not self.isPlayerDying then
     end
 
+    -- player death handling
+
+    --
+
     self:processSongEvents()
-    
+
     self:processInputQueue()
 
     if not self.isInCutscene then
@@ -349,6 +446,7 @@ function PlayState:startSong()
     self.vocals:play()
     self.vocals.volume = 1
     self.vocals.pitch = self.playbackRate
+
     --[[ self:resyncVocals() ]]
 end
 
@@ -374,7 +472,11 @@ function PlayState:generateSong()
 end
 
 function PlayState:dispatchEvent(event)
+    --MusicBeatState.dispatchEvent(self, event)
 
+    if self.currentStage then
+        self.currentStage:dispatchToCharacters(event)
+    end
 end
 
 function PlayState:regenNoteData(startTime)

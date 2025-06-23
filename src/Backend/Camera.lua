@@ -11,16 +11,21 @@ Camera.defaultZoom = 1
 ---@param height number
 function Camera:new(x, y, width, height)
     self.scroll = Point()
+    self.targetOffset = Point(0, 0)
     self.rotation = 0
     self.angle = 0
     self.zoom = 1
     self.target = nil
     self.followLerp = 0
     self.res = 1
-    
+
     self.color = {0, 0, 0, 0}
 
     self.x, self.y, self.width, self.height = x, y, width, height
+    self.x = self.x or 0
+    self.y = self.y or 0
+    self.width = self.width or 1
+    self.height = self.height or 1
 
     self.renders = {}
 

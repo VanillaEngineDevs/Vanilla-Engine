@@ -27,6 +27,33 @@ function love.load()
 
     Game = Group()
     Game.sound = require "Backend.SoundManager"
+    Game.camera = Camera()
+    Game.cameras = Group()
+    Game.cameras.list = {}
+    function Game.cameras:reset(new)
+        Game.camera = nil
+
+        while #self.list > 0 do
+            self:remove(self.list[1])
+        end
+
+        if new == nil then
+            new = Camera()
+        end
+
+        Game.camera = new
+        self:add(new)
+        new.ID = 0
+
+        Camera._defaultCameras = {new}
+    end
+    function Game.cameras:add(camera)
+        if not camera:isInstanceOf(Camera) then
+            error("Expected a Camera instance")
+        end
+        table.insert(self.list, camera)
+        self:insert(#self.list, camera)
+    end
     function Game:switchState(newState)
         for _, member in ipairs(Game.members) do
             if member:isInstanceOf(State) then
@@ -43,6 +70,7 @@ function love.load()
     Game:add(Camera._defaultCameras[1])
 
     SongRegistry:loadEntries()
+    StageRegistry:loadEntries()
 
     Paths.setCurrentLevel("week1")
     local songData = SongRegistry:fetchEntry("bopeebo")

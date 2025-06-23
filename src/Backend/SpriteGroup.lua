@@ -1,3 +1,4 @@
+---@class SpriteGroup : Sprite
 local SpriteGroup = Sprite:extend()
 
 function SpriteGroup:new(x, y, maxSize)

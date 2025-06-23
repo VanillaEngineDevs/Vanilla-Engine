@@ -12,9 +12,11 @@ DataAssets = r("Util.Assets.DataAssets")
 
 BaseRegistry = r("Data.BaseRegistry")
 SongMetadata = r("Data.Song.SongData")
+StageData = r("Data.Stage.StageData")
 Song = r("Play.Song.Song")
 VersionUtil = r("Util.VersionUtil")
 SongRegistry = r("Data.Song.SongRegistry")()
+StageRegistry = r("Data.Stage.StageRegistry")()
 NoteStyleRegistry = r("Data.Notestyle.NoteStyleRegistry")()
 
 SoundGroup = r("Audio.SoundGroup")

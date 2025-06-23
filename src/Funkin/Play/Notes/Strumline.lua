@@ -66,7 +66,7 @@ function Strumline:new(noteStyle, isPlayer)
     self:resetScrollSpeed()
 
     for i = 1, self.KEY_COUNT do
-        local child = StrumlineNote(noteStyle, isPlayer, --[[ self.DIRECTIONS[i] ]]table.find(Strumline.DIRECTIONS, i - 1))
+        local child = StrumlineNote(noteStyle, isPlayer, table.find(Strumline.DIRECTIONS, i - 1))
         child.x = self.INITIAL_OFFSET
         child.x = child.x + self:getXPos(table.find(Strumline.DIRECTIONS, i - 1))
         child.x = child.x + self.INITIAL_OFFSET
