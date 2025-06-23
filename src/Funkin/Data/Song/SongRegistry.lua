@@ -92,17 +92,7 @@ end
 function SongRegistry:parseEntryMetadataWithMigration(id, variation, version)
     local variation = variation or Constants.DEFAULT_VARIATION
 
-    if SONG_METADATA_VERSION_RULE == nil or VersionUtil:validateVersion(version, SONG_METADATA_VERSION_RULE) then
-        return self:parseEntryMetadata(id, variation)
-    elseif VersionUtil:validateVersion(version, "2.1.x") then
-        return self:parseEntryMetadata_v2_1_0(id, variation)
-    elseif VersionUtil:validateVersion(version, "2.0.x") then
-        return self:parseEntryMetadata_v2_0_0(id, variation)
-    else
-        return self:parseEntryMetadata(id, variation)
-    end
-
-    --[[ return self:parseEntryMetadata(id, variation) ]]
+    return self:parseEntryMetadata(id, variation)
 end
 
 function SongRegistry:fetchEntryChartVersion(id, variation)
@@ -115,13 +105,16 @@ end
 
 function SongRegistry:loadEntryChartFile(id, variation)
     local variation = variation and variation.variation or Constants.DEFAULT_VARIATION
+    print("variation: " .. variation)
     local entryFilePath = Paths.file("data/songs/" .. id .. "/" .. id .. "-chart" .. (variation == Constants.DEFAULT_VARIATION and "" or ("-" .. variation)) .. ".json")
     if not love.filesystem.getInfo(entryFilePath) then
+        print("Error: Chart file for song " .. id .. " with variation " .. variation .. " does not exist at path: " .. entryFilePath)
         return nil
     end
 
     local rawJson = love.filesystem.read(entryFilePath)
     if rawJson == nil then
+        print("Error: Could not read chart file for song " .. id .. " with variation " .. variation)
         return nil
     end
 
@@ -143,6 +136,7 @@ end
 
 function SongRegistry:parseEntryChartData(id, variation)
     variation = variation or Constants.DEFAULT_VARIATION
+    oPrint(id, variation, "FUCK222")
 
     local jsonData = SongRegistry:loadEntryChartFile(id, variation)
     if jsonData == nil then
@@ -153,7 +147,6 @@ function SongRegistry:parseEntryChartData(id, variation)
 
     local real = SongChartData(data.scrollSpeed, data.events, data.notes)
     real.version = data.version
-    oPrint("BALLS", real.notes.normal)
 
     return self:cleanChartData(real, variation)
 end

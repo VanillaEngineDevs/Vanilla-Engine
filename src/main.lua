@@ -7,6 +7,14 @@ function print(...)
     oPrint("[" .. (debug.getinfo(2, "S").source):gsub("@", ""):gsub(".lua", "") .. "] " .. table.concat(args, " "))
 end
 
+function printf(str, ...)
+    oPrint("[" .. (debug.getinfo(2, "S").source):gsub("@", ""):gsub(".lua", "") .. "] " .. string.format(str, ...))
+end
+
+function oPrintf(str, ...)
+    oPrint(string.format(str, ...))
+end
+
 function love.load()
     Config = require("Backend.Config")
     Class = require("Lib.Class")
@@ -40,7 +48,6 @@ function love.load()
     local songData = SongRegistry:fetchEntry("bopeebo")
     print(songData)
     songData:cacheCharts()
-    oPrint(#songData.difficulties["hard"].notes)
     local params = {
         targetSong = songData,
         targetDifficulty = "hard"

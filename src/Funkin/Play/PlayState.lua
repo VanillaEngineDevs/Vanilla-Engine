@@ -63,12 +63,15 @@ function PlayState:new(params)
     self.BACKGROUND_COLOR = {0, 0, 0, 1}
 
     self.currentSong = params.targetSong
-    print(#self.currentSong.difficulties["hard"].notes)
+
     if params.targetDifficulty then
         self.currentDifficulty = params.targetDifficulty
     end
     if params.targetVariation then
         self.currentVariation = params.targetVariation
+    end
+    if not self.currentVariation then 
+        self.currentVariation = Constants.DEFAULT_VARIATION
     end
     if params.targetInstrumental then
         self.currentInstrumental = params.targetInstrumental
@@ -156,7 +159,7 @@ function PlayState:get_currentChart()
 
     --[[ local curChart = self.currentSong:getDifficulty(self.currentDifficulty, self.currentVariation) ]]
     if not self.curChart then
-        self.curChart = self.currentSong:getDifficulty(self.currentDifficulty, self.currentVariation)
+        self.curChart = self.currentSong:getDifficulty(self.currentDifficulty, self.currentVariation, nil, true)
     end
     return self.curChart
 end
@@ -379,6 +382,7 @@ function PlayState:regenNoteData(startTime)
 
     local currentChart = self:get_currentChart()
     if #currentChart.notes == 0 then
+        printf("FALLING BACK TO BOPEEBO [%s] CHART", self.currentDifficulty)
         currentChart.notes = Json.decode(love.filesystem.read(Paths.json("songs/bopeebo/bopeebo-chart"))).notes[self.currentDifficulty]
     end
     local event = SongLoadScriptEvent(currentChart.song.id, currentChart.difficulty, table.copy(currentChart.notes)--[[ , table.copy(currentChart:getEvents() ]])

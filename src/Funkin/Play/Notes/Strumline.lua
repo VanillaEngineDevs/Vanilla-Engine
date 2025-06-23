@@ -142,7 +142,7 @@ function Strumline:updateNotes()
 
         if note.t < songStart or note.t < hitWindowStart then
             -- Note is in the past, skip it.
-            print("Strumline:updateNotes: Skipping note in the past: ", note.t, " < ", songStart, " or ", note.t, " < ", hitWindowStart)
+            --print("Strumline:updateNotes: Skipping note in the past: ", note.t, " < ", songStart, " or ", note.t, " < ", hitWindowStart)
             self.nextNoteIndex = i + 1
             goto continue
         end

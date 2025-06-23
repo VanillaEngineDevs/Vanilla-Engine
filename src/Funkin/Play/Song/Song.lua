@@ -170,7 +170,6 @@ function Song:new(id)
     self.difficulties = {}
 
     self._data = self:_fetchData(id)
-    print(self._data.playData)
 
     self._metadata = self._data == nil and {} or {[Constants.DEFAULT_VARIATION] = self._data}
 
@@ -250,7 +249,7 @@ function Song:populateDifficulties()
             end
             local variationSuffix = ""
             if metadata.variation == Constants.DEFAULT_VARIATION then
-                variationSuffix = ""
+                variationSuffix = "-" .. Constants.DEFAULT_VARIATION
             else
                 variationSuffix = "-" .. metadata.variation
             end
@@ -270,7 +269,7 @@ function Song:cacheCharts(force)
             goto continue
         end
         oPrint(self.id, variation, version)
-        local chart = SongRegistry:parseEntryChartDataWithMigration(self.id, variation, version)
+        local chart = SongRegistry:parseEntryChartData(self.id, variation)
         if chart == nil then
             goto continue
         end
@@ -280,14 +279,18 @@ function Song:cacheCharts(force)
 end
 
 function Song:applyChartData(chartData, variation)
+    if type(variation) == "table" then
+        variation = variation.variation or Constants.DEFAULT_VARIATION
+    end
+
     for diffId, chartNotes in pairs(chartData.notes) do
         local nullDiff = self:getDifficulty(diffId, variation)
         local difficulty = nullDiff or SongDifficulty(self, diffId, variation)
 
         if nullDiff == nil then
             local metadata = self._metadata[variation]
-            local d = self.difficulties[variation]
-            if d then
+            local d = self.difficulties[diffId .. variation] or self.difficulties[diffId]
+            if d and d.set then
                 d:set(diffId, difficulty)
             end
 
@@ -315,16 +318,25 @@ function Song:applyChartData(chartData, variation)
     end
 end
 
-function Song:getDifficulty(diffId, variation, variations)
+function Song:getDifficulty(diffId, variation, variations, log)
     diffId = diffId or self:listDifficulties(variation, variations)[1]
     variation = variation or Constants.DEFAULT_VARIATION
     variations = variations or {variation}
+    if type(variations) == "string" then
+        variations = {variations}
+    end
 
     for _, currentVariation in pairs(variations) do
         if not currentVariation or currentVariation == "default" then currentVariation = Constants.DEFAULT_VARIATION end
+        if type(currentVariation) == "string" then
+            currentVariation = {variation = currentVariation}
+        end
         local variationSuffix = currentVariation ~= Constants.DEFAULT_VARIATION and "-" .. currentVariation.variation or ""
+
         if self.difficulties[diffId .. variationSuffix] then
-            --table.print(self.difficulties[diffId .. variationSuffix])
+            if log then
+                oPrint("Found difficulty: " .. diffId .. variationSuffix)
+            end
             return self.difficulties[diffId .. variationSuffix]
         end
     end
