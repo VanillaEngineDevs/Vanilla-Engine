@@ -50,7 +50,7 @@ function PlayState:new(params)
     self.startingSong = false
     self.musicPausedBySubState = false
 
-    self.cameraTweensPausedBySubState = false
+    self.cameraTweensPausedBySubState = {}
     self.initialized = false
 
     self.vocals = VoicesGroup()
@@ -94,6 +94,9 @@ function PlayState:create()
     PlayState.instance = self
 
     self.cameraFollowPoint = Object(0, 0)
+
+    self.persistentUpdate = true
+    self.persistentDraw = true
 
     if not self.overrideMusic and Game.sound.music then
         Game.sound.music:stop()
@@ -182,15 +185,19 @@ function PlayState:get_currentSongLengthMs()
 end
 
 function PlayState:initCameras()
+    self.camGame = FunkinCamera("playStateCamGame")
     self.camHUD = Camera()
+    self.camCutscene = Camera()
 
     Game.cameras:reset()
     Game.cameras:add(self.camHUD)
+    Game.cameras:add(self.camCutscene)
 
     if self.previousCameraFollowPoint ~= nil then
-        --self.cameraFollowPoint:setPosition(self.previousCameraFollowPoint.x, self.previousCameraFollowPoint.y)
+        self.cameraFollowPoint:setPosition(self.previousCameraFollowPoint.x, self.previousCameraFollowPoint.y)
         self.previousCameraFollowPoint = nil
     end
+    -- self:add(self.cameraFollowPoint)
 end
 
 function PlayState:initHealthbar()
@@ -202,7 +209,12 @@ function PlayState:initStage()
 end
 
 function PlayState:initCharacters()
-
+    if self.currentStage ~= nil then
+        if dad ~= nil then
+            --self.currentStage:addCharacter(dad, "DAD")
+            self.cameraFollowPoint:setPosition(dad.cameraFocusPoint.x, dad.cameraFocusPoint.y)
+        end
+    end
 end
 
 function PlayState:initStrumlines()
@@ -269,6 +281,52 @@ function PlayState:resetCamera(resetZoom, cancelTweens, snap)
     end
 
     if snap then Game.camera:focusOn(self.cameraFollowPoint) end
+end
+
+function PlayState:tweenCameraToPosition(x, y, duration, ease)
+    self.cameraFollowPoint:setPosition(x, y)
+    self:tweenCameraToFollowPoint(duration, ease)
+end
+
+--[[
+ public function tweenCameraToFollowPoint(?duration:Float, ?ease:Null<Float->Float>):Void
+  {
+    // Cancel the current tween if it's active.
+    cancelCameraFollowTween();
+
+    if (duration == 0)
+    {
+      // Instant movement. Just reset the camera to force it to the follow point.
+      resetCamera(false, false);
+    }
+    else
+    {
+      // Disable camera following for the duration of the tween.
+      FlxG.camera.target = null;
+
+      // Follow tween! Caching it so we can cancel/pause it later if needed.
+      var followPos:FlxPoint = cameraFollowPoint.getPosition() - FlxPoint.weak(FlxG.camera.width * 0.5, FlxG.camera.height * 0.5);
+      cameraFollowTween = FlxTween.tween(FlxG.camera.scroll, {x: followPos.x, y: followPos.y}, duration,
+        {
+          ease: ease,
+          onComplete: function(_) {
+            resetCamera(false, false); // Re-enable camera following when the tween is complete.
+          }
+        });
+    }
+  }]]
+  
+function PlayState:tweenCameraToFollowPoint(duration, ease)
+    self:cancelCameraFollowTween()
+
+    if duration == 0 then
+        self:resetCamera(false, false)
+    else
+        Game.camera.target = nil
+
+        local followPos = self.cameraFollowPoint:getPosition() - Point(Game.width * 0.5, Game.height * 0.5)
+        -- self.cameraFollowTween = 
+    end
 end
 
 function PlayState:startCountdown()

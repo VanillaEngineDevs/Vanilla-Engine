@@ -35,6 +35,7 @@ MainMenuState = r("UI.MainMenu.MainMenuState")
 PlayState = r("Play.PlayState")
 
 FunkinSprite = r("Graphics.FunkinSprite")
+FunkinCamera = r("Graphics.FunkinCamera")
 
 StageProp = r("Play.Stage.StageProp")
 Bopper = r("Play.Stage.Bopper")

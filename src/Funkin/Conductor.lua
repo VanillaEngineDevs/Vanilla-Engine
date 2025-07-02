@@ -170,7 +170,6 @@ function Conductor:update(songPos, applyOffsets, forceDispatch)
         end
     end
 
-
     if self.currentTimeChange ~= nil and Game.sound.music ~= nil then
         self.currentStepTime = (self.currentTimeChange.beatTime * Constants.STEPS_PER_BEAT) + (self.songPosition - self.currentTimeChange.timeStamp) / self.get_stepLengthMs()
         self.currentBeatTime = self.currentStepTime / Constants.STEPS_PER_BEAT
@@ -203,7 +202,7 @@ function Conductor:mapTimeChanges(songTimeChanges)
     table.sort(songTimeChanges, function(a, b)
         return a.t > b.t
     end)
-    
+
     for _, songTimeChange in ipairs(songTimeChanges) do
         songTimeChange.timeStamp = songTimeChange.t
         songTimeChange.beatTime = songTimeChange.b
