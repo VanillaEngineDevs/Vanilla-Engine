@@ -22,8 +22,7 @@ function love.conf(t)
     t.window.width = Config.WindowWidth
     t.window.height = Config.WindowHeight
     t.window.resizable = Config.Resizable
-    
-    -- Modify render settings, automatically uses which renderer is recommended
+    t.window.vsync = Config.VSync
 
     t.version = Config.Version
 

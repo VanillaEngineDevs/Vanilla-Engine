@@ -14,7 +14,7 @@ Config.WindowHeight = 720
 
 Config.GameWidth = 1280
 Config.GameHeight = 720
-
+Config.VSync = 0
 Config.Resizable = true
 
 Config.Version = "11.5.0"

@@ -98,4 +98,11 @@ end
 
 function love.draw()
     Game:draw()
+
+    local width = love.graphics.getWidth()
+    local luaMem = collectgarbage("count") / 1024 -- convert to MB
+    local graphicsMem = love.graphics.getStats().texturememory / 1024 / 1024
+    local fps = love.timer.getFPS()
+
+    love.graphics.printf(string.format("FPS: %s\n Lua Memory: %.2f MB\nGraphics Memory: %.2f MB", fps, luaMem, graphicsMem), 10, 10, width - 20, "right")
 end

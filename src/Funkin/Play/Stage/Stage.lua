@@ -100,13 +100,12 @@ function Stage:buildStage()
             propData.active = false
         end
 
-        propSprite:updateHitbox()
-
         propSprite.x, propSprite.y = propData.position[1], propData.position[2]
 
         propSprite.alpha = propData.alpha or 1
         propSprite.antialiasing = not propData.isPixel
 
+        propSprite.scale.x, propSprite.scale.y = propData.scale[1] or 1, propData.scale[2] or 1
         propSprite.scrollFactor.x, propSprite.scrollFactor.y = propData.scroll[1] or 1, propData.scroll[2] or 1
         propSprite.angle = propData.angle or 0
         --propSprite.color = Color.fromString(propData.color or "#FFFFFF")
@@ -147,6 +146,8 @@ function Stage:buildStage()
         else
             self:addProp(propSprite, propData.name)
         end
+
+        propSprite:updateHitbox()
 
         --::continue::
     end
