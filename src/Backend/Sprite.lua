@@ -52,6 +52,7 @@ function Sprite:new(x, y, graphic)
     self.anims = nil
 
     self.offset = Point()
+	self.animOffsets = {}
 
 	self.cameras = {}
 
@@ -93,6 +94,17 @@ function Sprite:play(anim, force, frame)
 		self.curFrame = frame or 1
 		self.animFinished = false
 		self.animPaused = false
+	end
+end
+
+function Sprite:setAnimationOffsets(anim, offsetX, offsetY)
+	if not self.anims then return end
+	if not self.anims[anim] then return end
+
+	if type(offsetX) == "number" then
+		self.animOffsets[anim] = Point(offsetX, offsetY or offsetX)
+	else
+		self.animOffsets[anim] = offsetX
 	end
 end
 
@@ -183,6 +195,28 @@ function Sprite:addAnimByIndices(name, prefix, indices, postfix, framerate, loop
 	for _, i in ipairs(indices) do
 		local f = allFrames[i + 1]
 		if f then table.insert(anim.frames, f) end
+	end
+
+	if not self.anims then self.anims = {} end
+	self.anims[name] = anim
+end
+
+function Sprite:addAnimByFrames(name, frames, framerate, looped)
+	if framerate == nil then framerate = 30 end
+	if looped == nil then looped = true end
+
+	local anim = {
+		name = name,
+		framerate = framerate,
+		looped = looped,
+		frames = {}
+	}
+
+	for _, f in ipairs(frames) do
+		local frame = self.frames[f]
+		if frame then
+			table.insert(anim.frames, frame)
+		end
 	end
 
 	if not self.anims then self.anims = {} end
@@ -319,6 +353,11 @@ function Sprite:render(camera)
     if curFrame then
         ox = ox + curFrame.offset.x
         oy = oy + curFrame.offset.y
+
+		if self.animOffsets[curFrame.name] then
+			ox = ox + self.animOffsets[curFrame.name].x
+			oy = oy + self.animOffsets[curFrame.name].y
+		end
     end
 
 	if self.printIfDrawing then printf("Drawing sprite %s at (%d, %d) with rotation %.2f and scale (%.2f, %.2f)", self._label or "unknown", x, y, rot, sx, sy) end

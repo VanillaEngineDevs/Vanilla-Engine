@@ -7,4 +7,14 @@ function FunkinSprite:isAnimationDynamic(id)
     return #animData.frames > 1
 end
 
+function FunkinSprite:loadSparrow(key)
+    local data = Paths.getSparrowAtlas(key)
+
+    self:setFrames(data.frames) -- also sets the image!
+end
+
+function FunkinSprite:loadTexture(key)
+    self:load(Paths.image(key))
+end
+
 return FunkinSprite

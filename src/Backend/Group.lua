@@ -260,7 +260,7 @@ end
 ---@return nil
 function Group:refresh()
     self:sort(function(a, b)
-        return a.zIndex or 0 < b.zIndex or 0
+        return (a.zIndex or 0) < (b.zIndex or 0)
     end)
 end
 

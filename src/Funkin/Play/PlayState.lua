@@ -146,7 +146,7 @@ end
 
 function PlayState:get_stageZoom()
     if self.currentStage then
-        return self.currentStage.zoom
+        return self.currentStage:get_camZoom()
     else
         return Camera.defaultZoom * 1.05
     end
@@ -232,11 +232,10 @@ function PlayState:initPreciseInputs()
 end
 
 function PlayState:loadStage(id)
-    --self.currentStage = StageRegistry:fetchEntry(id)
+    self.currentStage = Stage(StageRegistry:fetchEntry(id))
+    self.currentStage:onCreate()
 
     if self.currentStage ~= nil then
-        self.currentStage:revive()
-
         self:resetCameraZoom()
 
         self:add(self.currentStage)

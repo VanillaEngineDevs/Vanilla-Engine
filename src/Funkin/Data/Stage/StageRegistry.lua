@@ -11,13 +11,14 @@ end
 function StageRegistry:new()
     StageRegistry.instance = self
     BaseRegistry.new(self, "STAGE", "stages", "x.x.x")
+    StageRegistry.generic = StageData
 end
 
 function StageRegistry:loadEntries()
     self:clearEntries()
 
     local entryIdList = DataAssets:listDataFilesInPath("stages/"):map(function(stageDataPath)
-        return stageDataPath:split("/")[1]
+        return stageDataPath
     end)
 
     local unscriptedDataEntryIds = entryIdList:filter(function(id)
@@ -26,7 +27,7 @@ function StageRegistry:loadEntries()
 
     for _, id in ipairs(unscriptedDataEntryIds) do
         local ok, entryData = pcall(function()
-            local entry = self:createEntry(id)
+            local entry = self:createEntry(id, Json.decode(love.filesystem.read(Paths.json("stages/" .. id))))
             if entry then
                 self.entries[id] = entry
             end
@@ -34,6 +35,15 @@ function StageRegistry:loadEntries()
 
         if not ok then
             print("Error loading stage data for " .. id .. ": " .. entryData)
+        end
+    end
+end
+
+function StageRegistry:fetchEntry(id)
+    for i, entry in pairs(self.entries) do
+        if id == i then
+
+            return entry
         end
     end
 end

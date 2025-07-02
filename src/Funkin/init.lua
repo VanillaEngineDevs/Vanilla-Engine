@@ -19,6 +19,8 @@ SongRegistry = r("Data.Song.SongRegistry")()
 StageRegistry = r("Data.Stage.StageRegistry")()
 NoteStyleRegistry = r("Data.Notestyle.NoteStyleRegistry")()
 
+Stage = r("Play.Stage.Stage")
+
 SoundGroup = r("Audio.SoundGroup")
 VoicesGroup = r("Audio.VoicesGroup")
 FunkinSound = r("Audio.FunkinSound")
@@ -33,6 +35,9 @@ MainMenuState = r("UI.MainMenu.MainMenuState")
 PlayState = r("Play.PlayState")
 
 FunkinSprite = r("Graphics.FunkinSprite")
+
+StageProp = r("Play.Stage.StageProp")
+Bopper = r("Play.Stage.Bopper")
 
 NoteDirection = r("Play.Notes.NoteDirection")
 Strumline = r("Play.Notes.Strumline")
