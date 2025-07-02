@@ -79,9 +79,12 @@ function Stage:buildStage()
 
         if propData.danceEvery ~= 0 then
             propSprite = Bopper(propData.danceEvery)
+            --goto continue
         else
             propSprite = StageProp(name)
         end
+
+        printf("Adding prop: %s", name)
 
         if isAnimated then
             if propData.animType == "packer" then
@@ -89,7 +92,7 @@ function Stage:buildStage()
             else
                 propSprite:loadSparrow(propData.assetPath)
             end
-        elseif self.isSolidColor then
+        elseif isSolidColor then
             local w, h = 1, 1
         else
             propSprite:loadTexture(propData.assetPath)
@@ -112,22 +115,25 @@ function Stage:buildStage()
 
         propSprite.flipX, propSprite.flipY = propData.flipX or false, propData.flipY or false
 
-        if propData.animType == "packer" then
-            for _, anim in ipairs(propData.animations) do
-                propSprite:addAnimByFrames(anim.name, anim.frameIndices)
+        if not isSolidColor then
+            if propData.animType == "packer" then
+                for _, anim in ipairs(propData.animations) do
+                    propSprite:addAnimByFrames(anim.name, anim.frameIndices)
 
-                if propSprite:isInstanceOf(Bopper) then
-                    propSprite:setAnimationOffsets(anim.name, anim.offsets[1] or 0, anim.offsets[2] or 0)
+                    if propSprite:isInstanceOf(Bopper) then
+                        propSprite:setAnimationOffsets(anim.name, anim.offsets[1] or 0, anim.offsets[2] or 0)
+                    end
                 end
-            end
-        else
-            for _, anim in pairs(propData.animations) do
-                if anim.frameIndices == nil or #anim.frameIndices <= 0 then
-                    propSprite:addAnimByName(anim.name, anim.prefix, anim.postfix or "", anim.framerate, anim.looped)
-                    propSprite:setAnimationOffsets(anim.name, anim.offsets[1] or 0, anim.offsets[2] or 0)
-                else
-                    propSprite:addAnimByIndices(anim.name, anim.prefix, anim.postfix or "", anim.frameIndices, anim.framerate, anim.looped)
-                    propSprite:setAnimationOffsets(anim.name, anim.offsets[1] or 0, anim.offsets[2] or 0)
+            else
+                for _, anim in pairs(propData.animations) do
+                    anim.offsets = anim.offsets or {0, 0}
+                    if anim.frameIndices == nil or #anim.frameIndices <= 0 then
+                        propSprite:addAnimByPrefix(anim.name, anim.prefix, tonumber(anim.framerate), anim.looped)
+                        propSprite:setAnimationOffsets(anim.name, anim.offsets[1] or 0, anim.offsets[2] or 0)
+                    else
+                        propSprite:addAnimByIndices(anim.name, anim.prefix, anim.frameIndices, tonumber(anim.framerate), anim.looped)
+                        propSprite:setAnimationOffsets(anim.name, anim.offsets[1] or 0, anim.offsets[2] or 0)
+                    end
                 end
             end
         end
@@ -141,6 +147,8 @@ function Stage:buildStage()
         else
             self:addProp(propSprite, propData.name)
         end
+
+        --::continue::
     end
 end
 

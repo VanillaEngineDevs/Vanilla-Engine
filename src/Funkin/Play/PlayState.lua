@@ -167,7 +167,8 @@ end
 
 function PlayState:get_currentStageId()
     local curChart = self:get_currentChart()
-    if not self.currentSong or curChart.stage or curChart.stage == "" then
+    if not self.currentSong or not curChart.stage or curChart.stage == "" then
+        print("NO STAGE SELECTED")
         return Constants.DEFAULT_STAGE
     end
 

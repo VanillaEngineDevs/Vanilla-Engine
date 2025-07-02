@@ -72,13 +72,14 @@ function love.load()
     SongRegistry:loadEntries()
     StageRegistry:loadEntries()
 
-    Paths.setCurrentLevel("week1")
-    local songData = SongRegistry:fetchEntry("bopeebo")
+    Paths.setCurrentLevel("week7")
+    local songData = SongRegistry:fetchEntry("guns")
     print(songData)
     songData:cacheCharts()
     local params = {
         targetSong = songData,
-        targetDifficulty = "hard"
+        targetDifficulty = "hard",
+        targetVariation = "pico"
     }
 
     Game:switchState(PlayState(params))

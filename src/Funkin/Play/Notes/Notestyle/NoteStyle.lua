@@ -72,7 +72,15 @@ function NoteStyle:buildNoteFrames(force)
         return self.noteFrames
     end
 
-    self.noteFrames = Paths.getSparrowAtlas(noteAssetPath)
+    --[[ self.noteFrames = Paths.getSparrowAtlas(noteAssetPath) ]]
+    if not self.noteFrames then
+        self.noteFrames = Paths.getSparrowAtlas(noteAssetPath)
+
+        if not self.noteFrames then
+            error("Could not load spritesheet for note style: " .. self.id)
+            return nil
+        end
+    end
 
     if not self.noteFrames then
         error("Could not load note frames for NoteStyle: " .. self.id)

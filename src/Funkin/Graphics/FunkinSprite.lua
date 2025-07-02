@@ -10,7 +10,7 @@ end
 function FunkinSprite:loadSparrow(key)
     local data = Paths.getSparrowAtlas(key)
 
-    self:setFrames(data.frames) -- also sets the image!
+    self:setFrames(data) -- also sets the image!
 end
 
 function FunkinSprite:loadTexture(key)
