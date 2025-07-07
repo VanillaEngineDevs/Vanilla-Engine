@@ -211,7 +211,6 @@ function love.load()
 	HoldCover = require "modules.Cover"
 	waveform = require "modules.waveform"
 	popupScore = require "modules.popupScore"
-	loadSavedata()
 	settings.pixelPerfect = false
 
 	-- Load Characters

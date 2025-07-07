@@ -1222,7 +1222,7 @@ local graphics = {
 			Timer.cancel(fadeTimer)
 		end
 
-		fade.height = push:getHeight() * 2
+		fade.height = (push:getHeight() or 720) * 2
 		fade.mesh = self.newGradient({0,0,0}, {0,0,0}, {0,0,0,0})
 
 		isFading = true
@@ -1248,7 +1248,7 @@ local graphics = {
 			Timer.cancel(fadeTimer)
 		end
 
-		fade.height = push:getHeight() * 2
+		fade.height = (push:getHeight() or 720) * 2
 		fade.mesh = self.newGradient({0,0,0,0}, {0,0,0}, {0,0,0})
 
 		isFading = false
