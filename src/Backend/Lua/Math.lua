@@ -64,6 +64,17 @@ function math.lerp(a, b, t)
     return a + (b - a) * t
 end
 
+---Lerps from a to b using delta time and speed
+---@param a number
+---@param b number
+---@param speed number -- how quickly it reaches b; higher = faster
+---@param dt number -- delta time
+---@return number
+function math.lerpDt(a, b, speed, dt)
+    local t = 1 - math.exp(-speed * dt)
+    return a + (b - a) * t
+end
+
 --- Returns a pseudo-random gradient vector
 ---@param hash number
 ---@param x number

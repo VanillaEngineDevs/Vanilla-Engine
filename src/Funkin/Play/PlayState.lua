@@ -441,10 +441,14 @@ function PlayState:update(dt)
     if self.health < Constants.HEALTH_MIN then self.health = Constants.HEALTH_MIN end
 
     if self.subState == nil and self.cameraZoomRate > 0 then
-        self.cameraBopMultiplier = math.lerp(1, self.cameraBopMultiplier, 0.95)
+        local originalFrameLerpFactor = 0.15
+        local targetFPS = 60
+        local lerpSpeed = -math.log(1 - originalFrameLerpFactor) * targetFPS
+        local fact = 1 - math.exp(-lerpSpeed * dt)
+        self.cameraBopMultiplier = math.lerp(self.cameraBopMultiplier, 1, fact)
         local zoomPlusBop = self.currentCameraZoom * self.cameraBopMultiplier
         Game.camera.zoom = zoomPlusBop
-        self.camHUD.zoom = math.lerp(self.defaultHUDCameraZoom, self.camHUD.zoom, 0.95)
+        self.camHUD.zoom = math.lerp(self.camHUD.zoom, self.defaultHUDCameraZoom, fact)
     end
 
     if self.currentStage~= nil and self.currentStage:getBoyfriend() ~= nil then
@@ -474,6 +478,51 @@ function PlayState:update(dt)
     end ]]
 end
 
+function PlayState:stepHit()
+    if not self.initialized then
+        return false
+    end
+
+    if not MusicBeatState.stepHit(self) then
+        return false
+    end
+
+    if self.isGamePaused then
+        return false
+    end
+
+    if self.iconP1 ~= nil then self.iconP1:onStepHit(math.floor(Conductor.currentStep)) end
+    if self.iconP2 ~= nil then self.iconP2:onStepHit(math.floor(Conductor.currentStep)) end
+
+    return true
+end
+
+function PlayState:beatHit()
+    if not self.initialized then
+        return false
+    end
+
+    if not MusicBeatState.beatHit(self) then
+        return false
+    end
+
+    if self.isGamePaused then
+        return false
+    end
+
+    if self.generatedMusic then
+    end
+
+    if Game.sound.music then
+        -- RESYNCING
+    end
+
+    if Game.camera.zoom < (1.35 * Camera.defaultZoom) and self.cameraZoomRate > 0 and Conductor.currentBeat % self.cameraZoomRate == 0 then
+        self.cameraBopMultiplier = self.cameraBopIntensity
+        self.camHUD.zoom = self.camHUD.zoom + self.hudCameraZoomIntensity * self.defaultHUDCameraZoom
+    end
+end
+
 function PlayState:startSong()
     self.startingSong = false
 
@@ -481,6 +530,7 @@ function PlayState:startSong()
     if not self.overrideMusic and not self.isGamePaused and chart ~= nil then
         print("Starting song " .. self.currentSong.id .. " on difficulty " .. self.currentDifficulty)
         chart:playInst(1.0, self.currentInstrumental, false)
+        Conductor.songPosition = 0
     end
 
     if Game.sound.music == nil then

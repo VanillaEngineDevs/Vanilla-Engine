@@ -113,7 +113,7 @@ end
 
 Conductor.inputOffset = 0
 Conductor.formatOffset = 0
-Conductor.audioVisualOffset = 0 
+Conductor.audioVisualOffset = 0
 
 function Conductor.get_beatsPerMeasure()
     return Conductor.get_stepsPerMeasure() / Constants.STEPS_PER_BEAT
