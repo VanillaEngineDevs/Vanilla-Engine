@@ -36,11 +36,26 @@ function MusicBeatState:createWatermarkText()
     -- TODO: Implement FlxText
 end
 
+function MusicBeatState:dispatchEvent(event)
+    ModuleHandler:callEvent(event)
+end
+
 function MusicBeatState:stepHit()
+    local event = SongTimeScriptEvent("SONG_STEP_HIT", Conductor.currentBeat, Conductor.currentStep)
+    self:dispatchEvent(event)
+
+    if event.eventCanceled then return false end
+
     return true
 end
 
 function MusicBeatState:beatHit()
+    local event = SongTimeScriptEvent("SONG_BEAT_HIT", Conductor.currentBeat, Conductor.currentStep)
+
+    self:dispatchEvent(event)
+
+    if event.eventCanceled then return false end
+
     return true
 end
 

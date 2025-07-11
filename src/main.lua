@@ -30,6 +30,7 @@ function love.load()
     Game.camera = Camera()
     Game.cameras = Group()
     Game.cameras.list = {}
+    Game.state = nil
     function Game.cameras:reset(new)
         Game.camera = nil
 
@@ -62,6 +63,8 @@ function love.load()
             end
         end
 
+        Game.state = newState
+
         newState:create()
         self:add(newState)
     end
@@ -81,6 +84,8 @@ function love.load()
         targetDifficulty = "hard",
         targetVariation = "pico"
     }
+
+    ModuleHandler:loadModuleCache()
 
     Game:switchState(PlayState(params))
 

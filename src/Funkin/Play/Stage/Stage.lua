@@ -169,19 +169,7 @@ function Stage:addProp(prop, name)
 end
 
 function Stage:dispatchToCharacters(event, event2)
-    --[[ if type(event) == "string" then
-        local character = self:getCharacter(event)
-        if character ~= nil then
-            --
-        end
-    else
-        local charList = self.characters
-
-        if charList["dad"] then
-            self:dispatchEvent(event, event2)
-            table.remove(charList, "dad")
-        end
-    end ]]
+    
 end
 
 function Stage:getCharacter(name)

@@ -580,8 +580,9 @@ function PlayState:generateSong()
 end
 
 function PlayState:dispatchEvent(event)
-    --MusicBeatState.dispatchEvent(self, event)
+    MusicBeatState.dispatchEvent(self, event)
 
+    ScriptEventDispatcher:callEvent(self.currentStage, event)
     if self.currentStage then
         self.currentStage:dispatchToCharacters(event)
     end
@@ -738,7 +739,7 @@ function PlayState:processNotes(dt)
 
             local event = --[[ HitNoteScriptEvent(note, 0, 0, 'perfect', false, 0) ]] {}
 
-            if event.eventCancelled then goto continue end
+            if event.eventCanceled then goto continue end
 
             self.opponentStrumline:hitNote(note)
 

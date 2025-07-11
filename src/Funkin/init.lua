@@ -46,4 +46,11 @@ StrumlineNote = r("Play.Notes.StrumlineNote")
 NoteSprite = r("Play.Notes.NoteSprite")
 NoteStyle = r("Play.Notes.Notestyle.NoteStyle")
 
+r("Modding.IScriptedClass")
+
 r("Modding.Events.ScriptEvent")
+ScriptEventDispatcher = r("Modding.Events.ScriptEventDispatcher")
+
+Module = r("Modding.Module.Module")
+ScriptedModule = r("Modding.Module.ScriptedModule")
+ModuleHandler = r("Modding.Module.ModuleHandler")()
