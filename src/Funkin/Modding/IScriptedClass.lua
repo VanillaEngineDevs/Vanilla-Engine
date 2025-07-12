@@ -1,4 +1,5 @@
 IScriptedClass = Class:extend()
+IScriptedClass.IScriptedClass = true
 function IScriptedClass.init() IScriptedClass.__modules = {} end
 function IScriptedClass:onScriptEvent()end
 function IScriptedClass:onCreate()end
@@ -8,11 +9,13 @@ function IScriptedClass:listScriptClasses() return IScriptedClass.__modules end
 IScriptedClass.init()
 
 IEventHandler = Class:extend()
+IEventHandler.IEventHandler = true
 function IEventHandler.init() IEventHandler.__modules = {} end
 function IEventHandler:dispatchEvent(event)end
 IEventHandler.init()
 
 IStateChangingScriptedClass = IScriptedClass:extend()
+IStateChangingScriptedClass.IStateChangingScriptedClass = true
 function IStateChangingScriptedClass.init() IStateChangingScriptedClass.__modules = {} end
 function IStateChangingScriptedClass:onStateChangeBegin(event)end
 function IStateChangingScriptedClass:onStateChangeEnd(event)end
@@ -28,12 +31,14 @@ function IStateChangingScriptedClass:listScriptClasses() return IScriptedClass._
 IStateChangingScriptedClass.init()
 
 IStateStageProp = IScriptedClass:extend()
+IStateStageProp.IStateStageProp = true
 function IStateStageProp.init() IStateStageProp.__modules = {} end
 function IStateStageProp:onAdd(event)end
 function IStateStageProp:listScriptClasses() return IScriptedClass.__modules end
 IStateStageProp.init()
 
 INoteScriptedClass = IScriptedClass:extend()
+INoteScriptedClass.INoteScriptedClass = true
 function INoteScriptedClass.init() INoteScriptedClass.__modules = {} end
 function INoteScriptedClass:onNoteIncoming(event) end
 function INoteScriptedClass:onNoteHit(event) end
@@ -43,13 +48,16 @@ function INoteScriptedClass:listScriptClasses() return IScriptedClass.__modules 
 INoteScriptedClass.init()
 
 IBPMSyncedScriptedClass = IScriptedClass:extend()
+IBPMSyncedScriptedClass.IBPMSyncedScriptedClass = true
 function IBPMSyncedScriptedClass.init() IBPMSyncedScriptedClass.__modules = {} end
 function IBPMSyncedScriptedClass:onStepHit(event) end
 function IBPMSyncedScriptedClass:onBeatHit(event) end
 function IBPMSyncedScriptedClass:listScriptClasses() return IScriptedClass.__modules end
 IBPMSyncedScriptedClass.init()
 
-IPlayStateScriptedClass = IScriptedClass:extend()
+IPlayStateScriptedClass = INoteScriptedClass:extend()
+IPlayStateScriptedClass:implement(IBPMSyncedScriptedClass)
+IPlayStateScriptedClass.IPlayStateScriptedClass = true
 function IPlayStateScriptedClass.init() IPlayStateScriptedClass.__modules = {} end
 function IPlayStateScriptedClass:onPause(event) end
 function IPlayStateScriptedClass:onResume(event) end
@@ -67,6 +75,7 @@ function IPlayStateScriptedClass:listScriptClasses() return IScriptedClass.__mod
 IPlayStateScriptedClass.init()
 
 IDialogueScriptedClass = IScriptedClass:extend()
+IDialogueScriptedClass.IDialogueScriptedClass = true
 function IDialogueScriptedClass.init() IDialogueScriptedClass.__modules = {} end
 function IDialogueScriptedClass:onDialogueStart(event) end
 function IDialogueScriptedClass:onDialogueCompleteLine(event) end

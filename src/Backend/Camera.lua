@@ -30,8 +30,6 @@ function Camera:new(x, y, width, height)
 
     self.canvas = love.graphics.newCanvas(self.width, self.height)
 
-    print(self.x, self.y, self.width, self.height)
-
     Object.new(self, x, y, width, height)
 end
 
@@ -106,7 +104,6 @@ function Camera:draw()
         local lastColor = {love.graphics.getColor()}
         local blend, alphaMode = love.graphics.getBlendMode()
 
-        -- draw to canvas
         love.graphics.setCanvas(self.canvas)
         love.graphics.clear(self.color)
 
@@ -118,11 +115,9 @@ function Camera:draw()
 
         love.graphics.setCanvas()
 
-        -- draw canvas to screen at proper position
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.setBlendMode(blend, alphaMode)
 
-        -- scale canvas to match resolution scaling
         love.graphics.draw(self.canvas, self.x, self.y, 0, self.res, self.res)
 
         love.graphics.setColor(lastColor)
@@ -136,14 +131,11 @@ function Camera:applyTransform()
     if self.width < 1 then halfW = Game.width / 2 end
     if self.height < 1 then halfH = Game.height / 2 end
 
-    -- Step 1: move origin to center of the canvas
     love.graphics.translate(halfW, halfH)
 
-    -- Step 2: apply zoom and rotation around center
     love.graphics.scale(self.zoom)
     love.graphics.rotate(self.angle)
 
-    -- Step 3: scroll the world so camera focus is at center
     love.graphics.translate(-self.scroll.x, -self.scroll.y)
 
     love.graphics.translate(-halfW, -halfH)

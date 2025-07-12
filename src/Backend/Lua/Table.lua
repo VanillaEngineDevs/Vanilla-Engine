@@ -107,7 +107,7 @@ local o_tblSort = table.sort
 ---@return table
 ---@diagnostic disable-next-line: duplicate-set-field
 function table.sort(table, method)
-    if table then 
+    if table then
         o_tblSort(table, method)
     end
 

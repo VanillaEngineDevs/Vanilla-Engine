@@ -251,6 +251,9 @@ function PlayState:loadStage(id)
     if self.currentStage ~= nil then
         self:resetCameraZoom()
 
+        local event = ScriptEvent("CREATE", false)
+        ScriptEventDispatcher.callEvent(self.currentStage, event)
+
         self:add(self.currentStage)
     else
         print("Failed to load stage " .. id)
@@ -580,11 +583,13 @@ function PlayState:generateSong()
 end
 
 function PlayState:dispatchEvent(event)
+    printf("Dispatching event %s", event.type)
     MusicBeatState.dispatchEvent(self, event)
 
     ScriptEventDispatcher:callEvent(self.currentStage, event)
     if self.currentStage then
         self.currentStage:dispatchToCharacters(event)
+        self.currentStage:dispatchToBoppers(event)
     end
 end
 

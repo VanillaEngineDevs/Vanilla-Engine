@@ -29,7 +29,7 @@ function Bopper:update_shouldAlternate()
 end
 
 function Bopper:onStepHit(e)
-    if self.danceEvery < 0 and (e.step % (self.danceEvery * Constants.STEPS_PER_BEAT)) == 0 then
+    if self.danceEvery > 0 and (e.step % (self.danceEvery * Constants.STEPS_PER_BEAT)) == 0 then
         self:dance(self.shouldBop)
     end
 end

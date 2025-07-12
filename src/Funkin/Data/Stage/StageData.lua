@@ -35,8 +35,6 @@ function StageData:new(id, data)
 
         self.props[name] = prop
     end
-
-    print("Loaded stage data for " .. (data.name or "Unknown"))
 end
 
 function StageData:makeDefaultCharacters()

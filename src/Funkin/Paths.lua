@@ -166,8 +166,6 @@ function Paths.getSparrowAtlas(key)
         end
     end
 
-    printf("%s: %s, %s", key, graphicPath, xmlPath)
-
     return obj
 end
 

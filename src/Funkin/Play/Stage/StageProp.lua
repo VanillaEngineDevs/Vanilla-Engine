@@ -1,4 +1,5 @@
 local StageProp = FunkinSprite:extend("StageProp")
+StageProp:implement(IStateStageProp)
 
 function StageProp:new(name)
     FunkinSprite.new(self)

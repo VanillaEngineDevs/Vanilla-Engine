@@ -55,10 +55,15 @@ end
 ---@param ... table
 ---@return nil
 function class:implement(...) 
-    for _, cls in pairs({...}) do
+    -- copy over all VALUES from the given class to the current class
+    for _, cls in ipairs({...}) do
+        if type(cls) ~= "table" then
+            error("Expected a table, got " .. type(cls), 2)
+        end
         for k, v in pairs(cls) do
-            if self[k] == nil and type(v) == "function" then
+            if k:find("__") ~= 1 then
                 self[k] = v
+                printf("Implementing %s.%s into %s", cls.__ID, k, self.__ID)
             end
         end
     end

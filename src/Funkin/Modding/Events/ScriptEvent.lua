@@ -6,6 +6,60 @@ function ScriptEvent:new(type, cancelable)
     self.type = type
     self.shouldPropogate = true
     self.eventCanceled = false
+
+    local t = type
+    if (
+        t == "CREATE" or
+        t == "DESTROY" or
+        t == "UPDATE"
+    ) then
+        self.IScriptedClass = true
+    elseif (
+        t == "NOTE_INCOMING" or
+        t == "NOTE_HIT" or
+        t == "NOTE_MISS" or
+        t == "NOTE_HOLD_DROP"
+    ) then
+        self.INoteScriptedClass = true
+    elseif (
+        t == "SONG_STEP_HIT" or
+        t == "SONG_BEAT_HIT"
+    ) then
+        self.IBPMSyncedScriptedClass = true
+    elseif (
+        t == "SONG_LOADED" or
+        t == "SONG_EVENT"
+    ) then
+        self.ISongScriptedClass = true
+    elseif (
+        t == "DIALOGUE_START" or
+        t == "DIALOGUE_LINE" or
+        t == "DIALOGUE_COMPLETE_LINE" or
+        t == "DIALOGUE_SKIP" or
+        t == "DIALOGUE_END"
+    ) then
+        self.IDialogueScriptedClass = true
+    elseif (
+        t == "ADDED" or
+        t == "REMOVED"
+    ) then
+        self.IStateStageProp = true
+    elseif (
+        t == "STATE_CHANGE_BEGIN" or
+        t == "STATE_CHANGE_END" or
+        t == "SUB_STATE_OPEN_BEGIN" or
+        t == "SUB_STATE_OPEN_END" or
+        t == "SUB_STATE_CLOSE_BEGIN" or
+        t == "SUB_STATE_CLOSE_END" or
+        t == "FOCUS_LOST" or
+        t == "FOCUS_GAINED"
+    ) then
+        self.IStateChangingScriptedClass = true
+    elseif (
+        t == "NOTE_GHOST_MISS"
+    ) then
+        self.IGhostMissNoteScriptedClass = true
+    end
 end
 
 function ScriptEvent:cancelEvent()
@@ -74,7 +128,6 @@ end
 SongLoadScriptEvent = ScriptEvent:extend("SongLoadScriptEvent")
 
 function SongLoadScriptEvent:new(id, difficulty, notes, events)
-    print("SongLoadScriptEvent created with id: " .. id .. ", difficulty: " .. difficulty)
     SongLoadScriptEvent.super.new(self, "SONG_LOADED")
     self.id = id
     self.difficulty = difficulty

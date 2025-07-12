@@ -84,8 +84,6 @@ function Stage:buildStage()
             propSprite = StageProp(name)
         end
 
-        printf("Adding prop: %s", name)
-
         if isAnimated then
             if propData.animType == "packer" then
                 --propData.loadPacker(propData.assetPath)
@@ -169,7 +167,17 @@ function Stage:addProp(prop, name)
 end
 
 function Stage:dispatchToCharacters(event, event2)
-    
+
+end
+
+function Stage:dispatchToBoppers(event)
+    for _, bopper in ipairs(self.boppers) do
+        self:dispatchToBopper(bopper, event)
+    end
+end
+
+function Stage:dispatchToBopper(bopper, event)
+    ScriptEventDispatcher:callEvent(bopper, eventClone)
 end
 
 function Stage:getCharacter(name)
@@ -211,6 +219,12 @@ end
 
 function Stage:getOpponent(pop)
     return self:getDad(pop)
+end
+
+function Stage:onScriptEvent(event)
+    for _, bopper in ipairs(self.boppers) do
+        ScriptEventDispatcher:callEvent(bopper, event)
+    end
 end
 
 return Stage
