@@ -75,8 +75,8 @@ function love.load()
     SongRegistry:loadEntries()
     StageRegistry:loadEntries()
 
-    Paths.setCurrentLevel("week7")
-    local songData = SongRegistry:fetchEntry("guns")
+    Paths.setCurrentLevel("week1")
+    local songData = SongRegistry:fetchEntry("dadbattle")
     print(songData)
     songData:cacheCharts()
     local params = {

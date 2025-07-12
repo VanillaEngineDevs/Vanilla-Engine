@@ -286,4 +286,12 @@ function Group:getObjects()
     return self.members
 end
 
+function Group:forEachAlive(func)
+    for _, member in ipairs(self.members) do
+        if member and member.exists and member.active then
+            func(member)
+        end
+    end
+end
+
 return Group

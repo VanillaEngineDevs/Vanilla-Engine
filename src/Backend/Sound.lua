@@ -56,13 +56,11 @@ function Sound:cleanup()
 	self.onComplete = nil
 
 	if self.source ~= nil then
-		print("DONT???")
 		self:stop()
 		if self.isSource and self.source.release then
 			self.source--[[@as love.Object]]:release()
 		end
 	end
-	print("FUCK Y OUUUUUUUUUUUU")
 	self.paused = true
 	self.isFinishedB = false
 	self.isSource = false
@@ -123,6 +121,21 @@ function Sound:play(volume, looped, pitch, restart)
 	self:setVolume(volume)
 	self:setLooping(looped)
 	self:setPitch(pitch)
+	pcall(self.source.play, self.source)
+	return self
+end
+
+function Sound:playAtTime(looped, time)
+	if not self.active or not self.source then return self end
+
+	if self:isPlaying() then
+		return self
+	end
+
+	self.paused = false
+	self.isFinishedB = false
+	self:setLooping(looped)
+	self:seek(time/1000)
 	pcall(self.source.play, self.source)
 	return self
 end

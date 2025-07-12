@@ -516,8 +516,35 @@ function PlayState:beatHit()
     if self.generatedMusic then
     end
 
-    if Game.sound.music then
-        -- RESYNCING
+    if Game.sound.music ~= nil then
+        local correctSync = math.min(Game.sound.music.source:getDuration() * 1000, math.max(0, Conductor.songPosition - (Conductor.combinedOffset or 0)))
+        local playerVoicesError = 0
+        local opponentVoicesError = 0
+
+        if self.vocals ~= nil and self.vocals.playing then
+            self.vocals.playerVoices:forEachAlive(function(voice)
+                local currentRawVoiceTime = voice.source:tell() * 1000 + self.vocals.playerVoicesOffset
+                if math.abs(currentRawVoiceTime - correctSync) > math.abs(playerVoicesError) then
+                    playerVoicesError = currentRawVoiceTime - correctSync
+                end
+            end)
+
+            self.vocals.opponentVoices:forEachAlive(function(voice)
+                local currentRawVoiceTime = voice.source:tell() * 1000 + self.vocals.opponentVoicesOffset
+                if math.abs(currentRawVoiceTime - correctSync) > math.abs(opponentVoicesError) then
+                    opponentVoicesError = currentRawVoiceTime - correctSync
+                end
+            end)
+
+            if not self.startingSong and (math.abs(Game.sound.music.source:tell() * 1000 - correctSync) > 100 or
+                math.abs(playerVoicesError) > 100 or
+                math.abs(opponentVoicesError) > 100) then
+                print("VOCALS NEED RESYNC!")
+                if vocals ~= nil then
+                    self:resyncVocals()
+                end
+            end
+        end
     end
 
     if Game.camera.zoom < (1.35 * Camera.defaultZoom) and self.cameraZoomRate > 0 and Conductor.currentBeat % self.cameraZoomRate == 0 then
@@ -558,7 +585,22 @@ function PlayState:startSong()
     self.vocals.volume = 1
     self.vocals.pitch = self.playbackRate
 
-    --[[ self:resyncVocals() ]]
+    self:resyncVocals()
+end
+
+function PlayState:resyncVocals()
+    if self.vocals ~= nil then return end
+
+    if not Game.sound.music.playing then return end
+
+    local timeToPlayAt = math.min(Game.sound.music.source:getDuration() * 1000, math.max(0, Conductor.songPosition - (Conductor.combinedOffset or 0)))
+    Game.sound.music:pause()
+    self.vocals:pause()
+
+    Game.sound.music.source:setPosition(timeToPlayAt / 1000)
+    Game.sound.music:playAtTime(false, timeToPlayAt)
+
+    self.vocals:play(false, timeToPlayAt)
 end
 
 function PlayState:generateSong()
@@ -583,7 +625,6 @@ function PlayState:generateSong()
 end
 
 function PlayState:dispatchEvent(event)
-    printf("Dispatching event %s", event.type)
     MusicBeatState.dispatchEvent(self, event)
 
     ScriptEventDispatcher:callEvent(self.currentStage, event)

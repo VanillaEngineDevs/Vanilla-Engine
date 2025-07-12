@@ -75,18 +75,21 @@ end
 function SoundGroup:pause()
     self:forEachAlive(function(snd)
         snd:pause()
+        self.playing = false
     end)
 end
 
 function SoundGroup:play(forceRestart, startTime, endTime)
     self:forEachAlive(function(snd)
         snd:play(forceRestart, startTime or 0, endTime)
+        self.playing = true
     end)
 end
 
 function SoundGroup:resume()
     self:forEachAlive(function(snd)
         snd:resume()
+        self.playing = true
     end)
 end
 
@@ -105,6 +108,7 @@ end
 function SoundGroup:stop()
     self:forEachAlive(function(snd)
         snd:stop()
+        self.playing = false
     end)
 end
 
