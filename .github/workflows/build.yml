@@ -21,6 +21,7 @@ jobs:
           curl -L --remote-name https://github.com/love2d/love/releases/download/11.4/love-11.4-win64.zip
           unzip love-11.4-win64.zip -d resources/win64
           mv resources/win64/love-11.4-win64 resources/win64/love
+          sudo apt install imagemagick -y
 
       - name: Build
         run: |
@@ -41,6 +42,7 @@ jobs:
 
       - name: Setup love-11.4-macos
         run: |
+          sudo apt install imagemagick -y
           unzip resources/macos/love.zip -d resources/macos
 
       - name: Build
@@ -62,6 +64,7 @@ jobs:
 
       - name: Build
         run: |
+          sudo apt install imagemagick -y
           python make.py lovefile
 
       - name: Upload
