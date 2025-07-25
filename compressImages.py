@@ -54,7 +54,7 @@ def compressDxt5(inputPath, outputPath):
     subprocess.run(cmd, check=True)
     print(f"[DXT5] {inputPath} → {outputPath}")
 
-def compressAstc(inputPath, outputPath, block="10x10"):
+def compressAstc(inputPath, block="10x10", outputPath=None):
     encoder = "astcenc-avx2" if platform.system() != "Windows" else "tools/nt/astcenc/astcenc-avx2.exe"
     cmd = [
         encoder,
@@ -65,9 +65,9 @@ def compressAstc(inputPath, outputPath, block="10x10"):
         "-medium"
     ]
     subprocess.run(cmd, check=True)
-    print(f"[ASTC] {inputPath} → {outputPath}")
+    print(f"[ASTC] {inputPath} -> {outputPath}")
 
-def compressImages(baseDir, formatType):
+def compressImages(baseDir, formatType, blockSize="10x10"):
     if formatType not in validFormats:
         raise ValueError(f"Unsupported format: {formatType}")
 
@@ -93,14 +93,15 @@ def compressImages(baseDir, formatType):
                 if formatType == "dxt5":
                     compressDxt5(fullPath, outputPath)
                 elif formatType == "astc":
-                    compressAstc(fullPath, outputPath)
+                    compressAstc(fullPath, blockSize, outputPath)
             except subprocess.CalledProcessError:
                 print(f"[ERROR] Compression failed: {fullPath}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("format", choices=validFormats, help="Compression format: dxt5 or astc")
+    parser.add_argument("block", nargs="?", default="10x10", help="Block size for ASTC compression (default: 10x10)")
     parser.add_argument("source", help="Directory to process recursively")
     args = parser.parse_args()
 
-    compressImages(args.source, args.format)
+    compressImages(args.source, args.format, args.block)

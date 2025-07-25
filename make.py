@@ -8,7 +8,7 @@ buildDir = "build"
 releaseDir = os.path.join(buildDir, "release")
 lovefileName = "funkin-vanilla-engine.love"
 blacklistFile = "blacklistCompileFolders.txt"
-versionFile = "version.txt"
+versionFile = "src/version.txt"
 compressScript = "compressImages.py"
 
 def getBlacklist():
@@ -43,7 +43,7 @@ def zipDir(srcDir, zipFile, blacklist=None):
                     continue
                 zf.write(fullPath, relPath)
 
-def compressAssets(imageFormat):
+def compressAssets(imageFormat, blockSize="10x10"):
     if imageFormat not in ["dxt5", "astc"]:
         return
 
@@ -52,7 +52,7 @@ def compressAssets(imageFormat):
     sourceFolder = "src/images"
 
     try:
-        run(f"python {compressScript} {imageFormat} {sourceFolder}")
+        run(f"python {compressScript} {imageFormat} {blockSize} {sourceFolder}")
     except subprocess.CalledProcessError:
         print("[ERROR] Compression failed")
 
@@ -127,7 +127,17 @@ def buildSwitch():
 
     version = open(versionFile).read().strip()
     nacpPath = os.path.join(switchDir, "funkin-vanilla-engine.nacp")
-    run(f'nacptool --create "Friday Night Funkin\' Vanilla Engine" "VE Devs" "{version}" "{nacpPath}"')
+
+    nacpToolPath = os.path.abspath("tools/nt/switch/nacptool.exe") if os.name == "nt" else "nacptool"
+    run([
+        nacpToolPath,
+        "--create", 
+        "Friday Night Funkin' Vanilla Engine",
+        "VE Devs",
+        version,
+        nacpPath
+    ])
+
 
     romfsDir = os.path.join(switchDir, "romfs")
     os.makedirs(romfsDir, exist_ok=True)
@@ -136,7 +146,17 @@ def buildSwitch():
         os.path.join(romfsDir, "game.love")
     )
 
-    run(f"elf2nro resources/switch/love.elf {nroDir}/funkin-vanilla-engine.nro --icon=resources/switch/icon.jpg --nacp={nacpPath} --romfsdir={romfsDir}")
+    elf2nroPath = os.path.abspath("tools/nt/switch/elf2nro.exe") if os.name == "nt" else "elf2nro"
+    run([
+        elf2nroPath,
+        "resources/switch/love.elf",
+        f"{nroDir}/funkin-vanilla-engine.nro",
+        "--icon=resources/switch/icon.jpg",
+        f"--nacp={nacpPath}",
+        f"--romfsdir={romfsDir}"
+    ])
+
+
 
     shutil.rmtree(romfsDir)
     os.remove(nacpPath)
@@ -152,8 +172,9 @@ def clean():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("target", nargs="?", default="win64", help="Build target: lovefile, win64, macos, switch, all, clean")
-    parser.add_argument("--imageformat", choices=["png", "dxt5", "astc"], default="png", help="Image format to use")
+    parser.add_argument("target", nargs="?", default="win64", help="Build target: lovefile, win64, macos, switch, all, clean. Default is 'win64'.")
+    parser.add_argument("--imageformat", choices=["png", "dxt5", "astc"], default="dxt5", help="Image format to use. Default is 'dxt5'.")
+    parser.add_argument("--block", default="10x10", help="Block size for ASTC compression. Default is 10x10 (Mobile devices).")
     args = parser.parse_args()
 
     print(f"[INFO] Selected image format: {args.imageformat}")
@@ -162,26 +183,36 @@ if __name__ == "__main__":
     print(f"[INFO] Current OS: {curOS}")
 
     if args.imageformat not in ["png", "dxt5", "astc"]:
-        print(f"[ERROR] Invalid image format: {args.imageformat}. Defaulting to 'png'.")
+        print(f"[ERROR] Invalid image format: {args.imageformat}. Defaulting to 'dxt5'.")
 
     with open("src/IMAGE_FORMAT.txt", "w") as f:
         f.write(args.imageformat)
 
-    compressAssets(args.imageformat)
+    compressAssets(args.imageformat, args.block)
 
     if args.target == "lovefile":
         buildLovefile()
     elif args.target == "win64":
+        if args.imageformat == "astc":
+            print("[WARNING] ASTC format will most likely not work on majority of Windows systems. Consider using DXT5 instead. Continuing with ASTC build...")
         buildLovefile()
         buildWin64()
     elif args.target == "macos":
+        if args.imageformat == "astc":
+            print("[WARNING] ASTC format will most likely not work on macOS. Consider using DXT5 instead. Continuing with ASTC build...")
         buildLovefile()
         buildMacos()
     elif args.target == "switch":
+        if args.imageformat != "astc" and args.imageformat != "dxt5":
+            print("[WARNING] It is recommended to use ASTC or DXT5 for Nintendo Switch builds. Defaulting to DXT5.")
+        if args.imageformat == "astc" and args.block != "8x8":
+            print("[WARNING] ATSC block size 8x8 is recommended for Nintendo Switch. Changing block size to 8x8. Continuing with ASTC build...")
         buildLovefile()
         buildSwitch()
     #TODO: Android build support? Maybe appimage too?
     elif args.target == "all":
+        print("[WARNING] It is recommended to build for each platform separately to avoid issues with incompatible formats.")
+        print("[INFO] Building all targets... This may take a while.")
         buildLovefile()
         buildWin64()
         buildMacos()
