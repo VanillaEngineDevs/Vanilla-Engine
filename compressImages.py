@@ -48,7 +48,8 @@ def compressDxt5(inputPath, outputPath):
             "-define", "dds:compression=dxt5",
             "-define", "dds:mipmaps=0",
             "-format", "dds",
-            "-path", os.path.dirname(   ),
+            # depending on python version, os.path.dirname MIGHT need an argument
+            "-path", os.path.dirname(outputPath) if os.path.dirname(outputPath) else ".",
             inputPath
         ]
 
