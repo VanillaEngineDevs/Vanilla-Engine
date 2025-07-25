@@ -521,12 +521,15 @@ local graphics = {
 				end
 
 				self.holdTimer = self.holdTimer + dt
-				local inputTbl = {}
-				if self.playerInputs then
-					table.insert(inputTbl, input:down("gameLeft"))
-					table.insert(inputTbl, input:down("gameRight"))
-					table.insert(inputTbl, input:down("gameUp"))
-					table.insert(inputTbl, input:down("gameDown"))
+				local inputTbl
+				if love.system.getOS() ~= "NX" then
+					inputTbl = {}
+					if self.playerInputs then
+						table.insert(inputTbl, input:down("gameLeft"))
+						table.insert(inputTbl, input:down("gameRight"))
+						table.insert(inputTbl, input:down("gameUp"))
+						table.insert(inputTbl, input:down("gameDown"))
+					end
 				end
 				if self.lastHit > 0 and self.lastHit + (stepCrochet or 0) * self.singDuration < math.abs(musicTime) then
 					if self.specialAnim then
@@ -545,7 +548,7 @@ local graphics = {
 							self:dance()
 						end
 					else
-						if not table.includes(inputTbl, true) then
+						if inputTbl and table.includes(inputTbl, true) then
 							self:dance()
 							self.lastHit = -1
 							if self.parent then self.parent.lastHit = -1 end
