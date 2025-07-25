@@ -1,5 +1,7 @@
 -- For XML's
 
+local xmlCache = {}
+
 function getImage(key)
     if not key:endsWith(".png") and not key:endsWith(".dds") then
         key = key .. ".png"
@@ -17,6 +19,7 @@ function getImage(key)
 
     return nil
 end
+
 function getSparrow(key)
     local ip, xp = key, key
     -- remove dds, png, astc from xp
@@ -32,7 +35,11 @@ function getSparrow(key)
     end
     local i = getImage(ip)
     if love.filesystem.getInfo(xp) then
+        if xmlCache[xp] then
+            return xmlCache[xp]
+        end
         local o = Sprite.getFramesFromSparrow(i, love.filesystem.read(xp))
+        xmlCache[xp] = o
         return o
     end
 

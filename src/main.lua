@@ -234,7 +234,7 @@ function love.load()
 
 	playMenuMusic = true
 
-	-- disable vsy
+	-- disable vsync
 	love.window.setVSync(0)
 
 	graphics.setImageType(love.filesystem.read("IMAGE_FORMAT.txt"))
@@ -243,7 +243,6 @@ function love.load()
 	volFade = 0
 
 	-- Load settings
-	--settings = require "settings"
 	input = require "input"
 
 	-- Load Debugs
@@ -333,8 +332,8 @@ function love.load()
 	for i, week in ipairs(weekMeta) do
 		for k, song in ipairs(week[2]) do
 			if type(song) == "table" then
-				if song.show == nil then 
-					song.show = true 
+				if song.show == nil then
+					song.show = true
 				end
 				if song.diffs == nil then
 					song.diffs = {{"easy", ext=""}, {"normal", ext=""}, {"hard", ext=""}}
@@ -429,8 +428,6 @@ function love.load()
 
 	love.audio.setVolume(0.1)
 
-	local test, params = string.match("bpm:1, 2", "^(%a+):([%d%s,]+)$")
-	print(test, params)
 	Gamestate.switch(menu)
 	--Gamestate.switch(weekData[7], 1, "hard", "-pico", "-pico")
 end

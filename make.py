@@ -192,21 +192,23 @@ if __name__ == "__main__":
     elif args.target == "win64":
         if args.imageformat == "astc":
             print("[WARNING] ASTC format will most likely not work on majority of Windows systems. Consider using DXT5 instead. Continuing with ASTC build...")
+        if args.imageformat != "dxt5":
+            print("[WARNING] It is recommended to use DXT5 for Windows builds.")
         buildLovefile()
         buildWin64()
     elif args.target == "macos":
         if args.imageformat == "astc":
             print("[WARNING] ASTC format will most likely not work on macOS. Consider using DXT5 instead. Continuing with ASTC build...")
+        if args.imageformat != "dxt5":
+            print("[WARNING] It is recommended to use DXT5 for macOS builds.")
         buildLovefile()
         buildMacos()
     elif args.target == "switch":
-        if args.imageformat != "astc" and args.imageformat != "dxt5":
-            print("[WARNING] It is recommended to use ASTC or DXT5 for Nintendo Switch builds. Defaulting to DXT5.")
-        if args.imageformat == "astc" and args.block != "8x8":
-            print("[WARNING] ATSC block size 8x8 is recommended for Nintendo Switch. Changing block size to 8x8. Continuing with ASTC build...")
+        if args.imageformat != "dxt5":
+            print("[WARNING] It is recommended to use DXT5 for Nintendo Switch builds.")
         buildLovefile()
         buildSwitch()
-    #TODO: Android build support? Maybe appimage too?
+    #TODO: Android build support? Maybe appimage too? ASTC 10x10 is recommended for mobile devices.
     elif args.target == "all":
         print("[WARNING] It is recommended to build for each platform separately to avoid issues with incompatible formats.")
         print("[INFO] Building all targets... This may take a while.")
