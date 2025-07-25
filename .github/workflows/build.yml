@@ -24,7 +24,7 @@ jobs:
 
       - name: Build
         run: |
-          make win64
+          python make.py win64
 
       - name: Upload
         uses: actions/upload-artifact@v4
@@ -45,7 +45,7 @@ jobs:
 
       - name: Build
         run: |
-          make macos
+          python make.py macos
 
       - name: Upload
         uses: actions/upload-artifact@v4
@@ -62,7 +62,7 @@ jobs:
 
       - name: Build
         run: |
-          make lovefile
+          python make.py lovefile
 
       - name: Upload
         uses: actions/upload-artifact@v4
