@@ -59,7 +59,7 @@ def compressDxt5(inputPath, outputPath):
     if os.path.exists(outputPath):
         os.rename(outputPath, outputPath.replace(".DDS", ".dds"))
 
-    print(f"[DXT5] {inputPath} → {outputPath}")
+    print(f"[DXT5] {inputPath} -> {outputPath}")
 
 def compressAstc(inputPath, block="10x10", outputPath=None):
     encoder = "astcenc-avx2" if platform.system() != "Windows" else "tools/nt/astcenc/astcenc-avx2.exe"
