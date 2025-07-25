@@ -38,6 +38,8 @@ local function tblPush(t, v, pos)
 	end
 end
 
+local supported = love.graphics.getImageFormats()
+
 local graphics = {
 	screenBase = function(width, height)
 		screenWidth, screenHeight = width, height
@@ -61,6 +63,23 @@ local graphics = {
 
 	imagePath = function(path)
 		local pathStr = "images/" .. path .. "." .. imageType
+		local forcePNG = true
+		if imageType == "dds" then
+			if supported.dxt5 then
+				forcePNG = false
+			else
+				forcePNG = true
+			end
+		elseif imageType == "astc" then
+			for name, supported in pairs(supported) do
+				if name:startsWith("astc") and supported then
+					forcePNG = false
+					break
+				end
+			end
+		end
+
+		local imageType = forcePNG and "png" or imageType
 
 		if not importMods.inMod then
 			if love.filesystem.getInfo(pathStr) then
