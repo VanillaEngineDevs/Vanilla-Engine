@@ -48,10 +48,16 @@ def compressDxt5(inputPath, outputPath):
             "-define", "dds:compression=dxt5",
             "-define", "dds:mipmaps=0",
             "-format", "dds",
-            "-path", os.path.dirname(outputPath),
+            "-path", os.path.dirname(   ),
             inputPath
         ]
+
     subprocess.run(cmd, check=True)
+    
+    # on windows, texconv outputs with the file extension being .DDS instead of .dds... Which I HATEEEEE FUCK YOU!!!
+    if os.path.exists(outputPath):
+        os.rename(outputPath, outputPath.replace(".DDS", ".dds"))
+
     print(f"[DXT5] {inputPath} → {outputPath}")
 
 def compressAstc(inputPath, block="10x10", outputPath=None):
