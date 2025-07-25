@@ -138,7 +138,6 @@ def buildSwitch():
         nacpPath
     ])
 
-
     romfsDir = os.path.join(switchDir, "romfs")
     os.makedirs(romfsDir, exist_ok=True)
     shutil.copy(
@@ -155,8 +154,6 @@ def buildSwitch():
         f"--nacp={nacpPath}",
         f"--romfsdir={romfsDir}"
     ])
-
-
 
     shutil.rmtree(romfsDir)
     os.remove(nacpPath)

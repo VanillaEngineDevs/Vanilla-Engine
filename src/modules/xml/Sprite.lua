@@ -18,14 +18,19 @@ function getImage(key)
     return nil
 end
 function getSparrow(key)
-    local ip, xp = key, key .. ".xml"
-    -- remove ".dds" from the key
-    xp = xp:gsub(".dds.xml", ".xml")
-    xp = xp:gsub(".png.xml", ".xml")
-    local i = getImage(ip)
-    if not love.filesystem.getInfo(xp) then
-        xp = xp:gsub("/dds/", "/png/")
+    local ip, xp = key, key
+    -- remove dds, png, astc from xp
+    if ip:endsWith(".dds") then
+        ip = ip:gsub("%.dds$", "")
+        xp = xp:gsub("%.dds$", ".xml")
+    elseif ip:endsWith(".png") then
+        ip = ip:gsub("%.png$", "")
+        xp = xp:gsub("%.png$", ".xml")
+    elseif ip:endsWith(".astc") then
+        ip = ip:gsub("%.astc$", "")
+        xp = xp:gsub("%.astc$", ".xml")
     end
+    local i = getImage(ip)
     if love.filesystem.getInfo(xp) then
         local o = Sprite.getFramesFromSparrow(i, love.filesystem.read(xp))
         return o
