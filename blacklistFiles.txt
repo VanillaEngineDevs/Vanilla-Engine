@@ -1,7 +1,9 @@
 src/images/week6/*
 src/images/week6.erect/*
+src/images/pixel/*
 src/images/icons/icon-bf-pixel.png
 src/images/icons/icon-pico-pixel.png
 src/images/icons/icon-senpai.png
 src/images/icons/icon-senpai-angry.png
 src/images/icons/icon-spirit.png
+src/images/characters/pixel/*

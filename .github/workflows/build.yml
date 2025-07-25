@@ -5,12 +5,11 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
   workflow_dispatch:
 
 jobs:
   win64:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
@@ -18,23 +17,21 @@ jobs:
 
       - name: Setup love-11.4-win64
         run: |
-          curl -L --remote-name https://github.com/love2d/love/releases/download/11.4/love-11.4-win64.zip
-          unzip love-11.4-win64.zip -d resources/win64
-          mv resources/win64/love-11.4-win64 resources/win64/love
-          sudo apt install imagemagick -y
+          Invoke-WebRequest -Uri https://github.com/love2d/love/releases/download/11.4/love-11.4-win64.zip -OutFile love.zip
+          Expand-Archive -Path love.zip -DestinationPath resources\win64
+          Move-Item -Path "resources\win64\love-11.4-win64" -Destination "resources\win64\love"
 
       - name: Build
-        run: |
-          python make.py win64
+        run: python make.py win64
 
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: funkin-rewritten-win64
+          name: vanilla-engine-win64
           path: build/win64
 
   macos:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
@@ -42,33 +39,49 @@ jobs:
 
       - name: Setup love-11.4-macos
         run: |
-          sudo apt install imagemagick -y
-          unzip resources/macos/love.zip -d resources/macos
+          Expand-Archive -Path resources\macos\love.zip -DestinationPath resources\macos
 
       - name: Build
-        run: |
-          python make.py macos
+        run: python make.py macos
 
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: funkin-rewritten-macos
+          name: vanilla-engine-macos
           path: build/macos
 
   lovefile:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
 
       - name: Build
-        run: |
-          sudo apt install imagemagick -y
-          python make.py lovefile
+        run: python make.py lovefile
 
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: funkin-rewritten-lovefile
+          name: vanilla-engine-lovefile
           path: build/lovefile
+
+  switch:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup love-11.4-switch
+        run: |
+          Invoke-WebRequest -Uri https://github.com/retronx-team/love-nx/releases/download/11.4-nx1/love.elf -OutFile resources\switch\love.elf
+
+      - name: Build
+        run: python make.py switch
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: vanilla-engine-switch
+          path: build/switch
