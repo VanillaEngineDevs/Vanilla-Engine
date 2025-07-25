@@ -569,10 +569,20 @@ return {
 		end
 		self.overrideHealthbarText = importMods.uiHealthbarTextMod or nil
 		self.overrideDrawHealthbar = importMods.uiHealthbarMod or nil
-		local chartData = json.decode(love.filesystem.read(chart))
+
+		local chartData
+		if string.endsWith(chart, ".json") then
+			chartData = json.decode(love.filesystem.read(chart))
+		else
+			chartData = love.filesystem.load(chart)()
+		end
 		chart = chartData.notes[difficulty]
 
-		local metadata = json.decode(love.filesystem.read(metadata))
+		if string.endsWith(metadata, ".json") then
+			metadata = json.decode(love.filesystem.read(metadata))
+		else
+			metadata = love.filesystem.load(metadata)()
+		end
 		Conductor.mapBPMChanges(metadata)
 
 		SONGNAME = metadata.songName
@@ -626,7 +636,7 @@ return {
 			else
 				dataStuff = noteTypes["normal"]
 			end
-			
+
 			noteObject.col = data
 			noteObject.y = CONSTANTS.WEEKS.STRUM_Y + time * 0.6 * speed
 			noteObject.ver = noteData.k

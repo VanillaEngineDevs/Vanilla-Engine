@@ -79,11 +79,11 @@ return {
 	initUI = function(self)
 		weeks:initUI()
 		if song == 3 then
-			weeks:generateNotes("data/songs/dadbattle/dadbattle-chart" .. songExt .. ".json", "data/songs/dadbattle/dadbattle-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/dadbattle/dadbattle-chart" .. songExt .. ".lua", "data/songs/dadbattle/dadbattle-metadata" .. songExt .. ".lua", difficulty)
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/fresh/fresh-chart" .. songExt .. ".json", "data/songs/fresh/fresh-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/fresh/fresh-chart" .. songExt .. ".lua", "data/songs/fresh/fresh-metadata" .. songExt .. ".lua", difficulty)
 		else
-			weeks:generateNotes("data/songs/bopeebo/bopeebo-chart" .. songExt .. ".json", "data/songs/bopeebo/bopeebo-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/bopeebo/bopeebo-chart" .. songExt .. ".lua", "data/songs/bopeebo/bopeebo-metadata" .. songExt .. ".lua", difficulty)
 		end
 	end,
 

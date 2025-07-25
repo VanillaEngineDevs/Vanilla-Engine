@@ -3,15 +3,23 @@ splash.cache = {}
 splash.spr = nil
 splash.image = nil
 
+-- Preload assets to avoid redundant loading
+local preloadedImage = nil
+local preloadedSprite = nil
+
 function splash:setup()
-    -- called at the start of each song
-    if not pixel then
-        self.image = love.graphics.newImage(graphics.imagePath("noteSplashes"))
-        self.spr = love.filesystem.load("sprites/noteSplashes.lua")
-    else
-        self.image = love.graphics.newImage(graphics.imagePath("pixel/pixelSplashes"))
-        self.spr = love.filesystem.load("sprites/pixel/pixelSplashes.lua")
+    -- Use preloaded assets if available
+    if not preloadedImage or not preloadedSprite then
+        if not pixel then
+            preloadedImage = love.graphics.newImage(graphics.imagePath("noteSplashes"))
+            preloadedSprite = love.filesystem.load("sprites/noteSplashes.lua")
+        else
+            preloadedImage = love.graphics.newImage(graphics.imagePath("pixel/pixelSplashes"))
+            preloadedSprite = love.filesystem.load("sprites/pixel/pixelSplashes.lua")
+        end
     end
+    self.image = preloadedImage
+    self.spr = preloadedSprite
 end
 
 function splash:new(settings, id)

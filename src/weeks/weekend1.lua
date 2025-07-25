@@ -118,7 +118,7 @@ return {
 				video:play()
 			end
 		elseif song == 4 then
-			weeks:generateNotes("data/songs/blazin/blazin-chart" .. songExt .. ".json", "data/songs/blazin/blazin-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/blazin/blazin-chart" .. songExt .. ".lua", "data/songs/blazin/blazin-metadata" .. songExt .. ".lua", difficulty)
 
 			for i = 1, 4 do
 				enemyArrows[i].visible = false
@@ -139,11 +139,11 @@ return {
 				video:play()
 			end
 		elseif song == 3 then
-			weeks:generateNotes("data/songs/2hot/2hot-chart" .. songExt .. ".json", "data/songs/2hot/2hot-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/2hot/2hot-chart" .. songExt .. ".lua", "data/songs/2hot/2hot-metadata" .. songExt .. ".lua", difficulty)
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/lit-up/lit-up-chart" .. songExt .. ".json", "data/songs/lit-up/lit-up-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/lit-up/lit-up-chart" .. songExt .. ".lua", "data/songs/lit-up/lit-up-metadata" .. songExt .. ".lua", difficulty)
 		else
-			weeks:generateNotes("data/songs/darnell/darnell-chart" .. songExt .. ".json", "data/songs/darnell/darnell-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/darnell/darnell-chart" .. songExt .. ".lua", "data/songs/darnell/darnell-metadata" .. songExt .. ".lua", difficulty)
 
 			if storyMode and not died then
 				video = cutscene.video("videos/darnellCutscene.ogv")

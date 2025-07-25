@@ -65,7 +65,7 @@ return {
 	initUI = function(self)
 		weeks:initUI()
 
-		weeks:generateNotes("data/songs/tutorial/tutorial-chart" .. songExt .. ".json", "data/songs/tutorial/tutorial-metadata" .. songExt .. ".json", difficulty)
+		weeks:generateNotes("data/songs/tutorial/tutorial-chart" .. songExt .. ".lua", "data/songs/tutorial/tutorial-metadata" .. songExt .. ".lua", difficulty)
 	end,
 
 	update = function(self, dt)

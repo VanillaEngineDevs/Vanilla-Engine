@@ -76,8 +76,8 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/songs/stress/stress-chart" .. songExt .. ".json", "data/songs/stress/stress-metadata" .. songExt .. ".json", difficulty)
-			weeks:generateGFNotes("data/songs/stress/stress-chart" .. songExt .. ".json", "picospeaker")
+			weeks:generateNotes("data/songs/stress/stress-chart" .. songExt .. ".lua", "data/songs/stress/stress-metadata" .. songExt .. ".lua", difficulty)
+			weeks:generateGFNotes("data/songs/stress/stress-chart" .. songExt .. ".lua", "picospeaker")
 
 			tankmanRunImg = love.graphics.newImage(graphics.imagePath("week7/tankmanKilled1"))
 
@@ -98,9 +98,9 @@ return {
 				end
 			end
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/guns/guns-chart" .. songExt .. ".json", "data/songs/guns/guns-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/guns/guns-chart" .. songExt .. ".lua", "data/songs/guns/guns-metadata" .. songExt .. ".lua", difficulty)
 		else
-			weeks:generateNotes("data/songs/ugh/ugh-chart" .. songExt .. ".json", "data/songs/ugh/ugh-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/ugh/ugh-chart" .. songExt .. ".lua", "data/songs/ugh/ugh-metadata" .. songExt .. ".lua", difficulty)
 		end
 	end,
 

@@ -121,11 +121,11 @@ return {
 		weeks:initUI()
 
 		if song == 3 then
-			weeks:generateNotes("data/songs/winter-horrorland/winter-horrorland-chart" .. songExt .. ".json", "data/songs/winter-horrorland/winter-horrorland-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/winter-horrorland/winter-horrorland-chart" .. songExt .. ".lua", "data/songs/winter-horrorland/winter-horrorland-metadata" .. songExt .. ".lua", difficulty)
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/eggnog/eggnog-chart" .. songExt .. ".json", "data/songs/eggnog/eggnog-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/eggnog/eggnog-chart" .. songExt .. ".lua", "data/songs/eggnog/eggnog-metadata" .. songExt .. ".lua", difficulty)
 		else
-			weeks:generateNotes("data/songs/cocoa/cocoa-chart" .. songExt .. ".json", "data/songs/cocoa/cocoa-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/cocoa/cocoa-chart" .. songExt .. ".lua", "data/songs/cocoa/cocoa-metadata" .. songExt .. ".lua", difficulty)
 		end
 	end,
 

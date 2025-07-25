@@ -112,7 +112,7 @@ return {
 		weeks:initUI("pixel")
 
 		if song == 3 then
-			weeks:generateNotes("data/songs/thorns/thorns-chart" .. songExt .. ".json", "data/songs/thorns/thorns-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/thorns/thorns-chart" .. songExt .. ".lua", "data/songs/thorns/thorns-metadata" .. songExt .. ".lua", difficulty)
 			if storyMode and not died then
 				dialogue.set("data/songs/thorns/thornsDialogue.txt")
 				dialogue.addSpeaker("dad", graphics.newImage(graphics.imagePath("week6/spiritFaceForward")), 400, 250, 6, 6, false)
@@ -132,7 +132,7 @@ return {
 				weeks:setupCountdown()
 			end
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/roses/roses-chart" .. songExt .. ".json", "data/songs/roses/roses-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/roses/roses-chart" .. songExt .. ".lua", "data/songs/roses/roses-metadata" .. songExt .. ".lua", difficulty)
 			if storyMode and not died then
 				dialogue.set("data/songs/roses/rosesDialogue.txt")
 				dialogue.addSpeaker("dad", love.filesystem.load("sprites/week6/angrySenpaiBox.lua")(), 650, 375, 6, 6, true, false)
@@ -152,7 +152,7 @@ return {
 				weeks:setupCountdown()
 			end
 		else
-			weeks:generateNotes("data/songs/senpai/senpai-chart" .. songExt .. ".json", "data/songs/senpai/senpai-metadata" .. songExt .. ".json", difficulty)
+			weeks:generateNotes("data/songs/senpai/senpai-chart" .. songExt .. ".lua", "data/songs/senpai/senpai-metadata" .. songExt .. ".lua", difficulty)
 			if storyMode and not died then
 				dialogue.set("data/songs/senpai/senpaiDialogue.txt")
 

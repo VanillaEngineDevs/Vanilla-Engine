@@ -104,7 +104,7 @@ return {
 	initUI = function(self)
 		weeks:initUI()
 
-		weeks:legacyGenerateNotes("data/songs/test/test.json")
+		weeks:legacyGenerateNotes("data/songs/test/test.lua")
 	end,
 
 	update = function(self, dt)
