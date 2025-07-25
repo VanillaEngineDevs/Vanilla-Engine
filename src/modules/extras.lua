@@ -51,6 +51,7 @@ function weeks.legacyGenerateNotes(self, chart)
             noteObject.y = -400 + time * 0.6 * speed
             noteObject.ver = noteVer
             noteObject.time = time
+            noteObject.batchReference = NOTES_BATCH
             noteObject:animate("on")
 
             local enemyNote = (mustHitSection and noteType >= 4) or (not mustHitSection and noteType < 4)
@@ -58,26 +59,12 @@ function weeks.legacyGenerateNotes(self, chart)
             local arrowsTable = enemyNote and enemyArrows or boyfriendArrows
 
             noteObject.x = arrowsTable[id].x
-            noteObject.shader = CONSTANTS.WEEKS.LANE_SHADERS[id]
-            local r, g, b = CONSTANTS.ARROW_COLORS[id][1], CONSTANTS.ARROW_COLORS[id][2], CONSTANTS.ARROW_COLORS[id][3]
-
-            if dataStuff.r or dataStuff.g or dataStuff.b then
-                noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
-            end
-
-			if dataStuff.r then r = {decToRGB(dataStuff.r)} end
-			if dataStuff.g then g = {decToRGB(dataStuff.g)} end
-			if dataStuff.b then b = {decToRGB(dataStuff.b)} end
 			noteObject.hitNote = not dataStuff.ignoreNote
 
             noteObject.healthGainMult = dataStuff.healthMult or 1
 			noteObject.healthLossMult = dataStuff.healthLossMult or 1
 
             noteObject.causesMiss = dataStuff.causesMiss or false
-
-			noteObject.shader:send("r", r)
-			noteObject.shader:send("g", g)
-			noteObject.shader:send("b", b)
 
             table.insert(notesTable[id], noteObject)
             if holdLength > 0 and pixel then
@@ -90,11 +77,11 @@ function weeks.legacyGenerateNotes(self, chart)
                     holdNote:animate("hold")
 
                     holdNote.x = arrowsTable[id].x
-                    holdNote.shader = noteObject.shader
                     holdNote.healthGainMult = noteObject.healthGainMult
 					holdNote.healthLossMult = noteObject.healthLossMult
                     holdNote.causesMiss = noteObject.causesMiss
                     holdNote.hitNote = noteObject.hitNote
+                    holdNote.batchReference = NOTES_BATCH
                     table.insert(notesTable[id], holdNote)
                 end
 
@@ -207,8 +194,8 @@ function weeks.cneGenerateNotes(self, chart, metadata)
             noteObject.y = -400 + time * 0.6 * speed
             noteObject.ver = noteVer
             noteObject.time = time
+            noteObject.batchReference = NOTES_BATCH
             noteObject:animate("on")
-
 
             local dataStuff = {}
             if noteTypes[noteVer] then
@@ -218,12 +205,6 @@ function weeks.cneGenerateNotes(self, chart, metadata)
             end
 
             noteObject.x = arrowsTable[id].x
-            noteObject.shader = CONSTANTS.WEEKS.LANE_SHADERS[id]
-            local r, g, b = CONSTANTS.ARROW_COLORS[id][1], CONSTANTS.ARROW_COLORS[id][2], CONSTANTS.ARROW_COLORS[id][3]
-
-            if dataStuff.r or dataStuff.g or dataStuff.b then
-                noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
-            end
 
             if dataStuff.r then r = {decToRGB(dataStuff.r)} end
 			if dataStuff.g then g = {decToRGB(dataStuff.g)} end
@@ -234,10 +215,6 @@ function weeks.cneGenerateNotes(self, chart, metadata)
 			noteObject.healthLossMult = dataStuff.healthLossMult or 1
 
             noteObject.causesMiss = dataStuff.causesMiss or false
-            
-            noteObject.shader:send("r", r)
-            noteObject.shader:send("g", g)
-            noteObject.shader:send("b", b)
 
             table.insert(notesTable[id], noteObject)
             if holdLength > 0 then
@@ -250,11 +227,11 @@ function weeks.cneGenerateNotes(self, chart, metadata)
                     holdNote:animate("hold")
 
                     holdNote.x = arrowsTable[id].x
-                    holdNote.shader = noteObject.shader
                     holdNote.healthGainMult = noteObject.healthGainMult
 					holdNote.healthLossMult = noteObject.healthLossMult
                     holdNote.causesMiss = noteObject.causesMiss
                     holdNote.hitNote = noteObject.hitNote
+                    holdNote.batchReference = NOTES_BATCH
                     table.insert(notesTable[id], holdNote)
                 end
 

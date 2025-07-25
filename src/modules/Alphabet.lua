@@ -25,9 +25,14 @@ function CreateText(text, isBold)
         
         distancePerItem = {x=20,y=120},
         startPosition = {x=0,y=0},
+        batch = nil,
 
         setup = function(self, text, isBold)
+            if not graphics.cache[graphics.imagePath("alphabet")] then
+                graphics.cache[graphics.imagePath("alphabet")] = love.graphics.newImage(graphics.imagePath("alphabet"))
+            end
             self.text = {}
+            self.batch = love.graphics.newSpriteBatch(graphics.cache[graphics.imagePath("alphabet")], 1000)
             for i = 1, #text do
                 local char = text:sub(i, i)
                 local lastWasSpace = text:sub(i-1, i-1) == " "
@@ -111,12 +116,18 @@ function CreateText(text, isBold)
         end,
 
         draw = function(self)
+            if self.batch then
+                self.batch:clear()
+            end
             love.graphics.push()
             love.graphics.translate(self.x, self.y)
             love.graphics.scale(self.size, self.size)
             for i, char in ipairs(self.text) do
                 char.alpha = self.alpha
-                char:draw()
+                char:draw(self.batch)
+            end
+            if self.batch then
+                love.graphics.draw(self.batch)
             end
             love.graphics.pop()
         end

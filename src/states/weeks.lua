@@ -79,6 +79,8 @@ local CURCHART = {
 
 sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
 
+NOTES_BATCH = nil
+
 local function getWife3Condition(acc)
 	if acc >= 99.9935 then return 1 end -- AAAAA
 	if acc >= 99.980 then return 2 end -- AAAA:
@@ -218,6 +220,8 @@ return {
 
 			countdown = love.filesystem.load("sprites/pixel/countdown.lua")()
 		end
+
+		NOTES_BATCH = love.graphics.newSpriteBatch(images.notes, 1000)
 
 		popupScore:init(sprites.numbers, rating)
 
@@ -512,27 +516,6 @@ return {
 		}
 
 		for i = 1, 4 do
-			if not pixel then
-				enemyArrows[i].shader = CONSTANTS.WEEKS.LANE_SHADERS[i]
-				boyfriendArrows[i].shader = CONSTANTS.WEEKS.LANE_SHADERS[i]
-
-				enemyArrows[i].shaderEnabled = false
-				boyfriendArrows[i].shaderEnabled = false
-
-				local r = CONSTANTS.ARROW_COLORS[i][1]
-				local g = CONSTANTS.ARROW_COLORS[i][2]
-				local b = CONSTANTS.ARROW_COLORS[i][3]
-
-				enemyArrows[i].updateShaderAlpha = true
-				boyfriendArrows[i].updateShaderAlpha = true
-
-				enemyArrows[i].shader:send("r", r)
-				enemyArrows[i].shader:send("g", g)
-				enemyArrows[i].shader:send("b", b)
-				boyfriendArrows[i].shader:send("r", r)
-				boyfriendArrows[i].shader:send("g", g)
-				boyfriendArrows[i].shader:send("b", b)
-			end
 			if settings.middlescroll then 
 				boyfriendArrows[i].x = -410 + 165 * i + CONSTANTS.WEEKS.STRUM_X_OFFSET
 				-- ew stuff
@@ -648,6 +631,7 @@ return {
 			noteObject.y = CONSTANTS.WEEKS.STRUM_Y + time * 0.6 * speed
 			noteObject.ver = noteData.k
 			noteObject.time = time
+			noteObject.batchReference = NOTES_BATCH
 			noteObject:animate("on")
 
 			local enemyNote = noteData.d > 3
@@ -655,13 +639,6 @@ return {
 			local arrowsTable = enemyNote and enemyArrows or boyfriendArrows
 
 			noteObject.x = arrowsTable[data].x
-			noteObject.shader = CONSTANTS.WEEKS.LANE_SHADERS[data]
-            local r, g, b = CONSTANTS.ARROW_COLORS[data][1], CONSTANTS.ARROW_COLORS[data][2], CONSTANTS.ARROW_COLORS[data][3]
-
-            if dataStuff.r or dataStuff.g or dataStuff.b then
-                noteObject.shader = love.graphics.newShader("shaders/RGBPallette.glsl")
-            end
-
 			if dataStuff.r then r = {decToRGB(dataStuff.r)} end
 			if dataStuff.g then g = {decToRGB(dataStuff.g)} end
 			if dataStuff.b then b = {decToRGB(dataStuff.b)} end
@@ -672,9 +649,6 @@ return {
 
 			noteObject.causesMiss = dataStuff.causesMiss or false
 
-			noteObject.shader:send("r", r)
-			noteObject.shader:send("g", g)
-			noteObject.shader:send("b", b)
 			table.insert(notesTable[data], noteObject)
 			if holdTime > 0 then
 				for k = 71 / speed, holdTime, 71 / speed do
@@ -686,11 +660,11 @@ return {
 					holdNote:animate("hold")
 
 					holdNote.x = arrowsTable[data].x
-					holdNote.shader = noteObject.shader
 					holdNote.healthGainMult = noteObject.healthGainMult
 					holdNote.healthLossMult = noteObject.healthLossMult
 					holdNote.causesMiss = noteObject.causesMiss
 					holdNote.hitNote = noteObject.hitNote
+					holdNote.batchReference = NOTES_BATCH
 					table.insert(notesTable[data], holdNote)
 				end
 
@@ -771,9 +745,7 @@ return {
 							},
 							"out-circ",
 							function()
-								-- Stop updating the shader because that can cause some performance issues
 								boyfriendArrows[i].alpha = boyfriendArrows[i].finishedAlpha
-								boyfriendArrows[i].updateShaderAlpha = false
 							end
 						)
 
@@ -787,7 +759,6 @@ return {
 							"out-circ",
 							function()
 								enemyArrows[i].alpha = enemyArrows[i].finishedAlpha
-								enemyArrows[i].updateShaderAlpha = false
 							end
 						)
 					end
@@ -916,7 +887,6 @@ return {
 								"out-circ",
 								function()
 									boyfriendArrows[i].alpha = 0
-									boyfriendArrows[i].updateShaderAlpha = false
 								end
 							)
 
@@ -930,7 +900,6 @@ return {
 								"out-circ",
 								function()
 									enemyArrows[i].alpha = 0
-									enemyArrows[i].updateShaderAlpha = false
 								end
 							)
 						end
@@ -1490,20 +1459,6 @@ return {
 			if input:released(curInput) then
 				boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i], false)
 			end
-
-			if not pixel then
-				if enemyArrow:getAnimName() ~= CONSTANTS.WEEKS.NOTE_LIST[i] then
-					enemyArrow.shaderEnabled = true
-				else
-					enemyArrow.shaderEnabled = false
-				end
-
-				if boyfriendArrow:getAnimName() ~= CONSTANTS.WEEKS.NOTE_LIST[i] then
-					boyfriendArrow.shaderEnabled = true
-				else
-					boyfriendArrow.shaderEnabled = false
-				end
-			end
 		    ::continue::
 		end
 
@@ -1557,7 +1512,8 @@ return {
 	end,
 
 	drawUI = function(self)
-		if paused then 
+		NOTES_BATCH:clear()
+		if paused then
 			love.graphics.push()
 				love.graphics.setFont(pauseFont)
 				love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
@@ -1661,6 +1617,8 @@ return {
 					graphics.setColor(1, 1, 1)
 				love.graphics.pop()
 			end
+
+			love.graphics.draw(NOTES_BATCH)
 
 			HoldCover:draw()
 			if pixel and not settings.pixelPerfect then

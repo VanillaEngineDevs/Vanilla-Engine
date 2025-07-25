@@ -508,7 +508,7 @@ function Sprite:createGrid(cellWidth, cellHeight, width, height, alternate, colo
     return grid
 end
 
-function Sprite:draw()
+function Sprite:draw(batch)
     if self.tex and (self.alpha > 0 or self.scale.x ~= 0 or self.scale.y ~= 0) then
         local cam = self.camera or Sprite.defaultCam
         local x, y = self:getScreenPosition(cam)
@@ -543,10 +543,25 @@ function Sprite:draw()
             love.graphics.setStencilTest("greater", 0)
         end
 
-        if not f then
+        --[[ if not f then
             love.graphics.draw(self.tex, x - (self.isGraphic and 75 or 0), y - (self.isGraphic and 40 or 0), r, sx, sy, ox, oy, kx, ky)
         else
             love.graphics.draw(self.tex, f.quad, x, y, r, sx, sy, ox, oy, kx, ky)
+        end ]]
+        if not batch then
+            if not f then
+                love.graphics.draw(self.tex, x - (self.isGraphic and 75 or 0), y - (self.isGraphic and 40 or 0), r, sx, sy, ox, oy, kx, ky)
+            else
+                love.graphics.draw(self.tex, f.quad, x, y, r, sx, sy, ox, oy, kx, ky)
+            end
+        else
+            batch:setColor(self.color[1], self.color[2], self.color[3], self.alpha)
+            if not f then
+                batch:add(x - (self.isGraphic and 75 or 0), y - (self.isGraphic and 40 or 0), r, sx, sy, ox, oy, kx, ky)
+            else
+                batch:add(f.quad, x, y, r, sx, sy, ox, oy, kx, ky)
+            end
+            batch:setColor(1, 1, 1, 1)
         end
 
         if cam then cam:detach() end

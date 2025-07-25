@@ -449,6 +449,8 @@ local graphics = {
 
 			playerInputs = false,
 
+			batchReference = nil,
+
 			setSheet = function(self, imageData)
 				sheet = imageData
 				if #sheets == 0 then
@@ -807,7 +809,7 @@ local graphics = {
 					graphics.setColor(lastColor[1], lastColor[2], lastColor[3], lastColor[4] * self.alpha)
 
 					if self.visible then
-						love.graphics.draw(
+						--[[ love.graphics.draw(
 							sheets[anim.sheet]:getSheet(),
 							sheets[anim.sheet]:getFrameQuad(self.curFrame),
 							x + self.offsetX2,
@@ -819,7 +821,41 @@ local graphics = {
 							oy,
 							self.shearX,
 							self.shearY
-						)
+						) ]]
+						if not self.batchReference then
+							love.graphics.draw(
+								sheets[anim.sheet]:getSheet(),
+								sheets[anim.sheet]:getFrameQuad(self.curFrame),
+								x + self.offsetX2,
+								y + self.offsetY2,
+								self.orientation + (frameData[self.curFrame].rotated and -math.rad(90) or 0),
+								self.sizeX * (self.flipX and -1 or 1) * (anim.flipX and -1 or 1),
+								self.sizeY * (self.flipY and -1 or 1) * (anim.flipY and -1 or 1),
+								ox,
+								oy,
+								self.shearX,
+								self.shearY
+							)
+						else
+							self.batchReference:setColor(
+								lastColor[1] * graphics.getFade(),
+								lastColor[2] * graphics.getFade(),
+								lastColor[3] * graphics.getFade(),
+								lastColor[4] * self.alpha
+							)
+							self.batchReference:add(
+								sheets[anim.sheet]:getFrameQuad(self.curFrame),
+								x + self.offsetX2,
+								y + self.offsetY2,
+								self.orientation + (frameData[self.curFrame].rotated and -math.rad(90) or 0),
+								self.sizeX * (self.flipX and -1 or 1) * (anim.flipX and -1 or 1),
+								self.sizeY * (self.flipY and -1 or 1) * (anim.flipY and -1 or 1),
+								ox,
+								oy,
+								self.shearX,
+								self.shearY
+							)
+						end
 					end
 
 					if self.clipRect then 
