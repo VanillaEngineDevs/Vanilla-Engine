@@ -234,9 +234,6 @@ function love.load()
 
 	playMenuMusic = true
 
-	-- disable vsync
-	love.window.setVSync(0)
-
 	graphics.setImageType(love.filesystem.read("IMAGE_FORMAT.txt"))
 
 	volumeWidth = {width = 160}

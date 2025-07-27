@@ -150,7 +150,7 @@ function OptionsMenu:reloadCheckboxes()
 end
 
 function OptionsMenu:update(dt)
-    local usesCheckbox 
+    local usesCheckbox
     self.group:update(dt)
 
     if input:pressed("up") then
@@ -208,7 +208,7 @@ function OptionsMenu:update(dt)
 
                     if num < 1 then num = #self.curOption.options end
                     if num > #self.curOption.options then num = 1 end
-                    
+
                     self.curOption.curOption = num
                     self.curOption:setValue(self.curOption.options[num])
                 end
@@ -228,6 +228,8 @@ function OptionsMenu:update(dt)
 
                 self:updateTextFrom(self.curOption)
             end
+
+            self.holdTime = self.holdTime - dt*20
         end
 
         if input:down("left") or input:down("right") then

@@ -1,7 +1,8 @@
+---@diagnostic disable: return-type-mismatch, param-type-mismatch
 settings = {}
 savedata = {}
 
-local SETTINGS_VERSION = 7
+local SETTINGS_VERSION = 8
 
 local function getDefaultSettings()
     customBindDown = "s"
@@ -17,7 +18,6 @@ local function getDefaultSettings()
         downscroll = false,
         ghostTapping = true,
         showDebug = false,
-        setImageType = "dds",
         sideJudgements = false,
         middlescroll = false,
         practiceMode = false,
@@ -28,6 +28,7 @@ local function getDefaultSettings()
         window = false,
         fpsCap = 60,
         pixelPerfect = false,
+        shaders = love.system.getOS() ~= "NX",
         scoringType = "KE",
         accuracyMode = "Simple",
         popupScoreMode = "Stack",
@@ -73,7 +74,6 @@ local function loadOrResetSettings()
         love.filesystem.remove("settings")
         settings = getDefaultSettings()
         saveSettings(false)
-        graphics.setImageType("dds")
     end
 end
 
@@ -82,8 +82,6 @@ function saveSettings(restartOnChange)
 
     local newSettings = lume.clone(settings, true)
 
-    -- Determine image type based on compression
-    newSettings.setImageType = newSettings.hardwareCompression and "dds" or "png"
     newSettings.pixelPerfect = false
     newSettings.settingsVer = SETTINGS_VERSION
 
@@ -110,3 +108,22 @@ function saveSavedata()
 end
 
 loadOrResetSettings()
+
+local o_setShader = love.graphics.setShader
+local o_newShader = love.graphics.newShader
+
+function love.graphics.setShader(shader)
+    if type(shader) == "userdata" and settings.shaders then
+        o_setShader(shader)
+    end
+end
+
+function love.graphics.newShader(shader)
+    if settings.shaders then
+        return o_newShader(shader)
+    else
+        return {
+            send = function() end
+        }
+    end
+end

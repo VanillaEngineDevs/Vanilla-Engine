@@ -5,17 +5,12 @@ local threadEvent = love.thread.newThread("threads/eventThread.lua")
 local channel_event = love.thread.getChannel("thread.event")
 local channel_active = love.thread.getChannel("thread.event.active")
 
-
-love._framerate = 165
-
 love._currentFPS = 0
 love._currentTPS = 0
 
 love._drawDT = 0
 
 local _
-local _, _, flags = love.window.getMode()
-love._framerate = (flags.refreshrate or 60) * 2
 
 function love.run()
     local love = love
@@ -95,7 +90,7 @@ function love.run()
            if a then return a, b end
         end
 
-        local cap = love._framerate
+        local cap = settings.fpsCap
         local capDT = 1 / cap
 
         -- Cap the minimum delta time to 1/30 (30 FPS)
@@ -103,7 +98,7 @@ function love.run()
 
         love_update(dt)
         drawTmr = drawTmr + dt
-        
+
         if drawTmr >= capDT then
             if g_active() then
                 g_origin()

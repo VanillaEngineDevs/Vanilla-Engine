@@ -3,15 +3,6 @@ local m_graphics = OptionsMenu:extend()
 local supportsHardwareCompression = love.graphics.getImageFormats().DXT5 ~= nil
 
 function m_graphics:enter()
-    --[[ local o = Option:new(
-        "Fps Limit",
-        "How many frames per second the game will run at",
-        settings.fpsCap,
-        "number"
-    )
-    o.minValue = debug and 1 or 30
-    o.maxValue = 500
-    self:addOption(o) ]]
     if supportsHardwareCompression then
         self:addOption(
             Option:new(
@@ -31,13 +22,38 @@ function m_graphics:enter()
             )
         )
     end
-    
+
+    self:addOption(
+        Option:new(
+            "Shaders",
+            "If checked, the game will use shaders to improve graphics. This will make the game run slower but look better. Needs Restart.",
+            settings.shaders,
+            "bool"
+        )
+    )
+
+    local fpsCapOpt = Option:new(
+        "FPS Cap",
+        "How many frames per second the game will run at.",
+        settings.fpsCap,
+        "number"
+    )
+    fpsCapOpt.minValue = debug and 1 or 30
+    fpsCapOpt.maxValue = 500
+    self:addOption(fpsCapOpt)
+
     self.super.enter(self)
 end
 
 function m_graphics:leave()
     if supportsHardwareCompression then
         settings.hardwareCompression = self.optionsArray[1]:getValue()
+        settings.shaders = self.optionsArray[2]:getValue()
+        settings.fpsCap = self.optionsArray[3]:getValue()
+    else
+        settings.hardwareCompression = false
+        settings.shaders = self.optionsArray[1]:getValue()
+        settings.fpsCap = self.optionsArray[2]:getValue()
     end
 
     self.super.leave(self)

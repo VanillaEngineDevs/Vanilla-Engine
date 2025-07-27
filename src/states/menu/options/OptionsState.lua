@@ -96,7 +96,7 @@ function OptionsState:leave()
     self.group:clear()
     self.grpOptions:clear()
 
-    saveSettings()
+    saveSettings(false)
 end
 
 return OptionsState

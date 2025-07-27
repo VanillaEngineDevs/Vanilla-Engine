@@ -26,7 +26,7 @@ function love.conf(t)
 	t.identity = "VE-FNFR"
 	t.version = "11.4"
 	t.console = _debug
-	t.window.vsync = false
+	t.window.vsync = 0
 
 	t.window.width = 1280
 	t.window.height = 720

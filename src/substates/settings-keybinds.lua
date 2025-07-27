@@ -36,7 +36,7 @@ local invalidkeys = {
 return {
     enter = function(self)
         images = {
-            notes = love.graphics.newImage(graphics.imagePath("notes")),
+            notes = love.graphics.newImage(graphics.imagePath("NOTE_assets")),
         } 
         sprites = {
             leftArrow = love.filesystem.load("sprites/left-arrow.lua"),
