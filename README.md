@@ -18,6 +18,7 @@ Friday Night Funkin' Rewritten features:
 * Much less memory usage than the original game
 * Controller support
 * Other cool features, like downscroll
+* Extended support for more platforms (MacOS, Linux, Nintendo Switch, etc.)
 * And more to come!
 
 Join **Vanilla Engine's** server for VE updates and what not: https://discord.gg/TJfbQbptyW
@@ -27,7 +28,7 @@ Join **HTV's** server for Funkin' Rewritten updates and discussion: https://disc
 ---
 
 ## Controls
-If using a controller on a PC, a controller with an Xbox button layout is recommended. **Controller keybinds are not rebindable and most likely will never be rebindable (unless a PR is made).**
+If using a controller on a PC, a controller with an Xbox button layout is recommended. (Controller keybinds are not rebindable)
 #### Menu
 | Action       | Input (Keyboard) | Input (Controller)  |
 | :----------- | :------------    | ------------        |
@@ -55,8 +56,6 @@ If using a controller on a PC, a controller with an Xbox button layout is recomm
 > | Nintendo Switch  | `./VE-FNFR/screenshots`                   |
 
 ---
-
-<!-- Settings section REMOVED as settings file is no longer used -->
 
 # Building
 Prerequisites: **Python** (all platforms), `dkp-pacman` (Linux only).
