@@ -3,7 +3,6 @@
 
 [![Download Nightly](https://img.shields.io/badge/Download%20Nightly-black?style=flat-square&logo=github&logoSize=amg)](https://nightly.link/VanillaEngineDevs/Vanilla-Engine/workflows/build/main) [![Download Stable](https://img.shields.io/badge/Download%20Stable-black?style=flat-square&logo=github)](https://github.com/VanillaEngineDevs/Vanilla-Engine/releases/latest)
 <br>
-
 ---
 
 > [!IMPORTANT]
@@ -12,8 +11,7 @@
 > 1. In your week file, instead of weeks:generateNotes(chartfile, metafile, difficulty), call weeks:legacyGenerateNotes(chartfile)
 > 2. Only load the vocals for VoicesBF. This is because VE now uses the FNNF 0.3.x Vocals system (split-vocal files).
 
-
-Friday Night Funkin' Vanilla Engine is a rewrite of [Friday Night Funkin'](https://ninja-muffin24.itch.io/funkin) built on [LÖVE](https://love2d.org/) for Windows and using [Funkin' Rewritten](https://github.com/HTV04/Funkin-Rewritten) for macOS, Linux, and Web platforms, as well as previously unsupported platforms, like the Nintendo Switch!
+Friday Night Funkin' Vanilla Engine is a rewrite of [Friday Night Funkin'](https://ninja-muffin24.itch.io/funkin) built on [LÖVE](https://love2d.org/) for Windows and using [Funkin' Rewritten](https://github.com/HTV04/Funkin-Rewritten) as a base.
 
 Friday Night Funkin' Rewritten features:
 * A rewritten engine focused on performance and playability
@@ -22,14 +20,14 @@ Friday Night Funkin' Rewritten features:
 * Other cool features, like downscroll
 * And more to come!
 
-Join **Vanilla Engine's** server for VE updates and what not: https://discord.gg/TBF3HkXWhq
+Join **Vanilla Engine's** server for VE updates and what not: https://discord.gg/TJfbQbptyW
 
 Join **HTV's** server for Funkin' Rewritten updates and discussion: https://discord.gg/tQGzN2Wu48
 
 ---
 
 ## Controls
-If using a controller on a PC, a controller with an Xbox button layout is recommended. Controller buttons will be remappable in a future update.™
+If using a controller on a PC, a controller with an Xbox button layout is recommended. **Controller keybinds are not rebindable and most likely will never be rebindable (unless a PR is made).**
 #### Menu
 | Action       | Input (Keyboard) | Input (Controller)  |
 | :----------- | :------------    | ------------        |
@@ -39,13 +37,13 @@ If using a controller on a PC, a controller with an Xbox button layout is recomm
 #### In-Game
 | Action       | Input (Keyboard) | Input (Controller)  |
 | :----------- | :------------    | ------------        |
-| Arrows       | `WASD / Arrow Keys` (Rebindable)       | `Left Stick / Right Stick / Shoulder Buttons / D-Pad / ABXY` (Rebindable) |
+| Arrows       | `WASD / Arrow Keys` | `Left Stick / Right Stick / Shoulder Buttons / D-Pad / ABXY` |
 | Confirm (Game Over)      | `Enter`          | `A`                 |
-| Back (Pause)         | `Escape`         | `B`                 |
+| Back (Pause)         | `Return`         | `Start`              |
 #### Debug
 | Action          | Input (Keyboard-only) |
 | :-----------    | :------------         |
-| Take Screenshot | `6`                   |
+| Take Screenshot | `F3`                  |
 | Open Debug Menu | `7`                   |
 > [!NOTE]
 > Screenshots will be saved in the `screenshots` folder in the game's directory. The path varies by platform:
@@ -58,85 +56,29 @@ If using a controller on a PC, a controller with an Xbox button layout is recomm
 
 ---
 
-# Settings
-The settings file can be found in the following places on the following systems:
-| Platform         | Settings File Path                                      |
-| :--------------- | :------------------------------------------------------ |
-| Windows          | `%APPDATA%\VE-FNFR\settings.ini`                        |
-| macOS            | `~/Library/Application Support/VE-FNFR/settings.ini`    |
-| Linux            | `~/.local/share/love/VE-FNFR/settings.ini`              |
-| Nintendo Switch  | `./VE-FNFR/settings.ini`                                |
-
----
-
-# Progress
-**Menus** - 100% Complete
-
-**Game Engine** - 99% Complete
-
-**Weeks** - 8/8 Complete
-* Tutorial + Weeks 1-7 are implemented.
-
----
-
-# License
-*Friday Night Funkin' Rewritten* is licensed under the terms of the GNU General Public License v3, with the exception of most of the images, music, and sounds, which are proprietary. While FNF Rewritten's code is FOSS, use its assets at your own risk.
-
-Also, derivative works (mods, forks, etc.) of FNF Rewritten must be open-source. The build methods shown in this README technically make one's code open-source anyway, but uploading it to GitHub or a similar platform is advised.
-
----
+<!-- Settings section REMOVED as settings file is no longer used -->
 
 # Building
-Web build instructions coming soon! Current method isn't that portable right now, but I'm working on something.
+Prerequisites: **Python** (all platforms), `dkp-pacman` (Linux only).
 
-## Unix-like (macOS, Linux, etc.)
-After running a build method, its release ZIP will be located at `./build/release`.
+### Build Command:
+```
+python make.py <version>
+```
+Where `<version>` can be one of: `win64`, `macos`, `switch`, `lovefile`, `all`, `clean`.
 
-### LOVE file
-* Run `make lovefile`
+You can also add an `imageformat` argument, for example:  
+```
+python make.py win64 --imageformat dxt5
+```
+Possible formats: `PNG`, `dxt5`, `ASTC`
 
-### Windows (64-bit)
-* Set up dependencies shown in `./resources/win64/dependencies.txt`
-* Run `make win64`
+If using `ASTC`, you may supply an optional `--block` argument, for example:  
+```
+python make.py switch --imageformat ASTC --block 8x8
+```
 
-### Windows (32-bit)
-* Set up dependencies shown in `./resources/win32/dependencies.txt`
-* Run `make win32`
-
-### macOS
-* Set up dependencies shown in `./resources/macos/dependencies.txt`
-* Run `make macos`
-
-### Nintendo Switch
-* Set up [devkitPro](https://devkitpro.org/wiki/Getting_Started)
-  * Install the `switch-dev` package
-* Set up dependencies shown in `./resources/switch/dependencies.txt`
-* Run `make switch`
-
-### Desktop Platforms
-* Set up dependencies shown in `./resources/win64/dependencies.txt`
-* Set up dependencies shown in `./resources/win32/dependencies.txt`
-* Set up dependencies shown in `./resources/macos/dependencies.txt`
-* Run `make desktop`
-
-### Console Platforms
-* Set up [devkitPro](https://devkitpro.org/wiki/Getting_Started)
-  * Install the `switch-dev` package
-* Set up dependencies shown in `./resources/switch/dependencies.txt`
-* Run `make console`
-
-### All Platforms
-* Set up dependencies shown in `./resources/win64/dependencies.txt`
-* Set up dependencies shown in `./resources/win32/dependencies.txt`
-* Set up dependencies shown in `./resources/macos/dependencies.txt`
-* Set up [devkitPro](https://devkitpro.org/wiki/Getting_Started)
-  * Install the `switch-dev` package
-* Set up dependencies shown in `./resources/switch/dependencies.txt`
-* Run `make`
-
----
-
-## Other
+### Other Platforms
 Follow the official instructions for LÖVE game distribution for your platform: https://love2d.org/wiki/Game_Distribution
 
 ---
@@ -150,3 +92,10 @@ Follow the official instructions for LÖVE game distribution for your platform: 
 * Davidobot for developing [love.js](https://github.com/Davidobot/love.js), used for the Web version of the game
 * TurtleP for developing [LÖVE Potion](https://github.com/lovebrew/LovePotion), originally used for the Nintendo Switch version of the game
 * Funkin' Crew (ninjamuffin99, PhantomArcade, kawaisprite, and evilsk8er), for making such an awesome game!
+
+---
+
+# License
+*Friday Night Funkin' Rewritten* is licensed under the terms of the GNU General Public License v3, with the exception of most of the images, music, and sounds, which are proprietary. While FNF Rewritten is open-source, you must not distribute these proprietary assets outside the game.
+
+Also, derivative works (mods, forks, etc.) of FNF Rewritten must be open-source. The build methods shown in this README technically make one's code open-source anyway, but uploading it to GitHub or a similar service is highly recommended.
