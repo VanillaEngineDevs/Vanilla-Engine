@@ -1,432 +1,229 @@
 ---@diagnostic disable: param-type-mismatch
---[[----------------------------------------------------------------------------
-Friday Night Funkin' Rewritten v1.1.0 beta 2
-
-Copyright (C) 2021  HTV04
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-------------------------------------------------------------------------------]]
 
 __VERSION__ = love.filesystem.read("version.txt")
---[[ if love.filesystem.isFused() then 
-	function print() end 
-else
-	_debug = true
-end ]]debug=true -- print functions tend the make the game lag when in update functions, so we do this to prevent that
-function uitextflarge(text,x,y,limit,align,hovered,r,sx,sy,ox,oy,kx,ky)
-	local x = x or 0
-	local y = y or 0
-	local r = r or 0
-	local limit = limit or 750
-	local align = align or "center"
-	local hovered = hovered or false
-	local sx = sx or 1
-	local sy = sy or 1
-	local ox = ox or 0
-	local oy = oy or 0
-	local kx = kx or 0
-	local ky = ky or 0
+if love.filesystem.isFused() then function print() end end
 
-	if not hovered then graphics.setColor(0,0,0) else graphics.setColor(1,1,1) end
-	for i = -6, 6 do
-		for j = -6, 6 do
-			love.graphics.printf(text,x+i,y+j,limit,align,r,sx,sy,ox,oy,kx,ky)
-		end
-	end
-	if not hovered then graphics.setColor(1,1,1) else graphics.setColor(0,0,0) end
-	love.graphics.printf(text,x,y,limit,align,r,sx,sy,ox,oy,kx,ky)
-end
-function uitextf(text,x,y,limit,align,r,sx,sy,ox,oy,kx,ky,alpha)
-	local x = x or 0
-	local y = y or 0
-	local r = r or 0
-	local limit = limit or 750
-	local align = align or "left"
-	local sx = sx or 1
-	local sy = sy or 1
-	local ox = ox or 0
-	local oy = oy or 0
-	local kx = kx or 0
-	local ky = ky or 0
-	graphics.setColor(0,0,0, alpha or 1)
-	for i = -2, 2 do
-		for j = -2, 2 do
-			love.graphics.printf(text,x+i,y+j,limit,align,r,sx,sy,ox,oy,kx,ky)
-		end
-	end
-	graphics.setColor(1,1,1, alpha or 1)
-	love.graphics.printf(text,x,y,limit,align,r,sx,sy,ox,oy,kx,ky)
-end
-function uitext(text,x,y,r,sx,sy,ox,oy,kx,ky,alpha)
-	local x = x or 0
-	local y = y or 0
-	local r = r or 0
-	local sx = sx or 1
-	local sy = sy or 1
-	local ox = ox or 0
-	local oy = oy or 0
-	local kx = kx or 0
-	local ky = ky or 0
-	graphics.setColor(0,0,0, alpha or 1)
-	for i = -1, 1 do
-		for j = -1, 1 do
-			love.graphics.print(text,x+i,y+j,r,sx,sy,ox,oy,kx,ky)
-		end
-	end
-	graphics.setColor(1,1,1, alpha or 1)
-	love.graphics.print(text,x,y,r,sx,sy,ox,oy,kx,ky)
-end
-function uitextColored(text,x,y,r,col1,col2,sx,sy,ox,oy,kx,ky)
-	local x = x or 0
-	local y = y or 0
-	local r = r or 0
-	local sx = sx or 1
-	local sy = sy or 1
-	local ox = ox or 0
-	local oy = oy or 0
-	local kx = kx or 0
-	local ky = ky or 0
-	local col1 = col1 or {0,0,0,1}
-	local col2 = col2 or {1,1,1,1}
-	graphics.setColor(col1[1],col1[2],col1[3],col1[4])
-	for i = -1, 1 do
-		for j = -1, 1 do
-			love.graphics.print(text,x+i,y+j,r,sx,sy,ox,oy,kx,ky)
-		end
-	end
-	graphics.setColor(col2[1],col2[2],col2[3],col2[4])
-	love.graphics.print(text,x,y,r,sx,sy,ox,oy,kx,ky)
-end
-function uitextfColored(text,x,y,limit,align,col1,col2,r,sx,sy,ox,oy,kx,ky)
-	local x = x or 0
-	local y = y or 0
-	local r = r or 0
-	local limit = limit or 750
-	local align = align or "center"
-	local sx = sx or 1
-	local sy = sy or 1
-	local ox = ox or 0
-	local oy = oy or 0
-	local kx = kx or 0
-	local ky = ky or 0
-	graphics.setColor(col1[1],col1[2],col1[3],col1[4])
-	for i = -1, 1 do
-		for j = -1, 1 do
-			love.graphics.printf(text,x+i,y+j,limit,align,r,sx,sy,ox,oy,kx,ky)
-		end
-	end
-	graphics.setColor(col2[1],col2[2],col2[3],col2[4])
-	love.graphics.printf(text,x,y,limit,align,r,sx,sy,ox,oy,kx,ky)
-end
-
-local capturedScreenshot = {
-	x = 0,
-	y = 0,
-	flash = 0,
-	alpha = 0,
-	img = nil,
-	hovered = false,
-	timers = {}
-}
-
-function borderedText(text,x,y,r,sx,sy,ox,oy,kx,ky,alpha)
-	local x = x or 0
-	local y = y or 0
-	local r = r or 0
-	local sx = sx or 1
-	local sy = sy or 1
-	local ox = ox or 0
-	local oy = oy or 0
-	local kx = kx or 0
-	local ky = ky or 0
-	graphics.setColor(0,0,0, alpha or 1)
-	for i = -1, 1 do
-		for j = -1, 1 do
-			love.graphics.print(text,x+i,y+j,r,sx,sy,ox,oy,kx,ky)
-		end
-	end
-	graphics.setColor(1,1,1, alpha or 1)
-	love.graphics.print(text,x,y,r,sx,sy,ox,oy,kx,ky)
-end
+local capturedScreenshot = {x=0, y=0, flash=0, alpha=0, img=nil, hovered=false, timers={}}
+local mouseTimer, mouseTimerReset, mainDrawing = 0, 0.5, true
 
 function songNameToFolder(str)
-	str = str:gsub(" ", "-")
-	str = str:lower()
-	
-	return str
+    return str:gsub(" ", "-"):lower()
 end
 
-mainDrawing = true
-
 require "modules.overrides"
-
-local mouseTimer = 0
-local mouseTimerReset = 0.5
+require "modules.uitext"
 
 function love.load()
-	paused = false
-	settings = {}
-	curOS = love.system.getOS()
+    paused = false
+    settings = {}
+    curOS = love.system.getOS()
 
-	-- Load libraries
-	baton = require "lib.baton"
-	ini = require "lib.ini"
-	push = require "lib.push"
-	Gamestate = require "lib.gamestate"
-	Timer = require "lib.timer"
-	json = require "lib.json"
-	lume = require "lib.lume"
-	Object = require "lib.classic"
-	xml = require "lib.xml"
-	lovefftINST = require "lib.fft.lovefft"
-	require("lib.loveanimate")
+    baton = require "lib.baton"
+    ini = require "lib.ini"
+    push = require "lib.push"
+    Gamestate = require "lib.gamestate"
+    Timer = require "lib.timer"
+    json = require "lib.json"
+    lume = require "lib.lume"
+    Object = require "lib.classic"
+    xml = require "lib.xml"
+    lovefftINST = require "lib.fft.lovefft"
+    require "lib.loveanimate"
 
-	-- Load modules
-	status = require "modules.status"
-	audio = require "modules.audio"
-	graphics = require "modules.graphics"
-	icon = require "modules.Icon"
-	camera = require "modules.camera"
-	beatHandler = require "modules.beatHandler"
-	Conductor = require "modules.Conductor"
-	util = require "modules.util"
-	cutscene = require "modules.cutscene"
-	dialogue = require "modules.dialogue"
-	Group = require "modules.Group"
-	require "modules.savedata"
-	require "modules.Alphabet"
-	Option = require "modules.Option"
-	CONSTANTS = require "modules.constants"
-	NoteSplash = require "modules.Splash"
-	HoldCover = require "modules.Cover"
-	waveform = require "modules.waveform"
-	popupScore = require "modules.popupScore"
-	settings.pixelPerfect = false
+    status = require "modules.status"
+    audio = require "modules.audio"
+    graphics = require "modules.graphics"
+    icon = require "modules.Icon"
+    camera = require "modules.camera"
+    beatHandler = require "modules.beatHandler"
+    Conductor = require "modules.Conductor"
+    util = require "modules.util"
+    cutscene = require "modules.cutscene"
+    dialogue = require "modules.dialogue"
+    Group = require "modules.Group"
+    require "modules.savedata"
+    require "modules.Alphabet"
+    Option = require "modules.Option"
+    CONSTANTS = require "modules.constants"
+    NoteSplash = require "modules.Splash"
+    HoldCover = require "modules.Cover"
+    waveform = require "modules.waveform"
+    popupScore = require "modules.popupScore"
+    settings.pixelPerfect = false
 
-	-- Load Characters
-	BaseCharacter = require "data.characters.BaseCharacter"
-	NeneCharacter = require "data.characters.NeneCharacter"
-	PixelNeneCharacter = require "data.characters.PixelNeneCharacter"
-	BFDarkCharacter = require "data.characters.BFDarkCharacter"
-	GFDarkCharacter = require "data.characters.GFDarkCharacter"
-	PicoDarkCharacter = require "data.characters.PicoDarkCharacter"
-	NeneDarkCharacter = require "data.characters.NeneDarkCharacter"
-	SpookyDarkCharacter = require "data.characters.SpookyDarkCharacter"
+    BaseCharacter = require "data.characters.BaseCharacter"
+    NeneCharacter = require "data.characters.NeneCharacter"
+    PixelNeneCharacter = require "data.characters.PixelNeneCharacter"
+    BFDarkCharacter = require "data.characters.BFDarkCharacter"
+    GFDarkCharacter = require "data.characters.GFDarkCharacter"
+    PicoDarkCharacter = require "data.characters.PicoDarkCharacter"
+    NeneDarkCharacter = require "data.characters.NeneDarkCharacter"
+    SpookyDarkCharacter = require "data.characters.SpookyDarkCharacter"
 
-	-- Modding
-	importMods = require "modding.importMods"
+    importMods = require "modding.importMods"
 
-	-- XML Modules
-	Sprite = require "modules.xml.Sprite"
-	xmlcamera = require "modules.xml.camera"
-	Checkbox = require "modules.Checkbox"
+    Sprite = require "modules.xml.Sprite"
+    xmlcamera = require "modules.xml.camera"
+    Checkbox = require "modules.Checkbox"
 
-	playMenuMusic = true
+    playMenuMusic = true
+    graphics.setImageType(love.filesystem.read("IMAGE_FORMAT.txt"))
+    volumeWidth = {width = 160}
+    volFade = 0
 
-	graphics.setImageType(love.filesystem.read("IMAGE_FORMAT.txt"))
+    input = require "input"
 
-	volumeWidth = {width = 160}
-	volFade = 0
+    debugMenu = require "states.debug.debugMenu"
+    spriteDebug = require "states.debug.sprite-debug"
+    stageDebug = require "states.debug.stage-debug"
+    frameDebug = require "states.debug.frame-debug"
+    stageBuilder = require "states.debug.stage-builder"
 
-	-- Load settings
-	input = require "input"
+    selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
+    confirmSound = love.audio.newSource("sounds/menu/confirm.ogg", "static")
 
-	-- Load Debugs
-	debugMenu = require "states.debug.debugMenu"
-	spriteDebug = require "states.debug.sprite-debug"
-	stageDebug = require "states.debug.stage-debug"
-	frameDebug = require "states.debug.frame-debug"
-	stageBuilder = require "states.debug.stage-builder"
+    stages = {
+        ["stage.base"] = require "stages.base.stage",
+        ["hauntedHouse.base"] = require "stages.base.hauntedHouse",
+        ["city.base"] = require "stages.base.city",
+        ["sunset.base"] = require "stages.base.sunset",
+        ["mall.base"] = require "stages.base.mall",
+        ["school.base"] = require "stages.base.school",
+        ["evilSchool.base"] = require "stages.base.evilSchool",
+        ["tank.base"] = require "stages.base.tank",
+        ["streets.base"] = require "stages.base.streets",
+        ["stage.erect"] = require "stages.erect.stage",
+        ["hauntedHouse.erect"] = require "stages.erect.hauntedHouse",
+        ["city.erect"] = require "stages.erect.city",
+        ["sunset.erect"] = require "stages.erect.sunset",
+        ["mall.erect"] = require "stages.erect.mall",
+        ["school.erect"] = require "stages.erect.school",
+        ["evilSchool.erect"] = require "stages.erect.evilSchool",
+        ["tank.erect"] = require "stages.erect.tank",
+        ["streets.erect"] = require "stages.erect.streets"
+    }
 
-	-- Sounds
-	selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
-	confirmSound = love.audio.newSource("sounds/menu/confirm.ogg", "static")
+    noteTypes = {
+        ["normal"] = require "notetypes.normal",
+        ["Hurt Note"] = require "notetypes.hurt"
+    }
 
-	-- Load stages
-	stages = {
-		["stage.base"] = require "stages.base.stage",
-		["hauntedHouse.base"] = require "stages.base.hauntedHouse",
-		["city.base"] = require "stages.base.city",
-		["sunset.base"] = require "stages.base.sunset",
-		["mall.base"] = require "stages.base.mall",
-		["school.base"] = require "stages.base.school",
-		["evilSchool.base"] = require "stages.base.evilSchool",
-		["tank.base"] = require "stages.base.tank",
-		["streets.base"] = require "stages.base.streets",
+    shaders = {}
+    if curOS ~= "NX" then 
+        shaders["rain"] = love.graphics.newShader("shaders/rain.glsl")
+    end
+    shaders["wiggle"] = love.graphics.newShader("shaders/wiggle.glsl")
 
-		["stage.erect"] = require "stages.erect.stage",
-		["hauntedHouse.erect"] = require "stages.erect.hauntedHouse",
-		["city.erect"] = require "stages.erect.city",
-		["sunset.erect"] = require "stages.erect.sunset",
-		["mall.erect"] = require "stages.erect.mall",
-		["school.erect"] = require "stages.erect.school",
-		["evilSchool.erect"] = require "stages.erect.evilSchool",
-		["tank.erect"] = require "stages.erect.tank",
-		["streets.erect"] = require "stages.erect.streets"
-	}
+    menu = require "states.menu.menu"
+    menuWeek = require "states.menu.menuWeek"
+    menuFreeplay = require "states.menu.menuFreeplay"
+    menuSettings = require "states.menu.options.OptionsState"
+    menuCredits = require "states.menu.menuCredits"
+    menuSelect = require "states.menu.menuSelect"
+    menuMods = require "states.menu.menuMods"
+    resultsScreen = require "states.menu.results"
 
-	-- Load Note types
-	noteTypes = {
-		["normal"] = require "notetypes.normal",
-		["Hurt Note"] = require "notetypes.hurt"
-	}
+    firstStartup = true
+    weeks = require "states.weeks"
 
-	shaders = {}
-	if love.system.getOS() ~= "NX" then 
-		shaders["rain"] = love.graphics.newShader("shaders/rain.glsl")
-	end
-	shaders["wiggle"] = love.graphics.newShader("shaders/wiggle.glsl")
-	--[[ shaders["dropShadow"] = love.graphics.newShader("shaders/dropShadow.glsl") ]]
+    OptionsMenu = require "states.menu.options.OptionsMenu"
+    gameOvers = {
+        default = require "substates.gameovers.boyfriend",
+        week7Default = require "substates.gameovers.boyfriend-week7",
+        pixelDefault = require "substates.gameovers.boyfriend-pixel"
+    }
 
-	-- Load Menus
-	menu = require "states.menu.menu"
-	menuWeek = require "states.menu.menuWeek"
-	menuFreeplay = require "states.menu.menuFreeplay"
-	menuSettings = require "states.menu.options.OptionsState"
-	menuCredits = require "states.menu.menuCredits"
-	menuSelect = require "states.menu.menuSelect"
-	menuMods = require "states.menu.menuMods"
-	resultsScreen = require "states.menu.results"
+    settingsKeybinds = require "substates.settings-keybinds"
+    optionSubstates = {
+        ["Gamemodes"] = require "substates.options.gamemodes",
+        ["Gameplay"] = require "substates.options.gameplay",
+        ["Graphics"] = require "substates.options.graphics",
+        ["Controls"] = require "substates.settings-keybinds",
+        ["Miscillaneous"] = require "substates.options.miscillaneous"
+    }
 
-	firstStartup = true
+    TankmanDatingSim = require "misc.dating"
+    weekData = require "data.weeks.weekData"
+    weekDesc = require "data.weeks.weekDescriptions"
+    weekMeta = require "data.weeks.weekMeta"
 
-	-- Load weeks
-	weeks = require "states.weeks"
+    for _, week in ipairs(weekMeta) do
+        for _, song in ipairs(week[2]) do
+            if type(song) == "table" then
+                song.show = song.show or true
+                if not song.diffs then
+                    song.diffs = {{"easy", ext=""}, {"normal", ext=""}, {"hard", ext=""}}
+                else
+                    for _, v in ipairs(song.diffs) do v.ext = v[2] end
+                end
+            end
+        end
+    end
+    modWeekPlacement = #weekMeta - 1
 
-	-- Load substates
-	OptionsMenu = require "states.menu.options.OptionsMenu"
-	gameOvers = {
-		default = require "substates.gameovers.boyfriend",
-		week7Default = require "substates.gameovers.boyfriend-week7",
-		pixelDefault = require "substates.gameovers.boyfriend-pixel",
-	}
-	settingsKeybinds = require "substates.settings-keybinds"
-	optionSubstates = {
-		["Gamemodes"] = require "substates.options.gamemodes",
-		["Gameplay"] = require "substates.options.gameplay",
-		["Graphics"] = require "substates.options.graphics",
-		["Controls"] = require "substates.settings-keybinds",
-		["Miscillaneous"] = require "substates.options.miscillaneous"
-	}
+    gameOverSounds = {
+        boyfriend = {firstDeath = love.audio.newSource("sounds/death.ogg", "static")}
+    }
 
-	TankmanDatingSim = require "misc.dating"
+    require "modules.extras"
+    __VERSION__ = love.filesystem.getInfo("version.txt") and love.filesystem.read("version.txt") or "vUnknown"
 
-	-- Load week data
-	weekData = require "data.weeks.weekData"
-	weekDesc = require "data.weeks.weekDescriptions"
-	weekMeta = require "data.weeks.weekMeta"
-	for i, week in ipairs(weekMeta) do
-		for k, song in ipairs(week[2]) do
-			if type(song) == "table" then
-				if song.show == nil then
-					song.show = true
-				end
-				if song.diffs == nil then
-					song.diffs = {{"easy", ext=""}, {"normal", ext=""}, {"hard", ext=""}}
-				else
-					for _, v in ipairs(song.diffs) do
-						v.ext = v[2]
-					end
-				end
-			end
-		end
-	end
-	modWeekPlacement = #weekMeta-1 -- everything after the main weeks is a mod folder.
+    if curOS == "OS X" then
+        love.window.setIcon(love.image.newImageData("icons/macos.png"))
+    else
+        love.window.setIcon(love.image.newImageData("icons/default.png"))
+    end
 
-	gameOverSounds = {
-		boyfriend = {
-			firstDeath = love.audio.newSource("sounds/death.ogg", "static"),
-		}
-	}
+    push.setupScreen(1280, 720, {upscale="normal", canvas = true})
 
-	require "modules.extras"
+    function hex2rgb(hex)
+        if type(hex) == "string" then
+            hex = hex:gsub("#",""):gsub("0x","")
+            return {
+                tonumber("0x"..hex:sub(1,2))/255,
+                tonumber("0x"..hex:sub(3,4))/255,
+                tonumber("0x"..hex:sub(5,6))/255
+            }
+        else
+            return {
+                bit.band(bit.rshift(hex, 16), 0xff)/255,
+                bit.band(bit.rshift(hex, 8), 0xff)/255,
+                bit.band(hex, 0xff)/255
+            }
+        end
+    end
 
-	__VERSION__ = love.filesystem.getInfo("version.txt") and love.filesystem.read("version.txt") or "vUnknown"
+    font = love.graphics.newFont("fonts/vcr.ttf", 24)
+    scoringFont = love.graphics.newFont("fonts/vcr.ttf", 26)
+    psychScoringFont = love.graphics.newFont("fonts/vcr.ttf", 36)
+    optionsFont = love.graphics.newFont("fonts/vcr.ttf", 32)
+    FNFFont = love.graphics.newFont("fonts/fnFont.ttf", 24)
+    credFont = love.graphics.newFont("fonts/fnFont.ttf", 32)
+    uiFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 32)
+    pauseFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 96)
+    weekFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 84)
+    weekFontSmall = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 54)
 
-	-- LÖVE init
-	if curOS == "OS X" then
-		love.window.setIcon(love.image.newImageData("icons/macos.png"))
-	else
-		love.window.setIcon(love.image.newImageData("icons/default.png"))
-	end
+    weekNum = 1
+    songDifficulty = 2
+    storyMode = false
+    countingDown = false
+    uiCam = {zoom = 1, x = 1, y = 1, sizeX = 1, sizeY = 1}
+    musicTime, health = 0, 0
 
-	push.setupScreen(1280, 720, {upscale="normal", canvas = true})
+    music = love.audio.newSource("music/menu/menu.ogg", "stream")
+    music:setLooping(true)
 
-	function hex2rgb(hex)
-		if type(hex) == "string" then
-			hex = hex:gsub("#",""):gsub("0x","")
-			local r = hex:sub(1,2) 
-			local g = hex:sub(3,4)
-			local b = hex:sub(5,6)
+    fixVol = tonumber(string.format("%.1f", love.audio.getVolume()))
+    volumeWidth = {width = 160}
 
-			hexR = tonumber("0x".. r)
-			hexG = tonumber("0x".. g)
-			hexB = tonumber("0x".. b)
-			return {hexR/255, hexG/255, hexB/255}
-		else
-			-- sometimes it can be given as 0xffe7e6e6
-			local r = bit.band(bit.rshift(hex, 16), 0xff)/255
-			local g = bit.band(bit.rshift(hex, 8), 0xff)/255
-			local b = bit.band(hex, 0xff)/255
-			return {r, g, b}
-		end
-	end
+    if CONSTANTS.OPTIONS.DO_MODS then
+        importMods.setup()
+        importMods.loadAllMods()
+    end
 
-	-- Variables
-	font = love.graphics.newFont("fonts/vcr.ttf", 24)
-	scoringFont = love.graphics.newFont("fonts/vcr.ttf", 26)
-	psychScoringFont = love.graphics.newFont("fonts/vcr.ttf", 36)
-	optionsFont = love.graphics.newFont("fonts/vcr.ttf", 32)
-	FNFFont = love.graphics.newFont("fonts/fnFont.ttf", 24)
-	credFont = love.graphics.newFont("fonts/fnFont.ttf", 32)   -- guglio is a bitch -- fuck you calling a bitch????
-	uiFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 32)
-	pauseFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 96)
-	weekFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 84)
-	weekFontSmall = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 54)
-
-	weekNum = 1
-	songDifficulty = 2
-
-	storyMode = false
-	countingDown = false
-
-	uiCam = {zoom = 1, x = 1, y = 1, sizeX = 1, sizeY = 1}
-
-	musicTime = 0
-	health = 0
-
-	music = love.audio.newSource("music/menu/menu.ogg", "stream")
-	music:setLooping(true)
-
-	fixVol = tonumber(string.format(
-		"%.1f  ",
-		(love.audio.getVolume())
-	))
-
-	volumeWidth = {width = 160 }
-
-	if CONSTANTS.OPTIONS.DO_MODS then
-		importMods.setup()
-		importMods.loadAllMods()
-	end
-
-	--[[ graphics:initStickerData() ]]
-
-	love.audio.setVolume(0.1)
-
-	Gamestate.switch(menu)
-	--Gamestate.switch(weekData[7], 1, "hard", "-pico", "-pico")
+    love.audio.setVolume(0.1)
+    Gamestate.switch(menu)
 end
 
 function love.resize(width, height)

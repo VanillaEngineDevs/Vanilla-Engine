@@ -734,93 +734,77 @@ return {
 		end
 	end,
 
-	-- Gross countdown script
 	setupCountdown = function(self, countNumVal, func)
-		local countNumVal = countNumVal or 4
+		countNumVal = countNumVal or 4
+
 		if not storyMode and countNumVal == 4 then
 			for i = 1, 4 do
 				boyfriendArrows[i].alpha = 0
 				boyfriendArrows[i].y = boyfriendArrows[i].y - 50
 				enemyArrows[i].alpha = 0
 				enemyArrows[i].y = enemyArrows[i].y - 50
-				Timer.after(
-					0.5 + (0.2 * i),
-					function()
-						Timer.tween(
-							1,
-							boyfriendArrows[i],
-							{
-								alpha = boyfriendArrows[i].finishedAlpha,
-								y = CONSTANTS.WEEKS.STRUM_Y * (settings.downscroll and -1 or 1)
-							},
-							"out-circ",
-							function()
-								boyfriendArrows[i].alpha = boyfriendArrows[i].finishedAlpha
-							end
-						)
 
-						Timer.tween(
-							1,
-							enemyArrows[i],
-							{
-								alpha = enemyArrows[i].finishedAlpha,
-								y = CONSTANTS.WEEKS.STRUM_Y * (settings.downscroll and -1 or 1)
-							},
-							"out-circ",
-							function()
-								enemyArrows[i].alpha = enemyArrows[i].finishedAlpha
-							end
-						)
-					end
-				)
+				Timer.after(0.5 + (0.2 * i), function()
+					local targetY = CONSTANTS.WEEKS.STRUM_Y * (settings.downscroll and -1 or 1)
+
+					Timer.tween(1, boyfriendArrows[i], {
+						alpha = boyfriendArrows[i].finishedAlpha,
+						y = targetY
+					}, "out-circ", function()
+						boyfriendArrows[i].alpha = boyfriendArrows[i].finishedAlpha
+					end)
+
+					Timer.tween(1, enemyArrows[i], {
+						alpha = enemyArrows[i].finishedAlpha,
+						y = targetY
+					}, "out-circ", function()
+						enemyArrows[i].alpha = enemyArrows[i].finishedAlpha
+					end)
+				end)
 			end
 		end
+
 		lastReportedPlaytime = 0
 		if countNumVal == 4 then
-			musicTime = ((60*4) / bpm) * -1000 -- countdown is 4 beats long
+			musicTime = ((60 * 4) / bpm) * -1000 -- countdown is 4 beats long
 		end
 		musicThres = 0
-
 		countingDown = true
+
 		if countNumVal % 2 == 1 then
 			if girlfriend then girlfriend:beat(countNumVal) end
 			if boyfriend then boyfriend:beat(countNumVal) end
 			if enemy then enemy:beat(countNumVal) end
 		end
-		if CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[countNumVal] then audio.playSound(sounds.countdown[CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[countNumVal]]) end
-		if countNumVal == 4 then 
+
+		audio.playSound(sounds.countdown[CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[countNumVal]])
+
+		if countNumVal == 4 then
 			countdownFade[1] = 0
-			Timer.after(
-				(60/bpm),
-				function()
-					self:setupCountdown(countNumVal - 1, func)
-				end
-			)
+			Timer.after((60 / bpm), function()
+				self:setupCountdown(countNumVal - 1, func)
+			end)
 		else
 			countdownFade[1] = 1
 			countdown:animate(CONSTANTS.WEEKS.COUNTDOWN_ANIMS[countNumVal])
-			Timer.tween(
-				(60/bpm), 
-				countdownFade,
-				{0},
-				"linear",
-				function()
-					if countNumVal ~= 1 then self:setupCountdown(countNumVal - 1, func)
-					else
-						countingDown = false
-						previousFrameTime = love.timer.getTime() * 1000
-						musicTime = 0
-						beatHandler.reset(0)
 
-						if inst then inst:play() end
-						if voicesBF then 
-							voicesBF:play() end
-						if voicesEnemy then voicesEnemy:play() end
-						beatHandler.setBeat(0)
-						if func then func() end
-					end
+			Timer.tween((60 / bpm), countdownFade, {0}, "linear", function()
+				if countNumVal ~= 1 then
+					self:setupCountdown(countNumVal - 1, func)
+				else
+					countingDown = false
+					previousFrameTime = love.timer.getTime() * 1000
+					musicTime = 0
+					beatHandler.reset(0)
+
+					if inst then inst:play() end
+					if voicesBF then voicesBF:play() end
+					if voicesEnemy then voicesEnemy:play() end
+
+					beatHandler.setBeat(0)
+					if func then func() end
 				end
-			)
+			end)
 		end
 	end,
 

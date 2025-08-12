@@ -113,7 +113,7 @@ local o_setShader = love.graphics.setShader
 local o_newShader = love.graphics.newShader
 
 function love.graphics.setShader(shader)
-    if type(shader) == "userdata" and settings.shaders then
+    if type(shader) ~= "table" then
         o_setShader(shader)
     end
 end

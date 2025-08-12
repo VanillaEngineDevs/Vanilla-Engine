@@ -78,7 +78,7 @@ return {
 			self:doLightningStrike(true, Conductor.curBeat)
 		end
     end,
-	
+
 	doLightningStrike = function(self, playSound, beat)
 		if playSound then
 			audio.playSound(sounds["thunder"][love.math.random(2)])
