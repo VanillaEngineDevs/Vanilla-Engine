@@ -29,6 +29,9 @@ def zipDir(srcDir, zipFile, blacklist=None):
                 folder = bl[:-2]
                 if relPath.startswith(folder + "/"):
                     return True
+            elif bl.startswith("*."):  # Extension-based blacklist
+                if relPath.lower().endswith(bl[1:].lower()):
+                    return True
             elif relPath == bl:
                 return True
         return False
@@ -67,7 +70,7 @@ def buildLovefile():
     zipPath = os.path.join(lovefileDir, lovefileName)
 
     srcDir = "src/"
-    blacklist = getBlacklist()
+    blacklist = getBlacklist() + videoBlacklist
     if os.path.exists(zipPath):
         os.remove(zipPath)
     zipDir(srcDir, zipPath, blacklist)
@@ -172,6 +175,7 @@ if __name__ == "__main__":
     parser.add_argument("target", nargs="?", default="win64", help="Build target: lovefile, win64, macos, switch, all, clean. Default is 'win64'.")
     parser.add_argument("--imageformat", choices=["png", "dxt5", "astc"], default="dxt5", help="Image format to use. Default is 'dxt5'.")
     parser.add_argument("--block", default="10x10", help="Block size for ASTC compression. Default is 10x10 (Mobile devices).")
+    parser.add_argument("--videoformat", choices=["mp4", "ogv"], default="ogv", help="Video format to use. Default is 'ogv'.")
     args = parser.parse_args()
 
     print(f"[INFO] Selected image format: {args.imageformat}")
@@ -184,6 +188,12 @@ if __name__ == "__main__":
 
     with open("src/IMAGE_FORMAT.txt", "w") as f:
         f.write(args.imageformat)
+
+    videoBlacklist = []
+    if args.videoformat == "ogv":
+        videoBlacklist.append("*.mp4")
+    elif args.videoformat == "mp4":
+        videoBlacklist.append("*.ogv")
 
     compressAssets(args.imageformat, args.block)
 
