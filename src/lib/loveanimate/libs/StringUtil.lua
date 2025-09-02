@@ -173,7 +173,7 @@ end
 --- (default: whitespace) up to a certain length
 --- on the left side of the string.
 ---
---- @param  str     string   The string to pad.
+--- @param  self    string   The string to pad.
 --- @param  length  integer  The length to pad the string to.
 --- @param  char    string   The character to pad the string with. (default: whitespace)
 ---
@@ -185,7 +185,7 @@ end
 --- (default: whitespace) up to a certain length
 --- on the right side of the string.
 ---
---- @param  str     string   The string to pad.
+--- @param  self    string   The string to pad.
 --- @param  length  integer  The length to pad the string to.
 --- @param  char    string   The character to pad the string with. (default: whitespace)
 ---
