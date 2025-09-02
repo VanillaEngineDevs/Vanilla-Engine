@@ -520,14 +520,11 @@ local graphics = {
 					end
 				end
 
-				self.holdTimer = self.holdTimer + dt
-				local inputTbl = {}
-				if love.system.getOS() ~= "NX" and self.playerInputs then
-					table.insert(inputTbl, input:down("gameLeft"))
-					table.insert(inputTbl, input:down("gameRight"))
-					table.insert(inputTbl, input:down("gameUp"))
-					table.insert(inputTbl, input:down("gameDown"))
+				local shouldStopSinging = true
+				if self.playerInputs then
+					shouldStopSinging = not self:isHoldingNote()
 				end
+
 				if self.lastHit > 0 and self.lastHit + (stepCrochet or 0) * self.singDuration < math.abs(musicTime) then
 					if self.specialAnim then
 						self.heyTimer = self.heyTimer - dt
@@ -545,13 +542,20 @@ local graphics = {
 							self:dance()
 						end
 					else
-						if love.system.getOS() ~= "NX" and table.includes(inputTbl, true) then
+						if shouldStopSinging then
 							self:dance()
 							self.lastHit = -1
 							if self.parent then self.parent.lastHit = -1 end
 						end
 					end
 				end
+			end,
+
+			isHoldingNote = function(self)
+				return input:down("gameLeft") or
+					input:down("gameDown") or
+					input:down("gameUp") or
+					input:down("gameRight")
 			end,
 
 			getFrameWidth = function(self, anim)
