@@ -85,6 +85,11 @@ function saveSettings(restartOnChange)
     newSettings.pixelPerfect = false
     newSettings.settingsVer = SETTINGS_VERSION
 
+    newSettings.customBindLeft = customBindLeft
+    newSettings.customBindRight = customBindRight
+    newSettings.customBindUp = customBindUp
+    newSettings.customBindDown = customBindDown
+
     local currentSerialized = lume.serialize(settings)
     local newSerialized = lume.serialize(newSettings)
 
