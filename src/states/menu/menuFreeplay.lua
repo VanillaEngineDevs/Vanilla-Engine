@@ -171,7 +171,7 @@ return {
                     weekNum = #weekMeta
                 end
 
-                if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
+                if songDifficulty > #(((allWeeks[weekNum] or {}).songs[songNum] or {}).diffs or {}) then
                     songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
                 end
             elseif menuNum == 2 then

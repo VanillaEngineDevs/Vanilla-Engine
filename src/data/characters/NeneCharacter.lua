@@ -42,6 +42,12 @@ function Nene:new(variation)
         viz.y = 0
         table.insert(abotVisualizers, viz)
     end
+
+    self.showNene = true
+end
+
+function Nene:unloadNene()
+    self.showNene = false
 end
 
 function Nene:update(dt)
@@ -178,7 +184,9 @@ function Nene:draw(debug)
     love.graphics.rectangle("fill", self.x + -327, self.y + 300, 120, 60)
     self.abot:draw()
 
-    self.spr:draw()
+    if self.showNene then
+        self.spr:draw()
+    end
 end
 
 function Nene:release()

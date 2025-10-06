@@ -134,6 +134,9 @@ healthBar = {
 
 downscrollOffset = 0 -- for compatibility
 
+local healthIconPreloads = {}
+local inHolds = {false, false, false, false}
+
 return {
 	enter = function(self, option)
 		self.gameoverType = "character" -- uses boyfriend.gameOverState
@@ -290,7 +293,7 @@ return {
 
 		if not camera.points["boyfriend"] then
 			if boyfriend then 
-				camera:addPoint("boyfriend", -boyfriend.x + 100, -boyfriend.y + 75) 
+				camera:addPoint("boyfriend", -boyfriend.x + 100, -boyfriend.y + 75)
 			else
 				camera:addPoint("boyfriend", 0, 0)
 			end
@@ -319,8 +322,11 @@ return {
 			end
 		end
 
-		enemyIcon = icon.newIcon(icon.imagePath((enemy and enemy.icon) and enemy.icon) or "dad", (enemy and enemy.optionsTable) and (enemy.optionsTable.scale or 1) or 1)
-		boyfriendIcon = icon.newIcon(icon.imagePath((boyfriend and boyfriend.icon) and boyfriend.icon) or "bf", (boyfriend and boyfriend.optionsTable) and (boyfriend.optionsTable.scale or 1) or 1)
+		self:preloadIcon((enemy and enemy.icon) and enemy.icon or "dad", "enemy")
+		self:preloadIcon((boyfriend and boyfriend.icon) and boyfriend.icon or "boyfriend", "boyfriend")
+
+		enemyIcon = healthIconPreloads.enemy
+		boyfriendIcon = healthIconPreloads.boyfriend
 
 		P1HealthColors = boyfriendIcon.mostCommonColour
 		P2HealthColors = enemyIcon.mostCommonColour
@@ -352,6 +358,13 @@ return {
 
 		isResetting = false
 		if boyfriend then boyfriend.playerInputs = true end
+	end,
+
+	preloadIcon = function(self, path, name)
+		name = name or path
+		if not healthIconPreloads[name] then
+			healthIconPreloads[name] = icon.newIcon(icon.imagePath(path), 1)
+		end
 	end,
 
 	calculateRating = function(self)
@@ -724,7 +737,12 @@ return {
 	generateGFNotes = function(self, chartG, diff)
 		-- very bare-bones chart generation
 		-- Does not handle sprites and all that, just note timings and type
-		local chartG = json.decode(love.filesystem.read(chartG)).notes[diff]
+		--[[ local chartG = json.decode(love.filesystem.read(chartG)).notes[diff] ]]
+		if string.endsWith(chartG, ".json") then
+			chartG = json.decode(love.filesystem.read(chartG)).notes[diff]
+		else
+			chartG = love.filesystem.load(chartG)().notes[diff]
+		end
 
 		for _, noteData in ipairs(chartG) do
 			local noteType = noteData.d % 4 + 1
@@ -1057,15 +1075,33 @@ return {
 					end
 				elseif event.name == "PlayAnimation" then
 					if event.value.target == "bf" or event.value.target == "boyfriend" then
-						boyfriend:animate(event.value.anim, false, nil, nil, nil, event.value.force)
+						if event.value.anim == "knifeToss" then
+							boyfriend:stopAnimTimers()
+						end
+						boyfriend:animate(event.value.anim, false, function()
+							if event.value.anim == "knifeToss" then
+								boyfriend:resumeAnimTimers()
+							end
+						end, nil, nil, nil, event.value.force)
 					elseif event.value.target == "gf" or event.value.target == "girlfriend" then
-						girlfriend:animate(event.value.anim, false, nil, nil, nil, event.value.force)
+						girlfriend:animate(event.value.anim, false, nil, nil, nil, nil, event.value.force)
 					elseif event.value.target == "dad" then
-						enemy:animate(event.value.anim, false, nil, nil, nil, event.value.force)
+						if event.value.anim == "redheadsAnim" then
+							print("Eugh... Red heads", enemy:isAnimName(event.value.anim))
+							CAM_LERP_POINT.x, CAM_LERP_POINT.y = camera:getPoint("enemy").x, camera:getPoint("enemy").y
+							IS_CLASSIC_MOVEMENT = true
+							enemy:stopAnimTimers()
+						end
+						enemy:animate(event.value.anim, false, function()
+							if event.value.anim == "redheadsAnim" then
+								enemy:resumeAnimTimers()
+								event.value.force = false
+							end
+						end, nil, nil, nil, event.value.force)
 					end
 				elseif event.name == "ZoomCamera" then
 					if type(event.value) == "number" then
-						camera.zoom = event.value
+						camera.zoom = event.value - (IS_WEEK_7 and 0.15 or 0)
 						uiCam.zoom = event.value
 					elseif type(event.value) == "table" then
 						event.value.mode = event.value.mode or "stage"
@@ -1078,12 +1114,68 @@ return {
 								bumpTween = Timer.tween(
 									time,
 									camera,
-									{defaultZoom = tonumber(event.value.zoom) or 1},
+									{defaultZoom = (tonumber(event.value.zoom) - (IS_WEEK_7 and 0.15 or 0)) or 1 },
 									CONSTANTS.WEEKS.EASING_TYPES[event.value.ease or "CLASSIC"]
 								)
 							else
-								camera.defaultZoom = tonumber(event.value.zoom) or 1
+								camera.defaultZoom = tonumber(event.value.zoom - (IS_WEEK_7 and 0.15 or 0)) or 1
 							end
+						end
+					end
+				elseif event.name == "SetHealthIcon" then
+					local who = "boyfriend"
+					if type(event.value.char) == "number" then
+						if event.value.char == 0 then
+							who = "boyfriend"
+						elseif event.value.char == 1 then
+							who = "dad"
+						elseif event.value.char == 2 then
+							who = "girlfriend"
+						end
+					elseif type(event.value.char) == "string" then
+						---@diagnostic disable-next-line: cast-local-type
+						who = event.value.char
+					end
+
+					if who == "boyfriend" then
+						local prevData = {
+							x = boyfriendIcon.x,
+							y = boyfriendIcon.y,
+							scaleX = boyfriendIcon.scaleX,
+							scaleY = boyfriendIcon.scaleY,
+							orientation = boyfriendIcon.angle,
+							offsetX = boyfriendIcon.offsetX,
+							offsetY = boyfriendIcon.offsetY,
+							shearX = boyfriendIcon.shearX,
+							shearY = boyfriendIcon.shearY,
+							scale = boyfriendIcon.scale,
+							scrollFactor = {boyfriendIcon.scrollFactor[1], boyfriendIcon.scrollFactor[2]},
+							flipX = boyfriendIcon.flipX,
+							visible = boyfriendIcon.visible,
+						}
+						boyfriendIcon = healthIconPreloads[event.value.id] or boyfriendIcon
+						for k, v in pairs(prevData) do
+							boyfriendIcon[k] = v
+						end
+					elseif who == "dad" then
+						local prevData = {
+							x = enemyIcon.x,
+							y = enemyIcon.y,
+							scaleX = enemyIcon.scaleX,
+							scaleY = enemyIcon.scaleY,
+							orientation = enemyIcon.angle,
+							offsetX = enemyIcon.offsetX,
+							offsetY = enemyIcon.offsetY,
+							shearX = enemyIcon.shearX,
+							shearY = enemyIcon.shearY,
+							scale = enemyIcon.scale,
+							scrollFactor = {enemyIcon.scrollFactor[1], enemyIcon.scrollFactor[2]},
+							flipX = enemyIcon.flipX,
+							visible = enemyIcon.visible,
+						}
+						enemyIcon = healthIconPreloads[event.value.id] or enemyIcon
+						for k, v in pairs(prevData) do
+							enemyIcon[k] = v
 						end
 					end
 				elseif event.name == "SetCameraBop" then
@@ -1127,6 +1219,12 @@ return {
 			if boyfriend then boyfriend:beat(Conductor.curBeat) end
 			if enemy then enemy:beat(Conductor.curBeat) end
 			if girlfriend then girlfriend:beat(Conductor.curBeat) end
+		end
+
+		for i = 1, #inHolds do
+			if inHolds[i] then
+				score = score + CONSTANTS.WEEKS.SCORE_HOLD_BONUS_PER_SECOND * dt
+			end
 		end
 	end,
 
@@ -1429,8 +1527,10 @@ return {
 
 				if boyfriendNote[1]:getAnimName() == "hold" then
 					HoldCover:show(i, 1, boyfriendNote[1].x, boyfriendNote[1].y)
+					inHolds[i] = true
 				else
 					HoldCover:hide(i, 1)
+					inHolds[i] = false
 				end
 				if voicesBF then voicesBF:setVolume(1) end
 
@@ -1807,5 +1907,8 @@ return {
 		noteSprites = nil
 
 		camera.defaultZoom = 1
+
+		healthIconPreloads = {}
+		inHolds = {false, false, false, false}
 	end
 }

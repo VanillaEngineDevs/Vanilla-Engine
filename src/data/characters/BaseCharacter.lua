@@ -80,4 +80,16 @@ function Character:getSheet()
     return self.spr:getSheet()
 end
 
+function Character:stopAnimTimers()
+    self.spr:stopAnimTimers()
+end
+
+function Character:resumeAnimTimers()
+    self.spr:resumeAnimTimers()
+end
+
+function Character:isAnimName(name)
+    return self.spr:isAnimName(name)
+end
+
 return Character

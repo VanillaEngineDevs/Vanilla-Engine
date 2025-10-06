@@ -438,7 +438,10 @@ local graphics = {
 			isCharacter = optionsTable.isCharacter or false,
 			danceSpeed = optionsTable.danceSpeed or 2,
 			danceIdle = optionsTable.danceIdle or false,
+			idlePostfix = optionsTable.idlePostfix or "",
 			maxHoldTimer = optionsTable.maxHoldTimer or 0.1,
+
+			animTimersActive = true,
 
 			visible = true,
 
@@ -460,6 +463,11 @@ local graphics = {
 
 			getSheet = function(self)
 				return imageData
+			end,
+
+			addSheet = function(self, luadata)
+				-- its like the sheets parameter
+				-- TODO: Add me!
 			end,
 
 			isAnimName = function(self, name)
@@ -484,6 +492,14 @@ local graphics = {
 			end,
 			isLooped = function(self)
 				return isLooped
+			end,
+
+			stopAnimTimers = function(self)
+				self.animTimersActive = false
+			end,
+
+			resumeAnimTimers = function(self)
+				self.animTimersActive = true
 			end,
 
 			setAnimFrame = function(self, frame)
@@ -526,7 +542,7 @@ local graphics = {
 				end
 
 				if self.lastHit > 0 and self.lastHit + (stepCrochet or 0) * self.singDuration < math.abs(musicTime) then
-					if self.specialAnim then
+					if self.specialAnim and self.animTimersActive then
 						self.heyTimer = self.heyTimer - dt
 
 						if self.heyTimer <= 0 and not self:isAnimated() and
@@ -673,7 +689,6 @@ local graphics = {
 			end,
 
 			getFrameData = function(self, curFrame, sheet)
-				-- get frame data from the current frame and sheet
 				local sheet = sheets[sheet or anim.sheet]
 
 				return sheet:getAllFrames()[curFrame]
@@ -716,12 +731,12 @@ local graphics = {
 				if isDanceIdle then
 					self.danced = not self.danced
 					if self.danced then
-						self:animate("danceRight")
+						self:animate("danceRight" .. self.idlePostfix)
 					else
-						self:animate("danceLeft")
+						self:animate("danceLeft" .. self.idlePostfix)
 					end
 				else
-					self:animate("idle")
+					self:animate("idle" .. self.idlePostfix)
 				end
 			end,
 
@@ -1032,6 +1047,8 @@ local graphics = {
 
 		-- shaders no worky rn
 		object.playerInputs = false
+
+		object.animTimersActive = false
 
 		object._symbols = {}
 		function object:addSymbol(name, SN)

@@ -1,5 +1,6 @@
 local stage
 
+local bloodyPreload
 return {
     enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter() 
@@ -79,21 +80,23 @@ return {
 			weeks:generateNotes("data/songs/stress/stress-chart" .. songExt .. ".lua", "data/songs/stress/stress-metadata" .. songExt .. ".lua", difficulty)
 			weeks:generateGFNotes("data/songs/stress/stress-chart" .. songExt .. ".lua", "picospeaker")
 
-			tankmanRunImg = love.graphics.newImage(graphics.imagePath("week7/tankmanKilled1"))
+			if songExt ~= "-pico" then
+				tankmanRunImg = love.graphics.newImage(graphics.imagePath("week7/tankmanKilled1"))
 
-			tankmanRun = {}
+				tankmanRun = {}
 
-			for i = 1, #gfNotes do
-				for j = 1, #gfNotes[i] do
-					local tankBih = love.filesystem.load("sprites/week7/tankmanRun.lua")()
-					tankBih.time = gfNotes[i][j].time
-					tankBih.flipX = i < 3
-					tankBih.y = 100 + love.math.random(50, 100)
-					tankBih.endingOffset = util.randomFloat(50, 200)
-					tankBih.killed = false
+				for i = 1, #gfNotes do
+					for j = 1, #gfNotes[i] do
+						local tankBih = love.filesystem.load("sprites/week7/tankmanRun.lua")()
+						tankBih.time = gfNotes[i][j].time
+						tankBih.flipX = i < 3
+						tankBih.y = 100 + love.math.random(50, 100)
+						tankBih.endingOffset = util.randomFloat(50, 200)
+						tankBih.killed = false
 
-					if love.math.random(1, 10) == 10 then
-						table.insert(tankmanRun, tankBih)
+						if love.math.random(1, 10) == 10 then
+							table.insert(tankmanRun, tankBih)
+						end
 					end
 				end
 			end
@@ -130,7 +133,7 @@ return {
 			end
 		end
 
-        if song == 3 then
+        if song == 3 and songExt ~= "-pico" then
 			if #tankmanRun > 0 then
 				for i = 1, #tankmanRun do
 					if tankmanRun[i] then

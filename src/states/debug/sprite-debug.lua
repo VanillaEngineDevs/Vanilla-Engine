@@ -18,10 +18,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 -- You do not need to mess with this file. You just need to press 7 when loaded into the game
-
 local selection
 local curDir, dirTable
 local sprite, spriteAnims, overlaySprite
+local scrollOffset = 0
+local maxVisible = 30
 
 return {
 	spriteViewerSearch = function(self, dir)
@@ -33,6 +34,8 @@ return {
 			curDir = dir
 		end
 		selection = 1
+		scrollOffset = 0
+
 		dirTable = love.filesystem.getDirectoryItems(curDir)
 		if curDir == "sprites" then
 			local modsDirTable = importMods.getAllModsSprites()
@@ -40,22 +43,23 @@ return {
 				table.insert(dirTable, v.name)
 			end
 		end
-		-- sort so directories are first
+
 		table.sort(dirTable, function(a, b)
-			local isDir = false
-			if love.filesystem.getInfo(curDir .. "/" .. a) and love.filesystem.getInfo(curDir .. "/" .. a).type == love.filesystem.getInfo(curDir .. "/" .. b).type then
+			local infoA = love.filesystem.getInfo(curDir .. "/" .. a)
+			local infoB = love.filesystem.getInfo(curDir .. "/" .. b)
+			if infoA and infoB and infoA.type == infoB.type then
 				return a < b
 			else
-				return love.filesystem.getInfo(curDir .. "/" .. a) and love.filesystem.getInfo(curDir .. "/" .. a).type == "directory"
+				return infoA and infoA.type == "directory"
 			end
 		end)
 	end,
 
 	enter = function(self, previous)
 		selection = 3
+		scrollOffset = 0
 
 		love.keyboard.setKeyRepeat(true)
-
 		self:spriteViewerSearch("sprites")
 
 		graphics.setFade(0)
@@ -87,7 +91,11 @@ return {
 		end
 
 		svMode = 2
-
+		if not spriteData then
+			print("Failed to load sprite: " .. tostring(spritePath))
+			self:spriteViewerSearch("..")
+			return
+		end
 		sprite = spriteData()
 		overlaySprite = spriteData()
 
@@ -111,48 +119,50 @@ return {
 
 			if input:pressed("up") then
 				selection = selection - 1
-
-				if selection < 1 then
-					selection = #spriteAnims
-				end
-
+				if selection < 1 then selection = #spriteAnims end
 				sprite:animate(spriteAnims[selection], false, nil, false)
 			end
+
 			if input:pressed("down") then
 				selection = selection + 1
-
-				if selection > #spriteAnims then
-					selection = 1
-				end
-
+				if selection > #spriteAnims then selection = 1 end
 				sprite:animate(spriteAnims[selection], false, nil, false)
 			end
+
 			if input:pressed("confirm") then
 				overlaySprite:animate(spriteAnims[selection], false, nil, false)
 			end
 		else
+			local moved = false
+
 			if input:pressed("up") then
 				selection = selection - 1
-
-				if selection < 1 then
-					selection = #dirTable
-				end
+				if selection < 1 then selection = #dirTable end
+				moved = true
 			end
+
 			if input:pressed("down") then
 				selection = selection + 1
-				if selection > #dirTable then
-					selection = 1
+				if selection > #dirTable then selection = 1 end
+				moved = true
+			end
+
+			if moved then
+				if selection - scrollOffset > maxVisible then
+					scrollOffset = selection - maxVisible
+				elseif selection <= scrollOffset then
+					scrollOffset = selection - 1
+					if scrollOffset < 0 then scrollOffset = 0 end
 				end
 			end
+
 			if input:pressed("confirm") then
-				if love.filesystem.getInfo(curDir .. "/" .. dirTable[selection]) then
-					if love.filesystem.getInfo(curDir .. "/" .. dirTable[selection]).type == "directory" then
-						self:spriteViewerSearch(dirTable[selection])
-					else
-						self:spriteViewer(curDir .. "/" .. dirTable[selection])
-					end
+				local path = curDir .. "/" .. dirTable[selection]
+				local info = love.filesystem.getInfo(path)
+				if info and info.type == "directory" then
+					self:spriteViewerSearch(dirTable[selection])
 				else
-					self:spriteViewer(curDir .. "/" .. dirTable[selection])
+					self:spriteViewer(path)
 				end
 			end
 		end
@@ -180,27 +190,41 @@ return {
 				graphics.setColor(1, 1, 1, 0.5)
 				overlaySprite:draw()
 				graphics.setColor(1, 1, 1)
-
 			love.graphics.pop()
 
 			for i = 1, #spriteAnims do
 				uitextColored(spriteAnims[i], 0, (i - 1) * 20, 0, nil, (i == selection and {1, 1, 0} or {1, 1, 1}))
 				graphics.setColor(1, 1, 1)
-
-				uitextColored("X: " .. tostring((sprite.x - overlaySprite.x)), 0, (#spriteAnims + 1) * 20)
-				uitextColored("Y: " .. tostring((sprite.y - overlaySprite.y)), 0, (#spriteAnims + 2) * 20)
-				uitextColored("Frame: " .. tostring(overlaySprite:getFrameFromCurrentAnim()), 0, (#spriteAnims + 3) * 20)
 			end
+
+			uitextColored("X: " .. tostring(sprite.x - overlaySprite.x), 0, (#spriteAnims + 1) * 20)
+			uitextColored("Y: " .. tostring(sprite.y - overlaySprite.y), 0, (#spriteAnims + 2) * 20)
+			uitextColored("Frame: " .. tostring(overlaySprite:getFrameFromCurrentAnim()), 0, (#spriteAnims + 3) * 20)
+
 		else
-			for i = 1, #dirTable do
-				uitextColored(dirTable[i], 0, (i - 1) * 20, 0, nil,
-					(
-						i == selection and {1, 1, 0} or
-						love.filesystem.getInfo(curDir .. "/" .. dirTable[i]) and love.filesystem.getInfo(curDir .. "/" .. dirTable[i]).type == "directory" and {1, 0, 1} or
-						{1, 1, 1}
-					)
-				)
+			local startIdx = math.max(1, scrollOffset + 1)
+			local endIdx = math.min(#dirTable, scrollOffset + maxVisible)
+
+			local baseY = 0
+			if scrollOffset > 0 then
+				baseY = 20
+				graphics.setColor(1, 1, 0)
+				uitextColored("^^^^", 0, 0, 0, nil, {1, 1, 1})
+			end
+
+			for i = startIdx, endIdx do
+				local y = (i - startIdx) * 20 + baseY
+				local color =
+					(i == selection and {1, 1, 0}) or
+					(love.filesystem.getInfo(curDir .. "/" .. dirTable[i]) and love.filesystem.getInfo(curDir .. "/" .. dirTable[i]).type == "directory" and {1, 0, 1}) or
+					{1, 1, 1}
+				uitextColored(dirTable[i], 0, y, 0, nil, color)
 				graphics.setColor(1, 1, 1)
+			end
+
+			if endIdx < #dirTable then
+				graphics.setColor(1, 1, 0)
+				uitextColored("vvvv", 0, (maxVisible + (scrollOffset > 0 and 1 or 0)) * 20, 0, nil, {1, 1, 1})
 			end
 		end
 	end

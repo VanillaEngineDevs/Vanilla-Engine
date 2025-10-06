@@ -145,6 +145,15 @@ return graphics.newSprite(
 		["augh"] = {start = 1, stop = 18, speed = 24, offsetX = 15, offsetY = 1, sheet = 2, flipX = true},
 		["beat it"] = {start = 19, stop = 35, speed = 24, offsetX = 48, offsetY = -7, sheet = 2, flipX = true},
 		["laugh"] = {start = 36, stop = 59, speed = 24, offsetX = -4, offsetY = 7, sheet = 2, flipX = true},
+
+		-- SHEET 3
+		["singDOWN-bloody"] = {start = 1, stop = 10, speed = 24, offsetX = 7, offsetY = -54, sheet = 3},
+		["idle-bloody"] = {start = 11, stop = 24, speed = 24, offsetX = -9, offsetY = 27, sheet = 3},
+		["singRIGHT-bloody"] = {start = 25, stop = 32, speed = 24, offsetX = 51, offsetY = 7, sheet = 3},
+		["singLEFT-bloody"] = {start = 33, stop = 42, speed = 24, offsetX = -69, offsetY = 9, sheet = 3},
+		["singUP-bloody"] = {start = 43, stop = 52, speed = 24, offsetX = 10, offsetY = 84, sheet = 3},
+		["good-bloody"] = {start = 53, stop = 119, speed = 24, offsetX = -49, offsetY = 45, sheet = 3},
+		["redheadsAnim"] = {start = 120, stop = 198, speed = 24, offsetX = -38, offsetY = 58, sheet = 3},
 	},
 	"idle",
 	false,
@@ -154,7 +163,9 @@ return graphics.newSprite(
 		flipX = true,
 		icon = "tankman",
 		sheets = {
+			-- TODO: Only load sheets when required
 			love.filesystem.load("sprites/characters/extraSheets/tankmanPico.lua")(),
+			love.filesystem.load("sprites/characters/extraSheets/tankmanCaptainBloody.lua")(),
 		}
 	}
 )

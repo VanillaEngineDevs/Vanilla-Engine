@@ -1,8 +1,10 @@
 ---@diagnostic disable: missing-fields
 local rimShaderBF, rimShaderEnemy, rimShaderGF
+local songEXT = ""
 
 return {
     enter = function(self, songExt)
+        IS_WEEK_7 = true
         songExt = songExt or ""
         stageImages = {
             ["BG"] = graphics.newImage(graphics.imagePath("week7.erect/bg")),
@@ -14,6 +16,8 @@ return {
         else
             girlfriend = BaseCharacter("sprites/characters/gfTankmen.lua")
 		end
+
+        songEXT = songExt
         
 		enemy = BaseCharacter("sprites/characters/tankmanCaptain.lua")
 
@@ -33,7 +37,7 @@ return {
         rimShaderBF:send("ang", math.rad(90))
 
         local w, h = boyfriend:getSheet():getDimensions()
-        rimShaderBF:send("textureSize", {w, h})
+        --rimShaderBF:send("textureSize", {w, h})
 
         rimShaderGF:send("dropColor", {hexToRGB(0xFFDFEF3C)})
         rimShaderGF:send("brightness", -46)
@@ -46,7 +50,7 @@ return {
             rimShaderGF:send("useMask", true)
             rimShaderGF:send("altMask", love.graphics.newImage(graphics.imagePath("week7.erect/masks/gfTankmen_mask")))
             w, h = sheet:getDimensions()
-            rimShaderGF:send("textureSize", {w, h})
+            --rimShaderGF:send("textureSize", {w, h})
         end
 
         rimShaderEnemy:send("dropColor", {hexToRGB(0xFFDFEF3C)})
@@ -57,7 +61,7 @@ return {
         rimShaderEnemy:send("ang", math.rad(135))
         rimShaderEnemy:send("thr", 0.3)
         w, h = enemy:getSheet():getDimensions()
-        rimShaderEnemy:send("textureSize", {w, h})
+        --rimShaderEnemy:send("textureSize", {w, h})
 
         enemy.flipX = true
 
@@ -67,8 +71,6 @@ return {
         enemy.x, enemy.y = -586, 274
         girlfriend.x, girlfriend.y = -42, 134
 
-        
-
         if songExt == "-pico" then
             girlfriend.y = girlfriend.y - 60
             boyfriend.y = boyfriend.y + 10
@@ -77,6 +79,24 @@ return {
 
     load = function(self, dt)
         camera.defaultZoom = 0.7
+
+        if song == 3 and songEXT == "-pico" then
+            boyfriend = BaseCharacter("sprites/characters/picoAndNene.lua")
+            girlfriend:unloadNene()
+            enemy = TankmanBloody()
+            enemy.flipX = true
+            weeks:preloadIcon("tankman-bloody", "tankman-bloody")
+            
+            boyfriend.x, boyfriend.y = 491, 355
+            enemy.x, enemy.y = -586, 274
+            girlfriend.x, girlfriend.y = -42, 134
+            
+            if songExt == "-pico" then
+                girlfriend.y = girlfriend.y - 60
+                boyfriend.y = boyfriend.y - 30
+            end
+            camera:addPoint("boyfriend", -boyfriend.x + 300, -boyfriend.y + 75)
+        end
     end,
 
     update = function(self, dt)
@@ -133,5 +153,7 @@ return {
 		end
 
         graphics.clearCache()
+
+        IS_WEEK_7 = false
     end
 }

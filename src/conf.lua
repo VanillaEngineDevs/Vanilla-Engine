@@ -31,6 +31,8 @@ function love.conf(t)
 	t.window.width = 1280
 	t.window.height = 720
 
+	t.window.resizable = true
+
 	if _debug then
 		local major, minor, revision, codename = love.getVersion()
 		loveVer = major .. "." .. minor .. "." .. revision .. " " .. codename

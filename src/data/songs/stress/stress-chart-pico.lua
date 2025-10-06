@@ -32,7 +32,7 @@ return {
             t = 8089.15730337079,
             e = "ZoomCamera",
             v = {
-                duration = 32,
+                duration = 16,
                 ease = "expoOut",
                 mode = "stage",
                 zoom = 1.1,
@@ -53,7 +53,7 @@ return {
             t = 10828.1573033708,
             e = "ZoomCamera",
             v = {
-                duration = 32,
+                duration = 16,
                 ease = "expoOut",
                 mode = "stage",
                 zoom = 1,
@@ -74,7 +74,7 @@ return {
             t = 17696.1573033708,
             e = "ZoomCamera",
             v = {
-                duration = 32,
+                duration = 16,
                 ease = "expoOut",
                 mode = "stage",
                 zoom = 1.1,
@@ -84,7 +84,7 @@ return {
             t = 18876.1573033708,
             e = "ZoomCamera",
             v = {
-                duration = 32,
+                duration = 16,
                 ease = "expoOut",
                 mode = "stage",
                 zoom = 1,
@@ -102,7 +102,7 @@ return {
             t = 20393.1573033708,
             e = "ZoomCamera",
             v = {
-                duration = 32,
+                duration = 16,
                 ease = "expoOut",
                 mode = "stage",
                 zoom = 1.1,
@@ -120,9 +120,9 @@ return {
             t = 21573.0337078652,
             e = "FocusCamera",
             v = {
-                x = 320,
+                x = 0,
                 duration = 4,
-                y = -70,
+                y = 0,
                 ease = "CLASSIC",
                 char = 1,
             },
@@ -131,7 +131,7 @@ return {
             t = 21615.3033707865,
             e = "ZoomCamera",
             v = {
-                duration = 32,
+                duration = 16,
                 ease = "expoOut",
                 mode = "stage",
                 zoom = 0.9,
@@ -153,7 +153,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1,
                 mode = "stage",
             },
@@ -163,8 +163,8 @@ return {
             e = "FocusCamera",
             v = {
                 duration = 4,
-                x = 320,
-                y = -70,
+                x = 0,
+                y = 0,
                 ease = "CLASSIC",
                 char = 1,
             },
@@ -174,7 +174,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 0.9,
                 mode = "stage",
             },
@@ -184,7 +184,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 0.95,
                 mode = "stage",
             },
@@ -221,7 +221,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1,
                 mode = "stage",
             },
@@ -242,7 +242,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1.05,
                 mode = "stage",
             },
@@ -252,7 +252,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1,
                 mode = "stage",
             },
@@ -270,7 +270,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1.1,
                 mode = "stage",
             },
@@ -299,7 +299,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1,
                 mode = "stage",
             },
@@ -320,7 +320,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1.05,
                 mode = "stage",
             },
@@ -330,7 +330,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1.1,
                 mode = "stage",
             },
@@ -340,7 +340,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1.15,
                 mode = "stage",
             },
@@ -350,7 +350,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1,
                 mode = "stage",
             },
@@ -475,8 +475,8 @@ return {
             t = 61938.6629213483,
             e = "FocusCamera",
             v = {
-                x = 0,
-                duration = 16,
+                x = -100,
+                duration = 8,
                 y = 0,
                 ease = "expoOut",
                 char = 1,
@@ -542,8 +542,8 @@ return {
             e = "FocusCamera",
             v = {
                 duration = 16,
-                x = 220,
-                y = -20,
+                x = 0,
+                y = 0,
                 char = 1,
                 ease = "expoOut",
             },
@@ -590,7 +590,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1,
                 mode = "stage",
             },
@@ -619,7 +619,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1.1,
                 mode = "stage",
             },
@@ -628,9 +628,9 @@ return {
             t = 75505.5168539326,
             e = "FocusCamera",
             v = {
-                duration = 32,
-                x = 320,
-                y = -100,
+                duration = 16,
+                x = 0,
+                y = 0,
                 ease = "expoOut",
                 char = 1,
             },
@@ -640,7 +640,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 0.7,
                 mode = "stage",
             },
@@ -864,9 +864,9 @@ return {
             t = 97078.5168539326,
             e = "FocusCamera",
             v = {
-                duration = 32,
-                x = 320,
-                y = -100,
+                duration = 16,
+                x = 0,
+                y = 0,
                 ease = "expoOut",
                 char = 1,
             },
@@ -876,7 +876,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 0.8,
                 mode = "stage",
             },
@@ -886,7 +886,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 0.85,
                 mode = "stage",
             },
@@ -904,7 +904,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 0.9,
                 mode = "stage",
             },
@@ -990,9 +990,9 @@ return {
             t = 107865.516853933,
             e = "FocusCamera",
             v = {
-                duration = 32,
-                x = 320,
-                y = -100,
+                duration = 16,
+                x = 0,
+                y = 0,
                 ease = "expoOut",
                 char = 1,
             },
@@ -1002,7 +1002,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 0.9,
                 mode = "stage",
             },
@@ -1011,7 +1011,7 @@ return {
             t = 110730.516853933,
             e = "FocusCamera",
             v = {
-                duration = 32,
+                duration = 8,
                 x = 0,
                 y = 0,
                 ease = "expoOut",
@@ -1023,7 +1023,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 0.95,
                 mode = "stage",
             },
@@ -1062,9 +1062,9 @@ return {
             t = 113258.516853933,
             e = "FocusCamera",
             v = {
-                duration = 32,
-                x = 320,
-                y = -100,
+                duration = 8,
+                x = 0,
+                y = 0,
                 ease = "expoOut",
                 char = 1,
             },
@@ -1074,7 +1074,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 0.9,
                 mode = "stage",
             },
@@ -1092,7 +1092,7 @@ return {
             e = "PlayAnimation",
             v = {
                 target = "dad",
-                anim = "hehPrettyGood",
+                anim = "good",
                 force = true,
             },
         },
@@ -1101,7 +1101,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 0.95,
                 mode = "stage",
             },
@@ -1111,7 +1111,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1,
                 mode = "stage",
             },
@@ -1132,7 +1132,7 @@ return {
             e = "ZoomCamera",
             v = {
                 ease = "expoOut",
-                duration = 32,
+                duration = 16,
                 zoom = 1.2,
                 mode = "stage",
             },

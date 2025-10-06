@@ -59,6 +59,7 @@ function love.load()
     PicoDarkCharacter = require "data.characters.PicoDarkCharacter"
     NeneDarkCharacter = require "data.characters.NeneDarkCharacter"
     SpookyDarkCharacter = require "data.characters.SpookyDarkCharacter"
+	TankmanBloody = require "data.characters.TankmanBloody"
 
     importMods = require "modding.importMods"
 
