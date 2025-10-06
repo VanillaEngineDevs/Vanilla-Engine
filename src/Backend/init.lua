@@ -4,6 +4,7 @@ local function r(p)
     return require(path .. "." .. p)
 end
 
+r("Love.Run")
 r("Lua.String")
 r("Lua.Table")
 r("Lua.Math")

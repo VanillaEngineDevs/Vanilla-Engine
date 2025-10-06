@@ -13,20 +13,20 @@ function StrumlineNote:new(noteStyle, isPlayer, direction)
 
     self:setup(noteStyle)
 
-    self.animationCallback = self.onAnimationFrame
-    self.animationFinishCallback = self.onAnimationFinish
+    self.onFrameChange:add(self.onAnimationFrame, StrumlineNote)
+    self.onFinish:add(self.onAnimationFinished, StrumlineNote)
 
     self.active = true
 
     self:playAnimation("static", true)
 end
 
-function StrumlineNote:onAnimationFrame(name, frameNumber, frameIndex)
+function StrumlineNote:onAnimationFrame(self, name, frameNumber, frameIndex)
 end
 
-function StrumlineNote:onAnimationFinished(name)
+function StrumlineNote:onAnimationFinished(self, name)
     if name == "confirm" then
-        self.confirmHoldTimer = 0
+        self.confirmHoldTimer = 0.0
     end
 end
 
@@ -34,10 +34,9 @@ function StrumlineNote:update(dt)
     FunkinSprite.update(self, dt)
 
     self:centerOrigin()
-
+;
     if self.confirmHoldTimer >= 0 then
         self.confirmHoldTimer = self.confirmHoldTimer + dt
-
         if self.confirmHoldTimer >= StrumlineNote.CONFIRM_HOLD_TIME then
             self.confirmHoldTimer = -1
             self:playStatic()

@@ -41,6 +41,7 @@ end
 
 function SongDifficulty:getInstPath(inst)
     inst = inst or ""
+    if not self.characters.instrumental then self.characters.instrumental = "" end
     if self.characters ~= nil then
         if inst ~= "" and table.contains(self.characters.altInstrumentals, inst) then
             local instId = "-" .. inst
@@ -55,8 +56,9 @@ function SongDifficulty:getInstPath(inst)
 end
 
 function SongDifficulty:cacheInst(inst)
+    local suffix = self.variation ~= nil and self.variation ~= "" and self.variation ~= Constants.DEFAULT_VARIATION and "-" .. self.variation or ""
     inst = inst or ""
-    print(self:getInstPath(inst), "FUCK")
+
     Game.sound.cache(self:getInstPath(inst))
 end
 
@@ -65,8 +67,8 @@ function SongDifficulty:playInst(volume, inst, looped)
     inst = inst or ""
     looped = looped or false
 
-    local suffix = inst ~= "" and "-" .. inst or ""
-    print(Paths.inst(self.song.id, suffix), "HIII")
+    local suffix = self.variation ~= nil and self.variation ~= "" and self.variation ~= Constants.DEFAULT_VARIATION and "-" .. self.variation or ""
+    print(Paths.inst(self.song.id, suffix), "SONG GET")
     Game.sound.music = FunkinSound:load(Paths.inst(self.song.id, suffix), volume, looped, function() end, false)
 
     Game.sound.list:remove(Game.sound.music)
@@ -402,5 +404,7 @@ function Song:fetchVariationMetadata(id, variation)
     local meta = SongRegistry:parseEntryMetadataWithMigration(id, variation, version)
     return meta
 end
+
+function Song:onNoteHit(event) end
 
 return Song

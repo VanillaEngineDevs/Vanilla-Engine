@@ -185,4 +185,10 @@ function FunkinSound:load(soundPath, volume, looped, autoDestroy, autoPlay, onCo
     return sound
 end
 
+function FunkinSound:playOnce(key, volume, onComplete, onLoad, important)
+    local sound = self:load(key, volume or 1, false, true, true, onComplete, onLoad)
+    sound:play(true)
+    return sound
+end
+
 return FunkinSound

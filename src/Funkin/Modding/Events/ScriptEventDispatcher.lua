@@ -53,7 +53,7 @@ function ScriptEventDispatcher:callEvent(target, event)
         if event.type == "NOTE_INCOMING" then
             target:onNoteIncoming(event)
             return
-        elseif event.type == "NOTE_HIT" then
+        elseif event.type == "NOTE_HIT" and target.onNoteHit then
             target:onNoteHit(event)
             return
         elseif event.type == "NOTE_MISS" then

@@ -54,3 +54,6 @@ ScriptEventDispatcher = r("Modding.Events.ScriptEventDispatcher")
 Module = r("Modding.Module.Module")
 ScriptedModule = r("Modding.Module.ScriptedModule")
 ModuleHandler = r("Modding.Module.ModuleHandler")()
+
+Controls = r("Input.Controls")()
+Scoring = r("Play.Scoring.Scoring")

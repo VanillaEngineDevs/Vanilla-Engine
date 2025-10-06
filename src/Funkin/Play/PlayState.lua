@@ -338,6 +338,23 @@ function PlayState:startCountdown()
 end
 
 function PlayState:update(dt)
+    local pressArray = {
+        "NOTE_LEFT", "NOTE_DOWN", "NOTE_UP", "NOTE_RIGHT"
+    }
+    local releaseArray = {
+        "NOTE_LEFT", "NOTE_DOWN", "NOTE_UP", "NOTE_RIGHT"
+    }
+    for i = 1, #pressArray do
+        local fn = Controls[pressArray[i] .. "_P"]
+        if fn and fn(Controls) then
+            table.insert(self.inputPressQueue, i - 1)
+        end
+    end
+    for i = 1, #releaseArray do
+        if Controls[releaseArray[i] .. "_R"](Controls) then
+            table.insert(self.inputReleaseQueue, i - 1)
+        end
+    end
     MusicBeatState.update(self, dt)
 
     local list = Game.sound.list
@@ -460,9 +477,11 @@ function PlayState:update(dt)
     if self.health <= Constants.HEALTH_MIN and not self.isPracticeMode and not self.isPlayerDying then
     end
 
-    -- player death handling
-
-    --
+    if (not self.isInCutscene and not self.disableKeys) then
+        if Controls:RESET() then
+            print("FUCK!")
+        end
+    end
 
     self:processSongEvents()
 
@@ -662,13 +681,9 @@ function PlayState:regenNoteData(startTime)
         if strumTime < startTime then goto continue end
 
         local noteData = songNote.d % 4
-        local playerNote = true
 
-        if noteData > 3 then
-            playerNote = false
-        end
-
-        local strumIndex = math.floor(noteData / 4)
+        -- theres 4 lanes, 0-3 player, 4-7 opponent
+        local strumIndex = songNote.d >= 4 and 1 or 0
         if strumIndex == 0 then
             table.insert(playerNoteData, songNote)
         elseif strumIndex == 1 then
@@ -685,12 +700,12 @@ function PlayState:processSongEvents()
     if self.songEvents ~= nil and #self.songEvents > 0 then
         --local songEventsToActivate = SongEventRegistry.queryEvents(self.songEvents, Conductor.songPosition)
 
-        
+
     end
 end
 
 function PlayState:processInputQueue()
-    if #self.inputPressQueue + #self.inputReleaseQueue == 0 then 
+    if #self.inputPressQueue + #self.inputReleaseQueue == 0 then
         return
     end
 
@@ -700,8 +715,7 @@ function PlayState:processInputQueue()
         return
     end
 
-    local notesInRange = {}
-    local holdNotesInRange = {}
+    local notesInRange = self.playerStrumline:getNotesMayHit()
 
     local notesByDirection = {{}, {}, {}, {}}
 
@@ -712,20 +726,19 @@ function PlayState:processInputQueue()
     while #self.inputPressQueue > 0 do
         local input = table.shift(self.inputPressQueue)
 
-        --self.playerStrumline:pressKey(input.noteDirection)
+        self.playerStrumline:pressKey(input)
 
-        if self.isBotPlayMode then 
+        if self.isBotPlayMode then
             goto continue
         end
 
-        local notesInDirection = notesByDirection[input.noteDirection+1]
+        local notesInDirection = notesByDirection[input+1]
 
         if #notesInDirection == 0 then
-            --self:ghostNoteMiss(input.noteDirection, #notesInRange > 0)
+            self:ghostNoteMiss(input, #notesInRange > 0)
 
-            --self.playerStrumline:playPress(input.noteDirection)
+            self.playerStrumline:playPress(input)
         else
-            --var targetNote:Null<NoteSprite> = notesInDirection.find((note) -> !note.lowPriority);
             local targetNote = nil
             for i, note in ipairs(notesInDirection) do
                 if not note.lowPriority then
@@ -734,9 +747,9 @@ function PlayState:processInputQueue()
                 end
             end
 
-            --self:goodNoteHit(targetNote, input)
-
-            --self.playerStrumline:playConfirm(input.noteDirection)
+            self:goodNoteHit(targetNote, input)
+            table.remove(notesInDirection, table.indexOf(notesInDirection, targetNote))
+            self.playerStrumline:playConfirm(input)
         end
 
         ::continue::
@@ -745,21 +758,23 @@ function PlayState:processInputQueue()
     while #self.inputReleaseQueue > 0 do
         local input = table.shift(self.inputReleaseQueue)
 
-        --self.playerStrumline:playStatic(input.noteDirection)
+        self.playerStrumline:playStatic(input)
 
-        --self.playerStrumline:releaseKey(input.noteDirection)
+        self.playerStrumline:releaseKey(input)
     end
 end
 
-function PlayState:processNotes(dt)
-    if not self.playerStrumline or not self.playerStrumline.notes or not self.playerStrumline.notes.members then
-        return
-    end
-    if not self.opponentStrumline or not self.opponentStrumline.notes or not self.opponentStrumline.notes.members then
-        return
-    end
+function PlayState:onKeyPress(event)
+end
 
-    for i, note in ipairs(self.opponentStrumline.notes.members) do
+function PlayState:onKeyRelease(event)
+end
+
+function PlayState:processNotes(dt)
+    if not self.playerStrumline then return end
+    if not self.opponentStrumline then return end
+
+    for i, note in ipairs(self.opponentStrumline.notes:getObjects()) do
         if note == nil then
             goto continue
         end
@@ -783,7 +798,7 @@ function PlayState:processNotes(dt)
         elseif Conductor.songPosition > hitWindowCenter then
             if note.hasBeenHit then goto continue end
 
-            local event = --[[ HitNoteScriptEvent(note, 0, 0, 'perfect', false, 0) ]] {}
+            local event = HitNoteScriptEvent(note, 0, 0, 'perfect', false, 0)
 
             if event.eventCanceled then goto continue end
 
@@ -817,7 +832,66 @@ function PlayState:processNotes(dt)
         ::continue::
     end
 
-    for i, holdNote in ipairs(self.opponentStrumline.holdNotes.members) do
+    for i, note in ipairs(self.playerStrumline.notes:getObjects()) do
+        if note == nil then
+            goto continue
+        end
+
+        local hitWindowStart = note.strumTime + Conductor.inputOffset - Constants.HIT_WINDOW_MS
+        local hitWindowCenter = note.strumTime + Conductor.inputOffset
+        local hitWindowEnd = note.strumTime + Conductor.inputOffset + Constants.HIT_WINDOW_MS
+
+        if Conductor.songPosition > hitWindowEnd then
+            if note.hasMissed or note.hasBeenHit then goto continue end
+
+            note.tooEarly = false
+            note.mayHit = false
+            note.hasMissed = true
+
+            if note.holdNoteSprite ~= nil then
+                note.holdNoteSprite.missedNote = false
+            end
+
+            ::continue::
+        elseif Conductor.songPosition > hitWindowCenter then
+            if self.isBotPlayMode then
+                if note.hasBeenHit then goto continue end
+
+                local event = HitNoteScriptEvent(note, 0, 0, 'perfect', false, 0)
+
+                if event.eventCanceled then goto continue end
+
+                self.playerStrumline:hitNote(note)
+
+                if note.holdNoteSprite then
+                    self.playerStrumline:playNoteHoldCover(note.holdNoteSprite)
+                end
+                ::continue::
+            end
+        elseif Conductor.songPosition > hitWindowStart then
+            if note.hasBeenHit or note.hasMissed then goto continue end
+
+            note.tooEarly = false
+            note.mayHit = true
+            note.hasMissed = false
+            if note.holdNoteSprite then
+                note.holdNoteSprite.missedNote = false
+            end
+
+            ::continue::
+        else
+            note.tooEarly = true
+            note.mayHit = false
+            note.hasMissed = false
+            if note.holdNoteSprite then
+                note.holdNoteSprite.missedNote = false
+            end
+        end
+
+        ::continue::
+    end
+
+    for i, holdNote in ipairs(self.opponentStrumline.holdNotes:getObjects()) do
         if holdNote == nil or not holdNote.alive then goto continue end
 
         if holdNote.hitNote and not holdNote.missedNote and holdNote.sustainLength > 0 then
@@ -835,5 +909,131 @@ function PlayState:processNotes(dt)
     end
 end
 
+function PlayState:ghostNoteMiss(direction, hasPossibleNotes)
+    hasPossibleNotes = hasPossibleNotes == nil and true or hasPossibleNotes
+
+    local event = GhostMissNoteScriptEvent(direction, hasPossibleNotes, Constants.HEALTH_GHOST_MISS_PENALTY, -10)
+    self:dispatchEvent(event)
+
+    if event.eventCanceled then return end
+
+    self.health = self.health + event.healthChange
+    self.songScore = self.songScore + event.scoreChange
+
+    if not self.isPracticeMode then
+        local pressArray = {
+            Controls:NOTE_LEFT_P(),
+            Controls:NOTE_DOWN_P(),
+            Controls:NOTE_UP_P(),
+            Controls:NOTE_RIGHT_P()
+        }
+
+        local indices = {}
+        for i, pressed in ipairs(pressArray) do
+            if pressed then table.insert(indices, i-1) end
+        end
+        if event.playSound then
+            if self.vocals ~= nil then
+                self.vocals.playerVolume = 0
+            end
+            FunkinSound:playOnce(Paths.soundRandom('missnote', 1, 3), love.math.random() * 0.1 + 0.1)
+        end
+    end
+end
+
+function PlayState:goodNoteHit(note, direction)
+    local inputLatencyNs = 0
+    local inputLatencyMs = inputLatencyNs / Constants.NS_PER_MS
+    if tostring(inputLatencyMs) == "nan" then
+        inputLatencyMs = 0
+    end
+
+    local diff = Conductor.songPosition - note.noteData.t
+
+    local totalDiff = diff
+    if diff < 0 then
+        totalDiff = diff + inputLatencyMs
+    else
+        totalDiff = diff - inputLatencyMs
+    end
+
+    local noteDiff = math.floor(totalDiff)
+
+    local score = Scoring:scoreNote(noteDiff, "PBOT1")
+    local daRating = Scoring:judgeNote(noteDiff, "PBOT1")
+
+    local healthChange = 0
+    local isComboBreak = false
+
+    if daRating == 'sick' then
+        healthChange = Constants.HEALTH_SICK_BONUS;
+        isComboBreak = Constants.JUDGEMENT_SICK_COMBO_BREAK;
+    elseif daRating == 'good' then
+        healthChange = Constants.HEALTH_GOOD_BONUS;
+        isComboBreak = Constants.JUDGEMENT_GOOD_COMBO_BREAK;
+    elseif daRating == 'bad' then
+        healthChange = Constants.HEALTH_BAD_BONUS;
+        isComboBreak = Constants.JUDGEMENT_BAD_COMBO_BREAK;
+    elseif daRating == 'shit' then
+        healthChange = Constants.HEALTH_SHIT_BONUS;
+        isComboBreak = Constants.JUDGEMENT_SHIT_COMBO_BREAK;
+    end
+
+    local event = HitNoteScriptEvent(note, healthChange, score, daRating, 
+        isComboBreak, note.scoreable and 1 or 0,
+            daRating == 'sick'
+    )
+
+    self:dispatchEvent(event)
+
+    if event.eventCanceled then return end
+    self.playerStrumline:hitNote(note, not event.isComboBreak)
+    if event.doesNotesplash then  end
+    if note.isHoldNote and note.holdNoteSprite ~= nil then self.playerStrumline:playNoteHoldCover(note.holdNoteSprite) end
+    if self.vocals ~= nil then self.vocals.playerVolume = 1 end
+
+    if note.scoreable then
+        --Highscore.tallies.totalNotesHit = Highscore.tallies.totalNotesHit + 1
+        self:applyScore(event.score, event.judgement, event.healthChange, event.isComboBreak)
+        self:popUpScore(event.judgement)
+    end
+end
+
+function PlayState:applyScore(score, judgement, healthChange, isComboBreak)
+    if judgement == 'sick' then
+        --Highscore.tallies.sicks = Highscore.tallies.sicks + 1
+    elseif judgement == 'good' then
+        --Highscore.tallies.goods = Highscore.tallies.goods + 1
+    elseif judgement == 'bad' then
+        --Highscore.tallies.bads = Highscore.tallies.bads + 1
+    elseif judgement == 'shit' then
+        --Highscore.tallies.shits = Highscore.tallies.shits + 1
+    end
+
+    self.health = self.health + healthChange
+    if isComboBreak then
+        -- if Highscore.tallies.combo >= 10 then self.comboPopUps:displayCombo(0) end
+        -- Highscore.tallies.combo = 0
+    else
+        -- Highscore.tallies.combo = Highscore.tallies.combo + 1
+        -- if Highscore.tallies.combo > Highscore.tallies.maxCombo then Highscore.tallies.maxCombo = Highscore.tallies.combo end
+    end
+
+    self.songScore = self.songScore + score
+end
+
+function PlayState:popUpScore(judgement, combo)
+    if judgement == "miss" then
+        return
+    end
+
+    if combo == nil then combo = --[[Highscore.tallies.combo]] 0 end
+
+    if not self.isPracticeMode then
+        -- self.comboPopUps:displayRating(judgement)
+        -- if combo >= 10 then self.comboPopUps:displayCombo(combo) end
+        if self.vocals ~= nil then self.vocals.playerVolume = 1 end
+    end
+end
 
 return PlayState

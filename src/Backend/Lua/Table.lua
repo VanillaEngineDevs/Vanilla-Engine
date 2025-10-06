@@ -203,3 +203,16 @@ function table.shift(tbl)
 
     return first
 end
+
+---Gets the index of a value in a table
+---@param tbl table
+---@param value any
+---@return number
+function table.indexOf(tbl, value)
+    for i, v in pairs(tbl) do
+        if v == value then
+            return i
+        end
+    end
+    return -1
+end

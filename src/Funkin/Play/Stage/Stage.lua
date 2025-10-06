@@ -1,4 +1,5 @@
 local Stage = SpriteGroup:extend("Stage")
+Stage:implement(IPlayStateScriptedClass)
 
 function Stage:new(stageData)
     SpriteGroup.new(self)
@@ -88,6 +89,7 @@ function Stage:buildStage()
             if propData.animType == "packer" then
                 --propData.loadPacker(propData.assetPath)
             else
+                print(propData.assetPath)
                 propSprite:loadSparrow(propData.assetPath)
             end
         elseif isSolidColor then
@@ -222,6 +224,24 @@ function Stage:getOpponent(pop)
 end
 
 function Stage:onScriptEvent(event)
+    for _, bopper in ipairs(self.boppers) do
+        ScriptEventDispatcher:callEvent(bopper, event)
+    end
+end
+
+function Stage:onNoteHit(event)
+    for _, bopper in ipairs(self.boppers) do
+        ScriptEventDispatcher:callEvent(bopper, event)
+    end
+end
+
+function Stage:onNoteMiss(event)
+    for _, bopper in ipairs(self.boppers) do
+        ScriptEventDispatcher:callEvent(bopper, event)
+    end
+end
+
+function Stage:onNoteGhostMiss(event)
     for _, bopper in ipairs(self.boppers) do
         ScriptEventDispatcher:callEvent(bopper, event)
     end

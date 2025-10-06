@@ -36,8 +36,6 @@ function Strumline:new(noteStyle, isPlayer)
     self.holdNotes = SpriteGroup()
     self.holdNotes.zIndex = 20
 
-    self.onNoteIncoming = SpriteGroup()
-
     self.strumlineNotes = SpriteGroup()
     self.strumlineNotes.zIndex = 10
     self:add(self.strumlineNotes)
@@ -129,12 +127,12 @@ function Strumline:updateNotes()
     if #self.noteData == 0 then
         return
     end
-
+    
     local songStart = PlayState.instance.startTimestamp or 0
     local hitWindowStart = self.conductorInUse.songPosition - Constants.HIT_WINDOW_MS
     local renderWindowStart = self.conductorInUse.songPosition + self:_getRenderDistanceMS()
     --printf("Strumline:updateNotes: songStart = %s, hitWindowStart = %s, renderWindowStart = %s", songStart, hitWindowStart, renderWindowStart)
-
+    
     for i = self.nextNoteIndex, #self.noteData do
         local note = self.noteData[i]
 
@@ -169,13 +167,15 @@ function Strumline:updateNotes()
         ::continue::
     end
 
-    for _, note in ipairs(self.notes:getObjects()) do
-        if not note or not note.alive then
+    for i, note in ipairs(self.notes:getObjects()) do
+        if not note then
             goto continue
         end
 
+        
         if not note.customPositionData then
-            note.y = self.y - self.INITIAL_OFFSET + self:calculateNoteYPos(note.strumTime) + note.yOffset
+            note.x = self:getXPos(note.direction)
+            note.y = self.y + self:calculateNoteYPos(note.strumTime) + note.yOffset - note.height*1.5
         end
 
         local isOffscreen = note.y < -note.height
@@ -199,6 +199,8 @@ function Strumline:calculateNoteYPos(strumTime)
 end
 
 function Strumline:killNote(note)
+    note.visible = false
+    note:kill()
 end
 
 function Strumline:buildNoteSprite(note)
@@ -225,7 +227,7 @@ function Strumline:buildNoteSprite(note)
     noteSprite.y = self:calculateNoteYPos(note.t)
     --noteSprite.printIfDrawing = true
 
-    printf("Strumline:buildNoteSprite: x = %s, y = %s", noteSprite.x, noteSprite.y)
+    --printf("Strumline:buildNoteSprite: x = %s, y = %s", noteSprite.x, noteSprite.y)
 
     return noteSprite
 end
@@ -237,9 +239,63 @@ function Strumline:constructNoteSprite()
 
     self.notes:add(result)
 
-    print(#self.notes.group.members, "notes in Strumline")
+    --print(#self.notes.group.members, "notes in Strumline")
 
     return result
+end
+
+function Strumline:hitNote(note, removeNote)
+    if removeNote == nil then removeNote = true end
+
+    self:playConfirm(note.direction)
+    note.hasBeenHit = true
+
+    if removeNote then
+        self:killNote(note)
+    else
+        note.alpha = 0.5
+        --note:desaturate()
+    end
+
+    if note.holdNoteSprite ~= nil then
+        --
+    end
+end
+
+function Strumline:playConfirm(direction)
+    self:getByDirection(direction):playConfirm()
+end
+
+function Strumline:playPress(direction)
+    self:getByDirection(direction):playPress()
+end
+
+function Strumline:playStatic(direction)
+    self:getByDirection(direction):playStatic()
+end
+
+function Strumline:getByDirection(direction)
+    for _, strum in ipairs(self.strumlineNotes:getObjects()) do
+        if strum.direction == direction then
+            return strum
+        end
+    end
+
+    return nil
+end
+
+function Strumline:getNotesMayHit()
+    return table.filter(self.notes:getObjects(), function(note)
+        return note ~= nil and note.alive and not note.hasBeenHit and note.mayHit
+    end)
+end
+
+function Strumline:pressKey(direction)
+    self.heldKeys[direction + 1] = true
+end
+
+function Strumline:releaseKey(direction)
+    self.heldKeys[direction + 1] = false
 end
 
 return Strumline

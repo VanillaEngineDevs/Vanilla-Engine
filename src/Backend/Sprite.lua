@@ -50,6 +50,7 @@ function Sprite:new(x, y, graphic)
 
     self.frames = nil
     self.anims = nil
+	self.lastFrame = 0
 
     self.offset = Point()
 	self.animOffsets = {}
@@ -61,6 +62,9 @@ function Sprite:new(x, y, graphic)
     if graphic then
         self:load(graphic)
     end
+
+	self.onFrameChange = Signal()
+	self.onFinish = Signal()
 end
 
 ---@param graphic (string | love.Drawable)
@@ -308,6 +312,11 @@ function Sprite:update(dt)
     if self.curAnim and not self.animFinished and not self.animPaused then
         self.curFrame = self.curFrame + dt * self.curAnim.framerate
         if self.curFrame >= #self.curAnim.frames + 1 then
+			if self.curFrame ~= self.lastFrame then
+				self.onFrameChange:dispatch(self, self.curAnim.name, #self.curAnim.frames)
+				self.lastFrame = self.curFrame
+			end
+			self.onFinish:dispatch(self, self.curAnim.name)
             if self.curAnim.looped then
                 self.curFrame = 1
             else
@@ -333,6 +342,7 @@ end
 
 ---@param camera Camera
 function Sprite:render(camera)
+	if not self.graphic then return end
 	love.graphics.push()
 
 	camera:applyTransform()

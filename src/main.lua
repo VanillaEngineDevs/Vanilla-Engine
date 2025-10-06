@@ -15,15 +15,16 @@ function oPrintf(str, ...)
     oPrint(string.format(str, ...))
 end
 
-function love.load()
-    Config = require("Backend.Config")
-    Class = require("Lib.Class")
-    Json = require("Lib.Json")
-    Timer = require("Lib.Timer")
-    Xml = require("Lib.Xml")
+Config = require("Backend.Config")
+Class = require("Lib.Class")
+Json = require("Lib.Json")
+Timer = require("Lib.Timer")
+Xml = require("Lib.Xml")
 
-    require("Backend")
-    require("Funkin")
+require("Backend")
+require("Funkin")
+
+function love.load()
 
     Game = Group()
     Game.sound = require "Backend.SoundManager"
@@ -75,14 +76,15 @@ function love.load()
     SongRegistry:loadEntries()
     StageRegistry:loadEntries()
 
-    Paths.setCurrentLevel("week1")
-    local songData = SongRegistry:fetchEntry("dadbattle")
+    Paths.setCurrentLevel("week7")
+    local songData = SongRegistry:fetchEntry("ugh")
     print(songData)
     songData:cacheCharts()
     local params = {
         targetSong = songData,
-        targetDifficulty = "hard",
-        targetVariation = "pico"
+        targetDifficulty = "nightmare",
+        targetVariation = "erect"
+        --[[ targetVariation = "pico" ]]
     }
 
     ModuleHandler:loadModuleCache()
@@ -90,7 +92,7 @@ function love.load()
     Game:switchState(PlayState(params))
 
     love.audio.setVolume(0.1)
-end 
+end
 
 function love.update(dt)
     Game:update(dt)

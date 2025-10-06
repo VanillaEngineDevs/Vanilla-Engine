@@ -7,4 +7,6 @@ function Module:new(moduleId, priority)
     self.priority = priority or 1000
 end
 
+function Module:onNoteHit(event) end
+
 return Module

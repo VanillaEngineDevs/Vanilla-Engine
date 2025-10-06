@@ -24,9 +24,9 @@ function Signal:remove(func)
     end
 end
 
-function Signal:dispatch()
+function Signal:dispatch(...)
     for _, func in ipairs(self.functions) do
-        if func[1] then func[1](func[2]) end
+        if func[1] then func[1](func[2], ...) end
     end
 end
 

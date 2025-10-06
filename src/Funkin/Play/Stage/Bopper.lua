@@ -1,5 +1,4 @@
 local Bopper = StageProp:extend("Bopper")
-Bopper:implement(IPlayStateScriptedClass)
 
 function Bopper:new(danceEvery)
     StageProp.new(self, "Bopper")

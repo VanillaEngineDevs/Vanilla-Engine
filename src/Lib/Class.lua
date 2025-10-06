@@ -63,7 +63,7 @@ function class:implement(...)
         for k, v in pairs(cls) do
             if k:find("__") ~= 1 then
                 self[k] = v
-                printf("Implementing %s.%s into %s", cls.__ID, k, self.__ID)
+                --printf("Implementing %s.%s into %s", cls.__ID, k, self.__ID)
             end
         end
     end

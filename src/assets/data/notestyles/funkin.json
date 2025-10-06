@@ -6,7 +6,7 @@
   "assets": {
     "note": {
       "assetPath": "shared:notes",
-      "scale": 1.0,
+      "scale": 1,
       "data": {
         "left": { "prefix": "noteLeft" },
         "down": { "prefix": "noteDown" },
@@ -16,7 +16,7 @@
     },
     "noteStrumline": {
       "assetPath": "shared:noteStrumline",
-      "scale": 1.55,
+      "scale": 1,
       "offsets": [0, 0],
       "data": {
         "leftStatic": { "prefix": "staticLeft0" },
@@ -39,18 +39,61 @@
     },
     "holdNote": {
       "assetPath": "NOTE_hold_assets",
+      "scale": 1,
       "data": {}
     },
     "noteSplash": {
-      "assetPath": "",
+      "assetPath": "shared:noteSplashes",
+      "alpha": 1.1,
       "data": {
-        "enabled": true
+        "enabled": true,
+        "leftSplashes": [
+          { "prefix": "note impact 1 purple0" },
+          { "prefix": "note impact 2 purple0" }
+        ],
+        "rightSplashes": [
+          { "prefix": "note impact 1 red0" },
+          { "prefix": "note impact 2 red0" }
+        ],
+        "upSplashes": [
+          { "prefix": "note impact 1 green0" },
+          { "prefix": "note impact 2 green0" }
+        ],
+        "downSplashes": [
+          { "prefix": "note impact 1  blue0" },
+          { "prefix": "note impact 2 blue0" }
+        ]
       }
     },
     "holdNoteCover": {
       "assetPath": "",
+      "offsets": [0, 0],
       "data": {
-        "enabled": true
+        "enabled": true,
+        "left": {
+          "assetPath": "shared:holdCoverPurple",
+          "start": { "prefix": "holdCoverStartPurple" },
+          "hold": { "prefix": "holdCoverPurple" },
+          "end": { "prefix": "holdCoverEndPurple" }
+        },
+        "right": {
+          "assetPath": "shared:holdCoverRed",
+          "start": { "prefix": "holdCoverStartRed" },
+          "hold": { "prefix": "holdCoverRed" },
+          "end": { "prefix": "holdCoverEndRed" }
+        },
+        "up": {
+          "assetPath": "shared:holdCoverGreen",
+          "start": { "prefix": "holdCoverStartGreen" },
+          "hold": { "prefix": "holdCoverGreen" },
+          "end": { "prefix": "holdCoverEndGreen" }
+        },
+        "down": {
+          "assetPath": "shared:holdCoverBlue",
+          "start": { "prefix": "holdCoverStartBlue" },
+          "hold": { "prefix": "holdCoverBlue" },
+          "end": { "prefix": "holdCoverEndBlue" }
+        }
       }
     },
     "countdownThree": {
