@@ -9,7 +9,7 @@
 > #### For Modders:
 > Vanilla Engine has recently been updated to support the new FNF 0.3.x charts. For **backwards** compatibility for Charts, Inst, and Vocals, do the following:
 > 1. In your week file, instead of weeks:generateNotes(chartfile, metafile, difficulty), call weeks:legacyGenerateNotes(chartfile)
-> 2. Only load the vocals for VoicesBF. This is because VE now uses the FNNF 0.3.x Vocals system (split-vocal files).
+> 2. Only load the vocals for VoicesBF. This is because VE now uses the FNF 0.3.x Vocals system (split-vocal files).
 
 Friday Night Funkin' Vanilla Engine is a rewrite of [Friday Night Funkin'](https://ninja-muffin24.itch.io/funkin) built on [LÖVE](https://love2d.org/) for Windows and using [Funkin' Rewritten](https://github.com/HTV04/Funkin-Rewritten) as a base.
 
