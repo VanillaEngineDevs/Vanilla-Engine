@@ -80,17 +80,7 @@ function Strumline:new(noteStyle, isPlayer)
 end
 
 function Strumline:getXPos(dir)
-    if dir == NoteDirection.LEFT then
-        return 0
-    elseif dir == Strumline.DIRECTIONS.DOWN then
-        return 0 + (1 * self.NOTE_SPACING)
-    elseif dir == Strumline.DIRECTIONS.UP then
-        return 0 + (2 * self.NOTE_SPACING)
-    elseif dir == Strumline.DIRECTIONS.RIGHT then
-        return 0 + (3 * self.NOTE_SPACING)
-    else
-        return 0
-    end
+    return dir * self.NOTE_SPACING
 end
 
 local function compareNoteData(a, b)
