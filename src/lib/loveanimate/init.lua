@@ -24,8 +24,17 @@ end
 ---
 --- @return love.animate.SparrowAtlas
 ---
-function la.newSparrowAtlas()
-    return SparrowAtlas:new()
+function la.newSparrowAtlas(x, y)
+    local obj = SparrowAtlas:new()
+    obj.x = x or 0
+    obj.y = y or 0
+
+    return obj
 end
 
 love.animate = la
+
+---@deprecated
+graphics.newAtlas = la.newAtlas
+graphics.newTextureAtlas = la.newTextureAtlas
+graphics.newSparrowAtlas = la.newSparrowAtlas

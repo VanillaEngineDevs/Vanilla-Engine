@@ -89,7 +89,7 @@ local function setupCanvas(canvasTable)
 		)
 	end
 
-	canvasOptions = {canvases[1].canvas, stencil = canvases[1].stencil}
+	canvasOptions = {canvases[1].canvas, stencil = true}
 end
 
 local function getCanvasTable(name)
@@ -224,7 +224,7 @@ return {
 		if not settings.canvas then return true end
 
 		canvasTable = getCanvasTable(name)
-		return love.graphics.setCanvas({canvasTable.canvas, stencil = canvasTable.stencil})
+		return love.graphics.setCanvas({canvasTable.canvas, stencil = true})
 	end,
 	setShader = function(name, shader)
 		if not shader then

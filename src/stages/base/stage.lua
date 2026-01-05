@@ -28,11 +28,6 @@ return {
         stageImages["Stage Front"].y = 400
         stageImages["Curtains"].y = -100
 
-        enemy = BaseCharacter("sprites/characters/daddy-dearest.lua")
-
-        girlfriend.x, girlfriend.y = 30, -90
-        enemy.x, enemy.y = -380, -110
-        boyfriend.x, boyfriend.y = 260, 100
     end,
 
     load = function()
@@ -53,7 +48,6 @@ return {
 		love.graphics.pop()
 		love.graphics.push()
 			love.graphics.translate(camera.x, camera.y)
-			enemy:draw()
 			boyfriend:draw()
             graphics.setColor(1,1,1)
             

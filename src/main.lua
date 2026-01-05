@@ -28,11 +28,12 @@ function love.load()
     Object = require "lib.classic"
     xml = require "lib.xml"
     lovefftINST = require "lib.fft.lovefft"
-    require "lib.loveanimate"
+	GIF = require "lib.gif"
 
     status = require "modules.status"
     audio = require "modules.audio"
     graphics = require "modules.graphics"
+	require "lib.loveanimate"
     icon = require "modules.Icon"
     camera = require "modules.camera"
     beatHandler = require "modules.beatHandler"
@@ -51,7 +52,14 @@ function love.load()
     popupScore = require "modules.popupScore"
     settings.pixelPerfect = false
 
-    BaseCharacter = require "data.characters.BaseCharacter"
+	Character = require "game.character"
+	Stage = require "game.stage"
+	SparrowCharacter = require "game.sparrowCharacter"
+	MultiSparrowCharacter = require "game.multiSparrowCharacter"
+	AnimateAtlasCharacter = require "game.animateAtlasCharacter"
+	MultiAnimateAtlasCharacter = require "game.multiAnimateAtlas"
+
+    --[[ BaseCharacter = require "data.characters.BaseCharacter"
     NeneCharacter = require "data.characters.NeneCharacter"
     PixelNeneCharacter = require "data.characters.PixelNeneCharacter"
     BFDarkCharacter = require "data.characters.BFDarkCharacter"
@@ -59,7 +67,7 @@ function love.load()
     PicoDarkCharacter = require "data.characters.PicoDarkCharacter"
     NeneDarkCharacter = require "data.characters.NeneDarkCharacter"
     SpookyDarkCharacter = require "data.characters.SpookyDarkCharacter"
-	TankmanBloody = require "data.characters.TankmanBloody"
+	TankmanBloody = require "data.characters.TankmanBloody" ]]
 
     importMods = require "modding.importMods"
 
@@ -175,7 +183,7 @@ function love.load()
         love.window.setIcon(love.image.newImageData("icons/default.png"))
     end
 
-    push.setupScreen(1280, 720, {upscale="normal", canvas = true})
+    push.setupScreen(1280, 720, {upscale="normal", canvas = true, stencil = true})
 
     function hex2rgb(hex)
         if type(hex) == "string" then

@@ -7,7 +7,8 @@ local menuNum = 1
 local songNum, songAppend
 local songDifficulty = 2
 
-local transparency, isMatpat
+local transparency, isIShowSpeed
+local danced = false
 
 return {
 	enter = function(self, previous)
@@ -16,11 +17,11 @@ return {
 			music:play()
 		end
 		function tweenMenu()
-			if logo.y == -300 then 
-				Timer.tween(1, logo, {y = -125}, "out-expo")
+			if logo.y == -150 then
+				Timer.tween(1, logo, {y = -100}, "out-expo")
 			end
-			if girlfriendTitle.x == 500 then
-				Timer.tween(1, girlfriendTitle, {x = 325}, "out-expo")
+			if girlfriendTitle.x == 1280*0.5 then
+				Timer.tween(1, girlfriendTitle, {x = 1280 * 0.4}, "out-expo")
 			end
 		end
 
@@ -31,31 +32,30 @@ return {
 			{[1] = 1},
 			"out-quad"
 		)
-		titleBG = graphics.newImage(graphics.imagePath("menu/titleBG"))
+		titleBG = graphics.newSparrowAtlas()
+		titleBG:load("states/title/titleBG")
 		changingMenu = false
-		isMatpat = love.math.random(0, 200) == 0
-		if isMatpat then
-			logo = love.filesystem.load("sprites/menu/matpat.lua")()
+		isIShowSpeed = love.math.random(0, 200) == 0
+		if not isIShowSpeed then
+			logo = graphics.newSparrowAtlas(-150, -150)
+			logo:load("states/title/logoBumpin")
+			logo:addAnimByPrefix("bump", "logo bumpin", 24, false)
+			logo:updateHitbox()
 		else
-			logo = love.filesystem.load("sprites/ve-logo.lua")()
+			logo = GIF.new("assets/ishowmeat.gif")
 		end
-		
-		girlfriendTitle = love.filesystem.load("sprites/menu/girlfriend-title.lua")()
-		function AnimateLogo()
-			logo:animate("anim", false, function()
-				if isMatpat then
-					Timer.after(0.25, AnimateLogo)
-				else
-					AnimateLogo()
-				end
-			end)
-		end
-		AnimateLogo()
 
-		girlfriendTitle:setAnimSpeed(14.4 / (60 / 102))
-
-		girlfriendTitle.x, girlfriendTitle.y = 500, 65
-		logo.x, logo.y = -350, -300
+		--[[ girlfriendTitle = love.filesystem.load("sprites/menu/girlfriend-title.lua")() ]]
+		girlfriendTitle = graphics.newSparrowAtlas(1280 * 0.5, 720 * 0.07)
+		print(girlfriendTitle.x, girlfriendTitle.y)
+		girlfriendTitle:load("states/title/gfDanceTitle")
+		girlfriendTitle:addAnimByIndices("danceLeft", "gfDance", {
+			30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+		}, nil, 24, false)
+		girlfriendTitle:addAnimByIndices("danceRight", "gfDance", {
+			15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29
+		}, nil, 24, false)
+		girlfriendTitle:play("danceRight")
 
 		tweenMenu()
 
@@ -75,8 +75,16 @@ return {
 
 		beatHandler.update(dt)
 
-		if beatHandler.onBeat() then 
-			if logo then logo:animate("anim", true) end
+		if beatHandler.onBeat() then
+			if logo and not isIShowSpeed then logo:play("bump", true) end
+			if girlfriendTitle then
+				if danced then
+					girlfriendTitle:play("danceRight", true)
+				else
+					girlfriendTitle:play("danceLeft", true)
+				end
+				danced = not danced
+			end
 		end
 
 		if not graphics.isFading() then
@@ -98,18 +106,14 @@ return {
 
 	draw = function(self)
 		love.graphics.push()
-			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
-
 			love.graphics.push()
 				love.graphics.push()
 					titleBG:draw()
 				love.graphics.pop()
 				love.graphics.push()
-					love.graphics.scale(0.9, 0.9)
-					logo:draw()
+					logo:draw(isIShowSpeed and 50 or nil, isIShowSpeed and 50 or nil)
 				love.graphics.pop()
 				love.graphics.push()
-					love.graphics.scale(0.9, 0.9)
 					girlfriendTitle:draw()
 				love.graphics.pop()
 			love.graphics.pop()

@@ -1,3 +1,4 @@
+---@diagnostic disable: param-type-mismatch
 local baseDirectory = (...):match("(.-)[^%.]+$")
 local Classic = require(baseDirectory .. "libs.Classic")
 
@@ -12,6 +13,8 @@ require("loveanimate.libs.StringUtil") ]]
 local xml = require(baseDirectory .. "libs.Xml")
 require(baseDirectory .. "libs.StringUtil")
 
+local currentImageFormat = "." .. graphics.getImageType()
+
 local function fileExists(path)
     return love.filesystem.getInfo(path, "file") ~= nil
 end
@@ -24,11 +27,40 @@ local function getFileContent(path)
     return ""
 end
 
+local function createFrame(name, x, y, width, height, sheetWidth, sheetHeight, ox, oy, oWidth, oHeight, rotated)
+    local aw, ah = x + width, y + height
+
+    local frame = {
+        name = name, ---@type string
+        quad = love.graphics.newQuad( ---@type love.Quad
+            x, y,
+            aw > sheetWidth and width - (aw - sheetWidth) or width,
+            ah > sheetHeight and height - (ah - sheetHeight) or height,
+            sheetWidth, sheetHeight
+        ),
+        width = oWidth or width, ---@type number
+        height = oHeight or height, ---@type number
+        offset = { ---@type {x: number, y: number}
+            x = ox or 0,
+            y = oy or 0
+        },
+        rotated = rotated or false ---@type boolean
+    }
+
+    return frame
+end
+
+local function sortFramesByIndices(prefix, postfix)
+	local s, e = #prefix + 1, - #postfix - 1
+	return function(a, b)
+		return string.sub(a.name, s, e) < string.sub(b.name, s, e)
+	end
+end
+
 function SparrowAtlas:constructor()
     self.frame = 0
     self.framerate = 24
 
-    self.symbol = ""
     self.playing = false
     self.looping = false
 
@@ -36,81 +68,228 @@ function SparrowAtlas:constructor()
 
     --- @protected
     self._frameTimer = 0
+    self.currentFrame = 1
 
-    --- @protected
-    self._symbols = {} --- @type table[]
+    self.frames = {}
+    self.animations = {}
+    self.curAnim = nil
+
+    self.x = 0
+    self.y = 0
+    self.rotation = 0
+    self.scale = {x = 1, y = 1}
+    self.origin = {x = 0, y = 0}
+    self.offset = {x = 0, y = 0}
+    self.colour = {1, 1, 1}
+    self.alpha = 1
 end
 
 --- Load the atlas from an image and xml
 --- 
---- @param  imageData   love.Image|string  Either a Love2D image instance or an image file path.
---- @param  xmlString   string             Either XML data or an XML file path.
---- @param  framerate?  integer            Framerate of each animation. (This is not specified in the XML, so it must be manually specified) (fallback is 24)
+--- @param  imageData?   love.Image|string  Either a Love2D image instance or an image file path.
+--- @param  xmlString?   string             Either XML data or an XML file path.
+--- @param  framerate?   integer            Framerate of each animation. (This is not specified in the XML, so it must be manually specified) (fallback is 24)
 ---
 function SparrowAtlas:load(imageData, xmlString, framerate)
-    if type(imageData) == "string" and fileExists(imageData) then
-        imageData = love.graphics.newImage(imageData)
+    ---@diagnostic disable-next-line: cast-local-type
+    xmlString = xmlString or imageData
+    if type(imageData) == "string" and not imageData:startsWith("#") then
+        imageData = "assets/" .. imageData .. currentImageFormat
+        if fileExists(imageData) then
+            if graphics.cache[imageData] then
+                imageData = graphics.cache[imageData]
+            else
+                imageData = love.graphics.newImage(imageData)
+                graphics.cache[imageData] = imageData
+            end
+        end
+        self.IS_RECTANGLE = false
+    elseif type(imageData) == "string" and imageData:startsWith("#") then
+        self.IS_RECTANGLE = true
+        local colorCode = imageData:sub(2)
+        local r = tonumber("0x" .. colorCode:sub(1, 2)) / 255
+        local g = tonumber("0x" .. colorCode:sub(3, 4)) / 255
+        local b = tonumber("0x" .. colorCode:sub(5, 6)) / 255
+        self.colour = {r, g, b}
     end
-    if fileExists(xmlString) then
-        xmlString = getFileContent(xmlString)
-    end
+
     self.image = imageData
     self.framerate = framerate or 24
+    if xmlString then
+        xmlString = "assets/" .. xmlString .. ".xml"
+        if fileExists(xmlString) then
+            xmlString = getFileContent(xmlString)
+            local xmlData = xml.parse(xmlString)
+            local sw, sh = self.image:getWidth(), self.image:getHeight()
 
-    local xmlData = xml.parse(xmlString)
-    local unsortedSymbols = {}
+            for i = 1, #xmlData.TextureAtlas.children do
+                local node = xmlData.TextureAtlas.children[i]
+                if node.name ~= "SubTexture" then
+                    goto continue
+                end
 
-    for i = 1, #xmlData.TextureAtlas.children do
-        local node = xmlData.TextureAtlas.children[i]
-        if node.name ~= "SubTexture" then
-            goto continue
+                table.insert(self.frames, createFrame(
+                    node.att.name,
+                    tonumber(node.att.x), tonumber(node.att.y),
+                    tonumber(node.att.width), tonumber(node.att.height),
+                    sw, sh,
+                    tonumber(node.att.frameX) or 0, tonumber(node.att.frameY) or 0,
+                    tonumber(node.att.frameWidth), tonumber(node.att.frameHeight),
+                    node.att.rotated == "true"
+                ))
+
+                ::continue::
+            end
+
         end
-        local isSparrowV1 = node.att.w ~= nil
-        
-        local symbolName = node.att.name:sub(1, #node.att.name - 4)
-        local frameNumber = tonumber(node.att.name:sub(#node.att.name - 3))
+    end
 
-        if not self._symbols[symbolName] then
-            local symbol = { frames = {} }
-            self._symbols[symbolName] = symbol
-            table.insert(unsortedSymbols, symbol)
-        end
-        local symbolData = self._symbols[symbolName]
-        table.insert(symbolData.frames, {
-            index = frameNumber,
-            quad = love.graphics.newQuad(
-                tonumber(node.att.x), tonumber(node.att.y),
-                tonumber(isSparrowV1 and node.att.w or node.att.width), tonumber(isSparrowV1 and node.att.h or node.att.height),
-                tonumber(imageData:getWidth()), tonumber(imageData:getHeight())
-            ),
-            offset = {
-                x = node.att.frameX ~= nil and -tonumber(node.att.frameX) or 0.0,
-                y = node.att.frameY ~= nil and -tonumber(node.att.frameY) or 0.0
-            },
-            rotated = node.att.rotated ~= nil and node.att.rotated or false
-        })
-        ::continue::
-    end
-    for i = 1, #unsortedSymbols do
-        local symbol = unsortedSymbols[i]
-        table.sort(symbol.frames, function(a, b)
-            return a.index < b.index
-        end)
-    end
+    self:centerOrigin()
+end
+
+function SparrowAtlas:addAnimByPrefix(name, prefix, framerate, looped)
+    framerate = framerate or 30
+    looped = looped == nil and true or looped
+
+    local anim, foundFrame = {
+        name = name,
+        framerate = framerate,
+        looped = looped,
+        frames = {}
+    }, false
+
+    for _, f in ipairs(self.frames) do
+		if f.name:startsWith(prefix) then
+			foundFrame = true
+			table.insert(anim.frames, f)
+		end
+	end
+
+	if not foundFrame then return end
+
+	table.sort(anim.frames, sortFramesByIndices(prefix, ""))
+
+	if not self.animations then self.animations = {} end
+	self.animations[name] = anim
+end
+
+function SparrowAtlas:addAnimByIndices(name, prefix, indices, postfix, framerate, looped)
+	if postfix == nil then postfix = "" end
+	if framerate == nil then framerate = 30 end
+	if looped == nil then looped = true end
+
+	local anim = {
+		name = name,
+		framerate = framerate,
+		looped = looped,
+		frames = {}
+	}
+
+	local allFrames, foundFrame = {}, false
+	local notPostfix = #postfix <= 0
+	for _, f in ipairs(self.frames) do
+		if f.name:startsWith(prefix) and
+			(notPostfix or f.name:endsWith(postfix)) then
+			foundFrame = true
+			table.insert(allFrames, f)
+		end
+	end
+	if not foundFrame then return end
+
+	table.sort(allFrames, sortFramesByIndices(prefix, postfix))
+
+	for _, i in ipairs(indices) do
+		local f = allFrames[i + 1]
+		if f then table.insert(anim.frames, f) end
+	end
+
+	if not self.animations then self.animations = {} end
+	self.animations[name] = anim
+end
+
+function SparrowAtlas:addAnimByFrames(name, frames, framerate, looped)
+	if framerate == nil then framerate = 30 end
+	if looped == nil then looped = true end
+
+	local anim = {
+		name = name,
+		framerate = framerate,
+		looped = looped,
+		frames = {}
+	}
+
+	for _, f in ipairs(frames) do
+		local frame = self.frames[f]
+		if frame then
+			table.insert(anim.frames, frame)
+		end
+	end
+
+	if not self.animations then self.animations = {} end
+	self.animations[name] = anim
 end
 
 ---
---- @param  symbol   string?
---- @param  looping  boolean?
+--- @param  anim   string?
+--- @param  force  boolean?
+--- @param  frame  integer?
 ---
-function SparrowAtlas:play(symbol, looping)
-    self.frame = 0
-    self.symbol = symbol or ""
+function SparrowAtlas:play(anim, force, frame)
+    local curAnim = self.curAnim
 
-    self.playing = true
-    self._frameTimer = 0.0
+	if curAnim and not force and curAnim.name == anim and
+		not self.animFinished then
+		self.animFinished = false
+		self.animPaused = false
+		return
+	end
+	if not self.animations then return end
 
-    self.looping = looping ~= nil and looping or true
+	curAnim = self.animations[anim]
+	if curAnim then
+		self.curAnim = curAnim
+		self.currentFrame = frame or 1
+		self.animFinished = false
+		self.animPaused = false
+	end
+end
+
+function SparrowAtlas:updateHitbox()
+	local width, height = self:getFrameDimensions()
+
+	self.width = math.abs(self.scale.x) * width
+	self.height = math.abs(self.scale.y) * height
+
+	self:fixOffsets(width, height)
+	self:centerOrigin(width, height)
+end
+
+---@param width number
+---@param height number
+function SparrowAtlas:centerOffsets(width, height)
+	self.offset.x = (width or self:getFrameWidth()) / 2
+	self.offset.y = (height or self:getFrameHeight()) / 2
+	print(self.offset.x, self.offset.y)
+end
+
+---@param width number
+---@param height number
+function SparrowAtlas:fixOffsets(width, height)
+	self.offset.x = (self.width - (width or self:getFrameWidth())) / -2
+	self.offset.y = (self.height - (height or self:getFrameHeight())) / -2
+end
+
+---@param width? number
+---@param height? number
+function SparrowAtlas:centerOrigin(width, height)
+	self.origin.x = (width or self:getFrameWidth()) / 2
+	self.origin.y = (height or self:getFrameHeight()) / 2
+end
+
+---@deprecated
+function SparrowAtlas:animate(name, looping, onComplete)
+    print("SparrowAtlas:animate is deprecated. Use SparrowAtlas:play instead.")
+    self:play(name, looping)
 end
 
 function SparrowAtlas:stop()
@@ -122,83 +301,122 @@ function SparrowAtlas:resume()
     self.playing = true
 end
 
----
---- @param  symbol  string?
---- @param  frame   integer?
----
---- @return number
----
-function SparrowAtlas:getFrameWidth(symbol, frame)
-    if not symbol then
-        symbol = self.symbol
+function SparrowAtlas:getCurrentAnimation()
+    return self.curAnim.name
+end
+
+function SparrowAtlas:getCurrentFrame()
+    if self.curAnim then
+        return self.curAnim.frames[math.floor(self.currentFrame)]
+    elseif self.frames then
+        return self.frames[1]
     end
-    if not frame then
-        frame = self.frame
-    end
-    local frameData = self._symbols[symbol].frames[frame + 1]
-    local _, _, w, _ = frameData.quad:getViewport()
-    return w
+    return nil
 end
 
 ---
---- @param  symbol  string?
---- @param  frame   integer?
+--- @return number
+---
+function SparrowAtlas:getFrameWidth()
+    local frame = self:getCurrentFrame()
+    if not self.IS_RECTANGLE and self.image then
+        frame = frame or { width = self.image:getWidth() }
+    else
+        frame = { width = self.scale.x }
+    end
+    return frame.width
+end
+
 ---
 --- @return number
 ---
-function SparrowAtlas:getFrameHeight(symbol, frame)
-    if not symbol then
-        symbol = self.symbol
+function SparrowAtlas:getFrameHeight()
+    local frame = self:getCurrentFrame()
+    if not self.IS_RECTANGLE and self.image then
+        frame = frame or { height = self.image:getHeight() }
+    else
+        frame = { height = self.scale.y }
     end
-    if not frame then
-        frame = self.frame
+    return frame.height
+end
+
+---
+--- @return number, number
+---
+function SparrowAtlas:getFrameDimensions()
+    local frame = self:getCurrentFrame()
+    if not self.IS_RECTANGLE and self.image then
+        frame = frame or { width = self.image:getWidth(), height = self.image:getHeight() }
+    else
+        frame = { width = self.scale.x, height = self.scale.y }
     end
-    local frameData = self._symbols[symbol].frames[frame + 1]
-    local _, _, _, h = frameData.quad:getViewport()
-    return h
+    return frame.width, frame.height
 end
 
 function SparrowAtlas:update(dt)
-    if self.framerate <= 0.0 or not self.playing then
-        return
-    end
-    self._frameTimer = self._frameTimer + dt
-    if self._frameTimer >= 1.0 / self.framerate then
-        local symbol = self._symbols[self.symbol]
-        self.frame = self.frame + 1
-
-        if self.frame >= #symbol.frames then
-            if self.looping then
-                self.frame = 0
+    if self.curAnim and not self.animFinished and not self.animPaused then
+        self.currentFrame = self.currentFrame + dt * self.curAnim.framerate
+        if self.currentFrame >= #self.curAnim.frames + 1 then
+			if self.currentFrame ~= self.lastFrame then
+				self.lastFrame = self.currentFrame
+			end
+            if self.curAnim.looped then
+                self.currentFrame = 1
             else
-                self.frame = #symbol.frames - 1
-                self.playing = false
+                self.currentFrame = #self.curAnim.frames
+                self.animFinished = true
             end
         end
-        self._frameTimer = 0.0
     end
 end
 
 function SparrowAtlas:draw(x, y, r, sx, sy, ox, oy)
-    local symbol = self._symbols[self.symbol]
-    local frame = symbol.frames[self.frame + 1]
-    
-    r = r or 0.0 -- rotation (radians)
-    sx = sx or 1.0 -- scale x
-    sy = sy or 1.0 -- scale y
-    ox = ox or 0.0 -- origin x
-    oy = oy or 0.0 -- origin y
-    
-    local identity = love.math.newTransform()
+    x = x or self.x
+    y = y or self.y
+    r = r or self.rotation
+    sx = sx or self.scale.x
+    sy = sy or self.scale.y
+    ox = ox or self.origin.x
+    oy = oy or self.origin.y
+
+    --[[ local symbol = self._symbols[self.symbol]
+    if not symbol then
+        love.graphics.draw(self.image, x, y, r or 0, sx or 1, sy or 1, ox or 0, oy or 0)
+        return
+    end
+
+    local frame = symbol.frames[self.frame + 1] ]]
+
+    local curFrame = self:getCurrentFrame()
+
+    x = x + ox - self.offset.x
+    y = y + oy - self.offset.y
+
+    if curFrame then
+        ox = ox + curFrame.offset.x
+        oy = oy + curFrame.offset.y
+    end
+
+    --[[ local identity = love.math.newTransform()
     identity:translate(x, y)
-    
     identity:translate(ox, oy)
     identity:rotate(r)
     identity:scale(sx, sy)
-    identity:translate(frame.offset.x, frame.offset.y)
-    identity:translate(-ox, -oy)
+    identity:translate(-ox, -oy) ]]
 
-    love.graphics.draw(self.image, frame.quad, identity)
+    if curFrame and not self.IS_RECTANGLE then
+        love.graphics.draw(self.image, curFrame.quad, x, y, r, sx, sy, ox, oy)
+    elseif not curFrame and not self.IS_RECTANGLE then
+        love.graphics.draw(self.image, x, y, r, sx, sy, ox, oy)
+    else
+        local lastColor = {love.graphics.getColor()}
+        love.graphics.setColor(self.colour[1] * lastColor[1], self.colour[2] * lastColor[2], self.colour[3] * lastColor[3], self.alpha * lastColor[4])
+        -- ox and oy scales from the scale (sx and sy IS the height)
+        local nox = ox * (sx < 0 and -1 or 1)
+        local noy = oy * (sy < 0 and -1 or 1)
+        love.graphics.rectangle("fill", x - nox, y - noy, sx, sy)
+        love.graphics.setColor(lastColor)
+    end
 end
 
 return SparrowAtlas

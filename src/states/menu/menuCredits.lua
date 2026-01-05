@@ -8,7 +8,7 @@ return {
                 members = {
                     {name = CreateText("GuglioIsStupid"), desc = "Lead Programmer", selected = false, callback = function() love.system.openURL("https://ilovefemboys.org") end},
                     {name = CreateText("Getsaa"), desc = "Menu Design", selected = false, callback = function() love.system.openURL("https://twitter.com/GetsaaNG") end},
-                    {name = CreateText("c l o t h i n g h a n g e r"), desc = "Former Programmer", selected = false, callback = function() love.system.openURL("https://twitter.com/clothinghanger6") end},
+                    {name = CreateText("c l o t h i n g h a n g e r"), desc = "Former Programmer", selected = false, callback = function() love.system.openURL("https://twitter.com/clothinghanger_") end},
                 }
             },
             ["Funkin Rewritten"] = {

@@ -184,8 +184,8 @@ return {
 
 			rating = love.filesystem.load("sprites/rating.lua")
 
-			girlfriend = BaseCharacter("sprites/characters/girlfriend.lua")
-			boyfriend = BaseCharacter("sprites/characters/boyfriend.lua")
+			--[[ girlfriend = BaseCharacter("sprites/characters/girlfriend.lua")
+			boyfriend = BaseCharacter("sprites/characters/boyfriend.lua") ]]
 
 			countdown = love.filesystem.load("sprites/countdown.lua")()
 		else
@@ -218,8 +218,8 @@ return {
 
 			rating = love.filesystem.load("sprites/pixel/rating.lua")
 
-			girlfriend = BaseCharacter("sprites/characters/girlfriend-pixel.lua")
-			boyfriend = BaseCharacter("sprites/characters/boyfriend-pixel.lua")
+			--[[ girlfriend = BaseCharacter("sprites/characters/girlfriend-pixel.lua")
+			boyfriend = BaseCharacter("sprites/characters/boyfriend-pixel.lua") ]]
 
 			countdown = love.filesystem.load("sprites/pixel/countdown.lua")()
 		end
@@ -253,7 +253,7 @@ return {
 		camera.camBopInterval = 4
 		dying = false
 		function self:onDeath()
-			Gamestate.push((boyfriend and boyfriend.gameOverState) or gameOvers.default)
+			--Gamestate.push((boyfriend and boyfriend.gameOverState) or gameOvers.default)
 		end
 		self.useBuiltinGameover = true
 		P1HealthColors = {0, 1, 0}
@@ -288,8 +288,8 @@ return {
 		ratingVisibility = {0}
 		combo = 0
 
-		if enemy then enemy:animate("idle") end
-		if boyfriend then boyfriend:animate("idle") end
+		if enemy then enemy:play("idle") end
+		if boyfriend then boyfriend:play("idle") end
 
 		if not camera.points["boyfriend"] then
 			if boyfriend then 
@@ -488,6 +488,7 @@ return {
 		enemyNotes = {}
 		boyfriendNotes = {}
 		gfNotes = {}
+		self.objects = {}
 		health = CONSTANTS.WEEKS.HEALTH.STARTING
 		healthLerp = health
 		score = 0
@@ -597,6 +598,43 @@ return {
 			metadata = love.filesystem.load(metadata)()
 		end
 		Conductor.mapBPMChanges(metadata)
+
+		table.print(metadata)
+		print(metadata.playData)
+		print(metadata.playData.characters)
+		print(metadata.playData.characters.opponent)
+		print(metadata.playData.characters.player)
+		print(metadata.playData.characters.girlfriend)
+		metadata.playData = metadata.playData or {}
+		metadata.playData.characters = metadata.playData.characters or {}
+		metadata.playData.characters.opponent = metadata.playData.characters.opponent or "dad"
+		metadata.playData.characters.player = metadata.playData.characters.player or "bf"
+		metadata.playData.characters.girlfriend = metadata.playData.characters.girlfriend or "gf"
+		boyfriend = Character.getCharacter(metadata.playData.characters.player)
+		enemy = Character.getCharacter(metadata.playData.characters.opponent)
+		girlfriend = Character.getCharacter(metadata.playData.characters.girlfriend)
+
+		boyfriend.zIndex = 10
+		enemy.zIndex = 8
+		girlfriend.zIndex = 9
+
+		boyfriend.characterType = CHARACTER_TYPE.BF
+		enemy.characterType = CHARACTER_TYPE.ENEMY
+		girlfriend.characterType = CHARACTER_TYPE.GF
+
+		boyfriend:dance()
+		enemy:dance()
+		girlfriend:dance()
+		
+		self:add(boyfriend)
+		self:add(enemy)
+		self:add(girlfriend)
+		self:sort()
+
+		self.stage = Stage.getStage(metadata.playData.stage or "stage")
+		camera.zoom = self.stage.cameraZoom or 1.0
+		camera.defaultZoom = camera.zoom
+		print("Stage camera zoom: " .. tostring(camera.zoom))
 
 		SONGNAME = metadata.songName
 		CURDIFF = difficulty
@@ -788,12 +826,6 @@ return {
 		end
 		musicThres = 0
 		countingDown = true
-
-		if countNumVal % 2 == 1 then
-			if girlfriend then girlfriend:beat(countNumVal) end
-			if boyfriend then boyfriend:beat(countNumVal) end
-			if enemy then enemy:beat(countNumVal) end
-		end
 
 		audio.playSound(sounds.countdown[CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[countNumVal]])
 
@@ -1046,6 +1078,7 @@ return {
 								girlfriend.abotHead:animate("toright")
 							end
 						end
+						if type(point) == "number" then point = {x = 0, y = 0} end
 						event.value.ease = event.value.ease or "CLASSIC"
 						if event.value.ease ~= "INSTANT" and event.value.ease ~= "CLASSIC" then
 							local time = (getStepLengthsMS(bpm) * (tonumber(event.value.duration) or 4)) / 1000
@@ -1078,13 +1111,17 @@ return {
 						if event.value.anim == "knifeToss" then
 							boyfriend:stopAnimTimers()
 						end
-						boyfriend:animate(event.value.anim, false, function()
-							if event.value.anim == "knifeToss" then
-								boyfriend:resumeAnimTimers()
+						for _, obj in ipairs(self.objects) do
+							if obj.characterType == CHARACTER_TYPE.BF then
+								obj:play(event.value.anim, event.value.force or false, false)
 							end
-						end, nil, nil, nil, event.value.force)
+						end
 					elseif event.value.target == "gf" or event.value.target == "girlfriend" then
-						girlfriend:animate(event.value.anim, false, nil, nil, nil, nil, event.value.force)
+						for _, obj in ipairs(self.objects) do
+							if obj.characterType == CHARACTER_TYPE.GF then
+								obj:play(event.value.anim, event.value.force or false, false)
+							end
+						end
 					elseif event.value.target == "dad" then
 						if event.value.anim == "redheadsAnim" then
 							print("Eugh... Red heads", enemy:isAnimName(event.value.anim))
@@ -1092,12 +1129,11 @@ return {
 							IS_CLASSIC_MOVEMENT = true
 							enemy:stopAnimTimers()
 						end
-						enemy:animate(event.value.anim, false, function()
-							if event.value.anim == "redheadsAnim" then
-								enemy:resumeAnimTimers()
-								event.value.force = false
+						for _, obj in ipairs(self.objects) do
+							if obj.characterType == CHARACTER_TYPE.ENEMY then
+								obj:play(event.value.anim, event.value.force or false, false)
 							end
-						end, nil, nil, nil, event.value.force)
+						end
 					end
 				elseif event.name == "ZoomCamera" then
 					if type(event.value) == "number" then
@@ -1105,21 +1141,29 @@ return {
 						uiCam.zoom = event.value
 					elseif type(event.value) == "table" then
 						event.value.mode = event.value.mode or "stage"
+						local taget = 1
 						if event.value.mode == "stage" then
-							if event.value.ease ~= "INSTANT" then
-								local time = getStepLengthsMS(bpm) * (tonumber(event.value.duration) or 4) / 1000
-								if bumpTween then 
-									Timer.cancel(bumpTween)
-								end
-								bumpTween = Timer.tween(
-									time,
-									camera,
-									{defaultZoom = (tonumber(event.value.zoom) - (IS_WEEK_7 and 0.15 or 0)) or 1 },
-									CONSTANTS.WEEKS.EASING_TYPES[event.value.ease or "CLASSIC"]
-								)
-							else
-								camera.defaultZoom = tonumber(event.value.zoom - (IS_WEEK_7 and 0.15 or 0)) or 1
+							print("Stage zoom")
+							target = tonumber(event.value.zoom) * self.stage.cameraZoom
+						else
+							print("direct zoom")
+							target = tonumber(event.value.zoom) * camera.defaultZoom
+						end
+						print(target)
+
+						if event.value.ease ~= "INSTANT" then
+							local time = getStepLengthsMS(bpm) * (tonumber(event.value.duration) or 4) / 1000
+							if bumpTween then 
+								Timer.cancel(bumpTween)
 							end
+							bumpTween = Timer.tween(
+								time,
+								camera,
+								{defaultZoom = target },
+								CONSTANTS.WEEKS.EASING_TYPES[(event.value.ease or "CLASSIC") .. (event.value.easeDir or "")]
+							)
+						else
+							camera.defaultZoom = target
 						end
 					end
 				elseif event.name == "SetHealthIcon" then
@@ -1185,6 +1229,8 @@ return {
 						camera.camBopIntensity = event.value.intensity or 1
 						camera.camBopInterval = event.value.rate or 4
 					end
+				else
+					Gamestate.onEvent(event)
 				end
 
 				table.remove(songEvents, i)
@@ -1215,10 +1261,15 @@ return {
 		if enemy then enemy:update(dt) end
 		if boyfriend then boyfriend:update(dt) end
 
+		if Conductor.onStep then
+			if boyfriend then boyfriend:onStepHit(Conductor.curStep) end
+			if enemy then enemy:onStepHit(Conductor.curStep) end
+			if girlfriend then girlfriend:onStepHit(Conductor.curStep) end
+		end
 		if Conductor.onBeat then
-			if boyfriend then boyfriend:beat(Conductor.curBeat) end
-			if enemy then enemy:beat(Conductor.curBeat) end
-			if girlfriend then girlfriend:beat(Conductor.curBeat) end
+			if boyfriend then boyfriend:onBeatHit(Conductor.curBeat) end
+			if enemy then enemy:onBeatHit(Conductor.curBeat) end
+			if girlfriend then girlfriend:onBeatHit(Conductor.curBeat) end
 		end
 
 		for i = 1, #inHolds do
@@ -1323,40 +1374,52 @@ return {
 						enemyArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
 						useAltAnims = false
 	
-						local whohit = enemy
-						-- default to true if nothing is returned
-						local continue = (Gamestate.onNoteHit(enemy, enemyNote[j].ver, "EnemyHit", i) == nil or false) and true or false
-	
-						if continue then
-							if enemyNote[j]:getAnimName() == "hold" or enemyNote[j]:getAnimName() == "end" then
-								if enemyNote[j]:getAnimName() == "hold" then
-									HoldCover:show(i, 2, enemyNote[j].x, enemyNote[j].y)
+						local didEvent = false
+						for _, obj in ipairs(self.objects) do
+							if obj.characterType == CHARACTER_TYPE.ENEMY then
+								local whohit = obj
+								-- default to true if nothing is returned
+								local continue
+								
+								if not didEvent then
+									continue = (Gamestate.onNoteHit(enemy, enemyNote[j].ver, "EnemyHit", i) == nil or false) and true or false
+									didEvent = true
 								else
-									HoldCover:hide(i, 2)
+									continue = true
 								end
-								if useAltAnims then
-									if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim .. " alt", _psychmod and true or false) end
-								else
-									if whohit and whohit.holdTimer > whohit.maxHoldTimer then whohit:animate(curAnim, (_psychmod and true or false)) end
+			
+								if continue then
+									if enemyNote[j]:getAnimName() == "hold" or enemyNote[j]:getAnimName() == "end" then
+										if enemyNote[j]:getAnimName() == "hold" then
+											HoldCover:show(i, 2, enemyNote[j].x, enemyNote[j].y)
+										else
+											HoldCover:hide(i, 2)
+										end
+										if useAltAnims then
+											if whohit then whohit:play(curAnim .. " alt", (_psychmod and true or false)) end
+										else
+											if whohit then whohit:play(curAnim, (_psychmod and true or false)) end
+										end
+									else
+										NoteSplash:new(
+											{
+												anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
+												posX = enemyArrow.x,
+												posY = enemyArrow.y,
+											},
+											i
+										)
+										if useAltAnims then
+											if whohit then whohit:play(curAnim .. " alt", true, false) end
+										else
+											if whohit then whohit:play(curAnim, true, false) end
+										end
+									end
 								end
-							else
-								NoteSplash:new(
-									{
-										anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
-										posX = enemyArrow.x,
-										posY = enemyArrow.y,
-									},
-									i
-								)
-								if useAltAnims then
-									if whohit then whohit:animate(curAnim .. " alt", false) end
-								else
-									if whohit then whohit:animate(curAnim, false) end
-								end
+			
+								if whohit then whohit.lastHit = musicTime end
 							end
 						end
-	
-						if whohit then whohit.lastHit = musicTime end
 	
 						table.remove(enemyNote, 1)
 
@@ -1372,7 +1435,11 @@ return {
 
 			if #gfNote > 0 then
 				if gfNote[1].time - musicTime <= 0 then
-					if girlfriend then girlfriend:animate(curAnim, false) end
+					for _, obj in ipairs(self.objects) do
+						if obj.characterType == CHARACTER_TYPE.GF then
+							obj:play(curAnim, true, false)
+						end
+					end
 
 					table.remove(gfNote, 1)
 				end
@@ -1399,10 +1466,20 @@ return {
 					table.remove(boyfriendNote, 1)
 
 					if not continue then
-						if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
+						for _, obj in ipairs(self.objects) do
+							if obj.characterType == CHARACTER_TYPE.BF then
+								obj:play(curAnim .. " miss", true, false)
+							end
+						end
 					end
 					
-					if combo >= 5 and girlfriend then girlfriend:animate("sad", false) end
+					if combo >= 5 then
+						for _, obj in ipairs(self.objects) do
+							if obj.characterType == CHARACTER_TYPE.GF then
+								obj:play("sad", true, false)
+							end
+						end
+					end
 
 					combo = 0
 				end
@@ -1486,10 +1563,18 @@ return {
 
 									if continue then
 										if not boyfriendNote[j].causesMiss then
-											if boyfriend then boyfriend:animate(curAnim, false) end
+											for _, obj in ipairs(self.objects) do
+												if obj.characterType == CHARACTER_TYPE.BF then
+													obj:play(curAnim, true, false)
+												end
+											end
 										else
 											audio.playSound(sounds.miss[love.math.random(3)])
-											if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
+											for _, obj in ipairs(self.objects) do
+												if obj.characterType == CHARACTER_TYPE.BF then
+													obj:play(curAnim .. " miss", true, false)
+												end
+											end
 										end
 									end
 
@@ -1509,7 +1594,11 @@ return {
 					if not success then
 						audio.playSound(sounds.miss[love.math.random(3)])
 
-						if boyfriend then boyfriend:animate(curAnim .. " miss", false) end
+						for _, obj in ipairs(self.objects) do
+							if obj.characterType == CHARACTER_TYPE.BF then
+								obj:play(curAnim .. " miss", true, false)
+							end
+						end
 
 						if didHitNote then
 							score = math.max(0, score - 100) -- if note was "missed" but hit, remove 100 points
@@ -1536,10 +1625,6 @@ return {
 
 				boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
 				health = health + 0.0125 * healthGainMult * boyfriendNote[1].healthGainMult
-
-				if boyfriend and boyfriend.holdTimer > boyfriend.maxHoldTimer then
-					if boyfriend then boyfriend:animate(curAnim, false) end
-				end
 
 				if boyfriend then boyfriend.lastHit = musicTime end
 
@@ -1588,6 +1673,47 @@ return {
 
 		enemyIcon.sizeX, enemyIcon.sizeY = util.coolLerp(enemyIcon.sizeX, 1.5, 0.1), enemyIcon.sizeX
 		boyfriendIcon.sizeX, boyfriendIcon.sizeY = util.coolLerp(boyfriendIcon.sizeX, -1.5, 0.1), -boyfriendIcon.sizeX
+	end,
+
+	add = function(self, object, sort)
+		sort = sort == nil and false or sort
+		table.insert(self.objects, object)
+		if sort then
+			self:sort()
+		end
+	end,
+
+	remove = function(self, object, sort)
+		for i, obj in ipairs(self.objects) do
+			if obj == object then
+				table.remove(self.objects, i)
+				return
+			end
+		end
+
+		if sort then
+			self:sort()
+		end
+	end,
+
+	sort = function(self)
+		table.sort(self.objects, function(a, b)
+			return (a.zIndex or 0) < (b.zIndex or 0)
+		end)
+	end,
+
+	renderStage = function(self)
+		love.graphics.push()
+			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
+			love.graphics.scale(camera.zoom, camera.zoom)
+			love.graphics.translate(-graphics.getWidth() / 2, -graphics.getHeight() / 2)
+
+			for _, object in ipairs(self.objects) do
+				if object.draw then
+					object:draw()
+				end
+			end
+		love.graphics.pop()
 	end,
 
 	drawRating = function(self)

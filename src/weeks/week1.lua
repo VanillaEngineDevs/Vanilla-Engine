@@ -1,16 +1,6 @@
-local stage
-
 return {
 	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter()
-
-		stage = stages["stage.base"]
-
-		if _songExt == "-erect" or _songExt == "-pico" then
-			stage = stages["stage.erect"]
-		end
-
-		stage:enter(_songExt)
 
 		song = songNum
 		difficulty = songAppend
@@ -22,7 +12,9 @@ return {
 
 	load = function(self, DONT_GENERATE)
 		weeks:load(not DONT_GENERATE)
-		stage:load()
+		if not DONT_GENERATE then
+			self:initUI()
+		end
 
 		if song == 3 then
 			inst = love.audio.newSource("songs/dadbattle/Inst" .. songExt .. ".ogg", "stream")
@@ -50,10 +42,6 @@ return {
 			end
 		end
 
-		if not DONT_GENERATE then
-			self:initUI()
-		end
-
 		weeks:setupCountdown()
 	end,
 
@@ -70,7 +58,6 @@ return {
 
 	update = function(self, dt)
 		weeks:update(dt)
-		stage:update(dt)
 
 		weeks:checkSongOver()
 
@@ -78,18 +65,12 @@ return {
 	end,
 
 	draw = function(self)
-		love.graphics.push()
-			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
-			love.graphics.scale(camera.zoom, camera.zoom)
-
-			stage:draw()
-		love.graphics.pop()
+		weeks:renderStage()
 
 		weeks:drawUI()
 	end,
 
 	leave = function(self)
-		stage:leave()
 
 		enemy = nil
 		boyfriend = nil

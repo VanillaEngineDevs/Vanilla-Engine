@@ -72,6 +72,12 @@ return { -- Add/remove weeks here
         }
     },
     {
+        "Spaghetti",
+        {
+            {"Spaghetti"}
+        }
+    },
+    {
         "Test",
         {
             {"Test", diffs = {{"normal", ""}}}, -- Test only has a "normal" difficulty with no extension.
