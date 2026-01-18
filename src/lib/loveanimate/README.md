@@ -1,3 +1,5 @@
+# Highly modified by Guglio
+
 # <img src="./logo.png" width="24" height="24" /> loveanimate
 A library for Love2D to display atlases/spritesheets generated from Adobe Animate, similar to [FlxAnimate](https://lib.haxe.org/p/flxanimate/) or [GDAnimate](https://github.com/what-is-a-git/gdanimate).
 

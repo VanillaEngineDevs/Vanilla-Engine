@@ -39,10 +39,17 @@ function AnimateAtlasCharacter:update(dt)
     self.sprite.origin.y = self.origin.y
 end
 
+function AnimateAtlasCharacter:updateHitbox()
+    self.sprite:updateHitbox()
+    self.width, self.height = self.sprite.width, self.sprite.height
+end
+
 function AnimateAtlasCharacter:play(name, forced, loop)
     self.sprite:play(name, forced, loop)
 
+    print(self.x, self.y)
     self.sprite.x, self.sprite.y = self.x + self.offsets[1], self.y + self.offsets[2]
+    print(self.sprite.x, self.sprite.y)
     for _, anim in ipairs(self.animations) do
         if anim.name == name and anim.offsets then
             self.sprite.x = self.sprite.x - anim.offsets[1]
@@ -54,20 +61,17 @@ function AnimateAtlasCharacter:play(name, forced, loop)
     end
 end
 
-function AnimateAtlasCharacter:draw()
-    self.sprite:draw()
+function AnimateAtlasCharacter:draw(camera)
+    self.sprite:draw(camera)
 end
 
 function AnimateAtlasCharacter:getWidth()
-    return self.sprite:getWidth()
 end
 
 function AnimateAtlasCharacter:getHeight()
-    return self.sprite:getHeight()
 end
 
 function AnimateAtlasCharacter:getDimensions()
-    return self.sprite:getWidth(), self.sprite:getHeight()
 end
 
 return AnimateAtlasCharacter

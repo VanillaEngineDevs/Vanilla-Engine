@@ -72,6 +72,16 @@ function character:onStepHit(step)
     end
 end
 
+function character:getCameraPoint()
+    local centerX = self.x + self.width/2
+    local centerY = self.y + self.height/2
+
+    return {
+        x = centerX + self.cameraOffsets.x,
+        y = centerY + self.cameraOffsets.y
+    }
+end
+
 function character:onBeatHit(beat) end
 
 function character:dance(forceRestart)

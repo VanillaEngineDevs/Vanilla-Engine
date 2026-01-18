@@ -1,13 +1,6 @@
 {
   "props": [
     {
-      "name": "solid",
-      "assetPath": "#FFFFFF",
-      "position": [-5000, -3000],
-      "scale": [10000, 10000],
-      "scroll": [0, 0]
-    },
-    {
       "name": "solidCover",
       "zIndex": 9999,
       "alpha": 0.0,

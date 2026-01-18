@@ -27,6 +27,7 @@ function AnimateAtlas:constructor(object)
 
     --- @protected
     self._curSymbol = nil
+    self._stencilDepth = 0
 
     --- @protected
     self._frameTimer = 0
@@ -48,6 +49,13 @@ function AnimateAtlas:constructor(object)
 			return finalColor * colorMultiplier;
 		}
     ]])
+    self._maskShader = love.graphics.newShader([[
+		vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
+			float alpha = Texel(texture, texture_coords).a;
+			if (alpha == 0.0) { discard; }
+			return vec4(alpha);
+        }
+    ]])
     self:setColorOffset(0, 0, 0, 0)
     self:setColorMultiplier(1, 1, 1, 1)
 
@@ -63,45 +71,10 @@ function AnimateAtlas:constructor(object)
     self.scale = {x = 1, y = 1}
     self.origin = {x = 0, y = 0}
     self.offset = {x = 0, y = 0}
+    self.scroll = {x = 1, y = 1}
 
-    self._frameBounds = {
-        minX = 0,
-        minY = 0,
-        maxX = 0,
-        maxY = 0,
-        valid = false
-    }
-end
-
-function AnimateAtlas:_resetFrameBounds()
-    local b = self._frameBounds
-    b.minX = 0
-    b.minY = 0
-    b.maxX = 0
-    b.maxY = 0
-    b.valid = false
-end
-
-function AnimateAtlas:_expandBounds(transform, w, h)
-    local b = self._frameBounds
-
-    local x1, y1 = transform:transformPoint(0, 0)
-    local x2, y2 = transform:transformPoint(w, 0)
-    local x3, y3 = transform:transformPoint(0, h)
-    local x4, y4 = transform:transformPoint(w, h)
-
-    if not b.valid then
-        b.minX = math.min(x1, x2, x3, x4)
-        b.minY = math.min(y1, y2, y3, y4)
-        b.maxX = math.max(x1, x2, x3, x4)
-        b.maxY = math.max(y1, y2, y3, y4)
-        b.valid = true
-    else
-        b.minX = math.min(b.minX, x1, x2, x3, x4)
-        b.minY = math.min(b.minY, y1, y2, y3, y4)
-        b.maxX = math.max(b.maxX, x1, x2, x3, x4)
-        b.maxY = math.max(b.maxY, y1, y2, y3, y4)
-    end
+    self.width = 0
+    self.height = 0
 end
 
 function AnimateAtlas:setColorOffset(r, g, b, a)
@@ -369,7 +342,7 @@ function AnimateAtlas:addAnimByIndices(name, prefix, indices, framerate, loop)
 end
 
 ---
---- @param keyframeName string?
+--- @param animName string?
 --- @param loop boolean?
 ---
 function AnimateAtlas:play(animName, forced, loop)
@@ -542,8 +515,6 @@ local function renderSprite(self, sprite, spritemap, spriteMatrix, matrix, color
             colorTransforms[colorTransformMode](self, colorTransform)
         end
     end
-    self:_resetFrameBounds()
-    self:_expandBounds(drawMatrix, sprite.w, sprite.h)
     love.graphics.draw(texture, quad, drawMatrix)
     love.graphics.setShader(lastShader)
 end
@@ -602,46 +573,88 @@ local function renderKeyFrame(self, keyframe, frame, matrix, colorTransform, opt
     return true
 end
 
+function AnimateAtlas:_pushMask(maskLayer, frame, matrix, optimized)
+    local keyframes = maskLayer[optimized and "FR" or "Frames"]
+
+    self._stencilDepth = self._stencilDepth + 1
+    local depth = self._stencilDepth
+
+    love.graphics.stencil(function()
+        love.graphics.setShader(self._maskShader)
+
+        for j = 1, #keyframes do
+            if renderKeyFrame(
+                self,
+                keyframes[j],
+                frame,
+                matrix,
+                nil,
+                optimized,
+                true
+            ) then
+                break
+            end
+        end
+
+        love.graphics.setShader()
+    end, "replace", depth, true)
+
+    love.graphics.setStencilTest("equal", depth)
+end
+
+function AnimateAtlas:_popMask()
+    self._stencilDepth = self._stencilDepth - 1
+
+    if self._stencilDepth > 0 then
+        love.graphics.setStencilTest("equal", self._stencilDepth)
+    else
+        love.graphics.setStencilTest()
+    end
+end
+
+
 ---
 --- @param  timeline  table
 --- @param  frame     integer
 --- @param  matrix    love.Transform
 ---
-function AnimateAtlas:drawTimeline(timeline, frame, matrix, colorTransform, stencilMode)
-    local optimized = timeline.L ~= nil
-    local timelineLayers = timeline[optimized and "L" or "LAYERS"]
+function AnimateAtlas:drawTimeline(timeline, frame, matrix, colorTransform)
+	local optimized = timeline.L ~= nil
+	local timelineLayers = timeline[optimized and "L" or "LAYERS"]
+	local namesToLayers = {}
 
-    local stencilActive = false
+	for i = #timelineLayers, 1, -1 do
+		local layer = timelineLayers[i]
+		namesToLayers[layer[optimized and "LN" or "Layer_name"]] = layer
+	end
 
-    for i = #timelineLayers, 1, -1 do
-        local layer = timelineLayers[i]
-        local layerType = layer[optimized and "LT" or "layerType"]
-        local keyframes = layer[optimized and "FR" or "Frames"]
-        if layerType == "Clp" then
-           --[[  local clipMatrix = matrix:clone()
-            love.graphics.stencil(function()
-                for j = 1, #keyframes do
-                    
-                    if renderKeyFrame(self, keyframes[j], frame, clipMatrix, nil, optimized, true) then
-                        break
-                    end
-                end
-            end, "replace", 1)
+	for i = #timelineLayers, 1, -1 do
+		local layer = timelineLayers[i]
+		local keyframes = layer[optimized and "FR" or "Frames"]
+		local layerType = layer[optimized and "LT" or "Layer_type"]
+		local clippedBy = layer[optimized and "CB" or "Clipped_by"] or layer[optimized and "Clpb" or "Clipped_by"]
 
-            love.graphics.setStencilTest("less", 1)
-            stencilActive = true ]]
-        else
-            for j = 1, #keyframes do
-                if renderKeyFrame(self, keyframes[j], frame, matrix, colorTransform, optimized, stencilMode) then
-                    break
-                end
-            end
+		if layerType ~= nil then
+			goto continue
+		end
+
+		if clippedBy ~= nil then
+            local maskLayer = namesToLayers[clippedBy]
+            self:_pushMask(maskLayer, frame, matrix, optimized)
         end
-    end
 
-    if stencilActive then
-        love.graphics.setStencilTest()
-    end
+		for j = 1, #keyframes do
+			if renderKeyFrame(self, keyframes[j], frame, matrix, colorTransform, optimized) then
+				break
+			end
+		end
+
+		if clippedBy ~= nil then
+            self:_popMask()
+        end
+
+		::continue::
+	end
 end
 
 function AnimateAtlas:getSymbolTimeline(symbol)
@@ -719,23 +732,222 @@ function AnimateAtlas:update(dt)
     end
 end
 
-function AnimateAtlas:getWidth()
-    local b = self._frameBounds
-    if not b.valid then return 0 end
-    return b.maxX - b.minX
+-- #region BOUNDING BOXES
+
+-- calctl, calckf, calcs, calcas
+
+function AnimateAtlas:_getTopLeft(self, timeline, frame, matrix, bounds)
+    local optimized = timeline.L ~= nil
+    local timelineLayers = timeline[optimized and "L" or "LAYERS"]
+    local foundSprites = false
+
+    for i = #timelineLayers, 1, -1 do
+        local layer = timelineLayers[i]
+		if layer[optimized and "LT" or "Layer_type"] then
+			goto continue
+		end
+
+		local keyframes = layer[optimized and "FR" or "Frames"]
+
+		local activeKeyframe = nil
+		for j = 1, #keyframes do
+			local kf = keyframes[j]
+			local index = kf[optimized and "I" or "index"]
+			local duration = kf[optimized and "DU" or "duration"]
+
+			if frame >= index and frame < index + duration then
+				activeKeyframe = kf
+				break
+			end
+		end
+
+		if activeKeyframe then
+			if self:_getKeyframe(self, activeKeyframe, frame, matrix, optimized, bounds) then
+				foundSprites = true
+			end
+		end
+
+		::continue::
+    end
+
+    return foundSprites
 end
 
-function AnimateAtlas:getHeight()
-    local b = self._frameBounds
-    if not b.valid then return 0 end
-    return b.maxY - b.minY
+function AnimateAtlas:_getKeyframe(self, keyframe, frame, matrix, optimized, bounds)
+	local elements = keyframe[optimized and "E" or "elements"]
+	local foundSprites = false
+	local index = keyframe[optimized and "I" or "index"]
+
+	for k = 1, #elements do
+		local element = elements[k]
+		local symbol = element[optimized and "SI" or "SYMBOL_Instance"]
+		local atlas = element[optimized and "ASI" or "ATLAS_SPRITE_Instance"]
+
+		if symbol then
+			if self:_calcS(self, symbol, frame, index, matrix, optimized, bounds) then
+				foundSprites = true
+			end
+		elseif atlas then
+			if self:_calcAS(self, atlas, matrix, optimized, bounds) then
+				foundSprites = true
+			end
+		end
+	end
+
+	return foundSprites
 end
 
-function AnimateAtlas:getDimensions()
-    local b = self._frameBounds
-    if not b.valid then return 0, 0 end
-    return b.maxX - b.minX, b.maxY - b.minY
+function AnimateAtlas:_calcS(self, symbol, frame, index, matrix, optimized, bounds)
+	local symbolName = symbol[optimized and "SN" or "SYMBOL_name"]
+	local firstFrame = symbol[optimized and "FF" or "firstFrame"] or 0
+
+	local frameIndex = firstFrame + (frame - index)
+	local symbolType = symbol[optimized and "ST" or "symbolType"]
+	if symbolType == "movieclip" or symbolType == "MC" then
+		frameIndex = 0
+	end
+
+	local loopMode = symbol[optimized and "LP" or "loop"]
+
+	local symbolTimeline = self.libraries[symbolName].data
+	local length = self:getTimelineLength(symbolTimeline)
+
+	if loopMode == "loop" or loopMode == "LP" then
+		if frameIndex < 0 then
+			frameIndex = length - 1
+		elseif frameIndex >= length then
+			frameIndex = frameIndex % length
+		end
+	elseif loopMode == "playonce" or loopMode == "PO" then
+		frameIndex = math.max(0, math.min(frameIndex, length - 1))
+	elseif loopMode == "singleframe" or loopMode == "SF" then
+		frameIndex = firstFrame
+	end
+
+	local is3DMatrix = symbol[optimized and "M3D" or "Matrix3D"] ~= nil
+	local symbolMatrix = love.math.newTransform()
+	local symbolMatrixRaw = is3DMatrix and symbol[optimized and "M3D" or "Matrix3D"] or symbol[optimized and "MX" or "Matrix"]
+	symbolMatrix:setMatrix((is3DMatrix and matrix3D or matrix2D)(symbolMatrixRaw, optimized))
+
+	local combinedMatrix = matrix:clone():apply(symbolMatrix)
+	return self:_getTopLeft(self, symbolTimeline, frameIndex, combinedMatrix, bounds)
 end
+
+function AnimateAtlas:_calcAS(self, atlasSprite, matrix, optimized, bounds)
+	local name = atlasSprite[optimized and "N" or "name"]
+
+	local sprite = nil
+	local spritemaps = self.spritemaps
+	for l = 1, #spritemaps do
+		local spritemap = spritemaps[l]
+		local sprites = spritemap.data.ATLAS.SPRITES
+		for z = 1, #sprites do
+			local s = sprites[z].SPRITE
+			if s.name == name then
+				sprite = s
+				goto found_sprite
+			end
+		end
+	end
+
+	::found_sprite::
+	if not sprite then return false end
+
+	local is3DMatrix = atlasSprite[optimized and "M3D" or "Matrix3D"] ~= nil
+	local spriteMatrixRaw = is3DMatrix and atlasSprite[optimized and "M3D" or "Matrix3D"] or atlasSprite[optimized and "MX" or "Matrix"]
+	local spriteMatrix = love.math.newTransform()
+	spriteMatrix:setMatrix((is3DMatrix and matrix3D or matrix2D)(spriteMatrixRaw, optimized))
+
+	local drawMatrix = matrix:clone():apply(spriteMatrix)
+	local w, h = sprite.w, sprite.h
+
+	if sprite.rotated then
+		drawMatrix:translate(0, w)
+		drawMatrix:rotate(-math.pi/2)
+		w, h = h, w
+	end
+	local x1, y1 = drawMatrix:transformPoint(0, 0)
+	local x2, y2 = drawMatrix:transformPoint(w, 0)
+	local x3, y3 = drawMatrix:transformPoint(w, h)
+	local x4, y4 = drawMatrix:transformPoint(0, h)
+
+	local minX = math.min(x1, x2, x3, x4)
+	local minY = math.min(y1, y2, y3, y4)
+	local maxX = math.max(x1, x2, x3, x4)
+	local maxY = math.max(y1, y2, y3, y4)
+
+	bounds.minX = math.min(bounds.minX, minX)
+	bounds.minY = math.min(bounds.minY, minY)
+	bounds.maxX = math.max(bounds.maxX, maxX)
+	bounds.maxY = math.max(bounds.maxY, maxY)
+
+	return true
+end
+
+function AnimateAtlas:getBoundTopLeft()
+	local timeline = self:getSymbolTimeline()
+	if timeline.data then
+		timeline = timeline.data[timeline.optimized and "AN" or "ANIMATION"][timeline.optimized and "TL" or "TIMELINE"]
+	end
+
+	local bounds = {minX = math.huge, minY = math.huge, maxX = -math.huge, maxY = -math.huge}
+	local identity = love.math.newTransform()
+
+	local foundSprites = self:_getTopLeft(self, timeline, self.frame, identity, bounds)
+
+	if foundSprites and bounds.minX ~= math.huge and bounds.minY ~= math.huge then
+		return bounds.minX, bounds.minY
+	end
+	return 0, 0
+end
+
+function AnimateAtlas:getBoundDimensions()
+	local width, height = 0, 0
+
+	local timeline = self:getSymbolTimeline()
+	if timeline.data then
+		timeline = timeline.data[timeline.optimized and "AN" or "ANIMATION"][timeline.optimized and "TL" or "TIMELINE"]
+	end
+
+	local bounds = {minX = math.huge, minY = math.huge, maxX = -math.huge, maxY = -math.huge}
+	local identity = love.math.newTransform()
+
+	local foundSprites = self:_getTopLeft(self, timeline, self.frame, identity, bounds)
+
+	if foundSprites and bounds.minX ~= math.huge and bounds.maxX ~= -math.huge then
+		width = math.max(0, bounds.maxX - bounds.minX)
+		height = math.max(0, bounds.maxY - bounds.minY)
+	end
+
+	return width, height
+end
+
+function AnimateAtlas:getMidpoint()
+    return self.x + self.width / 2, self.y + self.height / 2
+end
+
+function AnimateAtlas:updateHitbox()
+    self.width, self.height = self:getBoundDimensions()
+    self:fixOffsets()
+    self:centerOrigin()
+end
+
+function AnimateAtlas:centerOffsets(w, h)
+    self.offset.x = (w or self.width) / 2
+    self.offset.y = (h or self.height) / 2
+end
+
+function AnimateAtlas:fixOffsets(w, h)
+    self.offset.x = ((w or self.width) - self.width) / 2
+    self.offset.y = ((h or self.height) - self.height) / 2
+end
+
+function AnimateAtlas:centerOrigin(w, h)
+    self.origin.x = (w or self.width) / 2
+    self.origin.y = (h or self.height) / 2
+end
+
+-- #region
 
 function AnimateAtlas:stop()
     self.playing = false
@@ -746,7 +958,8 @@ function AnimateAtlas:resume()
     self.playing = true
 end
 
-function AnimateAtlas:draw(x, y, r, sx, sy, ox, oy)
+function AnimateAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
+    camera = camera or {x = 0, y = 0}
     x = x or self.x
     y = y or self.y
     r = r or self.rotation
@@ -755,25 +968,25 @@ function AnimateAtlas:draw(x, y, r, sx, sy, ox, oy)
     ox = ox or self.origin.x
     oy = oy or self.origin.y
 
-    x = x - ox - self.offset.x
-    y = y - oy - self.offset.y
+    x = x + ox - self.offset.x - (camera.x * self.scroll.x)
+    y = y + oy - self.offset.y - (camera.y * self.scroll.y)
 
     local identity = love.math.newTransform()
     identity:translate(x, y)
     identity:translate(ox, oy)
     identity:rotate(r)
     identity:scale(sx, sy)
-    --identity:translate(-ox, -oy)
+    identity:translate(-ox, -oy)
 
     local timeline
     if self.curAnim and self.curAnim.frames then
         local frameIndex = self.curAnim.frames[math.min(self.frame, #self.curAnim.frames)]
-        timeline = self:getSymbolTimeline(self.symbol)
+        timeline = self:getSymbolTimeline()
         if timeline.data then
             timeline = timeline.data[timeline.optimized and "AN" or "ANIMATION"][timeline.optimized and "TL" or "TIMELINE"]
         end
         self._curSymbol = nil
-        self:drawTimeline(timeline, frameIndex, identity, "advanced")
+        self:drawTimeline(timeline, frameIndex, identity, nil)
     end
 end
 

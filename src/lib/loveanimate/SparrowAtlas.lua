@@ -81,6 +81,7 @@ function SparrowAtlas:constructor()
     self.origin = {x = 0, y = 0}
     self.offset = {x = 0, y = 0}
     self.colour = {1, 1, 1}
+    self.scroll = {x = 1, y = 1}
     self.alpha = 1
 end
 
@@ -370,7 +371,8 @@ function SparrowAtlas:update(dt)
     end
 end
 
-function SparrowAtlas:draw(x, y, r, sx, sy, ox, oy)
+function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
+    camera = camera or {x = 0, y = 0}
     x = x or self.x
     y = y or self.y
     r = r or self.rotation
@@ -379,30 +381,15 @@ function SparrowAtlas:draw(x, y, r, sx, sy, ox, oy)
     ox = ox or self.origin.x
     oy = oy or self.origin.y
 
-    --[[ local symbol = self._symbols[self.symbol]
-    if not symbol then
-        love.graphics.draw(self.image, x, y, r or 0, sx or 1, sy or 1, ox or 0, oy or 0)
-        return
-    end
-
-    local frame = symbol.frames[self.frame + 1] ]]
-
     local curFrame = self:getCurrentFrame()
 
-    x = x + ox - self.offset.x
-    y = y + oy - self.offset.y
+    x = x + ox - self.offset.x - (camera.x * self.scroll.x)
+    y = y + oy - self.offset.y - (camera.y * self.scroll.y)
 
     if curFrame then
         ox = ox + curFrame.offset.x
         oy = oy + curFrame.offset.y
     end
-
-    --[[ local identity = love.math.newTransform()
-    identity:translate(x, y)
-    identity:translate(ox, oy)
-    identity:rotate(r)
-    identity:scale(sx, sy)
-    identity:translate(-ox, -oy) ]]
 
     if curFrame and not self.IS_RECTANGLE then
         love.graphics.draw(self.image, curFrame.quad, x, y, r, sx, sy, ox, oy)

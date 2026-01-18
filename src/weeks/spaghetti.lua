@@ -17,7 +17,6 @@ return {
 		if not DONT_GENERATE then
 			self:initUI()
 		end
-        enemy.x = -200
         inst = love.audio.newSource("songs/spaghetti/Inst.mp3", "stream")
         voicesBF = love.audio.newSource("songs/spaghetti/Voices-sserafim-sakura.mp3", "stream")
 

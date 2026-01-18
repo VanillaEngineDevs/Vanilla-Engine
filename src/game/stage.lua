@@ -1,4 +1,4 @@
----@diagnostic disable: need-check-nil
+---@diagnostic disable: need-check-nil, inject-field
 local stage = Object:extend()
 
 local defaultBF = {
@@ -9,7 +9,7 @@ local defaultBF = {
     scroll = {1, 1}
 }
 
-local defaultEnemy = {
+local defaultDad = {
     zIndex = 200,
     position = {335, 885},
     cameraOffsets = {160, -100},
@@ -60,15 +60,17 @@ function stage.getStage(id)
     s.version = data.version or "1.0.0"
     s.characters = data.characters or {}
     s.characters.bf = data.characters.bf or {}
+    -- set all missing values
     for k, v in pairs(defaultBF) do
         if s.characters.bf[k] == nil then
             s.characters.bf[k] = v
         end
     end
-    s.characters.enemy = data.characters.enemy or {}
-    for k, v in pairs(defaultEnemy) do
-        if s.characters.enemy[k] == nil then
-            s.characters.enemy[k] = v
+    s.characters.dad = data.characters.dad or {}
+    table.print(data.characters.dad)
+    for k, v in pairs(defaultDad) do
+        if s.characters.dad[k] == nil then
+            s.characters.dad[k] = v
         end
     end
     s.characters.gf = data.characters.gf or {}
@@ -95,21 +97,22 @@ function stage.getStage(id)
         chunk()(s)
     end
 
-    enemy.x = s.characters.enemy.position[1]
-    enemy.y = s.characters.enemy.position[2]
+    enemy.x = s.characters.dad.position[1]
+    enemy.y = s.characters.dad.position[2]
+    print("ENEMY POS: ", enemy.x, enemy.y)
     enemy.scroll = {
-        x = s.characters.enemy.scroll[1],
-        y = s.characters.enemy.scroll[2]
+        x = s.characters.dad.scroll[1],
+        y = s.characters.dad.scroll[2]
     }
     enemy.scale = {
-        x = s.characters.enemy.scale[1],
-        y = s.characters.enemy.scale[2]
+        x = s.characters.dad.scale[1],
+        y = s.characters.dad.scale[2]
     }
     enemy.cameraOffsets = {
-        x = s.characters.enemy.cameraOffsets[1],
-        y = s.characters.enemy.cameraOffsets[2]
+        x = s.characters.dad.cameraOffsets[1],
+        y = s.characters.dad.cameraOffsets[2]
     }
-    enemy.zIndex = s.characters.enemy.zIndex
+    enemy.zIndex = s.characters.dad.zIndex
 
     boyfriend.x = s.characters.bf.position[1]
     boyfriend.y = s.characters.bf.position[2]
@@ -179,9 +182,11 @@ function stage.getStage(id)
         prop.scale.x = propitem.scale[1]
         prop.scale.y = propitem.scale[2]
         prop.alpha = propitem.alpha or 1
-        ---@diagnostic disable-next-line: inject-field
         prop.zIndex = propitem.zIndex
+        prop.name = propitem.name
         prop:play(propitem.startingAnimation or "idle", true)
+
+        prop:updateHitbox()
 
         s.props[propitem.name] = prop
 

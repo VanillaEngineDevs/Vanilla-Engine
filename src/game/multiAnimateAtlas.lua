@@ -51,6 +51,11 @@ function MultiSparrowCharacter:new(data)
     end
 end
 
+function MultiSparrowCharacter:updateHitbox()
+    self.current:updateHitbox()
+    self.width, self.height = self.current.width, self.current.height
+end
+
 function MultiSparrowCharacter:update(dt)
     MultiSparrowCharacter.super.update(self, dt)
     for _, spr in pairs(self.sprites) do
@@ -88,8 +93,8 @@ function MultiSparrowCharacter:play(name, forced, loop)
     end
 end
 
-function MultiSparrowCharacter:draw()
-    self.current:draw()
+function MultiSparrowCharacter:draw(camera)
+    self.current:draw(camera)
 end
 
 function MultiSparrowCharacter:getWidth()

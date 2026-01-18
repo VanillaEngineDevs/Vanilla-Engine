@@ -291,28 +291,6 @@ return {
 		if enemy then enemy:play("idle") end
 		if boyfriend then boyfriend:play("idle") end
 
-		if not camera.points["boyfriend"] then
-			if boyfriend then 
-				camera:addPoint("boyfriend", -boyfriend.x + 100, -boyfriend.y + 75)
-			else
-				camera:addPoint("boyfriend", 0, 0)
-			end
-		end
-		if not camera.points["enemy"] then 
-			if enemy then
-				camera:addPoint("enemy", -enemy.x - 100, -enemy.y + 75) 
-			else
-				camera:addPoint("enemy", 0, 0)
-			end
-		end
-		if not camera.points["girlfriend"] then
-			if girlfriend then
-				camera:addPoint("girlfriend", -girlfriend.x - 100, -girlfriend.y + 75)
-			else
-				camera:addPoint("girlfriend", 0, 0)
-			end
-		end
-
 		function calculateNoteYPos(strumtime)
 			--[[ return CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - strumtime) * speed * (settings.downscroll and -1 or 1) ]]
 			if not isResetting then
@@ -634,7 +612,44 @@ return {
 		self.stage = Stage.getStage(metadata.playData.stage or "stage")
 		camera.zoom = self.stage.cameraZoom or 1.0
 		camera.defaultZoom = camera.zoom
-		print("Stage camera zoom: " .. tostring(camera.zoom))
+
+		boyfriend:updateHitbox()
+		boyfriend.x = boyfriend.x - boyfriend.width / 2
+		boyfriend.y = boyfriend.y - boyfriend.height
+
+		enemy:updateHitbox()
+		print("ENEMY DIMENSIONS", enemy.width, enemy.height)
+		enemy.x = enemy.x - enemy.width / 2
+		enemy.y = enemy.y - enemy.height
+
+		girlfriend:updateHitbox()
+		girlfriend.x = girlfriend.x - girlfriend.width / 2
+		girlfriend.y = girlfriend.y - girlfriend.height
+
+		if not camera.points["boyfriend"] then
+			if boyfriend then 
+				camera:addPoint("boyfriend", -boyfriend.x + boyfriend.cameraOffsets.x, -boyfriend.y + boyfriend.cameraOffsets.y)
+			else
+				camera:addPoint("boyfriend", 0, 0)
+			end
+		end
+		if not camera.points["enemy"] then 
+			if enemy then
+				camera:addPoint("enemy", -enemy.x + enemy.cameraOffsets.x, -enemy.y + enemy.cameraOffsets.y)
+			else
+				camera:addPoint("enemy", 0, 0)
+			end
+		end
+		if not camera.points["girlfriend"] then
+			if girlfriend then
+				camera:addPoint("girlfriend", -girlfriend.x + girlfriend.cameraOffsets.x, -girlfriend.y + girlfriend.cameraOffsets.y)
+			else
+				camera:addPoint("girlfriend", 0, 0)
+			end
+		end
+
+		camera.x, camera.y = camera.points["boyfriend"].x, camera.points["boyfriend"].y
+		print("Camera points set to: ", camera.x, camera.y)
 
 		SONGNAME = metadata.songName
 		CURDIFF = difficulty
@@ -1043,24 +1058,93 @@ return {
 		for i, event in ipairs(songEvents) do
 			if event.time <= absMusicTime then
 				if event.name == "FocusCamera" and not camera.lockedMoving then
+					IS_CLASSIC_MOVEMENT = false
 					if type(event.value) == "number" then
+						local targetX, targetY = 0, 0
 						if event.value == 0 then -- Boyfriend
-							camera:moveToPoint(1.25, "boyfriend")
-							if girlfriend and girlfriend.name == "nene" and girlfriend.isPixel then
-								if girlfriend.abotHead and girlfriend.abotHead:getAnimName() ~= "toright" then
-									girlfriend.abotHead:animate("toright")
-								end
-							end
+							if not boyfriend then return end
+							local bfpoint = boyfriend:getCameraPoint()
+							targetX = bfpoint.x
+							targetY = bfpoint.y
 						elseif event.value == 1 then -- Enemy
-							camera:moveToPoint(1.25, "enemy")
-							if girlfriend and girlfriend.name == "nene" and girlfriend.isPixel then
-								if girlfriend.abotHead and girlfriend.abotHead:getAnimName() ~= "toleft" then
-									girlfriend.abotHead:animate("toleft")
-								end
-							end
+							if not enemy then return end
+							local dadpoint = enemy:getCameraPoint()
+							targetX = dadpoint.x
+							targetY = dadpoint.y
+						elseif event.value == 2 then -- Girlfriend
+							if not girlfriend then return end
+							local gfpoint = girlfriend:getCameraPoint()
+							targetX = gfpoint.x
+							targetY = gfpoint.y
 						end
+
+						if camTween then 
+							Timer.cancel(camTween)
+						end
+
+						IS_CLASSIC_MOVEMENT = true
+						CAM_LERP_POINT.x = targetX
+						CAM_LERP_POINT.y = targetY
 					elseif type(event.value) == "table" then
-						event.value.char = tonumber(event.value.char)
+						local char = tonumber(event.value.char) or tonumber(event.value.value) or 0
+						local x = tonumber(event.value.x) or 0
+						local y = tonumber(event.value.y) or 0
+
+						local duration = tonumber(event.value.duration) or 4
+						local ease = event.value.ease or "CLASSIC"
+
+						local targetX, targetY = x, y
+						print("CHARACTER", char)
+
+						if char == -1 then
+						elseif char == 0 then
+							if not boyfriend then return end
+							local bfpoint = boyfriend:getCameraPoint()
+							print("BF POINT", bfpoint.x, bfpoint.y)
+							targetX = targetX + bfpoint.x
+							targetY = targetY + bfpoint.y
+						elseif char == 1 then
+							if not enemy then return end
+							local dadpoint = enemy:getCameraPoint()
+							targetX = targetX + dadpoint.x
+							targetY = targetY + dadpoint.y
+						elseif char == 2 then
+							if not girlfriend then return end
+							local gfpoint = girlfriend:getCameraPoint()
+							targetX = targetX + gfpoint.x
+							targetY = targetY + gfpoint.y
+						else
+							print("Unknown char for FocusCamera event: " .. tostring(char))
+						end
+
+						if ease == "CLASSIC" then
+							if camTween then 
+								Timer.cancel(camTween)
+							end
+							IS_CLASSIC_MOVEMENT = true
+							CAM_LERP_POINT.x = targetX
+							CAM_LERP_POINT.y = targetY
+						elseif ease == "INSTANT" then
+							camera.x = targetX
+							camera.y = targetY
+						else
+							local time = (getStepLengthsMS(bpm) * duration) / 1000
+							if camTween then 
+								Timer.cancel(camTween)
+							end
+
+							camTween = Timer.tween(
+								time,
+								camera,
+								{
+									x = targetX,
+									y = targetY
+								},
+								CONSTANTS.WEEKS.EASING_TYPES[ease or "CLASSIC"]
+							)
+						end
+
+						--[[ event.value.char = tonumber(event.value.char)
 						local point = 0
 						if event.value.char == 0 then
 							point = camera:getPoint("boyfriend")
@@ -1078,6 +1162,7 @@ return {
 								girlfriend.abotHead:animate("toright")
 							end
 						end
+						---@diagnostic disable-next-line: cast-local-type
 						if type(point) == "number" then point = {x = 0, y = 0} end
 						event.value.ease = event.value.ease or "CLASSIC"
 						if event.value.ease ~= "INSTANT" and event.value.ease ~= "CLASSIC" then
@@ -1090,21 +1175,21 @@ return {
 								time,
 								camera,
 								{
-									x = point.x - (tonumber(event.value.x) or 0),
-									y = point.y - (tonumber(event.value.y) or 0)
+									x = point.x + (tonumber(event.value.x) or 0),
+									y = point.y + (tonumber(event.value.y) or 0)
 								},
 								CONSTANTS.WEEKS.EASING_TYPES[event.value.ease or "CLASSIC"]
 							)
 						elseif event.value.ease ~= "CLASSIC" then
-							camera.x = point.x - tonumber(event.value.x or 0)
-							camera.y = point.y - tonumber(event.value.y or 0)
+							camera.x = point.x + tonumber(event.value.x or 0)
+							camera.y = point.y + tonumber(event.value.y or 0)
 						else
 							if camTween then 
 								Timer.cancel(camTween)
 							end
 							IS_CLASSIC_MOVEMENT = true
 							CAM_LERP_POINT.x, CAM_LERP_POINT.y = point.x - tonumber(event.value.x or 0), point.y - tonumber(event.value.y or 0)
-						end
+						end ]]
 					end
 				elseif event.name == "PlayAnimation" then
 					if event.value.target == "bf" or event.value.target == "boyfriend" then
@@ -1683,6 +1768,15 @@ return {
 		end
 	end,
 
+	get = function(self, name)
+		for _, obj in ipairs(self.objects) do
+			if obj.name == name then
+				return obj
+			end
+		end
+		return nil
+	end,
+
 	remove = function(self, object, sort)
 		for i, obj in ipairs(self.objects) do
 			if obj == object then
@@ -1710,9 +1804,12 @@ return {
 
 			for _, object in ipairs(self.objects) do
 				if object.draw then
-					object:draw()
+					object:draw(camera)
 				end
 			end
+
+			local bfcenter = boyfriend and boyfriend:getCameraPoint()
+			love.graphics.rectangle("fill", bfcenter.x + camera.x, bfcenter.y + camera.y, 5, 5)
 		love.graphics.pop()
 	end,
 
