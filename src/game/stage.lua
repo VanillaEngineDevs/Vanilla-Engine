@@ -90,16 +90,39 @@ function stage.getStage(id)
     end
 
     s.props = {}
+    s.script = nil
 
-    local stageLuaChunk = love.filesystem.getInfo("stages/" .. s.id .. ".lua")
+    local stageLuaChunk = love.filesystem.getInfo("data/scripts/stages/" .. s.id .. ".lua")
+    -- environment that holds ALL of global and defines Stage as self
+    local env = setmetatable({
+        Stage = {
+            data = s,
+        },
+        add = function(obj)
+            weeks:add(obj)
+        end,
+        remove = function(obj)
+            weeks:remove(obj)
+        end,
+        getBoyfriend = function()
+            return boyfriend
+        end,
+        getGirlfriend = function()
+            return girlfriend
+        end,
+        getEnemy = function()
+            return enemy
+        end,
+    }, {__index = _G})
     if stageLuaChunk then
-        local chunk = love.filesystem.load("stages/" .. s.id .. ".lua")
-        chunk()(s)
+        local chunk = love.filesystem.load("data/scripts/stages/" .. s.id .. ".lua")
+        setfenv(chunk, env)
+        chunk()
+        s.script = env.Stage
     end
 
     enemy.x = s.characters.dad.position[1]
     enemy.y = s.characters.dad.position[2]
-    print("ENEMY POS: ", enemy.x, enemy.y)
     enemy.scroll = {
         x = s.characters.dad.scroll[1],
         y = s.characters.dad.scroll[2]
@@ -146,19 +169,24 @@ function stage.getStage(id)
     }
     girlfriend.zIndex = s.characters.gf.zIndex
 
-    for i, propitem in ipairs(s._props) do
+    return s
+end
+
+function stage:build()
+    self:call("build")
+
+    for i, propitem in ipairs(self._props) do
         local prop = nil
         local type = propitem.animType or defaultProps.animType
         if type == "sparrow" then
             prop = graphics.newSparrowAtlas()
             local assetPath = propitem.assetPath
             if not assetPath:startsWith("#") then
-                assetPath = s.directory .. "/images/" .. propitem.assetPath
+                assetPath = self.directory .. "/images/" .. propitem.assetPath
             end
-            print(assetPath)
             prop:load(assetPath)
             for _, anim in ipairs(propitem.animations or {}) do
-                if #anim.indiceFrames > 0 then
+                if anim.indiceFrames and #anim.indiceFrames > 0 then
                     prop:addAnimByIndices(
                         anim.name,
                         anim.prefix,
@@ -188,18 +216,22 @@ function stage.getStage(id)
 
         prop:updateHitbox()
 
-        s.props[propitem.name] = prop
+        self.props[propitem.name] = prop
 
         weeks:add(prop)
     end
 
     weeks:sort()
-
-    return s
 end
 
 function stage:new()
     self.props = {}
+end
+
+function stage:call(funcName, ...)
+    if self.script and self.script[funcName] and type(self.script[funcName]) == "function" then
+        return self.script[funcName](self.script, ...)
+    end
 end
 
 return stage

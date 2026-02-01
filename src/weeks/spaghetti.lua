@@ -37,48 +37,29 @@ return {
 		weeks:updateUI(dt)
 	end,
 
-    onNoteHit = function(self, character, noteType, rating, id)
-        local notok = false
-        if noteType == "sakura-joint" then
-            notok = true
-            character:play(CONSTANTS.WEEKS.ANIM_LIST[id] .. "-joint", true, false)
-        elseif noteType == "sakura-bf1" then
-            notok = true
-            character:play(CONSTANTS.WEEKS.ANIM_LIST[id] .. "-bf1", true, false)
-        elseif noteType == "sakura-bf2" then
-            notok = true
-            character:play(CONSTANTS.WEEKS.ANIM_LIST[id] .. "-bf2", true, false)
-        end
-
-        return true
-    end,
-
     onEvent = function(self, event)
         if event.name == "sserafimSing" then
-            self:setGirlsSinging(event.value.singing)
+			weeks.stage.script:setGirlsSinging(event.value.singing)
+		elseif event.name == "sserafimShow" then
+			weeks.stage.script:setGirlsVisible(event.value.visible)
+		elseif event.name == "sserafimGuitarVibration" then
+			hapticUtil:increasingVibrate(0.25, 1/2, event.value.duration)
+		elseif event.name == "sserafimDark" then
+			weeks.stage.script:setDarkenAmt(event.value.amount, event.value.duration)
+		elseif event.name == "sserafimLights" then
+			weeks.stage.script:flashTruckLights(event.value.amount, event.value.duration)
+		elseif event.name == "sserafimCover" then
+			weeks.stage.script:setCoverVisible(event.value.visible)
+		elseif event.name == "sserafimFlash" then
+			weeks:flash(event.value.duration)
+		elseif event.name == "sserafimPulseLights" then
+			weeks.stage.script:setLightState(event.value.enabled, event.value.colors, event.value.durations, event.value.intensities)
+		elseif event.name == "sserafimKick" then
+			weeks.stage.script:kickTruck(event.value.final)
         end
-    end,
-
-    setGirlsSinging = function(self, singing)
-        if #singing < 6 then return end
-
-        enemy.characterType = singing[1] and CHARACTER_TYPE.BF or CHARACTER_TYPE.DAD
-        boyfriend.characterType = singing[5] and CHARACTER_TYPE.BF or CHARACTER_TYPE.DAD
-        girlfriend.characterType = singing[6] and CHARACTER_TYPE.BF or CHARACTER_TYPE.DAD
     end,
 
 	draw = function(self)
-		--[[ love.graphics.push()
-			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
-			love.graphics.scale(camera.zoom, camera.zoom)
-            love.graphics.translate(-graphics.getWidth() / 2, -graphics.getHeight() / 2)
-
-            boyfriend:draw()
-            girlfriend:draw()
-            enemy:draw()
-
-		love.graphics.pop() ]]
-
         weeks:renderStage()
 
 		weeks:drawUI()

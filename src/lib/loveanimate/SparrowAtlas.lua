@@ -83,6 +83,9 @@ function SparrowAtlas:constructor()
     self.colour = {1, 1, 1}
     self.scroll = {x = 1, y = 1}
     self.alpha = 1
+
+    self.shader = nil
+    self.visible = true
 end
 
 --- Load the atlas from an image and xml
@@ -372,7 +375,16 @@ function SparrowAtlas:update(dt)
 end
 
 function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
+    if not self.visible then
+        return
+    end
     camera = camera or {x = 0, y = 0}
+    local cx = camera.x
+    local cy = camera.y
+    if camera.centered then
+        cx = cx - (1280 / 2)
+        cy = cy - (720 / 2)
+    end
     x = x or self.x
     y = y or self.y
     r = r or self.rotation
@@ -383,27 +395,31 @@ function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
 
     local curFrame = self:getCurrentFrame()
 
-    x = x + ox - self.offset.x - (camera.x * self.scroll.x)
-    y = y + oy - self.offset.y - (camera.y * self.scroll.y)
+    x = x + ox - self.offset.x - (cx * self.scroll.x)
+    y = y + oy - self.offset.y - (cy * self.scroll.y)
 
     if curFrame then
         ox = ox + curFrame.offset.x
         oy = oy + curFrame.offset.y
     end
 
+    local lastShader = love.graphics.getShader()
+    love.graphics.setShader(self.shader)
+    local lastColor = {love.graphics.getColor()}
+    love.graphics.setColor(self.colour[1] * lastColor[1], self.colour[2] * lastColor[2], self.colour[3] * lastColor[3], self.alpha * lastColor[4])
     if curFrame and not self.IS_RECTANGLE then
         love.graphics.draw(self.image, curFrame.quad, x, y, r, sx, sy, ox, oy)
     elseif not curFrame and not self.IS_RECTANGLE then
         love.graphics.draw(self.image, x, y, r, sx, sy, ox, oy)
     else
-        local lastColor = {love.graphics.getColor()}
-        love.graphics.setColor(self.colour[1] * lastColor[1], self.colour[2] * lastColor[2], self.colour[3] * lastColor[3], self.alpha * lastColor[4])
         -- ox and oy scales from the scale (sx and sy IS the height)
         local nox = ox * (sx < 0 and -1 or 1)
         local noy = oy * (sy < 0 and -1 or 1)
         love.graphics.rectangle("fill", x - nox, y - noy, sx, sy)
-        love.graphics.setColor(lastColor)
     end
+
+    love.graphics.setColor(lastColor)
+    love.graphics.setShader(lastShader)
 end
 
 return SparrowAtlas

@@ -56,6 +56,7 @@ function AnimateAtlas:constructor(object)
 			return vec4(alpha);
         }
     ]])
+    self.shader = nil
     self:setColorOffset(0, 0, 0, 0)
     self:setColorMultiplier(1, 1, 1, 1)
 
@@ -75,6 +76,9 @@ function AnimateAtlas:constructor(object)
 
     self.width = 0
     self.height = 0
+
+    self.frameElements = {}
+    self.visible = true
 end
 
 function AnimateAtlas:setColorOffset(r, g, b, a)
@@ -295,15 +299,9 @@ function AnimateAtlas:addAnimByIndices(name, prefix, indices, framerate, loop)
     framerate = framerate or 30
     loop = loop == nil and true or loop
 
-    -- add +1 to each value in indices as theyre 0-based in the json
-    for i = 1, #indices do
-        indices[i] = indices[i] + 1
-    end
-
     local anim = {
         name = name,
         prefix = prefix,
-        indices = indices,
         framerate = framerate,
         loop = loop,
         frames = {}
@@ -314,6 +312,8 @@ function AnimateAtlas:addAnimByIndices(name, prefix, indices, framerate, loop)
     local timelineData = timeline.data[optimized and "AN" or "ANIMATION"][optimized and "TL" or "TIMELINE"]
     local layers = timelineData[optimized and "L" or "LAYERS"]
 
+    local allFrames = {}
+
     for i = 1, #layers do
         local layer = layers[i]
         local keyframes = layer[optimized and "FR" or "Frames"]
@@ -321,21 +321,23 @@ function AnimateAtlas:addAnimByIndices(name, prefix, indices, framerate, loop)
         for j = 1, #keyframes do
             local keyframe = keyframes[j]
             local nameInFrame = keyframe[optimized and "N" or "name"] or ""
-            if string.startsWith(nameInFrame, prefix) then
+            if nameInFrame == prefix then
                 local index = keyframe[optimized and "I" or "index"]
                 local duration = keyframe[optimized and "DU" or "duration"] or 1
                 for f = index, index + duration - 1 do
-                    table.insert(anim.frames, f)
+                    table.insert(allFrames, f)
                 end
             end
         end
     end
 
+    for _, i in ipairs(indices) do
+        local f = allFrames[i + 1]
+        if f then table.insert(anim.frames, f) end
+    end
+
     if #anim.frames == 0 then
-        local length = self:getLength()
-        for f = 0, length - 1 do
-            table.insert(anim.frames, f)
-        end
+        anim.frames = {0}
     end
 
     table.insert(self.animations, anim)
@@ -355,21 +357,36 @@ function AnimateAtlas:play(animName, forced, loop)
     then
         return
     end
+    
     for i, anim in ipairs(self.animations) do
         if anim.name == animName then
             self.curAnim = anim
             self.frame = 1
             self.playing = true
             self.looping = loop ~= nil and loop or anim.loop
-
+            self.animFinished = false
             break
         end
     end
+
+    self.width, self.height = self:getBoundDimensions()
 end
 
 function AnimateAtlas:getLength()
     local optimized = self.timeline.optimized == true or self.timeline.L ~= nil
     return self:getTimelineLength(self.timeline.data[optimized and "AN" or "ANIMATION"][optimized and "TL" or "TIMELINE"])
+end
+
+function AnimateAtlas:getDefaultSymbol()
+    local optimized = self.timeline.optimized == true or self.timeline.data.L ~= nil
+    return self.timeline.data[optimized and "AN" or "ANIMATION"][optimized and "TL" or "TIMELINE"][optimized and "N" or "name"]
+end
+
+function AnimateAtlas:addFrameElement(filterFn, element)
+    table.insert(self.frameElements, {
+        filter = filterFn,
+        element = element
+    })
 end
 
 local function matrix2D(matrix)
@@ -485,6 +502,11 @@ local function renderSymbol(self, symbol, frame, index, matrix, colorTransform, 
     end
 
     self:drawTimeline(symbolTimeline, frameIndex, matrix:clone():apply(symbolMatrix), colorTransform, stencilMode)
+    for _, fe in ipairs(self.frameElements) do
+        if fe.filter(frame) then
+            fe.element:draw(self, frame.matrix)
+        end
+    end
 end
 
 local function renderSprite(self, sprite, spritemap, spriteMatrix, matrix, colorTransform, stencilMode)
@@ -505,8 +527,9 @@ local function renderSprite(self, sprite, spritemap, spriteMatrix, matrix, color
         drawMatrix:rotate(-math.pi/2)
     end
     local lastShader = love.graphics.getShader()
+    love.graphics.setShader(self.shader)
     if not stencilMode then
-        love.graphics.setShader(self._colorTransformShader)
+        --love.graphics.setShader(self._colorTransformShader)
 
         self:setColorOffset(0, 0, 0, 0)
         self:setColorMultiplier(1, 1, 1, 1)
@@ -580,6 +603,7 @@ function AnimateAtlas:_pushMask(maskLayer, frame, matrix, optimized)
     local depth = self._stencilDepth
 
     love.graphics.stencil(function()
+        local lastShader = love.graphics.getShader()
         love.graphics.setShader(self._maskShader)
 
         for j = 1, #keyframes do
@@ -596,7 +620,7 @@ function AnimateAtlas:_pushMask(maskLayer, frame, matrix, optimized)
             end
         end
 
-        love.graphics.setShader()
+        love.graphics.setShader(lastShader)
     end, "replace", depth, true)
 
     love.graphics.setStencilTest("equal", depth)
@@ -723,6 +747,7 @@ function AnimateAtlas:update(dt)
                 self.frame = 1
             else
                 self.playing = false
+                self.animFinished = true
                 self.frame = #self.curAnim.frames
                 if self._callback then
                     self._callback(self.objectReference)
@@ -959,7 +984,16 @@ function AnimateAtlas:resume()
 end
 
 function AnimateAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
+    if not self.visible then
+        return
+    end
     camera = camera or {x = 0, y = 0}
+    local cx = camera.x
+    local cy = camera.y
+    if camera.centered then
+        cx = cx - (1280 / 2)
+        cy = cy - (720 / 2)
+    end
     x = x or self.x
     y = y or self.y
     r = r or self.rotation
@@ -968,8 +1002,10 @@ function AnimateAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     ox = ox or self.origin.x
     oy = oy or self.origin.y
 
-    x = x + ox - self.offset.x - (camera.x * self.scroll.x)
-    y = y + oy - self.offset.y - (camera.y * self.scroll.y)
+    x = x + ox - self.offset.x - (cx * self.scroll.x)
+    y = y + oy - self.offset.y - (cy * self.scroll.y)
+
+    local w, h = self.width, self.height
 
     local identity = love.math.newTransform()
     identity:translate(x, y)
@@ -977,6 +1013,7 @@ function AnimateAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     identity:rotate(r)
     identity:scale(sx, sy)
     identity:translate(-ox, -oy)
+    identity:translate(w/2, h/2)
 
     local timeline
     if self.curAnim and self.curAnim.frames then

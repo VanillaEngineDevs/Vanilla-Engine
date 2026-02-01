@@ -1,6 +1,13 @@
 {
   "props": [
     {
+      "name": "solid",
+      "assetPath": "#FFFFFF",
+      "position": [-5000, -3000],
+      "scale": [10000, 10000],
+      "scroll": [0, 0]
+    },
+    {
       "name": "solidCover",
       "zIndex": 9999,
       "alpha": 0.0,
@@ -23,9 +30,9 @@
     },
     {
       "danceEvery": 0,
-      "alpha": 0.0,
+      "alpha": 1.0,
       "zIndex": 10,
-      "position": [790, 625],
+      "position": [-1400, 625],
       "scale": [1, 1],
       "animType": "sparrow",
       "name": "fucker",
@@ -176,13 +183,13 @@
   "characters": {
     "bf": {
       "zIndex": 300,
-      "position": [1530, 970],
+      "position": [1050, 640],
       "scroll": [0.99, 0.99],
       "cameraOffsets": [-100, -100]
     },
     "dad": {
       "zIndex": 200,
-      "position": [70, 470],
+      "position": [-375, 215],
       "scroll": [0.97, 0.97],
       "cameraOffsets": [150, -100]
     },
@@ -190,7 +197,7 @@
       "zIndex": 300,
       "cameraOffsets": [0, 0],
       "scroll": [0.95, 0.95],
-      "position": [-290, -470]
+      "position": [-100, -220]
     }
   },
   "name": "Diner",

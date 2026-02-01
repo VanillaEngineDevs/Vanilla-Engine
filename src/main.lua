@@ -74,6 +74,7 @@ function love.load()
     Sprite = require "modules.xml.Sprite"
     xmlcamera = require "modules.xml.camera"
     Checkbox = require "modules.Checkbox"
+	hapticUtil = require "modules.hapticUtil"
 
     playMenuMusic = true
     graphics.setImageType(love.filesystem.read("IMAGE_FORMAT.txt"))
@@ -374,6 +375,7 @@ function love.touchmoved(id, x, y, dx, dy, pressure)
 end
 
 function love.update(dt)
+	hapticUtil:update(dt)
 	if volFade > 0 then
 		volFade = volFade - 1 * dt
 	end

@@ -6,9 +6,9 @@ function MultiSparrowCharacter:new(data)
     self.sprites = {}
     self.animations = {} -- will hold vars: name, prefix, sheet, offsetX, offsetY
 
-    self.current = graphics.newTextureAtlas()
+    self.sprite = graphics.newTextureAtlas()
     self.assetPath = data.assetPath:gsub("shared:", "assets/")
-    self.current:load(self.assetPath .. "")
+    self.sprite:load(self.assetPath .. "")
 
     for i, anim in ipairs(data.animations) do
         if not anim.assetPath and not anim.asset then
@@ -52,19 +52,21 @@ function MultiSparrowCharacter:new(data)
 end
 
 function MultiSparrowCharacter:updateHitbox()
-    self.current:updateHitbox()
-    self.width, self.height = self.current.width, self.current.height
+    self.sprite:updateHitbox()
+    self.width, self.height = self.sprite.width, self.sprite.height
 end
 
 function MultiSparrowCharacter:update(dt)
     MultiSparrowCharacter.super.update(self, dt)
     for _, spr in pairs(self.sprites) do
         spr:update(dt)
-        spr.x, spr.y = self.x + self.offsets[1], self.y + self.offsets[2]
+        spr.x, spr.y = self.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES, self.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
         spr.scale.x = self.scale.x
         spr.scale.y = self.scale.y
         spr.origin.x = self.origin.x
         spr.origin.y = self.origin.y
+        spr.shader = self.shader
+        spr.visible = self.visible
     end
 end
 
@@ -74,7 +76,7 @@ function MultiSparrowCharacter:play(name, forced, loop)
     for _, anim in ipairs(self.animations) do
         for asset, spr in pairs(self.sprites) do
             if asset == anim.asset and name == anim.name then
-                self.current = spr
+                self.sprite = spr
                 animname = anim.name
                 break
             end
@@ -82,31 +84,31 @@ function MultiSparrowCharacter:play(name, forced, loop)
         if animname ~= "" then break end
     end
 
-    self.current:play(animname, forced, loop)
-    self.current.x, self.current.y = self.x + self.offsets[1], self.y + self.offsets[2]
+    self.sprite:play(animname, forced, loop)
+    self.sprite.x, self.sprite.y = self.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES, self.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
     for _, anim in ipairs(self.animations) do
         if anim.name == animname and anim.offsets then
-            self.current.x = self.current.x + anim.offsets[1]
-            self.current.y = self.current.y + anim.offsets[2]
+            self.sprite.x = self.sprite.x + anim.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES
+            self.sprite.y = self.sprite.y + anim.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
             break
         end
     end
 end
 
 function MultiSparrowCharacter:draw(camera)
-    self.current:draw(camera)
+    self.sprite:draw(camera)
 end
 
 function MultiSparrowCharacter:getWidth()
-    return self.current:getWidth()
+    return self.sprite:getWidth()
 end
 
 function MultiSparrowCharacter:getHeight()
-    return self.current:getHeight()
+    return self.sprite:getHeight()
 end
 
 function MultiSparrowCharacter:getDimensions()
-    return self.current:getWidth(), self.current:getHeight()
+    return self.sprite:getWidth(), self.sprite:getHeight()
 end
 
 return MultiSparrowCharacter

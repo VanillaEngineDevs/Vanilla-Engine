@@ -74,6 +74,14 @@ function Conductor.getBPMFromSeconds(time)
     return lastChange
 end
 
+function Conductor.getBeatLengthsMS()
+    return 60 / Conductor.bpm * 1000
+end
+
+function Conductor.getStepLengthMs()
+    return Conductor.getBeatLengthsMS() * (timeSignatureNum / 4)
+end
+
 function Conductor.getBPMFromStep(step)
     local lastChange = {
         stepTime = 0,

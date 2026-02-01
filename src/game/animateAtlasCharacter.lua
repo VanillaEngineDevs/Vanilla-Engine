@@ -11,7 +11,7 @@ function AnimateAtlasCharacter:new(data)
         local isIndices = anim.frameIndices ~= nil
 
         if isIndices then
-            self.sprite:addAnimByIndices(anim.name, anim.prefix, anim.frameIndices, anim.framerate, anim.loop)
+            self.sprite:addAnimByIndices(anim.name, anim.prefix, anim.frameIndices, anim.framerate, anim.loop or false)
         else
             self.sprite:addAnimByPrefix(anim.name, anim.prefix, anim.framerate, anim.loop or false)
         end
@@ -30,13 +30,15 @@ end
 function AnimateAtlasCharacter:update(dt)
     AnimateAtlasCharacter.super.update(self, dt)
     self.sprite:update(dt)
-    self.sprite.x, self.sprite.y = self.x + self.offsets[1], self.y + self.offsets[2]
+    self.sprite.x, self.sprite.y = self.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES, self.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
     self.sprite.x = self.sprite.x - self.curAnimOffset[1]
     self.sprite.y = self.sprite.y - self.curAnimOffset[2]
     self.sprite.scale.x = self.scale.x
     self.sprite.scale.y = self.scale.y
     self.sprite.origin.x = self.origin.x
     self.sprite.origin.y = self.origin.y
+    self.sprite.shader = self.shader
+    self.sprite.visible = self.visible
 end
 
 function AnimateAtlasCharacter:updateHitbox()
@@ -47,13 +49,11 @@ end
 function AnimateAtlasCharacter:play(name, forced, loop)
     self.sprite:play(name, forced, loop)
 
-    print(self.x, self.y)
     self.sprite.x, self.sprite.y = self.x + self.offsets[1], self.y + self.offsets[2]
-    print(self.sprite.x, self.sprite.y)
     for _, anim in ipairs(self.animations) do
         if anim.name == name and anim.offsets then
-            self.sprite.x = self.sprite.x - anim.offsets[1]
-            self.sprite.y = self.sprite.y - anim.offsets[2]
+            self.sprite.x = self.sprite.x - anim.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES
+            self.sprite.y = self.sprite.y - anim.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
             self.curAnimOffset[1] = anim.offsets[1]
             self.curAnimOffset[2] = anim.offsets[2]
             break
