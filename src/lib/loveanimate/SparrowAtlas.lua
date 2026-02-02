@@ -236,6 +236,10 @@ function SparrowAtlas:addAnimByFrames(name, frames, framerate, looped)
 	self.animations[name] = anim
 end
 
+function SparrowAtlas:isAnimation(name)
+    return self.animations and self.animations[name] ~= nil
+end
+
 ---
 --- @param  anim   string?
 --- @param  force  boolean?

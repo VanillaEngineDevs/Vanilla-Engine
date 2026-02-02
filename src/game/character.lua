@@ -106,6 +106,15 @@ function character:update(dt)
     if self.characterType == CHARACTER_TYPE.BF and self:justPressedNote() then
         self.holdTimer = 0
     end
+
+    if self.sprite.animFinished
+            and self.sprite.curAnim
+            and not self.sprite.curAnim.name:endsWith("-hold")
+        and self.sprite:hasAnimation(self.sprite.curAnim.name .. "-hold") then
+
+        self:play(self.sprite.curAnim.name .. "-hold", true, true)
+    end
+
     if self:isSinging() then
         self.holdTimer = self.holdTimer + dt
         local singTimeSec = self.singTime * Conductor.getBeatLengthsMS() / 1000
@@ -123,7 +132,7 @@ function character:update(dt)
         end
         if self.holdTimer >= singTimeSec and shouldstop then
             self.holdTimer = 0
-            
+
             local currentAnimation = self.sprite and self.sprite.curAnim and self.sprite.curAnim.name or ""
             if currentAnimation:endsWith("-hold") then
                 currentAnimation = currentAnimation:sub(1, #currentAnimation - #(" -hold"))

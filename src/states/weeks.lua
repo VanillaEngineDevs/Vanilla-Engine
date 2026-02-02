@@ -1429,14 +1429,14 @@ return {
 										end
 										if useAltAnims then
 											if whohit then 
-												whohit:play(curAnim .. " alt", (_psychmod and true or false))
+												whohit:play(curAnim .. " alt", (_psychmod and true or false), true)
 												if whohit.call then
 													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim .. " alt"})
 												end
 											end
 										else
 											if whohit then 
-												whohit:play(curAnim, (_psychmod and true or false))
+												whohit:play(curAnim, (_psychmod and true or false), true)
 												if whohit.call then
 													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim})
 												end
@@ -1454,14 +1454,14 @@ return {
 										)
 										if useAltAnims then
 											if whohit then 
-												whohit:play(curAnim .. " alt", true, false)
+												whohit:play(curAnim .. " alt", true, true)
 												if whohit.call then
 													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim .. " alt"})
 												end
 											end
 										else
 											if whohit then 
-												whohit:play(curAnim, true, false)
+												whohit:play(curAnim, true, true)
 												if whohit.call then
 													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim})
 												end
@@ -1495,7 +1495,7 @@ return {
 				if gfNote[1].time - musicTime <= 0 then
 					for _, obj in ipairs(self.objects) do
 						if obj.characterType == CHARACTER_TYPE.GF then
-							obj:play(curAnim, true, false)
+							obj:play(curAnim, true, true)
 							obj.holdTimer = 0
 							if obj.call then
 								obj:call("onNoteHit", {noteType = gfNote[1].ver, direction = i})
@@ -1529,7 +1529,7 @@ return {
 					if not continue then
 						for _, obj in ipairs(self.objects) do
 							if obj.characterType == CHARACTER_TYPE.BF then
-								obj:play(curAnim .. " miss", true, false)
+								obj:play(curAnim .. " miss", true, true)
 								if obj.call then
 									obj:call("onNoteMiss", curAnim .. " miss")
 								end
@@ -1630,7 +1630,7 @@ return {
 										if not boyfriendNote[j].causesMiss then
 											for _, obj in ipairs(self.objects) do
 												if obj.characterType == CHARACTER_TYPE.BF then
-													obj:play(curAnim, true, false)
+													obj:play(curAnim, true, true)
 													if obj.call then
 														obj:call("onNoteHit", {noteType = boyfriendNote[j].ver, direction = i, anim = curAnim})
 													end
@@ -1640,7 +1640,7 @@ return {
 											audio.playSound(sounds.miss[love.math.random(3)])
 											for _, obj in ipairs(self.objects) do
 												if obj.characterType == CHARACTER_TYPE.BF then
-													obj:play(curAnim .. " miss", true, false)
+													obj:play(curAnim .. " miss", true, true)
 													if obj.call then
 														obj:call("onNoteMiss", curAnim .. " miss")
 													end

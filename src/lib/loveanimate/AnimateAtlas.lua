@@ -760,6 +760,15 @@ function AnimateAtlas:update(dt)
     end
 end
 
+function AnimateAtlas:hasAnimation(name)
+    for i, anim in ipairs(self.animations) do
+        if anim.name == name then
+            return true
+        end
+    end
+    return false
+end
+
 -- #region BOUNDING BOXES
 
 -- calctl, calckf, calcs, calcas
