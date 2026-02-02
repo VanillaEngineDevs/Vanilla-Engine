@@ -19,20 +19,34 @@ function EXTEND_LIBRARY(assetPath, appendAssets)
     return assetPath
 end
 
-function AnimateAtlasCharacter:new(data)
+function AnimateAtlasCharacter:new(data, _atlasSettings)
     AnimateAtlasCharacter.super.new(self, data)
 
     self.sprite = graphics.newTextureAtlas()
+    local base = self
+    function self.sprite:getAtlasSettings()
+        return _atlasSettings or {}
+    end
     self.assetPath = EXTEND_LIBRARY(data.assetPath)
     self.sprite:load(self.assetPath .. "")
 
     for i, anim in ipairs(data.animations) do
         local isIndices = anim.frameIndices ~= nil
 
-        if isIndices then
-            self.sprite:addAnimByIndices(anim.name, anim.prefix, anim.frameIndices, anim.framerate, anim.loop or false)
-        else
-            self.sprite:addAnimByPrefix(anim.name, anim.prefix, anim.framerate, anim.loop or false)
+        local animType = anim.animType or "prefix"
+        if animType == "prefix" then
+            if isIndices then
+                self.sprite:addAnimByIndices(anim.name, anim.prefix, anim.frameIndices, anim.framerate or 24, anim.loop or false)
+            else
+                self.sprite:addAnimByPrefix(anim.name, anim.prefix, anim.framerate or 24, anim.loop or false)
+            end
+        elseif animType == "symbol" then
+            if isIndices then
+                print("SYMBOL ANIMS WITH INDICES")
+                self.sprite:addAnimBySymbolIndices(anim.name, anim.prefix, anim.frameIndices, anim.framerate or 24, anim.loop or false)
+            else
+                self.sprite:addAnimBySymbol(anim.name, anim.prefix, anim.framerate or 24, anim.loop or false)
+            end
         end
     end
 
@@ -40,6 +54,15 @@ function AnimateAtlasCharacter:new(data)
         if anim.name == "danceLeft" then
             self.shouldAlternate = true
             break
+        end
+    end
+
+    if self.sprite:hasAnimation("singLEFT") then
+        self.sprite:play("singLEFT", true, false)
+        if self.shouldAlternate then
+            self.sprite:play("danceLeft", true, false)
+        else
+            self.sprite:play("idle", true, false)
         end
     end
 
@@ -78,11 +101,16 @@ function AnimateAtlasCharacter:play(name, forced, loop)
 
     self.sprite.x, self.sprite.y = self.x + self.offsets[1], self.y + self.offsets[2]
     for _, anim in ipairs(self.animations) do
-        if anim.name == name and anim.offsets then
-            self.sprite.x = self.sprite.x - anim.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES
-            self.sprite.y = self.sprite.y - anim.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
-            self.curAnimOffset[1] = anim.offsets[1]
-            self.curAnimOffset[2] = anim.offsets[2]
+        if anim.name == name then
+            if anim.offsets then
+                self.sprite.x = self.sprite.x - anim.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES
+                self.sprite.y = self.sprite.y - anim.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
+                self.curAnimOffset[1] = anim.offsets[1]
+                self.curAnimOffset[2] = anim.offsets[2]
+            else
+                self.curAnimOffset[1] = 0
+                self.curAnimOffset[2] = 0
+            end
             break
         end
     end

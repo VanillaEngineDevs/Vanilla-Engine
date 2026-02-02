@@ -71,11 +71,16 @@ function SparrowCharacter:play(name, forced, loop)
     end
 
     for _, anim in ipairs(self.animations) do
-        if anim.name == name and anim.offsets then
-            self.sprite.x = self.sprite.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES
-            self.sprite.y = self.sprite.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
-            self.curAnimOffset[1] = anim.offsets[1]
-            self.curAnimOffset[2] = anim.offsets[2]
+        if anim.name == name then
+            if anim.offsets then
+                self.sprite.x = self.sprite.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES
+                self.sprite.y = self.sprite.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
+                self.curAnimOffset[1] = anim.offsets[1]
+                self.curAnimOffset[2] = anim.offsets[2]
+            else
+                self.curAnimOffset[1] = 0
+                self.curAnimOffset[2] = 0
+            end
             break
         end
     end

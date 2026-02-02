@@ -17,16 +17,47 @@ function character.getCharacter(id)
 
     print("Creating character of type: " .. data.renderType, id)
 
+    local characterLuaChunk = love.filesystem.getInfo("data/scripts/characters/" .. id .. ".lua")
+    local env = setmetatable({
+        Character = {
+            --[[ data = char, ]]
+        },
+        add = function(obj)
+            weeks:add(obj)
+        end,
+        remove = function(obj)
+            weeks:remove(obj)
+        end,
+    }, {__index = _G})
+    if characterLuaChunk then
+        local chunk = love.filesystem.load("data/scripts/characters/" .. id .. ".lua")
+        
+        setfenv(chunk, env)
+        chunk()
+        --char.script = env.Character
+    end
+
+    local _atlasSettings = {}
+    if env.Character and env.Character.getAtlasSettings then
+        _atlasSettings = env.Character:getAtlasSettings()
+    else
+        _atlasSettings = {}
+    end
+
     if data.renderType == "sparrow" then
         char = SparrowCharacter(data)
     elseif data.renderType == "multisparrow" then
         char = MultiSparrowCharacter(data)
     elseif data.renderType == "animateatlas" then
-        char = AnimateAtlasCharacter(data)
+        char = AnimateAtlasCharacter(data, _atlasSettings)
     elseif data.renderType == "multianimateatlas" then
-        char = MultiAnimateAtlasCharacter(data)
+        char = MultiAnimateAtlasCharacter(data, _atlasSettings)
     elseif data.renderType == "packer" then
     end
+
+    -- set Character.data now
+    env.Character.data = char
+    char.script = env.Character
 
     char.onFrameChange = signal.new()
     char.onAnimationFinished = signal.new()
@@ -50,26 +81,6 @@ function character.getCharacter(id)
     char.script = nil
 
     char:setAntialiasing(not data.isPixel)
-
-    local characterLuaChunk = love.filesystem.getInfo("data/scripts/characters/" .. char.id .. ".lua")
-    local env = setmetatable({
-        Character = {
-            data = char,
-        },
-        add = function(obj)
-            weeks:add(obj)
-        end,
-        remove = function(obj)
-            weeks:remove(obj)
-        end,
-    }, {__index = _G})
-    if characterLuaChunk then
-        local chunk = love.filesystem.load("data/scripts/characters/" .. char.id .. ".lua")
-        
-        setfenv(chunk, env)
-        chunk()
-        char.script = env.Character
-    end
 
     char:call("onCreate")
 
@@ -205,7 +216,9 @@ end
 
 function character:isSinging()
     return self.sprite and self.sprite.curAnim and
-        self.sprite.curAnim.name:startsWith("sing") and not self.sprite.curAnim.name:endsWith("-end")
+        self.sprite.curAnim.name:startsWith("sing") 
+            and not self.sprite.curAnim.name:endsWith("-end")
+            and not self.sprite.curAnim.name:endsWith("-hold")
 end
 
 function character:onBeatHit(beat) end
@@ -225,8 +238,9 @@ function character:dance(force)
 
         if self.sprite and self.sprite.curAnim then
             local currentAnimation = self.sprite.curAnim.name
-            -- if not dance and not idle and not finishged, return
-            if not currentAnimation:startsWith("dance") and not currentAnimation:startsWith("idle") and not self.sprite.animFinished then
+            if not currentAnimation:startsWith("dance") and not currentAnimation:startsWith("idle") and not
+                currentAnimation:endsWith("-hold") and not self.sprite.animFinished
+            and not currentAnimation == "__raw__" then
                 return
             end
         end
@@ -239,7 +253,7 @@ function character:dance(force)
         end
         self.hasDanced = not self.hasDanced
     else
-        self:play("idle", force, false)
+        self:play("idle", true, false)
     end
 end
 
@@ -278,5 +292,11 @@ function character:getDeathQuote()
 
     return nil
 end
+
+--[[ function character:getAtlasSettings()
+    if self:isFunction("getAtlasSettings") then
+        return self:call("getAtlasSettings")
+    end
+end ]]
 
 return character

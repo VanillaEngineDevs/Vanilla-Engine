@@ -1,6 +1,6 @@
 local MultiAnimateAtlasCharacter = Character:extend()
 
-function MultiAnimateAtlasCharacter:new(data)
+function MultiAnimateAtlasCharacter:new(data, _atlasSettings)
     MultiAnimateAtlasCharacter.super.new(self, data)
 
     self.sprites = {}
@@ -8,6 +8,10 @@ function MultiAnimateAtlasCharacter:new(data)
 
     self.sprite = graphics.newTextureAtlas()
     self.assetPath = EXTEND_LIBRARY(data.assetPath)
+    local base = self
+    function self.sprite:getAtlasSettings()
+        return _atlasSettings or {}
+    end
     self.sprite:load(self.assetPath .. "")
 
     for i, anim in ipairs(data.animations) do
@@ -32,6 +36,9 @@ function MultiAnimateAtlasCharacter:new(data)
     for _, anim in ipairs(self.animations) do
         if not self.sprites[anim.asset] then
             self.sprites[anim.asset] = graphics.newTextureAtlas()
+            self.sprites[anim.asset].getAtlasSettings = function()
+                return base._atlasSettings or {}
+            end
             self.sprites[anim.asset]:load(anim.asset)
         end
 
@@ -101,9 +108,11 @@ function MultiAnimateAtlasCharacter:play(name, forced, loop)
     end
     self.sprite.x, self.sprite.y = self.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES, self.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
     for _, anim in ipairs(self.animations) do
-        if anim.name == animname and anim.offsets then
-            self.sprite.x = self.sprite.x + anim.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES
-            self.sprite.y = self.sprite.y + anim.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
+        if anim.name == animname then
+            if anim.offsets then
+                self.sprite.x = self.sprite.x + anim.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES
+                self.sprite.y = self.sprite.y + anim.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
+            end
             break
         end
     end

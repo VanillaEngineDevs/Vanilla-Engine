@@ -124,9 +124,14 @@ function MultiSparrowCharacter:play(name, forced, loop)
     self.sprite:play(animname, forced, loop)
 
     for _, anim in ipairs(self.animations) do
-        if anim.name == animname and anim.offsets then
-            self.curAnimOffset[1] = anim.offsets[1]
-            self.curAnimOffset[2] = anim.offsets[2]
+        if anim.name == animname then
+            if anim.offsets then
+                self.curAnimOffset[1] = anim.offsets[1]
+                self.curAnimOffset[2] = anim.offsets[2]
+            else
+                self.curAnimOffset[1] = 0
+                self.curAnimOffset[2] = 0
+            end
             break
         end
     end

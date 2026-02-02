@@ -2,12 +2,9 @@
   "version": "1.0.0",
   "name": "Monster (Christmas)",
   "assetPath": "shared:characters/monster",
-  "healthIcon": {
-    "id": "monster"
-  },
   "renderType": "animateatlas",
-  "offsets": [0, 1],
-  "cameraOffsets": [0, 12],
+  "offsets": [-375, -325],
+  "cameraOffsets": [0, 29],
   "animations": [
     {
       "name": "idle",
@@ -24,27 +21,27 @@
     {
       "name": "singLEFT",
       "prefix": "Monster Right note",
-      "offsets": [-36, 20],
+      "offsets": [-50, -100],
       "animType": "symbol"
     },
     {
       "name": "singLEFT-hold",
       "prefix": "Monster Right note",
       "frameIndices": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-      "offsets": [-36, 20],
+      "offsets": [-50, -100],
       "looped": true,
       "animType": "symbol"
     },
     {
       "name": "singDOWN",
       "prefix": "monster down",
-      "offsets": [-50, -116],
+      "offsets": [-50, -175],
       "animType": "symbol"
     },
     {
       "name": "singDOWN-hold",
       "prefix": "monster down",
-      "offsets": [-50, -116],
+      "offsets": [-50, -175],
       "frameIndices": [
         2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
         22, 23, 24, 25, 26, 27, 28, 29
@@ -55,7 +52,7 @@
     {
       "name": "singUP",
       "prefix": "monster up note",
-      "offsets": [-21, 32],
+      "offsets": [-21, -60],
       "animType": "symbol"
     },
     {
@@ -65,14 +62,14 @@
         2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
         22, 23
       ],
-      "offsets": [-21, 32],
+      "offsets": [-21, -60],
       "looped": true,
       "animType": "symbol"
     },
     {
       "name": "singRIGHT",
       "prefix": "Monster left note",
-      "offsets": [-32, -28],
+      "offsets": [-530, -305],
       "animType": "symbol"
     },
     {
@@ -81,7 +78,7 @@
       "frameIndices": [
         2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
       ],
-      "offsets": [-32, -28],
+      "offsets": [-530, -305],
       "looped": true,
       "animType": "symbol"
     }
