@@ -547,10 +547,20 @@ return {
 		}
 	end,
 
-	generateNotes = function(self, chart, metadata, difficulty)
+	generateNotes = function(self, name, diff)
 		local eventBpm
-		local chart = getFilePath(chart)
-		local metadata = getFilePath(metadata)
+		local chartPath = "data/songs/" .. name .. "/" .. name .. "-chart" .. songExt .. ".lua"
+		local metadataPath = "data/songs/" .. name .. "/" .. name .. "-metadata" .. songExt .. ".lua"
+		if not love.filesystem.getInfo(chartPath) then
+			chartPath = "data/songs/" .. name .. "/" .. name .. "-chart" .. songExt .. ".json"
+		end
+		if not love.filesystem.getInfo(metadataPath) then
+			metadataPath = "data/songs/" .. name .. "/" .. name .. "-metadata" .. songExt .. ".json"
+		end
+		print("Loading chart:", chartPath)
+		print("Loading metadata:", metadataPath)
+		local chart = getFilePath(chartPath)
+		local metadata = getFilePath(metadataPath)
 		if importMods.inMod then
 			importMods.setupScripts()
 		end
@@ -563,7 +573,7 @@ return {
 		else
 			chartData = love.filesystem.load(chart)()
 		end
-		chart = chartData.notes[difficulty]
+		chart = chartData.notes[diff] or chartData.notes["normal"]
 
 		if string.endsWith(metadata, ".json") then
 			metadata = json.decode(love.filesystem.read(metadata))
@@ -579,6 +589,18 @@ return {
 		boyfriend = Character.getCharacter(metadata.playData.characters.player)
 		enemy = Character.getCharacter(metadata.playData.characters.opponent)
 		girlfriend = Character.getCharacter(metadata.playData.characters.girlfriend)
+
+		inst = love.audio.newSource("songs/" .. name .. "/Inst" .. songExt .. ".ogg", "stream")
+		if love.filesystem.getInfo("songs/" .. name .. "/Voices-" .. metadata.playData.characters.player .. songExt .. ".ogg") then
+			voicesBF = love.audio.newSource("songs/" .. name .. "/Voices-" .. metadata.playData.characters.player .. songExt .. ".ogg", "stream")
+		else
+			voicesBF = nil
+		end
+		if love.filesystem.getInfo("songs/" .. name .. "/Voices-" .. metadata.playData.characters.opponent .. songExt .. ".ogg") then
+			voicesEnemy = love.audio.newSource("songs/" .. name .. "/Voices-" .. metadata.playData.characters.opponent .. songExt .. ".ogg", "stream")
+		else
+			voicesEnemy = nil
+		end
 
 		boyfriend.zIndex = 10
 		enemy.zIndex = 8
@@ -1245,6 +1267,7 @@ return {
 					end
 				else
 					Gamestate.onEvent(event)
+					self.stage:call("onEvent", event)
 				end
 
 				table.remove(songEvents, i)
@@ -1255,6 +1278,7 @@ return {
 		for i, event in ipairs(modEvents) do
 			if event.time <= absMusicTime then
 				Gamestate.onEvent(event)
+				self.stage:call("onEvent", event)
 
 				table.remove(modEvents, i)
 				break

@@ -111,6 +111,28 @@ function Stage:onUpdate(dt)
     getEnemy().visible = THEFUCKINGENEMYVISIBILITY
 end
 
+function Stage:onEvent(event)
+    if event.name == "sserafimSing" then
+        self:setGirlsSinging(event.value.singing)
+    elseif event.name == "sserafimShow" then
+        self:setGirlsVisible(event.value.visible)
+    elseif event.name == "sserafimGuitarVibration" then
+        hapticUtil:increasingVibrate(0.25, 1/2, event.value.duration)
+    elseif event.name == "sserafimDark" then
+        self:setDarkenAmt(event.value.amount, event.value.duration)
+    elseif event.name == "sserafimLights" then
+        self:flashTruckLights(event.value.amount, event.value.duration)
+    elseif event.name == "sserafimCover" then
+        self:setCoverVisible(event.value.visible)
+    elseif event.name == "sserafimFlash" then
+        weeks:flash(event.value.duration)
+    elseif event.name == "sserafimPulseLights" then
+        self:setLightState(event.value.enabled, event.value.colors, event.value.durations, event.value.intensities)
+    elseif event.name == "sserafimKick" then
+        self:kickTruck(event.value.final)
+    end
+end
+
 function Stage:setGirlsVisible(visible)
     if #visible < 5 then
         print("Got " .. #visible .. " visibility values, expected 5.")

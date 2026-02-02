@@ -1,4 +1,10 @@
 return {
+	songs = {
+		"bopeebo",
+		"fresh",
+		"dadbattle"
+	},
+
 	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
 		weeks:enter()
 
@@ -13,47 +19,11 @@ return {
 	load = function(self, DONT_GENERATE)
 		weeks:load(not DONT_GENERATE)
 		if not DONT_GENERATE then
-			self:initUI()
-		end
-
-		if song == 3 then
-			inst = love.audio.newSource("songs/dadbattle/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/dadbattle/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/dadbattle/Voices-dad" .. songExt .. ".ogg", "stream")
-			if girlfriend.name == "nene" then
-				girlfriend.soundData = love.sound.newSoundData("songs/dadbattle/Inst" .. songExt .. ".ogg")
-				girlfriend.multiplier = 3
-			end
-		elseif song == 2 then
-			inst = love.audio.newSource("songs/fresh/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/fresh/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/fresh/Voices-dad" .. songExt .. ".ogg", "stream")
-			if girlfriend.name == "nene" then
-				girlfriend.soundData = love.sound.newSoundData("songs/fresh/Inst" .. songExt .. ".ogg")
-				girlfriend.multiplier = 3
-			end
-		else
-			inst = love.audio.newSource("songs/bopeebo/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/bopeebo/Voices" .. audioAppend .. songExt .. ".ogg", "stream")
-			voicesEnemy = love.audio.newSource("songs/bopeebo/Voices-dad" .. songExt .. ".ogg", "stream")
-			if girlfriend.name == "nene" then
-				girlfriend.soundData = love.sound.newSoundData("songs/bopeebo/Inst" .. songExt .. ".ogg")
-				girlfriend.multiplier = 3
-			end
+			weeks:initUI()
+			weeks:generateNotes(self.songs[song], difficulty)
 		end
 
 		weeks:setupCountdown()
-	end,
-
-	initUI = function(self)
-		weeks:initUI()
-		if song == 3 then
-			weeks:generateNotes("data/songs/dadbattle/dadbattle-chart" .. songExt .. ".lua", "data/songs/dadbattle/dadbattle-metadata" .. songExt .. ".lua", difficulty)
-		elseif song == 2 then
-			weeks:generateNotes("data/songs/fresh/fresh-chart" .. songExt .. ".lua", "data/songs/fresh/fresh-metadata" .. songExt .. ".lua", difficulty)
-		else
-			weeks:generateNotes("data/songs/bopeebo/bopeebo-chart" .. songExt .. ".lua", "data/songs/bopeebo/bopeebo-metadata" .. songExt .. ".lua", difficulty)
-		end
 	end,
 
 	update = function(self, dt)
@@ -71,11 +41,6 @@ return {
 	end,
 
 	leave = function(self)
-
-		enemy = nil
-		boyfriend = nil
-		girlfriend = nil
-
 		graphics.clearCache()
 
 		weeks:leave()
