@@ -4,7 +4,7 @@ function SparrowCharacter:new(data)
     SparrowCharacter.super.new(self, data)
 
     self.sprite = graphics.newSparrowAtlas()
-    self.assetPath = data.assetPath:gsub("shared:", "assets/")
+    self.assetPath = EXTEND_LIBRARY(data.assetPath)
     self.sprite:load(self.assetPath .. "")
 
     for i, anim in ipairs(data.animations) do
@@ -54,6 +54,8 @@ function SparrowCharacter:update(dt)
     self.sprite.visible = self.visible
     self.sprite.flipX = self.flipX
     self.sprite.flipY = self.flipY
+    self.sprite.onFrameChange = self.onFrameChange
+    self.sprite.onAnimationFinished = self.onAnimationFinished
 end
 
 function SparrowCharacter:updateHitbox()
@@ -62,7 +64,11 @@ function SparrowCharacter:updateHitbox()
 end
 
 function SparrowCharacter:play(name, forced, loop)
-    self.sprite:play(name, forced, loop)
+    if self:isFunction("play") and not self.inScriptCall then
+        self:call("play", name, forced, loop)
+    else
+        self.sprite:play(name, forced, loop)
+    end
 
     for _, anim in ipairs(self.animations) do
         if anim.name == name and anim.offsets then

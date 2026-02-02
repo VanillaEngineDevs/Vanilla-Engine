@@ -1,5 +1,5 @@
 function Character:onCreate()
-    
+
 end
 
 function Character:postCreate()

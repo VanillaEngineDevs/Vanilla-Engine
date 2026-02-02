@@ -214,6 +214,52 @@ function stage:build()
                     )
                 end
             end
+        elseif type == "animateatlas" then
+            prop = graphics.newTextureAtlas()
+            local assetPath = propitem.assetPath
+            if not assetPath:startsWith("#") then
+                assetPath = "assets/" .. self.directory .. "/images/" .. propitem.assetPath
+            end
+            prop:load(assetPath)
+            --prop:setAntialiasing(not propitem.isPixel)
+            for _, anim in ipairs(propitem.animations or {}) do
+                if anim.animType == "symbol" then
+                    -- not prefix
+                    if anim.indiceFrames and #anim.indiceFrames > 0 then
+                        prop:addAnimBySymbolIndices(
+                            anim.name,
+                            anim.prefix,
+                            anim.indiceFrames,
+                            anim.frameRate,
+                            anim.looped
+                        )
+                    else
+                        prop:addAnimBySymbol(
+                            anim.name,
+                            anim.prefix,
+                            anim.frameRate,
+                            anim.looped
+                        )
+                    end
+                else
+                    if anim.indiceFrames and #anim.indiceFrames > 0 then
+                        prop:addAnimByIndices(
+                            anim.name,
+                            anim.prefix,
+                            anim.indiceFrames,
+                            anim.frameRate,
+                            anim.looped
+                        )
+                    else
+                        prop:addAnimByPrefix(
+                            anim.name,
+                            anim.prefix,
+                            anim.frameRate,
+                            anim.looped
+                        )
+                    end
+                end
+            end
         end
 
         prop.x = propitem.position[1]

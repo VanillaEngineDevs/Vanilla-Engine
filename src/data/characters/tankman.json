@@ -3,7 +3,7 @@
   "name": "Tankman",
   "renderType": "multianimateatlas",
   "assetPath": "shared:characters/tankman/basic",
-  "offsets": [3, -44],
+  "offsets": [625, 75],
   "cameraOffsets": [-3, 32],
   "animations": [
     {

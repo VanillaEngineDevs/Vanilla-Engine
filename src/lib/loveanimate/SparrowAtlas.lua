@@ -89,6 +89,9 @@ function SparrowAtlas:constructor()
 
     self.flipX = false
     self.flipY = false
+
+    self.onFrameChange = signal.new()
+    self.onAnimationFinished = signal.new()
 end
 
 --- Load the atlas from an image and xml
@@ -178,7 +181,7 @@ function SparrowAtlas:load(imageData, dataString, framerate)
 end
 
 function SparrowAtlas:setAntialiasing(antialiasing)
-    if self.image then
+    if self.image and self.image.setFilter then
         self.image:setFilter(antialiasing and "linear" or "nearest", antialiasing and "linear" or "nearest")
     end
 end
@@ -413,6 +416,10 @@ function SparrowAtlas:update(dt)
                 self.currentFrame = #self.curAnim.frames
                 self.animFinished = true
             end
+        end
+        self.onFrameChange:emit(self.curAnim.name, self.frame, self.curAnim.frames[self.frame])
+        if self.animFinished then
+            self.onAnimationFinished:emit(self.curAnim.name)
         end
     end
 end

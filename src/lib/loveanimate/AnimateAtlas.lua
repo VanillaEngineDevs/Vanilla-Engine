@@ -82,6 +82,9 @@ function AnimateAtlas:constructor(object)
 
     self.flipX = false
     self.flipY = false
+
+    self.onFrameChange = signal.new()
+    self.onAnimationFinished = signal.new()
 end
 
 function AnimateAtlas:setColorOffset(r, g, b, a)
@@ -325,6 +328,93 @@ function AnimateAtlas:addAnimByIndices(name, prefix, indices, framerate, loop)
             local keyframe = keyframes[j]
             local nameInFrame = keyframe[optimized and "N" or "name"] or ""
             if nameInFrame == prefix then
+                local index = keyframe[optimized and "I" or "index"]
+                local duration = keyframe[optimized and "DU" or "duration"] or 1
+                for f = index, index + duration - 1 do
+                    table.insert(allFrames, f)
+                end
+            end
+        end
+    end
+
+    for _, i in ipairs(indices) do
+        local f = allFrames[i + 1]
+        if f then table.insert(anim.frames, f) end
+    end
+
+    if #anim.frames == 0 then
+        anim.frames = {0}
+    end
+
+    table.insert(self.animations, anim)
+end
+
+function AnimateAtlas:addAnimBySymbol(name, symbolName, framerate, loop)
+    framerate = framerate or 30
+    loop = loop == nil and true or loop
+
+    local anim = {
+        name = name,
+        symbolName = symbolName,
+        framerate = framerate,
+        loop = loop,
+        frames = {}
+    }
+    local timeline = self.timeline
+    local optimized = timeline.optimized == true or timeline.data.L ~= nil
+    local timelineData = timeline.data[optimized and "AN" or "ANIMATION"][optimized and "TL" or "TIMELINE"]
+    local layers = timelineData[optimized and "L" or "LAYERS"]
+
+    for i = 1, #layers do
+        local layer = layers[i]
+        local keyframes = layer[optimized and "FR" or "Frames"]
+
+        for j = 1, #keyframes do
+            local keyframe = keyframes[j]
+            local nameInFrame = keyframe[optimized and "N" or "name"] or ""
+            if nameInFrame == symbolName then
+                local index = keyframe[optimized and "I" or "index"]
+                local duration = keyframe[optimized and "DU" or "duration"] or 1
+                for f = index, index + duration - 1 do
+                    table.insert(anim.frames, f)
+                end
+            end
+        end
+    end
+
+    if #anim.frames == 0 then
+        anim.frames = {0}
+    end
+    table.insert(self.animations, anim)
+end
+
+function AnimateAtlas:addAnimBySymbolIndices(name, symbolName, indices, framerate, loop)
+    framerate = framerate or 30
+    loop = loop == nil and true or loop
+
+    local anim = {
+        name = name,
+        symbolName = symbolName,
+        framerate = framerate,
+        loop = loop,
+        frames = {}
+    }
+
+    local timeline = self.timeline
+    local optimized = timeline.optimized == true or timeline.data.L ~= nil
+    local timelineData = timeline.data[optimized and "AN" or "ANIMATION"][optimized and "TL" or "TIMELINE"]
+    local layers = timelineData[optimized and "L" or "LAYERS"]
+
+    local allFrames = {}
+
+    for i = 1, #layers do
+        local layer = layers[i]
+        local keyframes = layer[optimized and "FR" or "Frames"]
+
+        for j = 1, #keyframes do
+            local keyframe = keyframes[j]
+            local nameInFrame = keyframe[optimized and "N" or "name"] or ""
+            if nameInFrame == symbolName then
                 local index = keyframe[optimized and "I" or "index"]
                 local duration = keyframe[optimized and "DU" or "duration"] or 1
                 for f = index, index + duration - 1 do
@@ -756,6 +846,11 @@ function AnimateAtlas:update(dt)
                     self._callback(self.objectReference)
                 end
             end
+        end
+
+        self.onFrameChange:emit(self.curAnim.name, self.frame, self.curAnim.frames[self.frame])
+        if self.animFinished then
+            self.onAnimationFinished:emit(self.curAnim.name)
         end
     end
 end

@@ -7,12 +7,15 @@ X_OFFSET_AMOUNT_FOR_SPITES = 25
 Y_OFFSET_AMOUNT_FOR_SPRITES = 30
 
 function character.getCharacter(id)
+    print("Loading character: " .. id)
     local data = json.decode(love.filesystem.read("data/characters/" .. id .. ".json"))
     if not data.renderType then
         data.renderType = "sparrow"
     end
 
     local char
+
+    print("Creating character of type: " .. data.renderType, id)
 
     if data.renderType == "sparrow" then
         char = SparrowCharacter(data)
@@ -24,6 +27,16 @@ function character.getCharacter(id)
         char = MultiAnimateAtlasCharacter(data)
     elseif data.renderType == "packer" then
     end
+
+    char.onFrameChange = signal.new()
+    char.onAnimationFinished = signal.new()
+
+    char.onFrameChange:connect(function(name, frameNumber, frameIndex)
+        char:call("onFrameChange", name, frameNumber, frameIndex)
+    end)
+    char.onAnimationFinished:connect(function(name)
+        char:call("onAnimationFinished", name)
+    end)
 
     char._data = data
     char.id = id
@@ -72,8 +85,15 @@ CHARACTER_TYPE = {
 
 function character:call(funcName, ...)
     if self.script and self.script[funcName] and type(self.script[funcName]) == "function" then
-        return self.script[funcName](self.script, ...)
+        self.inScriptCall = true
+        local result = self.script[funcName](self.script, ...)
+        self.inScriptCall = false
+        return result
     end
+end
+
+function character:isFunction(name)
+    return self.script and self.script[name] and type(self.script[name]) == "function"
 end
 
 function character:new()

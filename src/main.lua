@@ -59,22 +59,13 @@ function love.load()
 	AnimateAtlasCharacter = require "game.animateAtlasCharacter"
 	MultiAnimateAtlasCharacter = require "game.multiAnimateAtlas"
 
-    --[[ BaseCharacter = require "data.characters.BaseCharacter"
-    NeneCharacter = require "data.characters.NeneCharacter"
-    PixelNeneCharacter = require "data.characters.PixelNeneCharacter"
-    BFDarkCharacter = require "data.characters.BFDarkCharacter"
-    GFDarkCharacter = require "data.characters.GFDarkCharacter"
-    PicoDarkCharacter = require "data.characters.PicoDarkCharacter"
-    NeneDarkCharacter = require "data.characters.NeneDarkCharacter"
-    SpookyDarkCharacter = require "data.characters.SpookyDarkCharacter"
-	TankmanBloody = require "data.characters.TankmanBloody" ]]
-
     importMods = require "modding.importMods"
 
     Sprite = require "modules.xml.Sprite"
     xmlcamera = require "modules.xml.camera"
     Checkbox = require "modules.Checkbox"
 	hapticUtil = require "modules.hapticUtil"
+	signal = require "modules.signal"
 
     playMenuMusic = true
     graphics.setImageType(love.filesystem.read("IMAGE_FORMAT.txt"))
@@ -91,27 +82,6 @@ function love.load()
 
     selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
     confirmSound = love.audio.newSource("sounds/menu/confirm.ogg", "static")
-
-    stages = {
-        ["stage.base"] = require "stages.base.stage",
-        ["hauntedHouse.base"] = require "stages.base.hauntedHouse",
-        ["city.base"] = require "stages.base.city",
-        ["sunset.base"] = require "stages.base.sunset",
-        ["mall.base"] = require "stages.base.mall",
-        ["school.base"] = require "stages.base.school",
-        ["evilSchool.base"] = require "stages.base.evilSchool",
-        ["tank.base"] = require "stages.base.tank",
-        ["streets.base"] = require "stages.base.streets",
-        ["stage.erect"] = require "stages.erect.stage",
-        ["hauntedHouse.erect"] = require "stages.erect.hauntedHouse",
-        ["city.erect"] = require "stages.erect.city",
-        ["sunset.erect"] = require "stages.erect.sunset",
-        ["mall.erect"] = require "stages.erect.mall",
-        ["school.erect"] = require "stages.erect.school",
-        ["evilSchool.erect"] = require "stages.erect.evilSchool",
-        ["tank.erect"] = require "stages.erect.tank",
-        ["streets.erect"] = require "stages.erect.streets"
-    }
 
     noteTypes = {
         ["normal"] = require "notetypes.normal",

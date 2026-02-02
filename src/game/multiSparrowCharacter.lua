@@ -7,7 +7,7 @@ function MultiSparrowCharacter:new(data)
     self.animations = {} -- will hold vars: name, prefix, sheet, offsetX, offsetY
 
     self.sprite = graphics.newSparrowAtlas()
-    self.assetPath = data.assetPath:gsub("shared:", "assets/")
+    self.assetPath = EXTEND_LIBRARY(data.assetPath)
     self.sprite:load(self.assetPath .. "")
 
     for i, anim in ipairs(data.animations) do
@@ -15,7 +15,7 @@ function MultiSparrowCharacter:new(data)
             anim.assetPath = self.assetPath
         else
             local nuts = anim.assetPath or anim.asset
-            anim.assetPath = nuts:gsub("shared:", "assets/")
+            anim.assetPath = EXTEND_LIBRARY(nuts)
         end
 
         table.insert(
@@ -78,6 +78,8 @@ function MultiSparrowCharacter:update(dt)
         spr.visible = self.visible
         spr.flipX = self.flipX
         spr.flipY = self.flipY
+        spr.onFrameChange = self.onFrameChange
+        spr.onAnimationFinished = self.onAnimationFinished
     end
 end
 
@@ -95,7 +97,11 @@ function MultiSparrowCharacter:play(name, forced, loop)
         if animname ~= "" then break end
     end
 
-    self.sprite:play(animname, forced, loop)
+    if self:isFunction("play") and not self.inScriptCall then
+        self:call("play", animname, forced, loop)
+    else
+        self.sprite:play(animname, forced, loop)
+    end
 
     for _, anim in ipairs(self.animations) do
         if anim.name == animname and anim.offsets then

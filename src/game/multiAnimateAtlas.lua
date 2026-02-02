@@ -7,7 +7,7 @@ function MultiAnimateAtlasCharacter:new(data)
     self.animations = {} -- will hold vars: name, prefix, sheet, offsetX, offsetY
 
     self.sprite = graphics.newTextureAtlas()
-    self.assetPath = data.assetPath:gsub("shared:", "assets/")
+    self.assetPath = EXTEND_LIBRARY(data.assetPath)
     self.sprite:load(self.assetPath .. "")
 
     for i, anim in ipairs(data.animations) do
@@ -15,7 +15,7 @@ function MultiAnimateAtlasCharacter:new(data)
             anim.assetPath = self.assetPath
         else
             local nuts = anim.assetPath or anim.asset
-            anim.assetPath = nuts:gsub("shared:", "assets/")
+            anim.assetPath = EXTEND_LIBRARY(nuts)
         end
 
         table.insert(
@@ -69,6 +69,8 @@ function MultiAnimateAtlasCharacter:update(dt)
         spr.visible = self.visible
         spr.flipX = self.flipX
         spr.flipY = self.flipY
+        spr.onFrameChange = self.onFrameChange
+        spr.onAnimationFinished = self.onAnimationFinished
     end
 end
 
@@ -92,7 +94,11 @@ function MultiAnimateAtlasCharacter:play(name, forced, loop)
         if animname ~= "" then break end
     end
 
-    self.sprite:play(animname, forced, loop)
+    if self:isFunction("play") and not self.inScriptCall then
+        self:call("play", animname, forced, loop)
+    else
+        self.sprite:play(animname, forced, loop)
+    end
     self.sprite.x, self.sprite.y = self.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES, self.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
     for _, anim in ipairs(self.animations) do
         if anim.name == animname and anim.offsets then

@@ -1,10 +1,26 @@
 local AnimateAtlasCharacter = Character:extend()
 
+function EXTEND_LIBRARY(assetPath)
+    local lib, path = assetPath:match("^(.-):(.-)$")
+    if lib and path then
+        if lib ~= "shared" then
+            lib = lib .. "/images"
+        end
+        assetPath = "assets/" .. lib:lower() .. "/" .. path
+    else
+        if not assetPath:startsWith("#") and not assetPath:startsWith("assets/") then
+            assetPath = "shared/" .. assetPath
+        end
+    end
+
+    return assetPath
+end
+
 function AnimateAtlasCharacter:new(data)
     AnimateAtlasCharacter.super.new(self, data)
 
     self.sprite = graphics.newTextureAtlas()
-    self.assetPath = data.assetPath:gsub("shared:", "assets/")
+    self.assetPath = EXTEND_LIBRARY(data.assetPath)
     self.sprite:load(self.assetPath .. "")
 
     for i, anim in ipairs(data.animations) do
@@ -41,6 +57,8 @@ function AnimateAtlasCharacter:update(dt)
     self.sprite.visible = self.visible
     self.sprite.flipX = self.flipX
     self.sprite.flipY = self.flipY
+    self.sprite.onFrameChange = self.onFrameChange
+    self.sprite.onAnimationFinished = self.onAnimationFinished
 end
 
 function AnimateAtlasCharacter:updateHitbox()
@@ -49,7 +67,11 @@ function AnimateAtlasCharacter:updateHitbox()
 end
 
 function AnimateAtlasCharacter:play(name, forced, loop)
-    self.sprite:play(name, forced, loop)
+    if self:isFunction("play") and not self.inScriptCall then
+        self:call("play", name, forced, loop)
+    else
+        self.sprite:play(name, forced, loop)
+    end
 
     self.sprite.x, self.sprite.y = self.x + self.offsets[1], self.y + self.offsets[2]
     for _, anim in ipairs(self.animations) do

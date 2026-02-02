@@ -23,11 +23,11 @@
     },
     {
       "name": "singDOWN",
-      "prefix": "down"
+      "prefix": "down "
     },
     {
       "name": "singUP",
-      "prefix": "up"
+      "prefix": "up "
     },
     {
       "name": "singLEFT",
