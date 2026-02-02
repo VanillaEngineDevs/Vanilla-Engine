@@ -12,7 +12,7 @@ return {
 	load = function(self, DONT_GENERATE)
 		weeks:load(not DONT_GENERATE)
 		if not DONT_GENERATE then
-			self:initUI()
+			self:initUI() 
 		end
 
 		if song == 4 then
@@ -47,8 +47,6 @@ return {
 		else
 			weeks:generateNotes("data/songs/darnell/darnell-chart" .. songExt .. ".lua", "data/songs/darnell/darnell-metadata" .. songExt .. ".lua", difficulty)
 		end
-
-		weeks:setupCountdown()
 	end,
 
 	onNoteMiss = function(self, character, noteType, rating, id)
