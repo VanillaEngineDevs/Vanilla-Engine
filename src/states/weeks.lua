@@ -1429,9 +1429,9 @@ return {
 										end
 										if useAltAnims then
 											if whohit then 
-												whohit:play(curAnim .. " alt", (_psychmod and true or false), true)
+												whohit:play(curAnim .. "-alt", (_psychmod and true or false), true)
 												if whohit.call then
-													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim .. " alt"})
+													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim .. "-alt"})
 												end
 											end
 										else
@@ -1454,9 +1454,9 @@ return {
 										)
 										if useAltAnims then
 											if whohit then 
-												whohit:play(curAnim .. " alt", true, true)
+												whohit:play(curAnim .. "-alt", true, true)
 												if whohit.call then
-													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim .. " alt"})
+													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim .. "-alt"})
 												end
 											end
 										else

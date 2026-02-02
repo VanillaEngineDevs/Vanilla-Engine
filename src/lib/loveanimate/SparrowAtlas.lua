@@ -100,6 +100,7 @@ end
 function SparrowAtlas:load(imageData, xmlString, framerate)
     ---@diagnostic disable-next-line: cast-local-type
     xmlString = xmlString or imageData
+    local ogPath = imageData
     if type(imageData) == "string" and not imageData:startsWith("#") then
         imageData = "assets/" .. imageData .. currentImageFormat
         if fileExists(imageData) then
@@ -118,6 +119,11 @@ function SparrowAtlas:load(imageData, xmlString, framerate)
         local g = tonumber("0x" .. colorCode:sub(3, 4)) / 255
         local b = tonumber("0x" .. colorCode:sub(5, 6)) / 255
         self.colour = {r, g, b}
+    end
+
+    -- if no image, print FAILED TO LOAD IMAGE: path
+    if not love.filesystem.getInfo("assets/" .. ogPath .. currentImageFormat, "file") and not self.IS_RECTANGLE then
+        print("FAILED TO LOAD IMAGE: " .. tostring(ogPath))
     end
 
     self.image = imageData
@@ -236,16 +242,17 @@ function SparrowAtlas:addAnimByFrames(name, frames, framerate, looped)
 	self.animations[name] = anim
 end
 
-function SparrowAtlas:isAnimation(name)
+function SparrowAtlas:hasAnimation(name)
     return self.animations and self.animations[name] ~= nil
 end
 
 ---
 --- @param  anim   string?
 --- @param  force  boolean?
+--- @param  loop   boolean?
 --- @param  frame  integer?
 ---
-function SparrowAtlas:play(anim, force, frame)
+function SparrowAtlas:play(anim, force, loop, frame)
     local curAnim = self.curAnim
 
 	if curAnim and not force and curAnim.name == anim and
@@ -262,6 +269,9 @@ function SparrowAtlas:play(anim, force, frame)
 		self.currentFrame = frame or 1
 		self.animFinished = false
 		self.animPaused = false
+        if loop ~= nil then
+            self.curAnim.looped = loop
+        end
 	end
 end
 
@@ -366,6 +376,9 @@ end
 
 function SparrowAtlas:update(dt)
     if self.curAnim and not self.animFinished and not self.animPaused then
+        if type(self.currentFrame) ~= "number" then
+            self.currentFrame = 1
+        end
         self.currentFrame = self.currentFrame + dt * self.curAnim.framerate
         if self.currentFrame >= #self.curAnim.frames + 1 then
 			if self.currentFrame ~= self.lastFrame then
