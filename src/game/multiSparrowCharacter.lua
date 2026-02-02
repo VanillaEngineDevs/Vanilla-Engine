@@ -56,6 +56,12 @@ function MultiSparrowCharacter:updateHitbox()
     self.width, self.height = self.sprite.width, self.sprite.height
 end
 
+function MultiSparrowCharacter:setAntialiasing(enabled)
+    for _, spr in pairs(self.sprites) do
+        spr:setAntialiasing(enabled)
+    end
+end
+
 function MultiSparrowCharacter:update(dt)
     MultiSparrowCharacter.super.update(self, dt)
     for _, spr in pairs(self.sprites) do

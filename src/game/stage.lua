@@ -128,8 +128,8 @@ function stage.getStage(id)
         y = s.characters.dad.scroll[2]
     }
     enemy.scale = {
-        x = s.characters.dad.scale[1],
-        y = s.characters.dad.scale[2]
+        x = s.characters.dad.scale[1] * enemy.scale.x,
+        y = s.characters.dad.scale[2] * enemy.scale.y
     }
     enemy.cameraOffsets = {
         x = s.characters.dad.cameraOffsets[1],
@@ -144,8 +144,8 @@ function stage.getStage(id)
         y = s.characters.bf.scroll[2]
     }
     boyfriend.scale = {
-        x = s.characters.bf.scale[1],
-        y = s.characters.bf.scale[2]
+        x = s.characters.bf.scale[1] * boyfriend.scale.x,
+        y = s.characters.bf.scale[2] * boyfriend.scale.y
     }
     boyfriend.cameraOffsets = {
         x = s.characters.bf.cameraOffsets[1],
@@ -160,8 +160,8 @@ function stage.getStage(id)
         y = s.characters.gf.scroll[2]
     }
     girlfriend.scale = {
-        x = s.characters.gf.scale[1],
-        y = s.characters.gf.scale[2]
+        x = s.characters.gf.scale[1] * girlfriend.scale.x,
+        y = s.characters.gf.scale[2] * girlfriend.scale.y
     }
     girlfriend.cameraOffsets = {
         x = s.characters.gf.cameraOffsets[1],
@@ -175,29 +175,40 @@ end
 function stage:build()
     self:call("build")
 
-    for i, propitem in ipairs(self._props) do
+    for _, propitem in ipairs(self._props) do
         local prop = nil
         local type = propitem.animType or defaultProps.animType
-        if type == "sparrow" then
+        if type == "sparrow" or type == "packer" then
             prop = graphics.newSparrowAtlas()
             local assetPath = propitem.assetPath
             if not assetPath:startsWith("#") then
                 assetPath = self.directory .. "/images/" .. propitem.assetPath
             end
             prop:load(assetPath)
+            prop:setAntialiasing(not propitem.isPixel)
             for _, anim in ipairs(propitem.animations or {}) do
-                if anim.indiceFrames and #anim.indiceFrames > 0 then
-                    prop:addAnimByIndices(
-                        anim.name,
-                        anim.prefix,
-                        anim.indiceFrames,
-                        anim.frameRate,
-                        anim.looped
-                    )
+                if type == "sparrow" then
+                    if anim.indiceFrames and #anim.indiceFrames > 0 then
+                        prop:addAnimByIndices(
+                            anim.name,
+                            anim.prefix,
+                            anim.indiceFrames,
+                            anim.frameRate,
+                            anim.looped
+                        )
+                    else
+                        prop:addAnimByPrefix(
+                            anim.name,
+                            anim.prefix,
+                            anim.frameRate,
+                            anim.looped
+                        )
+                    end
                 else
-                    prop:addAnimByPrefix(
+                    -- use addAnimByFrames(name, frames, framerate, loop)
+                    prop:addAnimByFrames(
                         anim.name,
-                        anim.prefix,
+                        anim.frameIndices,
                         anim.frameRate,
                         anim.looped
                     )

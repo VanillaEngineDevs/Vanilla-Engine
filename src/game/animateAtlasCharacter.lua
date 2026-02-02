@@ -63,6 +63,10 @@ function AnimateAtlasCharacter:play(name, forced, loop)
     end
 end
 
+function AnimateAtlasCharacter:setAntialiasing(enabled)
+    --self.sprite:setAntiAliasing(enabled)
+end
+
 function AnimateAtlasCharacter:draw(camera)
     self.sprite:draw(camera)
 end

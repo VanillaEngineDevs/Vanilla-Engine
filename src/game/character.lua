@@ -32,9 +32,12 @@ function character.getCharacter(id)
     char.danceEvery = data.danceEvery or DEFAULT_DANCE_EVERY
     char.singTime = data.singTime or DEFAULT_SING_TIME
     char.offsets = data.offsets or {0, 0}
+    char.scale = {x = data.scale or 1, y = data.scale or 1}
 
     char.script = nil
-    
+
+    char:setAntialiasing(not data.isPixel)
+
     local characterLuaChunk = love.filesystem.getInfo("data/scripts/characters/" .. char.id .. ".lua")
     local env = setmetatable({
         Character = {
@@ -87,7 +90,6 @@ function character:new()
     self.x = 0
     self.y = 0
     self.origin = {x = 0, y = 0}
-    self.scale = {x = 1, y = 1}
     self.cameraOffsets = {x = 0, y = 0}
     self.scroll = {x = 1, y = 1}
     self.curAnimOffset = {0, 0}

@@ -94,12 +94,12 @@ end
 --- Load the atlas from an image and xml
 --- 
 --- @param  imageData?   love.Image|string  Either a Love2D image instance or an image file path.
---- @param  xmlString?   string             Either XML data or an XML file path.
+--- @param  dataString?   string             Either XML data or an XML file path.
 --- @param  framerate?   integer            Framerate of each animation. (This is not specified in the XML, so it must be manually specified) (fallback is 24)
 ---
-function SparrowAtlas:load(imageData, xmlString, framerate)
+function SparrowAtlas:load(imageData, dataString, framerate)
     ---@diagnostic disable-next-line: cast-local-type
-    xmlString = xmlString or imageData
+    dataString = dataString or imageData
     local ogPath = imageData
     if type(imageData) == "string" and not imageData:startsWith("#") then
         imageData = "assets/" .. imageData .. currentImageFormat
@@ -128,11 +128,11 @@ function SparrowAtlas:load(imageData, xmlString, framerate)
 
     self.image = imageData
     self.framerate = framerate or 24
-    if xmlString then
-        xmlString = "assets/" .. xmlString .. ".xml"
-        if fileExists(xmlString) then
-            xmlString = getFileContent(xmlString)
-            local xmlData = xml.parse(xmlString)
+    if dataString then
+        dataString = "assets/" .. dataString .. ".xml"
+        if fileExists(dataString) then
+            dataString = getFileContent(dataString)
+            local xmlData = xml.parse(dataString)
             local sw, sh = self.image:getWidth(), self.image:getHeight()
 
             for i = 1, #xmlData.TextureAtlas.children do
@@ -153,11 +153,34 @@ function SparrowAtlas:load(imageData, xmlString, framerate)
 
                 ::continue::
             end
-
+        else
+            dataString = dataString:gsub("%.xml$", ".txt")
+            print("WARNING: XML file not found, trying TXT: " .. tostring(dataString))
+            local content = getFileContent(dataString)
+            for line in content:gmatch("[^\r\n]+") do
+                print(line)
+                local name, x, y, width, height = line:match("^(.-)%s*=%s*(%d+)%s+(%d+)%s+(%d+)%s+(%d+)")
+                local n, frameid = name:match("^(.-)_(%d+)$")
+                frameid = tonumber(frameid)
+                if name and x and y and width and height and frameid then
+                    table.insert(self.frames, createFrame(
+                        name,
+                        tonumber(x), tonumber(y),
+                        tonumber(width), tonumber(height),
+                        self.image:getWidth(), self.image:getHeight()
+                    ))
+                end
+            end
         end
     end
 
     self:centerOrigin()
+end
+
+function SparrowAtlas:setAntialiasing(antialiasing)
+    if self.image then
+        self.image:setFilter(antialiasing and "linear" or "nearest", antialiasing and "linear" or "nearest")
+    end
 end
 
 function SparrowAtlas:addAnimByPrefix(name, prefix, framerate, looped)

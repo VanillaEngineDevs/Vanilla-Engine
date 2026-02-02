@@ -72,6 +72,12 @@ function MultiAnimateAtlasCharacter:update(dt)
     end
 end
 
+function MultiAnimateAtlasCharacter:setAntialiasing(enabled)
+    for _, spr in pairs(self.sprites) do
+        --spr:setAntiAliasing(enabled)
+    end
+end
+
 function MultiAnimateAtlasCharacter:play(name, forced, loop)
     local animname = ""
 

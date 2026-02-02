@@ -27,17 +27,29 @@ function SparrowCharacter:new(data)
     self.animations = data.animations
 end
 
+function SparrowCharacter:setAntialiasing(enabled)
+    self.sprite:setAntialiasing(enabled)
+end
+
 function SparrowCharacter:update(dt)
     SparrowCharacter.super.update(self, dt)
     self.sprite:update(dt)
+    if self.sprite.lastScale == nil then
+        self.sprite.lastScale = {1,1}
+    end
+    if self.sprite.lastScale[1] ~= self.scale.x or self.sprite.lastScale[2] ~= self.scale.y then
+        self.sprite.scale.x = self.scale.x
+        self.sprite.scale.y = self.scale.y
+        self.sprite:updateHitbox()
+    end
+    self.sprite.lastScale = {self.scale.x, self.scale.y}
+
     self.sprite.x = self.x + (self.offsets[1] * self.scale.x) - X_OFFSET_AMOUNT_FOR_SPITES
     self.sprite.y = self.y + (self.offsets[2] * self.scale.y) - Y_OFFSET_AMOUNT_FOR_SPRITES
     self.sprite.x = self.sprite.x - (self.curAnimOffset[1] * self.scale.x)
     self.sprite.y = self.sprite.y - (self.curAnimOffset[2] * self.scale.y)
-    self.sprite.scale.x = self.scale.x
-    self.sprite.scale.y = self.scale.y
-    self.sprite.origin.x = self.origin.x
-    self.sprite.origin.y = self.origin.y
+    self.sprite.origin.x = self.origin.x * self.scale.x
+    self.sprite.origin.y = self.origin.y * self.scale.y
     self.sprite.shader = self.shader
     self.sprite.visible = self.visible
     self.sprite.flipX = self.flipX
