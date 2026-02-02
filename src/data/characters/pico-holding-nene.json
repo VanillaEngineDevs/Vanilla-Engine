@@ -8,7 +8,7 @@
   "offsets": [52, 16],
   "cameraOffsets": [-32, 24],
   "death": {
-    "cameraOffsets": [-100, 25]
+    "cameraOffsets": [175, 175]
   },
   "flipX": true,
   "renderType": "multianimateatlas",

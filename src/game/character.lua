@@ -162,7 +162,7 @@ function character:update(dt)
                 currentAnimation = currentAnimation:sub(1, #currentAnimation - #(" -hold"))
             end
             local endAnimation = currentAnimation .. "-end"
-            self:dance(true)
+            self:dance(false)
         end
     else
         self.holdTimer = 0
@@ -215,7 +215,7 @@ function character:dance(force)
         self:call("dance", force)
         return
     end
-    
+
     if self.isDead then return end
 
     if not force then

@@ -19,7 +19,7 @@ return {
         },
         characters = {
             player = "pico-playable",
-            girlfriend = "nene",
+            girlfriend = "nene-tankmen",
             opponent = "tankman",
             instrumental = "pico",
             altInstrumentals = {

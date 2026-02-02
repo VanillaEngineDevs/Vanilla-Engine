@@ -8,11 +8,12 @@ function Character:onAnimationFrame(name, frameNumber, _)
     end
 end
 
-function Character:onNoteHit(event)
-    if event.noteType == "censor" then
-        self.data:play(CONSTANTS.WEEKS.ANIM_LIST[event.direction] .. "-censor", true, false)
-    elseif event.noteType == "hey" then
-        self.data.holdTimer = 0
-        self.data:play("hey", true, false)
+function Character:getDeathQuote()
+    local dadID = enemy and enemy._data and enemy.id or "dad"
+
+    if dadID == "tankman" then
+        return "assets/week7/sounds/jeffGameover/jeffGameover-" .. love.math.random(1, 25) .. ".ogg"
+    else
+        return nil
     end
 end

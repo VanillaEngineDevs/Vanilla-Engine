@@ -1647,14 +1647,17 @@ return {
 					end
 					
 					if combo >= 5 then
+						
+					end
+
+					if combo >= 70 then
 						for _, obj in ipairs(self.objects) do
 							if obj.characterType == CHARACTER_TYPE.GF then
-								obj:play("sad", true, false)
+								obj:play("drop70", true, false)
 								obj.holdTimer = 0
 							end
 						end
 					end
-
 					combo = 0
 				end
 
@@ -1715,6 +1718,21 @@ return {
 								end
 
 								combo = combo + 1
+								if combo == 50 then
+									for _, obj in ipairs(self.objects) do
+										if obj.characterType == CHARACTER_TYPE.GF then
+											obj:play("combo50", true, false)
+											obj.holdTimer = 0
+										end
+									end
+								elseif combo == 200 then
+									for _, obj in ipairs(self.objects) do
+										if obj.characterType == CHARACTER_TYPE.GF then
+											obj:play("combo200", true, false)
+											obj.holdTimer = 0
+										end
+									end
+								end
 								if combo > maxCombo then maxCombo = combo end
 								noteCounter = noteCounter + 1
 
