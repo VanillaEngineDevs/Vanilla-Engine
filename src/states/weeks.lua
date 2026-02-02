@@ -591,13 +591,41 @@ return {
 		girlfriend = Character.getCharacter(metadata.playData.characters.girlfriend)
 
 		inst = love.audio.newSource("songs/" .. name .. "/Inst" .. songExt .. ".ogg", "stream")
-		if love.filesystem.getInfo("songs/" .. name .. "/Voices-" .. metadata.playData.characters.player .. songExt .. ".ogg") then
-			voicesBF = love.audio.newSource("songs/" .. name .. "/Voices-" .. metadata.playData.characters.player .. songExt .. ".ogg", "stream")
+		local voicesBFPath = "songs/" .. name .. "/Voices-" .. metadata.playData.characters.player .. songExt .. ".ogg"
+		local voicesEnemyPath = "songs/" .. name .. "/Voices-" .. metadata.playData.characters.opponent .. songExt .. ".ogg"
+		local voiceConversions = {
+			["pico-playable"] = "pico",
+			["pico-pixel"] = "pico",
+			["pico-blazin"] = "pico",
+			["pico-dark"] = "pico",
+			["pico-christmas"] = "pico",
+			["pico-holding-nene"] = "pico",
+
+			["bf-car"] = "bf",
+			["bf-pixel"] = "bf",
+			["bf-christmas"] = "bf",
+			["bf-holding-gf"] = "bf",
+			["bf-dark"] = "bf",
+
+			["tankman-bloody"] = "tankman",
+
+			["mom-car"] = "mom"
+		}
+		if voiceConversions[metadata.playData.characters.player] then
+			if not love.filesystem.getInfo(voicesBFPath) then
+				voicesBFPath = "songs/" .. name .. "/Voices-" .. voiceConversions[metadata.playData.characters.player] .. songExt .. ".ogg"
+			end
+			if not love.filesystem.getInfo(voicesEnemyPath) then
+				voicesEnemyPath = "songs/" .. name .. "/Voices-" .. voiceConversions[metadata.playData.characters.opponent] .. songExt .. ".ogg"
+			end
+		end
+		if love.filesystem.getInfo(voicesBFPath) then
+			voicesBF = love.audio.newSource(voicesBFPath, "stream")
 		else
 			voicesBF = nil
 		end
-		if love.filesystem.getInfo("songs/" .. name .. "/Voices-" .. metadata.playData.characters.opponent .. songExt .. ".ogg") then
-			voicesEnemy = love.audio.newSource("songs/" .. name .. "/Voices-" .. metadata.playData.characters.opponent .. songExt .. ".ogg", "stream")
+		if love.filesystem.getInfo(voicesEnemyPath) then
+			voicesEnemy = love.audio.newSource(voicesEnemyPath, "stream")
 		else
 			voicesEnemy = nil
 		end
