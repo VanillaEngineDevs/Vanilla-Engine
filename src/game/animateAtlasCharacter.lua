@@ -39,6 +39,8 @@ function AnimateAtlasCharacter:update(dt)
     self.sprite.origin.y = self.origin.y
     self.sprite.shader = self.shader
     self.sprite.visible = self.visible
+    self.sprite.flipX = self.flipX
+    self.sprite.flipY = self.flipY
 end
 
 function AnimateAtlasCharacter:updateHitbox()

@@ -97,6 +97,9 @@ function character:new()
     self.singTime = 8
     self.offsets = {0, 0}
     self.visible = true
+
+    self.flipX = false
+    self.flipY = false
 end
 
 function character:update(dt)

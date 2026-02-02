@@ -1,7 +1,7 @@
-local MultiSparrowCharacter = Character:extend()
+local MultiAnimateAtlasCharacter = Character:extend()
 
-function MultiSparrowCharacter:new(data)
-    MultiSparrowCharacter.super.new(self, data)
+function MultiAnimateAtlasCharacter:new(data)
+    MultiAnimateAtlasCharacter.super.new(self, data)
 
     self.sprites = {}
     self.animations = {} -- will hold vars: name, prefix, sheet, offsetX, offsetY
@@ -51,13 +51,13 @@ function MultiSparrowCharacter:new(data)
     end
 end
 
-function MultiSparrowCharacter:updateHitbox()
+function MultiAnimateAtlasCharacter:updateHitbox()
     self.sprite:updateHitbox()
     self.width, self.height = self.sprite.width, self.sprite.height
 end
 
-function MultiSparrowCharacter:update(dt)
-    MultiSparrowCharacter.super.update(self, dt)
+function MultiAnimateAtlasCharacter:update(dt)
+    MultiAnimateAtlasCharacter.super.update(self, dt)
     for _, spr in pairs(self.sprites) do
         spr:update(dt)
         spr.x, spr.y = self.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES, self.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
@@ -67,10 +67,12 @@ function MultiSparrowCharacter:update(dt)
         spr.origin.y = self.origin.y
         spr.shader = self.shader
         spr.visible = self.visible
+        spr.flipX = self.flipX
+        spr.flipY = self.flipY
     end
 end
 
-function MultiSparrowCharacter:play(name, forced, loop)
+function MultiAnimateAtlasCharacter:play(name, forced, loop)
     local animname = ""
 
     for _, anim in ipairs(self.animations) do
@@ -95,20 +97,20 @@ function MultiSparrowCharacter:play(name, forced, loop)
     end
 end
 
-function MultiSparrowCharacter:draw(camera)
+function MultiAnimateAtlasCharacter:draw(camera)
     self.sprite:draw(camera)
 end
 
-function MultiSparrowCharacter:getWidth()
+function MultiAnimateAtlasCharacter:getWidth()
     return self.sprite:getWidth()
 end
 
-function MultiSparrowCharacter:getHeight()
+function MultiAnimateAtlasCharacter:getHeight()
     return self.sprite:getHeight()
 end
 
-function MultiSparrowCharacter:getDimensions()
+function MultiAnimateAtlasCharacter:getDimensions()
     return self.sprite:getWidth(), self.sprite:getHeight()
 end
 
-return MultiSparrowCharacter
+return MultiAnimateAtlasCharacter

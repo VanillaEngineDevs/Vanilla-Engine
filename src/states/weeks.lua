@@ -571,13 +571,6 @@ return {
 			metadata = love.filesystem.load(metadata)()
 		end
 		Conductor.mapBPMChanges(metadata)
-
-		table.print(metadata)
-		print(metadata.playData)
-		print(metadata.playData.characters)
-		print(metadata.playData.characters.opponent)
-		print(metadata.playData.characters.player)
-		print(metadata.playData.characters.girlfriend)
 		metadata.playData = metadata.playData or {}
 		metadata.playData.characters = metadata.playData.characters or {}
 		metadata.playData.characters.opponent = metadata.playData.characters.opponent or "dad"
@@ -595,12 +588,21 @@ return {
 		enemy.characterType = CHARACTER_TYPE.DAD
 		girlfriend.characterType = CHARACTER_TYPE.GF
 
+		boyfriend.flipX = not boyfriend._data.flipX
+		enemy.flipX = enemy._data.flipX
+		print(enemy.flipX)
+		girlfriend.flipX = girlfriend._data.flipX
+
 		boyfriend:dance()
 		enemy:dance()
 		girlfriend:dance()
 
 		self.stage = Stage.getStage(metadata.playData.stage or "stage")
 		self.stage:build()
+		self.stage:call("postCreate")
+		if boyfriend.call then boyfriend:call("postCreate") end
+		if enemy.call then enemy:call("postCreate") end
+		if girlfriend.call then girlfriend:call("postCreate") end
 		camera.zoom = self.stage.cameraZoom or 1.0
 		camera.defaultZoom = camera.zoom
 
@@ -1155,10 +1157,8 @@ return {
 						event.value.mode = event.value.mode or "stage"
 						local taget = 1
 						if event.value.mode == "stage" then
-							print("Stage zoom")
 							target = tonumber(event.value.zoom) * self.stage.cameraZoom
 						else
-							print("direct zoom")
 							target = tonumber(event.value.zoom) * camera.defaultZoom
 						end
 						print(target)
@@ -1175,6 +1175,9 @@ return {
 								CONSTANTS.WEEKS.EASING_TYPES[(event.value.ease or "CLASSIC") .. (event.value.easeDir or "")]
 							)
 						else
+							if bumpTween then 
+								Timer.cancel(bumpTween)
+							end
 							camera.defaultZoom = target
 						end
 					end
@@ -1189,7 +1192,6 @@ return {
 							who = "girlfriend"
 						end
 					elseif type(event.value.char) == "string" then
-						---@diagnostic disable-next-line: cast-local-type
 						who = event.value.char
 					end
 

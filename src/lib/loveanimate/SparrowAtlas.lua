@@ -86,6 +86,9 @@ function SparrowAtlas:constructor()
 
     self.shader = nil
     self.visible = true
+
+    self.flipX = false
+    self.flipY = false
 end
 
 --- Load the atlas from an image and xml
@@ -393,14 +396,28 @@ function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     ox = ox or self.origin.x
     oy = oy or self.origin.y
 
+    if self.flipX then
+        sx = sx * -1
+        x = x + (self:getFrameWidth() * self.scale.x)
+    end
+    if self.flipY then
+        sy = sy * -1
+    end
+
     local curFrame = self:getCurrentFrame()
 
     x = x + ox - self.offset.x - (cx * self.scroll.x)
     y = y + oy - self.offset.y - (cy * self.scroll.y)
 
     if curFrame then
-        ox = ox + curFrame.offset.x
-        oy = oy + curFrame.offset.y
+        if curFrame.rotated then
+            r = r - math.pi / 2
+            ox, oy = select(3, curFrame.quad:getViewport()) - (oy + curFrame.offset.y), ox + curFrame.offset.x
+            sx, sy = sy, sx
+        else
+            ox = ox + curFrame.offset.x * (sx < 0 and -1 or 1)
+            oy = oy + curFrame.offset.y * (sy < 0 and -1 or 1)
+        end
     end
 
     local lastShader = love.graphics.getShader()

@@ -79,6 +79,9 @@ function AnimateAtlas:constructor(object)
 
     self.frameElements = {}
     self.visible = true
+
+    self.flipX = false
+    self.flipY = false
 end
 
 function AnimateAtlas:setColorOffset(r, g, b, a)
@@ -1001,6 +1004,13 @@ function AnimateAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     sy = sy or self.scale.y
     ox = ox or self.origin.x
     oy = oy or self.origin.y
+
+    if self.flipX then
+        sx = -sx
+    end
+    if self.flipY then
+        sy = -sy
+    end
 
     x = x + ox - self.offset.x - (cx * self.scroll.x)
     y = y + oy - self.offset.y - (cy * self.scroll.y)
