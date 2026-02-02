@@ -3,6 +3,7 @@ return {
     songName = "Blammed (Pico Mix)",
     artist = "Metaroom (feat. Saruky)",
     charter = "fabs + Spazkid",
+    level = "week3",
     playData = {
         difficulties = {
             "easy",

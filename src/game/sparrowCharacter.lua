@@ -97,4 +97,8 @@ end
 function SparrowCharacter:getDimensions()
 end
 
+function SparrowCharacter:getMidpoint()
+    return self.sprite:getMidpoint()
+end
+
 return SparrowCharacter

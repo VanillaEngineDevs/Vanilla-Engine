@@ -90,6 +90,8 @@ function SparrowAtlas:constructor()
     self.flipX = false
     self.flipY = false
 
+    self.zIndex = 0
+
     self.onFrameChange = signal.new()
     self.onAnimationFinished = signal.new()
 end
@@ -368,7 +370,7 @@ function SparrowAtlas:getFrameWidth()
     local frame = self:getCurrentFrame()
     if not self.IS_RECTANGLE and self.image then
         frame = frame or { width = self.image:getWidth() }
-    else
+    elseif self.IS_RECTANGLE then
         frame = { width = self.scale.x }
     end
     return frame.width
@@ -381,7 +383,7 @@ function SparrowAtlas:getFrameHeight()
     local frame = self:getCurrentFrame()
     if not self.IS_RECTANGLE and self.image then
         frame = frame or { height = self.image:getHeight() }
-    else
+    elseif self.IS_RECTANGLE then
         frame = { height = self.scale.y }
     end
     return frame.height
@@ -394,35 +396,52 @@ function SparrowAtlas:getFrameDimensions()
     local frame = self:getCurrentFrame()
     if not self.IS_RECTANGLE and self.image then
         frame = frame or { width = self.image:getWidth(), height = self.image:getHeight() }
-    else
+    elseif self.IS_RECTANGLE then
         frame = { width = self.scale.x, height = self.scale.y }
     end
     return frame.width, frame.height
 end
 
-function SparrowAtlas:update(dt)
-    if self.curAnim and not self.animFinished and not self.animPaused then
-        if type(self.currentFrame) ~= "number" then
+function SparrowAtlas:getMidpoint()
+    local w, h = self:getFrameDimensions()
+    return w*3, h*1.25
+end
+
+function SparrowAtlas:update(dt, emitSignals)
+    if emitSignals == nil then emitSignals = true end
+    if not (self.curAnim and not self.animFinished and not self.animPaused) then
+        return
+    end
+
+    self.currentFrame = tonumber(self.currentFrame) or 1
+    self.currentFrame = self.currentFrame + dt * self.curAnim.framerate
+
+    if self.currentFrame >= #self.curAnim.frames + 1 then
+        if self.curAnim.looped then
             self.currentFrame = 1
-        end
-        self.currentFrame = self.currentFrame + dt * self.curAnim.framerate
-        if self.currentFrame >= #self.curAnim.frames + 1 then
-			if self.currentFrame ~= self.lastFrame then
-				self.lastFrame = self.currentFrame
-			end
-            if self.curAnim.looped then
-                self.currentFrame = 1
-            else
-                self.currentFrame = #self.curAnim.frames
-                self.animFinished = true
-            end
-        end
-        self.onFrameChange:emit(self.curAnim.name, self.frame, self.curAnim.frames[self.frame])
-        if self.animFinished then
-            self.onAnimationFinished:emit(self.curAnim.name)
+        else
+            self.currentFrame = #self.curAnim.frames
+            self.animFinished = true
         end
     end
+
+    local frameIndex = math.floor(self.currentFrame)
+    local lastFrameIndex = self.lastFrameIndex or 0
+
+    if emitSignals and frameIndex ~= lastFrameIndex then
+        self.onFrameChange:emit(
+            self.curAnim.name,
+            frameIndex,
+            self.curAnim.frames[frameIndex]
+        )
+        self.lastFrameIndex = frameIndex
+    end
+
+    if self.animFinished and emitSignals then
+        self.onAnimationFinished:emit(self.curAnim.name)
+    end
 end
+
 
 function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     if not self.visible then

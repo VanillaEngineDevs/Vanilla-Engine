@@ -125,4 +125,8 @@ function MultiAnimateAtlasCharacter:getDimensions()
     return self.sprite:getWidth(), self.sprite:getHeight()
 end
 
+function MultiAnimateAtlasCharacter:getMidpoint()
+    return self.sprite:getMidpoint()
+end
+
 return MultiAnimateAtlasCharacter

@@ -3,6 +3,7 @@ return {
     songName = "DadBattle (Pico Mix)",
     artist = "TeraVex (ft. Saruky)",
     charter = "fabs + Spazkid",
+    level = "week1",
     playData = {
         difficulties = {
             "easy",

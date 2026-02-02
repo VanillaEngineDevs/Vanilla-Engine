@@ -3,6 +3,7 @@ return {
     songName = "Ugh",
     artist = "Kawai Sprite",
     charter = "MtH",
+    level = "week7",
     playData = {
         difficulties = {
             "easy",

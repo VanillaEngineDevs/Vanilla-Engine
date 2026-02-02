@@ -3,6 +3,7 @@ return {
     songName = "Thorns Erect",
     artist = "Kawai Sprite (feat. Saster)",
     charter = "Jenny Crowe + fabs",
+    level = "week6",
     playData = {
         difficulties = {
             "erect",

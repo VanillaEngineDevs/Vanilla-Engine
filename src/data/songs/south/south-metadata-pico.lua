@@ -3,6 +3,7 @@ return {
     songName = "South (Pico Mix)",
     artist = "Six Impala (feat. Saster)",
     charter = "fabs + Spazkid",
+    level = "week2",
     playData = {
         difficulties = {
             "easy",

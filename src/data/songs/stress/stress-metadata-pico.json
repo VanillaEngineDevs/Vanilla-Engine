@@ -5,6 +5,7 @@
   "charter": "fabs + Spazkid",
   "divisions": 96,
   "looped": false,
+  "level": "week7",
   "playData": {
     "songVariations": [],
     "difficulties": ["easy", "normal", "hard"],

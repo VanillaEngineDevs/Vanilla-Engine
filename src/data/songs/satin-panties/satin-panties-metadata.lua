@@ -4,6 +4,7 @@ return {
     artist = "Kawai Sprite",
     charter = "ninjamuffin99 + MtH + Spazkid",
     timeFormat = "ms",
+    level = "week4",
     timeChanges = {
         {
             t = 0,

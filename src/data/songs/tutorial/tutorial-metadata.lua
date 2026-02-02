@@ -3,6 +3,7 @@ return {
     timeFormat = "ms",
     artist = "Kawai Sprite",
     charter = "ninjamuffin99 + MtH",
+    level = "week1",
     playData = {
         ratings = {
             easy = 0,

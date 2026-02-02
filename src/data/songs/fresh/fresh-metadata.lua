@@ -3,6 +3,7 @@ return {
     timeFormat = "ms",
     artist = "Kawai Sprite",
     charter = "ninjamuffin99 + MtH",
+    level = "week1",
     playData = {
         album = "volume1",
         stage = "mainStage",

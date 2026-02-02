@@ -238,9 +238,11 @@ return {
 	end,
 
 	load = function(self, wasntRestart)
+		self.inSong = true
 		if wasntRestart == nil then
 			wasntRestart = true
 		end
+		print("WAS RESTART?", not wasntRestart)
 		SMOOTH_RESET = true
 		quitPressed = false
 		camera.camBopIntensity = 1
@@ -325,12 +327,50 @@ return {
 		enemyIcon.y = healthBar.y
 		boyfriendIcon.y = healthBar.y
 
-		if wasntRestart then
+		if wasntRestart and not graphics.isFading() then
+			previousMusicTime = 0
 			graphics:fadeInWipe(0.6)
 		end
 
 		isResetting = false
 		if boyfriend then boyfriend.playerInputs = true end
+
+		-- reload all the notes
+		if not wasntRestart then
+			print("Reloading notes from preloaded chart...")
+			for i = 1, 4 do
+				boyfriendArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
+				enemyArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
+				boyfriendNotes[i] = {}
+				enemyNotes[i] = {}
+
+				for _, note in ipairs(CURCHART.BOYFRIEND[i]) do
+					table.insert(boyfriendNotes[i], note)
+				end
+				for _, note in ipairs(CURCHART.ENEMY[i]) do
+					table.insert(enemyNotes[i], note)
+				end
+
+				print("Loaded "..#boyfriendNotes[i].." boyfriend notes and "..#enemyNotes[i].." enemy notes for lane "..i)
+			end
+			songEvents = {}
+			for _, event in ipairs(CURCHART.EVENTS) do
+				table.insert(songEvents, event)
+			end
+
+			if boyfriend then
+				local bfpoint = boyfriend:getCameraPoint()
+
+				camera.x = bfpoint.x
+				camera.y = bfpoint.y
+				camera.defaultX = bfpoint.x
+				camera.defaultY = bfpoint.y
+				camera.targetX = bfpoint.x
+				camera.targetY = bfpoint.y
+				CAM_LERP_POINT.x = bfpoint.x
+				CAM_LERP_POINT.y = bfpoint.y
+			end
+		end
 	end,
 
 	preloadIcon = function(self, path, name)
@@ -580,6 +620,7 @@ return {
 		else
 			metadata = love.filesystem.load(metadata)()
 		end
+		self.metadata = metadata
 		Conductor.mapBPMChanges(metadata)
 		metadata.playData = metadata.playData or {}
 		metadata.playData.characters = metadata.playData.characters or {}
@@ -892,6 +933,8 @@ return {
 				else
 					countingDown = false
 					previousFrameTime = love.timer.getTime() * 1000
+					lastReportedPlaytime = 0
+					musicThres = 0
 					musicTime = 0
 					beatHandler.reset(0)
 
@@ -1022,9 +1065,14 @@ return {
 								end
 
 								musicTime = 0
+								lastReportedPlaytime = 0
+								musicThres = 0
 								beatHandler.reset(0)
 								previousFrameTime = love.timer.getTime() * 1000
 								beatHandler.setBeat(0)
+								if inst then inst:seek(0) end
+								if voicesBF then voicesBF:seek(0) end
+								if voicesEnemy then voicesEnemy:seek(0) end
 
 								Gamestate.current():load(true)
 							end
@@ -1293,9 +1341,14 @@ return {
 						camera.camBopIntensity = event.value.intensity or 1
 						camera.camBopInterval = event.value.rate or 4
 					end
-				else
-					Gamestate.onEvent(event)
-					self.stage:call("onEvent", event)
+				end
+
+				Gamestate.onEvent(event)
+				self.stage:call("onSongEvent", event)
+				for _, obj in ipairs(self.objects) do
+					if obj.call then
+						obj:call("onSongEvent", event)
+					end
 				end
 
 				table.remove(songEvents, i)
@@ -1306,8 +1359,12 @@ return {
 		for i, event in ipairs(modEvents) do
 			if event.time <= absMusicTime then
 				Gamestate.onEvent(event)
-				self.stage:call("onEvent", event)
-
+				self.stage:call("onSongEvent", event)
+				for _, obj in ipairs(self.objects) do
+					if obj.call then
+						obj:call("onSongEvent", event)
+					end
+				end
 				table.remove(modEvents, i)
 				break
 			end
@@ -1397,7 +1454,7 @@ return {
 		if paused then return end
 
 		if IS_CLASSIC_MOVEMENT then
-			local adjustedLerp  = 1 - math.pow(1.0 - 0.04, dt * 60)
+			local adjustedLerp = 1 - math.pow(1.0 - 0.04, dt * 60)
 			camera.x = camera.x + (CAM_LERP_POINT.x - camera.x) * adjustedLerp
 			camera.y = camera.y + (CAM_LERP_POINT.y - camera.y) * adjustedLerp
 		end
@@ -1823,6 +1880,17 @@ return {
 		return nil
 	end,
 
+	getCharacter = function(self, name)
+		name = name or "boyfriend"
+		for _, obj in ipairs(self.objects) do
+			if obj.characterType then
+				if obj.name == name then
+					return obj
+				end
+			end
+		end
+	end,
+
 	remove = function(self, object, sort)
 		for i, obj in ipairs(self.objects) do
 			if obj == object then
@@ -2048,6 +2116,26 @@ return {
 		self:drawRating()
 	end,
 
+	debugKeyPressed = function(self, k)
+		-- are we actually in a song?
+		if not self.inSong then return end
+		if k == "p" then
+			if camTween then
+				Timer.cancel(camTween)
+			end
+			if inst then
+				inst:stop()
+			end
+			if voicesBF then
+				voicesBF:stop()
+			end
+			if voicesEnemy then
+				voicesEnemy:stop()
+			end
+			Gamestate.push(gameoverSubstate)
+		end
+	end,
+
 	generateScoringText = function(self, visibility)
 		-- KE
 		local mode = settings.scoringType
@@ -2191,5 +2279,7 @@ return {
 
 		healthIconPreloads = {}
 		inHolds = {false, false, false, false}
+
+		self.inSong = false
 	end
 }

@@ -3,6 +3,7 @@ return {
     songName = "DadBattle Erect",
     charter = "Jenny Crowe + fabs + Spazkid",
     artist = "Kawai Sprite",
+    level = "week1",
     offsets = {
         vocals = {
             bf = 0,

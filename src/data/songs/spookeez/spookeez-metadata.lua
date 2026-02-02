@@ -3,6 +3,7 @@ return {
     songName = "Spookeez",
     artist = "Kawai Sprite",
     charter = "ninjamuffin99 + MtH + Spazkid",
+    level = "week2",
     playData = {
         songVariations = {
             "erect",

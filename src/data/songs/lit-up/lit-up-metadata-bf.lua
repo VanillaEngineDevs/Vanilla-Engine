@@ -5,6 +5,7 @@ return {
     charter = "fabs + Spazkid",
     divisions = 96,
     looped = false,
+    level = "weekend1",
     playData = {
         songVariations = {
         },

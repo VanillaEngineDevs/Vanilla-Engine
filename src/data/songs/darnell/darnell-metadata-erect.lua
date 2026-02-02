@@ -3,6 +3,7 @@ return {
     songName = "Darnell Erect",
     artist = "Kawai Sprite",
     charter = "fabs + Spazkid",
+    level = "weekend1",
     divisions = 96,
     looped = false,
     playData = {

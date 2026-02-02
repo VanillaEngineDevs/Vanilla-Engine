@@ -3,6 +3,7 @@
   "songName": "Monster",
   "artist": "Bassetfilms",
   "charter": "ChaoticGamerCG + MtH + Spazkid",
+  "level": "week2",
   "playData": {
     "difficulties": ["easy", "normal", "hard"],
     "characters": { "player": "bf", "girlfriend": "gf", "opponent": "monster" },

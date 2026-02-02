@@ -3,6 +3,7 @@ return {
     songName = "Pico (Pico Mix)",
     artist = "Metaroom (ft. Saster)",
     charter = "fabs",
+    level = "week3",
     playData = {
         difficulties = {
             "easy",

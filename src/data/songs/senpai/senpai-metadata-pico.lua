@@ -8,6 +8,7 @@ return {
     offsets = {
         instrumental = 0,
     },
+    level = "week6",
     playData = {
         difficulties = {
             "easy",

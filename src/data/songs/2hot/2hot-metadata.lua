@@ -3,6 +3,7 @@ return {
     timeFormat = "ms",
     artist = "Kawai Sprite",
     charter = "Jenny Crowe + Spazkid + ninjamuffin99",
+    level = "weekend1",
     playData = {
         stage = "phillyStreets",
         characters = {

@@ -19,6 +19,7 @@ return {
 	load = function(self, DONT_GENERATE)
 		weeks:load(not DONT_GENERATE)
 		if not DONT_GENERATE then
+			print("Generating notes for song:", self.songs[song], "with difficulty:", difficulty)
 			weeks:initUI()
 			weeks:generateNotes(self.songs[song], difficulty)
 		end

@@ -3,6 +3,7 @@ return {
     songName = "Lit Up",
     artist = "Kawai Sprite",
     charter = "Jenny Crowe + Spazkid",
+    level = "weekend1",
     playData = {
         difficulties = {
             "easy",

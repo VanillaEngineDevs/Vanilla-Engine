@@ -10,6 +10,8 @@ function songNameToFolder(str)
     return str:gsub(" ", "-"):lower()
 end
 
+__DEBUG__ = not love.filesystem.isFused()
+
 require "modules.overrides"
 require "modules.uitext"
 
@@ -107,11 +109,12 @@ function love.load()
     weeks = require "states.weeks"
 
     OptionsMenu = require "states.menu.options.OptionsMenu"
-    gameOvers = {
+    --[[ gameOvers = {
         default = require "substates.gameovers.boyfriend",
         week7Default = require "substates.gameovers.boyfriend-week7",
         pixelDefault = require "substates.gameovers.boyfriend-pixel"
-    }
+    } ]]
+	gameoverSubstate = require "substates.gameover"
 
     settingsKeybinds = require "substates.settings-keybinds"
     optionSubstates = {
@@ -300,6 +303,7 @@ function love.keypressed(key)
 		end
     else
 		Gamestate.keypressed(key)
+		if __DEBUG__ then weeks:debugKeyPressed(key) end
 	end
 end
 
@@ -345,6 +349,7 @@ function love.touchmoved(id, x, y, dx, dy, pressure)
 end
 
 function love.update(dt)
+	CURRENT_IMAGE_FORMAT = "." .. graphics.getImageType()
 	hapticUtil:update(dt)
 	if volFade > 0 then
 		volFade = volFade - 1 * dt

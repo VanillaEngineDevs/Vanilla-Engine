@@ -3,6 +3,7 @@ return {
     songName = "Bopeebo Erect",
     artist = "Kawai Sprite (feat. Saruky)",
     charter = "Jenny Crowe + fabs",
+    level = "week1",
     playData = {
         difficulties = {
             "erect",

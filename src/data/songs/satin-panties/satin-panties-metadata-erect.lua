@@ -3,6 +3,7 @@ return {
     songName = "Satin Panties Erect",
     artist = "Kawai Sprite",
     charter = "fabs + Spazkid",
+    level = "week4",
     playData = {
         difficulties = {
             "erect",

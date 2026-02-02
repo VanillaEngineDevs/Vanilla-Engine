@@ -3,6 +3,7 @@ return {
     timeFormat = "ms",
     artist = "Kawai Sprite",
     charter = "ninjamuffin99 + MtH",
+    level = "week6",
     playData = {
         stage = "schoolEvil",
         characters = {

@@ -111,7 +111,7 @@ function Stage:onUpdate(dt)
     getEnemy().visible = THEFUCKINGENEMYVISIBILITY
 end
 
-function Stage:onEvent(event)
+function Stage:onSongEvent(event)
     if event.name == "sserafimSing" then
         self:setGirlsSinging(event.value.singing)
     elseif event.name == "sserafimShow" then

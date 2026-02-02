@@ -83,6 +83,10 @@ function AnimateAtlas:constructor(object)
     self.flipX = false
     self.flipY = false
 
+    self.animPaused = false
+
+    self.zIndex = 0
+
     self.onFrameChange = signal.new()
     self.onAnimationFinished = signal.new()
 end
@@ -147,7 +151,8 @@ local colorTransforms = {
 --- Load the atlas from folder
 --- @param folder string
 ---
-function AnimateAtlas:load(folder)
+function AnimateAtlas:load(folder, listAllSymbols)
+    print(folder)
     for key, value in pairs(self._rotatedAtlasSpriteTextures) do
         value:release()
         self._rotatedAtlasSpriteTextures[key] = nil
@@ -204,6 +209,24 @@ function AnimateAtlas:load(folder)
         local hasFramerate = self.timeline.data.FRT ~= nil or self.timeline.data.framerate ~= nil
         self.framerate = hasFramerate and (optimized and self.timeline.data.FRT or self.timeline.data.framerate) or 24
     end
+
+    -- lists all animation names if true
+    if listAllSymbols then
+        print("Animations in atlas '" .. folder .. "':")
+
+        for name, lib in pairs(self.libraries) do
+            local data = lib.data
+            local isOptimized = lib.optimized
+
+            local layers =
+                isOptimized and data.L
+                or data.layers
+
+            if layers and #layers > 0 then
+                print(" - " .. name)
+            end
+        end
+    end
 end
 
 ---
@@ -220,6 +243,10 @@ function AnimateAtlas:isSymbol(symbol)
     end
 
     return false
+end
+
+function AnimateAtlas:pause()
+    self.animPaused = true
 end
 
 function AnimateAtlas:stop()
@@ -440,17 +467,37 @@ end
 --- @param animName string?
 --- @param loop boolean?
 ---
-function AnimateAtlas:play(animName, forced, loop)
-    -- if anim exists and is not finished, forced needs to be true to continue
+function AnimateAtlas:play(animName, forced, loop, frameStart)
+    if not animName or animName == "" or not self:hasAnimation(animName) then
+        self.curAnim = {
+            name = "__raw__",
+            framerate = self.framerate,
+            loop = (loop == nil) and true or loop,
+            raw = true,
+            startFrame = frameStart or 0,
+            endFrame = self:getLength() - 1
+        }
+
+        self.frame = self.curAnim.startFrame
+        self.playing = true
+        self.animFinished = false
+        self.animPaused = false
+        return
+    end
+
     if
         self.curAnim ~= nil and
         self.curAnim.name == animName and
         self.playing and
         not forced
     then
+        if self.animPaused then
+            self.animPaused = false
+            self.playing = true
+        end
         return
     end
-    
+
     for i, anim in ipairs(self.animations) do
         if anim.name == animName then
             self.curAnim = anim
@@ -458,6 +505,8 @@ function AnimateAtlas:play(animName, forced, loop)
             self.playing = true
             self.looping = loop ~= nil and loop or anim.loop
             self.animFinished = false
+            self.animPaused = false
+            self.paused = false
             break
         end
     end
@@ -825,7 +874,9 @@ function AnimateAtlas:getSymbolLength(symbol)
     return self:getTimelineLength(timeline.data)
 end
 
-function AnimateAtlas:update(dt)
+function AnimateAtlas:update(dt, emitSignals)
+    if self.animPaused then return end
+    if emitSignals == nil then emitSignals = true end
     if self.framerate <= 0 or not self.playing or not self.curAnim then return end
 
     self._frameTimer = self._frameTimer + dt
@@ -833,24 +884,46 @@ function AnimateAtlas:update(dt)
 
     while self._frameTimer >= interval do
         self._frameTimer = self._frameTimer - interval
-        self.frame = self.frame + 1
 
-        if self.frame > #self.curAnim.frames then
-            if self.looping then
-                self.frame = 1
-            else
-                self.playing = false
-                self.animFinished = true
-                self.frame = #self.curAnim.frames
-                if self._callback then
-                    self._callback(self.objectReference)
+        if self.curAnim.raw then
+            self.frame = self.frame + 1
+
+            if self.frame > self.curAnim.endFrame then
+                if self.curAnim.loop then
+                    self.frame = self.curAnim.startFrame
+                else
+                    self.frame = self.curAnim.endFrame
+                    self.playing = false
+                    self.animFinished = true
                 end
             end
-        end
 
-        self.onFrameChange:emit(self.curAnim.name, self.frame, self.curAnim.frames[self.frame])
-        if self.animFinished then
-            self.onAnimationFinished:emit(self.curAnim.name)
+            if emitSignals then
+                self.onFrameChange:emit("__raw__", self.frame, self.frame)
+            end
+        else
+            self.frame = self.frame + 1
+            if self.frame > #self.curAnim.frames then
+                if self.looping then
+                    self.frame = 1
+                else
+                    self.playing = false
+                    self.animFinished = true
+                    self.frame = #self.curAnim.frames
+                end
+
+                if self.animFinished and emitSignals then
+                    self.onAnimationFinished:emit(self.curAnim.name)
+                end
+            end
+
+            if emitSignals then
+                self.onFrameChange:emit(
+                    self.curAnim.name,
+                    self.frame,
+                    self.curAnim.frames[self.frame]
+                )
+            end
         end
     end
 end
@@ -1130,8 +1203,13 @@ function AnimateAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     identity:translate(w/2, h/2)
 
     local timeline
-    if self.curAnim and self.curAnim.frames then
-        local frameIndex = self.curAnim.frames[math.min(self.frame, #self.curAnim.frames)]
+    if self.curAnim then
+        local frameIndex
+        if self.curAnim.raw then
+            frameIndex = self.frame
+        else
+            frameIndex = self.curAnim.frames[math.min(self.frame, #self.curAnim.frames)]
+        end
         timeline = self:getSymbolTimeline()
         if timeline.data then
             timeline = timeline.data[timeline.optimized and "AN" or "ANIMATION"][timeline.optimized and "TL" or "TIMELINE"]

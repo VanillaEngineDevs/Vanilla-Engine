@@ -4,6 +4,7 @@ return {
     charter = "Jenny Crowe + fabs + Spazkid",
     artist = "Kawai Sprite",
     looped = false,
+    level = "week6",
     playData = {
         difficulties = {
             "erect",

@@ -3,6 +3,7 @@ return {
     songName = "Spookeez Erect",
     artist = "Kawai Sprite (feat. Saruky)",
     charter = "Spazkid + fabs",
+    level = "week2",
     playData = {
         difficulties = {
             "erect",

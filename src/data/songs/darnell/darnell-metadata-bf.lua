@@ -3,6 +3,7 @@ return {
     songName = "Darnell (BF Mix)",
     artist = "Saruky",
     charter = "fabs + Spazkid",
+    level = "weekend1",
     playData = {
         difficulties = {
             "easy",

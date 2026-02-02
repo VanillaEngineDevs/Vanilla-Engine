@@ -3,6 +3,7 @@ return {
     songName = "Bopeebo (Pico Mix)",
     artist = "ThatAndyGuy (feat. Saruky)",
     charter = "fabs + Spazkid",
+    level = "week1",
     playData = {
         difficulties = {
             "easy",

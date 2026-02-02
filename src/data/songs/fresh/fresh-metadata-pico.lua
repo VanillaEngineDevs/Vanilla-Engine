@@ -3,6 +3,7 @@ return {
     songName = "Fresh (Pico Mix)",
     artist = "Xploshi (ft. Saster)",
     charter = "fabs + Spazkid",
+    level = "week1",
     playData = {
         difficulties = {
             "easy",

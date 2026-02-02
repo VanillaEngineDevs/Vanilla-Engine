@@ -3,6 +3,7 @@ return {
     songName = "M.I.L.F",
     artist = "Kawai Sprite",
     charter = "ninjamuffin99 + MtH + Spazkid",
+    level = "week4",
     playData = {
         difficulties = {
             "easy",

@@ -3,6 +3,7 @@ return {
     songName = "Darnell",
     artist = "Kawai Sprite",
     charter = "fabs",
+    level = "weekend1",
     playData = {
         songVariations = {
             "bf",

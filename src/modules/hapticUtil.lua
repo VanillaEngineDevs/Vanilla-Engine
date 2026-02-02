@@ -59,6 +59,11 @@ function hapticUtil:isHapticsAvailable()
 end
 
 function hapticUtil:vibrate(period, duration, amplitude, sharpness, targetModes)
+    period = period or Constants.DEFAULT_VIBRATION_PERIOD
+    duration = duration or Constants.DEFAULT_VIBRATION_DURATION
+    amplitude = amplitude or Constants.DEFAULT_VIBRATION_AMPLITUDE
+    sharpness = sharpness or Constants.DEFAULT_VIBRATION_SHARPNESS
+
     if not self:isHapticsAvailable() then return end
 
     targetModes = targetModes or { HAPTICS_MODE.ALL }

@@ -1,12 +1,15 @@
 local AnimateAtlasCharacter = Character:extend()
 
-function EXTEND_LIBRARY(assetPath)
+function EXTEND_LIBRARY(assetPath, appendAssets)
+    if appendAssets == nil then
+        appendAssets = true
+    end
     local lib, path = assetPath:match("^(.-):(.-)$")
     if lib and path then
         if lib ~= "shared" then
             lib = lib .. "/images"
         end
-        assetPath = "assets/" .. lib:lower() .. "/" .. path
+        assetPath = (appendAssets and "assets/" or "") .. lib:lower() .. "/" .. path
     else
         if not assetPath:startsWith("#") and not assetPath:startsWith("assets/") then
             assetPath = "shared/" .. assetPath
@@ -100,6 +103,10 @@ function AnimateAtlasCharacter:getHeight()
 end
 
 function AnimateAtlasCharacter:getDimensions()
+end
+
+function AnimateAtlasCharacter:getMidpoint()
+    return self.sprite:getMidpoint()
 end
 
 return AnimateAtlasCharacter

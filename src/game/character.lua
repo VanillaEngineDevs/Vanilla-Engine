@@ -32,7 +32,7 @@ function character.getCharacter(id)
     char.onAnimationFinished = signal.new()
 
     char.onFrameChange:connect(function(name, frameNumber, frameIndex)
-        char:call("onFrameChange", name, frameNumber, frameIndex)
+        char:call("onAnimationFrame", name, frameNumber, frameIndex)
     end)
     char.onAnimationFinished:connect(function(name)
         char:call("onAnimationFinished", name)
@@ -122,6 +122,8 @@ function character:new()
 
     self.flipX = false
     self.flipY = false
+
+    self.zIndex = 0
 end
 
 function character:update(dt)
@@ -209,7 +211,13 @@ end
 function character:onBeatHit(beat) end
 
 function character:dance(force)
+    if self:isFunction("dance") and not self.inScriptCall then
+        self:call("dance", force)
+        return
+    end
+    
     if self.isDead then return end
+
     if not force then
         if self:isSinging() then
             return
@@ -233,6 +241,42 @@ function character:dance(force)
     else
         self:play("idle", force, false)
     end
+end
+
+function character:getDeathCameraOffsets()
+    if self._data.death and self._data.death.cameraOffsets then
+        return self._data.death.cameraOffsets
+    end
+
+    return {0, 0}
+end
+
+function character:getDeathCameraZoom()
+    if self._data.death and self._data.death.cameraZoom then
+        return self._data.death.cameraZoom
+    end
+    return 1
+end
+
+function character:getDeathPreTransitionDelay()
+    if self._data.death and self._data.death.preTransitionDelay then
+        return self._data.death.preTransitionDelay
+    end
+    return 0
+end
+
+function character:hasAnimation(name)
+    return self.sprite:hasAnimation(name)
+end
+
+function character:getDeathQuote()
+    -- the script for getDeathQuote() CAN return something!
+    -- its like char:call("getDeathQuote"), but we can get what is returned
+    if self:isFunction("getDeathQuote") then
+        return self.script["getDeathQuote"](self.script)
+    end
+
+    return nil
 end
 
 return character

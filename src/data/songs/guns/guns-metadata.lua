@@ -3,6 +3,7 @@ return {
     timeFormat = "ms",
     artist = "Kawai Sprite",
     charter = "MtH",
+    level = "week7",
     playData = {
         stage = "tankmanBattlefield",
         songVariations = {

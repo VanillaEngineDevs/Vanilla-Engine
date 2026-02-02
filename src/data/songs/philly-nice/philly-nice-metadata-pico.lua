@@ -3,6 +3,7 @@ return {
     songName = "Philly Nice (Pico Mix)",
     artist = "tsuyunoshi (ft. Saruky)",
     charter = "Spazkid",
+    level = "week3",
     playData = {
         difficulties = {
             "easy",

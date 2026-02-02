@@ -3,6 +3,7 @@ return {
     songName = "High Erect",
     artist = "Kohta Takahashi (feat. Kawai Sprite)",
     charter = "PhantomArcade + fabs + Spazkid",
+    level = "week4",
     playData = {
         difficulties = {
             "erect",

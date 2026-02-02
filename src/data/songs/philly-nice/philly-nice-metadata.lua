@@ -3,6 +3,7 @@ return {
     timeFormat = "ms",
     artist = "Kawai Sprite",
     charter = "ninjamuffin99 + MtH + Spazkid",
+    level = "week3",
     playData = {
         stage = "phillyTrain",
         characters = {

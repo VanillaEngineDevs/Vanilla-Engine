@@ -3,6 +3,7 @@ return {
     songName = "Fresh Erect",
     artist = "Kohta Takahashi (feat. Saruky)",
     charter = "fabs",
+    level = "week1",
     playData = {
         difficulties = {
             "erect",

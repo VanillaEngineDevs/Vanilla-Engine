@@ -3,6 +3,7 @@ return {
     songName = "Blazin'",
     artist = "Kawai Sprite",
     charter = "fabs + PhantomArcade",
+    level = "weekend1",
     playData = {
         difficulties = {
             "easy",

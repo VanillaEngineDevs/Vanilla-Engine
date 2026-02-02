@@ -18,13 +18,17 @@ function MultiSparrowCharacter:new(data)
             anim.assetPath = EXTEND_LIBRARY(nuts)
         end
 
+        local isIndices = anim.frameIndices ~= nil
+
         table.insert(
             self.animations,
             {
                 name = anim.name,
                 atlasanim = anim.prefix,
                 asset = anim.assetPath,
-                offsets = anim.offsets
+                offsets = anim.offsets,
+                frameIndices = anim.frameIndices,
+                isIndices = isIndices
             }
         )
     end
@@ -35,12 +39,23 @@ function MultiSparrowCharacter:new(data)
             self.sprites[anim.asset]:load(anim.asset)
         end
 
-        self.sprites[anim.asset]:addAnimByPrefix(
-            anim.name,
-            anim.atlasanim,
-            24,
-            anim.loop or false
-        )
+        if anim.isIndices then
+            self.sprites[anim.asset]:addAnimByIndices(
+                anim.name,
+                anim.atlasanim,
+                anim.frameIndices,
+                "",
+                24,
+                anim.loop or false
+            )
+        else
+            self.sprites[anim.asset]:addAnimByPrefix(
+                anim.name,
+                anim.atlasanim,
+                24,
+                anim.loop or false
+            )
+        end
     end
 
     for _, anim in ipairs(self.animations) do
@@ -65,7 +80,7 @@ end
 function MultiSparrowCharacter:update(dt)
     MultiSparrowCharacter.super.update(self, dt)
     for _, spr in pairs(self.sprites) do
-        spr:update(dt)
+        spr:update(dt, (self.sprite == spr))
         spr.x = self.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES
         spr.y = self.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
         spr.x = spr.x - self.curAnimOffset[1]
@@ -84,29 +99,32 @@ function MultiSparrowCharacter:update(dt)
 end
 
 function MultiSparrowCharacter:play(name, forced, loop)
-    local animname = ""
+    local animname = nil
+    local targetSprite = nil
 
     for _, anim in ipairs(self.animations) do
-        for asset, spr in pairs(self.sprites) do
-            if asset == anim.asset and name == anim.name then
-                self.sprite = spr
+        if anim.name == name then
+            targetSprite = self.sprites[anim.asset]
+            if targetSprite then
                 animname = anim.name
-                break
             end
+            break
         end
-        if animname ~= "" then break end
     end
 
     if self:isFunction("play") and not self.inScriptCall then
-        self:call("play", animname, forced, loop)
-    else
-        self.sprite:play(animname, forced, loop)
+        self:call("play", name, forced, loop)
     end
+
+    if not animname or not targetSprite then
+        return
+    end
+
+    self.sprite = targetSprite
+    self.sprite:play(animname, forced, loop)
 
     for _, anim in ipairs(self.animations) do
         if anim.name == animname and anim.offsets then
-            self.sprite.x = self.sprite.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES - anim.offsets[1]
-            self.sprite.y = self.sprite.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES - anim.offsets[2]
             self.curAnimOffset[1] = anim.offsets[1]
             self.curAnimOffset[2] = anim.offsets[2]
             break
@@ -116,6 +134,7 @@ function MultiSparrowCharacter:play(name, forced, loop)
     self.sprite.x = self.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES - self.curAnimOffset[1]
     self.sprite.y = self.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES - self.curAnimOffset[2]
 end
+
 
 function MultiSparrowCharacter:draw(camera)
     self.sprite:draw(camera)
@@ -131,6 +150,10 @@ end
 
 function MultiSparrowCharacter:getDimensions()
     return self.sprite:getWidth(), self.sprite:getHeight()
+end
+
+function MultiSparrowCharacter:getMidpoint()
+    return self.sprite:getMidpoint()
 end
 
 return MultiSparrowCharacter

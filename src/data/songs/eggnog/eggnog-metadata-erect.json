@@ -3,6 +3,7 @@
   "songName": "Eggnog Erect",
   "artist": "Saruky",
   "charter": "fabs + Spazkid",
+  "level": "week5",
   "playData": {
     "difficulties": ["erect", "nightmare"],
     "characters": {

@@ -3,6 +3,7 @@ return {
     songName = "Pico Erect",
     artist = "Kawai Sprite (feat. Saruky)",
     charter = "fabs + Spazkid",
+    level = "week3",
     playData = {
         difficulties = {
             "erect",

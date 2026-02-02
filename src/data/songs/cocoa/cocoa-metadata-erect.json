@@ -3,6 +3,7 @@
   "songName": "Cocoa Erect",
   "artist": "Saster",
   "charter": "fabs + Spazkid",
+  "level": "week5",
   "playData": {
     "difficulties": ["erect", "nightmare"],
     "characters": {

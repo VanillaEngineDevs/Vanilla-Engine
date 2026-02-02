@@ -3,6 +3,7 @@ return {
     songName = "Ugh Erect",
     artist = "Kawai Sprite",
     charter = "fabs + Spazkid",
+    level = "week7",
     playData = {
         difficulties = {
             "erect",

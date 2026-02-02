@@ -3,6 +3,7 @@ return {
     songName = "Philly Nice Erect",
     artist = "Kawai Sprite (feat. Saruky)",
     charter = "Spazkid + fabs",
+    level = "week3",
     playData = {
         difficulties = {
             "erect",

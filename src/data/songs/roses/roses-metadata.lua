@@ -15,6 +15,7 @@ return {
             },
         },
     },
+    level = "week6",
     playData = {
         stage = "school",
         characters = {

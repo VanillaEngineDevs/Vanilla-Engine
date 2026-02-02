@@ -3,6 +3,7 @@ return {
     songName = "Ugh (Pico Mix)",
     artist = "tsuyunoshi (ft. Saruky)",
     charter = "fabs + Spazkid",
+    level = "week7",
     playData = {
         difficulties = {
             "easy",

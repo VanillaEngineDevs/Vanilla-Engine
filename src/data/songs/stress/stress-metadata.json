@@ -3,6 +3,7 @@
   "songName": "Stress",
   "artist": "Kawai Sprite",
   "charter": "MtH + Spazkid + Hundrec",
+  "level": "week7",
   "playData": {
     "difficulties": ["easy", "normal", "hard"],
     "characters": {

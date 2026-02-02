@@ -3,6 +3,7 @@ return {
     songName = "Senpai Erect",
     artist = "Kawai Sprite",
     charter = "Jenny Crowe + fabs",
+    level = "week6",
     playData = {
         difficulties = {
             "erect",
