@@ -250,7 +250,19 @@ return {
 		camera.centered = true
 		dying = false
 		function self:onDeath()
-			--Gamestate.push((boyfriend and boyfriend.gameOverState) or gameOvers.default)
+			if camTween then
+				Timer.cancel(camTween)
+			end
+			if inst then
+				inst:stop()
+			end
+			if voicesBF then
+				voicesBF:stop()
+			end
+			if voicesEnemy then
+				voicesEnemy:stop()
+			end
+			Gamestate.push(gameoverSubstate)
 		end
 		self.useBuiltinGameover = true
 		P1HealthColors = {0, 1, 0}
@@ -650,12 +662,16 @@ return {
 
 			["tankman-bloody"] = "tankman",
 
-			["mom-car"] = "mom"
+			["mom-car"] = "mom",
+
+			["spooky-dark"] = "spooky",
 		}
 		if voiceConversions[metadata.playData.characters.player] then
 			if not love.filesystem.getInfo(voicesBFPath) then
 				voicesBFPath = "songs/" .. name .. "/Voices-" .. voiceConversions[metadata.playData.characters.player] .. songExt .. ".ogg"
 			end
+		end
+		if voiceConversions[metadata.playData.characters.opponent] then
 			if not love.filesystem.getInfo(voicesEnemyPath) then
 				voicesEnemyPath = "songs/" .. name .. "/Voices-" .. voiceConversions[metadata.playData.characters.opponent] .. songExt .. ".ogg"
 			end

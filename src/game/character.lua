@@ -171,7 +171,7 @@ function character:update(dt)
                 currentAnimation = currentAnimation:sub(1, #currentAnimation - #(" -hold"))
             end
             local endAnimation = currentAnimation .. "-end"
-            self:dance(false)
+            --self:dance(false)
         end
     else
         self.holdTimer = 0
@@ -198,6 +198,13 @@ end
 
 function character:onStepHit(step)
     if (self.danceEvery > 0 and (step % (self.danceEvery * CONSTANTS.STEPS_PER_BEAT) == 0)) then
+        if not self.sprite.animFinished and self.sprite.curAnim then
+            local isidledance = self.sprite.curAnim.name:startsWith("dance") or self.sprite.curAnim.name:startsWith("idle")
+
+            if not isidledance then
+                return
+            end
+        end
         self:dance(self.shouldBop)
     end
 end
@@ -216,8 +223,22 @@ function character:isSinging()
     if not self.sprite or not self.sprite.curAnim then
         return false
     end
-    
-    return self.sprite.curAnim.name:startsWith("sing") and not self.sprite.curAnim.name:endsWith("-end") and not self.sprite.animFinished
+
+    if self.sprite.curAnim.name:endsWith("-hold") then
+        return false
+    end
+
+    if self.sprite.curAnim.name:startsWith("sing") and not self.sprite.curAnim.name:endsWith("-end") then
+        if self.sprite.animFinished then return false end
+
+        return true
+    end
+
+    if not self.sprite.curAnim.name:startsWith("sing") and self.sprite.animFinished then
+        return false
+    end
+
+    return true
 end
 
 function character:onBeatHit(beat) end
@@ -234,7 +255,6 @@ function character:dance(force)
         if self:isSinging() then
             return
         end
-        print(self.sprite.animFinished)
 
         if self.sprite and self.sprite.curAnim then
             local currentAnimation = self.sprite.curAnim.name
@@ -254,7 +274,7 @@ function character:dance(force)
         end
         self.hasDanced = not self.hasDanced
     else
-        self:play("idle", true, false)
+        self:play("idle", force, false)
     end
 end
 

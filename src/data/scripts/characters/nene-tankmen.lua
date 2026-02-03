@@ -85,10 +85,11 @@ function Character:dance(force)
 
     if state == STATE_DEFAULT then
         if self.data.hasDanced then
-            self.data:play("danceRight", force)
+            self.data:play("danceRight", true, false)
         else
-            self.data:play("danceLeft", force)
+            self.data:play("danceLeft", true, false)
         end
+        print('did the fucking dance')
         self.data.hasDanced = not self.data.hasDanced
     elseif state == STATE_PRE_RAISE then
         self.data:play("danceLeft", false)
