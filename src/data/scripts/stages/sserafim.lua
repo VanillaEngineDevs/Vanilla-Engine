@@ -134,6 +134,7 @@ function Stage:onSongEvent(event)
 end
 
 function Stage:setGirlsVisible(visible)
+    --visible = {false, false, false, false, true}
     if #visible < 5 then
         print("Got " .. #visible .. " visibility values, expected 5.")
         return

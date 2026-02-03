@@ -122,6 +122,15 @@ function table.shuffle(tbl)
     return tbl
 end
 
+function table.indexOf(tbl, value)
+    for i, v in ipairs(tbl) do
+        if v == value then
+            return i
+        end
+    end
+    return nil
+end
+
 function util.tryExcept(try, except)
     local status, err = pcall(try)
     if not status and except then

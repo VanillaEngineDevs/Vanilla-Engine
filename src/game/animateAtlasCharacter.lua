@@ -42,7 +42,6 @@ function AnimateAtlasCharacter:new(data, _atlasSettings)
             end
         elseif animType == "symbol" then
             if isIndices then
-                print("SYMBOL ANIMS WITH INDICES")
                 self.sprite:addAnimBySymbolIndices(anim.name, anim.prefix, anim.frameIndices, anim.framerate or 24, anim.loop or false)
             else
                 self.sprite:addAnimBySymbol(anim.name, anim.prefix, anim.framerate or 24, anim.loop or false)

@@ -119,10 +119,12 @@ function AnimateAtlas:constructor(object)
 
     self.animations = {}
     self.curAnim = nil
+    self.frameCount = 0
 
     self.x = 0
     self.y = 0
     self.rotation = 0
+    self.angle = 0
     self.scale = {x = 1, y = 1}
     self.origin = {x = 0, y = 0}
     self.offset = {x = 0, y = 0}
@@ -444,7 +446,88 @@ end
 
 function AnimateAtlas:getDefaultSymbol()
     local optimized = self.timeline.optimized == true or self.timeline.data.L ~= nil
-    return self.timeline.data[optimized and "AN" or "ANIMATION"][optimized and "TL" or "TIMELINE"][optimized and "N" or "name"]
+    local timeline = self.timeline.data[optimized and "AN" or "ANIMATION"][optimized and "TL" or "TIMELINE"]
+    
+    local timelineName = timeline[optimized and "N" or "name"]
+    if timelineName and timelineName ~= "" then
+        return timelineName
+    end
+    
+    for symbolName, _ in pairs(self.libraries) do
+        return symbolName
+    end
+    
+    return ""
+end
+
+function AnimateAtlas:getFrameLabelList()
+    local foundLabels = {}
+    local mainTimeline = self.timeline.data
+    local optimized = mainTimeline.L ~= nil
+    
+    if mainTimeline.AN or mainTimeline.ANIMATION then
+        mainTimeline = mainTimeline[optimized and "AN" or "ANIMATION"] and mainTimeline[optimized and "AN" or "ANIMATION"][optimized and "TL" or "TIMELINE"]
+        if not mainTimeline then
+            return foundLabels
+        end
+    end
+    
+    local layers = mainTimeline[optimized and "L" or "LAYERS"]
+    if not layers then
+        return foundLabels
+    end
+    
+    for i = 1, #layers do
+        local layer = layers[i]
+        local frames = layer[optimized and "FR" or "Frames"]
+        
+        if frames then
+            for j = 1, #frames do
+                local frame = frames[j]
+                local frameName = frame[optimized and "N" or "name"] or ""
+                if frameName ~= "" and not table.contains(foundLabels, frameName) then
+                    table.insert(foundLabels, frameName)
+                end
+            end
+        end
+    end
+    
+    return foundLabels
+end
+
+---
+--- Gets a frame label by its name.
+--- @param name string
+--- @return table|nil
+---
+function AnimateAtlas:getFrameLabel(name)
+    local mainTimeline = self.timeline.data
+    local optimized = mainTimeline.L ~= nil
+    
+    if mainTimeline.AN or mainTimeline.ANIMATION then
+        mainTimeline = mainTimeline[optimized and "AN" or "ANIMATION"][optimized and "TL" or "TIMELINE"]
+    end
+    
+    local layers = mainTimeline[optimized and "L" or "LAYERS"]
+    if not layers then
+        return nil
+    end
+    
+    for i = 1, #layers do
+        local layer = layers[i]
+        local frames = layer[optimized and "FR" or "Frames"]
+        
+        if frames then
+            for j = 1, #frames do
+                local frame = frames[j]
+                if frame[optimized and "N" or "name"] == name then
+                    return frame
+                end
+            end
+        end
+    end
+    
+    return nil
 end
 
 function AnimateAtlas:addFrameElement(filterFn, element)
@@ -551,9 +634,16 @@ local function renderSymbol(self, symbolData, frame, index, matrix, colorTransfo
         frameIndex = firstFrame
     end
 
+    local is3DMatrix = symbolData[optimized and "M3D" or "Matrix3D"] ~= nil
     local symbolMatrix = love.math.newTransform()
-    local rawMatrix = symbolData[optimized and "MX" or "Matrix"]
-    symbolMatrix:setMatrix(matrix2D(rawMatrix))
+    local symbolMatrixRaw
+    if is3DMatrix then
+        symbolMatrixRaw = symbolData[optimized and "M3D" or "Matrix3D"]
+    else
+        symbolMatrixRaw = symbolData[optimized and "MX" or "Matrix"]
+    end
+
+    symbolMatrix:setMatrix((is3DMatrix and matrix3D or matrix2D)(symbolMatrixRaw, optimized))
 
     self._curSymbol = symbol
     self:drawTimeline(symbol.timeline, frameIndex, matrix:clone():apply(symbolMatrix), colorTransform)
@@ -602,8 +692,13 @@ local function renderAtlasSprite(self, atlasSprite, matrix, colorTransform, opti
     else
         spriteMatrixRaw = atlasSprite[optimized and "MX" or "Matrix"]
     end
+    
     local spriteMatrix = love.math.newTransform()
-    spriteMatrix:setMatrix((is3DMatrix and matrix3D or matrix2D)(spriteMatrixRaw, optimized))
+    if spriteMatrixRaw then
+        spriteMatrix:setMatrix((is3DMatrix and matrix3D or matrix2D)(spriteMatrixRaw, optimized))
+    else
+        spriteMatrix:setMatrix("column", 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+    end
 
     local spritemaps = self.spritemaps
     for l = 1, #spritemaps do
@@ -628,7 +723,13 @@ local function renderKeyFrame(self, keyframe, frame, matrix, colorTransform, opt
         return false
     end
 
+    if not matrix then
+        matrix = love.math.newTransform()
+    end
+
     local elements = keyframe[optimized and "E" or "elements"]
+    if not elements then return true end
+
     for i = 1, #elements do
         local element = elements[i]
         local symbol = element[optimized and "SI" or "SYMBOL_Instance"]
@@ -638,6 +739,19 @@ local function renderKeyFrame(self, keyframe, frame, matrix, colorTransform, opt
             renderSymbol(self, symbol, frame, index, matrix, colorTransform, optimized)
         elseif atlasSprite then
             renderAtlasSprite(self, atlasSprite, matrix, colorTransform, optimized)
+        elseif element.isAnimate then
+            love.graphics.push("transform")
+            love.graphics.applyTransform(matrix)
+            element:draw(self._camera)
+            love.graphics.pop()
+        elseif element.draw then
+            love.graphics.push("transform")
+            local newMat = matrix:clone()
+            newMat:translate(element.x or 0, element.y or 0)
+            love.graphics.applyTransform(newMat)
+            element.shader = self.shader
+            element:draw()
+            love.graphics.pop()
         end
     end
 
@@ -654,6 +768,7 @@ function AnimateAtlas:_pushMask(maskLayer, frame, matrix, optimized)
         local lastShader = love.graphics.getShader()
         love.graphics.setShader(self._maskShader)
 
+        love.graphics.push("transform")
         for j = 1, #keyframes do
             if renderKeyFrame(
                 self,
@@ -667,7 +782,8 @@ function AnimateAtlas:_pushMask(maskLayer, frame, matrix, optimized)
                 break
             end
         end
-
+        
+        love.graphics.pop()
         love.graphics.setShader(lastShader)
     end, "replace", depth, true)
 
@@ -706,6 +822,27 @@ function AnimateAtlas:drawTimeline(timeline, frame, matrix, colorTransform)
     for i = #rawLayers, 1, -1 do
         local layer = rawLayers[i]
         local layerName = layer[optimized and "LN" or "Layer_name"]
+        local layerType = layer[optimized and "LT" or "Layer_type"]
+		local clippedBy = layer[optimized and "CB" or "Clipped_by"] or layer[optimized and "Clpb" or "Clipped_by"]
+
+		if layerType ~= nil then
+			goto continue
+		end
+
+		if clippedBy ~= nil then
+            local maskLayer = nil
+            for j = 1, #rawLayers do
+                local potentialMaskLayer = rawLayers[j]
+                local potentialMaskLayerName = potentialMaskLayer[optimized and "LN" or "Layer_name"]
+                if potentialMaskLayerName == clippedBy then
+                    maskLayer = potentialMaskLayer
+                    break
+                end
+            end
+            if maskLayer then
+                self:_pushMask(maskLayer, frame, matrix, optimized)
+            end
+        end
 
         if visibleLayers[layerName] == false then
             goto continue
@@ -716,6 +853,10 @@ function AnimateAtlas:drawTimeline(timeline, frame, matrix, colorTransform)
             if renderKeyFrame(self, keyframes[j], frame, matrix, colorTransform, optimized) then
                 break
             end
+        end
+
+        if clippedBy ~= nil then
+            self:_popMask()
         end
 
         ::continue::
@@ -774,7 +915,6 @@ function AnimateAtlas:getSymbolLength(symbol)
 end
 
 function AnimateAtlas:update(dt, emitSignals)
-    if self.animPaused then return end
     if emitSignals == nil then emitSignals = true end
     if self.framerate <= 0 or not self.playing or not self.curAnim then return end
 
@@ -785,7 +925,8 @@ function AnimateAtlas:update(dt, emitSignals)
         self._frameTimer = self._frameTimer - interval
 
         if self.curAnim.raw then
-            self.frame = self.frame + 1
+            if not self.animPaused then self.frame = self.frame + 1 end
+            self.frameCount = self.curAnim.endFrame - self.curAnim.startFrame + 1
 
             if self.frame > self.curAnim.endFrame then
                 if self.curAnim.loop then
@@ -801,7 +942,7 @@ function AnimateAtlas:update(dt, emitSignals)
                 self.onFrameChange:emit("__raw__", self.frame, self.frame)
             end
         else
-            self.frame = self.frame + 1
+            if not self.animPaused then self.frame = self.frame + 1 end
 
             if self.frame > #self.curAnim.frames then
                 if self.looping then
@@ -839,6 +980,7 @@ function AnimateAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
         return
     end
     camera = camera or {x = 0, y = 0}
+    self._camera = camera
     local cx = camera.x
     local cy = camera.y
     if camera.centered then
@@ -872,6 +1014,20 @@ function AnimateAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     identity:scale(sx, sy)
     identity:translate(-ox, -oy)
     identity:translate(w/2, h/2)
+    
+    if self.angle ~= 0 then
+        local centerX, centerY = self:getMidpoint()
+        identity:translate(centerX - x, centerY - y)
+        identity:rotate(self.angle)
+        identity:translate(-(centerX - x), -(centerY - y))
+
+        -- evil bullshit
+        local cosAngle = math.cos(math.rad(self.angle))
+        local sinAngle = math.sin(math.rad(self.angle))
+        local newW = math.abs(w * cosAngle) + math.abs(h * sinAngle)
+        local newH = math.abs(h * cosAngle) + math.abs(w * sinAngle)
+        identity:translate((w - newW) / 2, (h - newH) / 2)
+    end
 
     local timeline
     if self.curAnim then
@@ -1001,7 +1157,12 @@ function AnimateAtlas:_calcS(self, symbol, frame, index, matrix, optimized, boun
 	local is3DMatrix = symbol[optimized and "M3D" or "Matrix3D"] ~= nil
 	local symbolMatrix = love.math.newTransform()
 	local symbolMatrixRaw = is3DMatrix and symbol[optimized and "M3D" or "Matrix3D"] or symbol[optimized and "MX" or "Matrix"]
-	symbolMatrix:setMatrix((is3DMatrix and matrix3D or matrix2D)(symbolMatrixRaw, optimized))
+	
+	if symbolMatrixRaw then
+		symbolMatrix:setMatrix((is3DMatrix and matrix3D or matrix2D)(symbolMatrixRaw, optimized))
+	else
+		symbolMatrix:setMatrix("column", 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+	end
 
 	local combinedMatrix = matrix:clone():apply(symbolMatrix)
 	return self:_getTopLeft(self, symbolTimeline, frameIndex, combinedMatrix, bounds)
@@ -1030,7 +1191,12 @@ function AnimateAtlas:_calcAS(self, atlasSprite, matrix, optimized, bounds)
 	local is3DMatrix = atlasSprite[optimized and "M3D" or "Matrix3D"] ~= nil
 	local spriteMatrixRaw = is3DMatrix and atlasSprite[optimized and "M3D" or "Matrix3D"] or atlasSprite[optimized and "MX" or "Matrix"]
 	local spriteMatrix = love.math.newTransform()
-	spriteMatrix:setMatrix((is3DMatrix and matrix3D or matrix2D)(spriteMatrixRaw, optimized))
+	
+	if spriteMatrixRaw then
+		spriteMatrix:setMatrix((is3DMatrix and matrix3D or matrix2D)(spriteMatrixRaw, optimized))
+	else
+		spriteMatrix:setMatrix("column", 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+	end
 
 	local drawMatrix = matrix:clone():apply(spriteMatrix)
 	local w, h = sprite.w, sprite.h
@@ -1056,6 +1222,23 @@ function AnimateAtlas:_calcAS(self, atlasSprite, matrix, optimized, bounds)
 	bounds.maxY = math.max(bounds.maxY, maxY)
 
 	return true
+end
+
+function AnimateAtlas:addElementToFrames(keyword, element) --ogurifap.gif
+    local frames = self:getFramesWithKeyword(keyword)
+    local optimized = self.timeline.optimized or self.timeline.data.L ~= nil
+
+    for i = 1, #frames do
+        local frame = frames[i]
+        local elements = frame[optimized and "E" or "elements"]
+
+        if not elements then
+            elements = {}
+            frame[optimized and "E" or "elements"] = elements
+        end
+
+        table.insert(elements, element)
+    end
 end
 
 function AnimateAtlas:getBoundTopLeft()
@@ -1130,12 +1313,144 @@ function AnimateAtlas:hasAnimation(name)
             return true
         end
     end
+
+    local frameLabels = self:getFrameLabelList()
+    if frameLabels and table.indexOf(frameLabels, name) then
+        return true
+    end
+
+    if self:isSymbol(name) then
+        return true
+    end
+    
     return false
 end
 
-function AnimateAtlas:stop()
-    self.playing = false
-    self.frame = 1
+function AnimateAtlas:isAnimationDynamic(id)
+    if not self:hasAnimation(id) then
+        return false
+    end
+
+    for _, anim in ipairs(self.animations) do
+        if anim.name == id then
+            return #anim.frames > 1
+        end
+    end
+
+    return false
+end
+
+function AnimateAtlas:getCurrentAnimation()
+    return self.curAnim and self.curAnim.name or ""
+end
+
+function AnimateAtlas:isAnimationFinished()
+    return self.animFinished or false
+end
+
+function AnimateAtlas:listAnimations()
+    local frameLabels = self:getFrameLabelList()
+    local animationNames = {}
+
+    for _, anim in ipairs(self.animations) do
+        table.insert(animationNames, anim.name)
+    end
+
+    for _, label in ipairs(frameLabels) do
+        if not table.contains(animationNames, label) then
+            table.insert(animationNames, label)
+        end
+    end
+
+    return animationNames
+end
+
+function AnimateAtlas:getSymbolElements(symbol)
+    if not self:isSymbol(symbol) then
+        return {}
+    end
+
+    local lib = self.libraries[symbol]
+    if not lib then
+        return {}
+    end
+
+    local timeline = lib.data
+    local optimized = lib.optimized
+
+    local layers = timeline[optimized and "L" or "LAYERS"]
+    local elements = {}
+
+    if not layers then
+        return elements
+    end
+
+    for i = 1, #layers do
+        local layer = layers[i]
+        local frames = layer[optimized and "FR" or "Frames"]
+        
+        if frames and #frames > 0 then
+            local frameElements = frames[1][optimized and "E" or "elements"] or {}
+            for j = 1, #frameElements do
+                table.insert(elements, frameElements[j])
+            end
+        end
+    end
+
+    if #elements == 0 then
+        print("WARNING: No elements found for '" .. symbol .. "' symbol.")
+    end
+
+    return elements
+end
+
+function AnimateAtlas:getFirstElement(symbol)
+    local elements = self:getSymbolElements(symbol)
+    return elements and #elements > 0 and elements[1] or nil
+end
+
+function AnimateAtlas:getFramesWithKeyword(keyword)
+    local frames = {}
+
+    for symbolName, lib in pairs(self.libraries) do
+        if symbolName:find(keyword) then
+            local timeline = lib.data
+
+            self:forEachLayer(timeline, function(layer)
+                self:forEachLayerFrame(layer, function(frame)
+                    table.insert(frames, frame)
+                end)
+            end)
+        end
+    end
+
+    return frames
+end
+
+function AnimateAtlas:forEachLayerFrame(layer, callback)
+    if not layer then return end
+
+    local optimized = layer.optimized == true or layer.FR ~= nil
+    local frames = layer[optimized and "FR" or "Frames"]
+
+    if frames then
+        for i = 1, #frames do
+            callback(frames[i])
+        end
+    end
+end
+
+function AnimateAtlas:forEachLayer(timeline, callback)
+    if not timeline then return end
+
+    local optimized = timeline.L ~= nil
+    local layers = timeline[optimized and "L" or "LAYERS"]
+
+    if layers then
+        for i = 1, #layers do
+            callback(layers[i])
+        end
+    end
 end
 
 function AnimateAtlas:resume()
@@ -1226,15 +1541,23 @@ end
 function AnimateAtlas:addAnimBySymbol(name, symbolName, framerate, loop)
     local lib = self.libraries[symbolName]
     if not lib then
-        print("Missing symbol:", symbolName)
+        print("Symbol not found with name '" .. symbolName .. "'")
         return
     end
 
     local length = getSymbolFrameCount(lib.data)
+    if length <= 0 then
+        print("Symbol '" .. symbolName .. "' has no frames")
+        return
+    end
+
     local frames = {}
     for i = 0, length - 1 do
         frames[#frames + 1] = i
     end
+
+    framerate = framerate or self.framerate or 24
+    loop = loop ~= false
 
     table.insert(self.animations, {
         name = name,
@@ -1243,8 +1566,8 @@ function AnimateAtlas:addAnimBySymbol(name, symbolName, framerate, loop)
         timeline = lib.data,
         optimized = lib.optimized,
         frames = frames,
-        framerate = framerate or 24,
-        loop = loop ~= false
+        framerate = framerate,
+        loop = loop
     })
 end
 

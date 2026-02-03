@@ -2,11 +2,12 @@ local LipSyncSprite = require("data.scripts.props.sserafimLipSyncSprite")
 local lipSyncSprite = nil
 
 function Character:onCreate()
-    lipSyncSprite = LipSyncSprite(-67, -140, '-yunjin')
+    lipSyncSprite = LipSyncSprite(108, -122, '')
     lipSyncSprite.active = false
-    lipSyncSprite.angle = math.rad(23)
+    lipSyncSprite.flipX = true
+    lipSyncSprite.angle = math.rad(12)
 
-    self.data.sprite:addElementToFrames("mouth yunjin", lipSyncSprite.sprite)
+    self.data.sprite:addElementToFrames("mouth default", lipSyncSprite.sprite)
 end
 
 function Character:onUpdate(dt)
@@ -18,23 +19,23 @@ end
 local offsets = {
     idle = {
         offset = {0, 0},
-        angle = 23
+        angle = 12
     },
     singUP = {
         offset = {0, 0},
-        angle = 22
+        angle = 12
     },
     singRIGHT = {
         offset = {0, 0},
-        angle = 23
+        angle = 12
     },
     singDOWN = {
         offset = {0, 0},
-        angle = 23
+        angle = 12
     },
     singLEFT = {
         offset = {0, 0},
-        angle = 23
+        angle = 12
     }
 }
 
@@ -48,7 +49,4 @@ function Character:play(name, force, loop)
         lipSyncSprite.offsets = {0, 0}
         lipSyncSprite.angle = 0
     end
-end
-
-function Character:onDraw(camera)
 end

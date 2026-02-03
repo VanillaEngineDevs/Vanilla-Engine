@@ -78,8 +78,6 @@ function character.getCharacter(id)
     char.offsets = data.offsets or {0, 0}
     char.scale = {x = data.scale or 1, y = data.scale or 1}
 
-    char.script = nil
-
     char:setAntialiasing(not data.isPixel)
 
     char:call("onCreate")
@@ -215,10 +213,11 @@ function character:getCameraPoint()
 end
 
 function character:isSinging()
-    return self.sprite and self.sprite.curAnim and
-        self.sprite.curAnim.name:startsWith("sing") 
-            and not self.sprite.curAnim.name:endsWith("-end")
-            and not self.sprite.curAnim.name:endsWith("-hold")
+    if not self.sprite or not self.sprite.curAnim then
+        return false
+    end
+    
+    return self.sprite.curAnim.name:startsWith("sing") and not self.sprite.curAnim.name:endsWith("-end") and not self.sprite.animFinished
 end
 
 function character:onBeatHit(beat) end
@@ -235,6 +234,7 @@ function character:dance(force)
         if self:isSinging() then
             return
         end
+        print(self.sprite.animFinished)
 
         if self.sprite and self.sprite.curAnim then
             local currentAnimation = self.sprite.curAnim.name
@@ -245,6 +245,7 @@ function character:dance(force)
             end
         end
     end
+
     if self.shouldAlternate then
         if self.hasDanced then
             self:play("danceRight" .. self.idleSuffix, force, false)

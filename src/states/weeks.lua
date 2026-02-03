@@ -1638,9 +1638,9 @@ return {
 					if not continue then
 						for _, obj in ipairs(self.objects) do
 							if obj.characterType == CHARACTER_TYPE.BF then
-								obj:play(curAnim .. " miss", true, false)
+								obj:play(curAnim .. "miss", true, false)
 								if obj.call then
-									obj:call("onNoteMiss", curAnim .. " miss")
+									obj:call("onNoteMiss", curAnim .. "miss")
 								end
 							end
 						end
@@ -1767,9 +1767,9 @@ return {
 											audio.playSound(sounds.miss[love.math.random(3)])
 											for _, obj in ipairs(self.objects) do
 												if obj.characterType == CHARACTER_TYPE.BF then
-													obj:play(curAnim .. " miss", true, false)
+													obj:play(curAnim .. "miss", true, false)
 													if obj.call then
-														obj:call("onNoteMiss", curAnim .. " miss")
+														obj:call("onNoteMiss", curAnim .. "miss")
 													end
 												end
 											end
@@ -1794,9 +1794,9 @@ return {
 
 						for _, obj in ipairs(self.objects) do
 							if obj.characterType == CHARACTER_TYPE.BF then
-								obj:play(curAnim .. " miss", true, false)
+								obj:play(curAnim .. "miss", true, false)
 								if obj.call then
-									obj:call("onNoteMiss", curAnim .. " miss")
+									obj:call("onNoteMiss", curAnim .. "miss")
 								end
 							end
 						end
