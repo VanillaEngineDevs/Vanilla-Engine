@@ -52,6 +52,7 @@ function love.load()
     HoldCover = require "modules.Cover"
     waveform = require "modules.waveform"
     popupScore = require "modules.popupScore"
+	eventCreator = require "modules.eventCreator"
     settings.pixelPerfect = false
 
 	Character = require "game.character"

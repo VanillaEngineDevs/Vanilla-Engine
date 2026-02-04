@@ -38,6 +38,8 @@ local function updateTimerHandle(handle, dt)
 		--   limit = <number>,
 		--   count = <number>,
 		-- }
+		if handle.active == false then return end
+		
 		handle.time = handle.time + dt
 		handle.during(dt, math.max(handle.limit - handle.time, 0))
 
@@ -70,18 +72,24 @@ function Timer:update(dt)
 end
 
 function Timer:during(delay, during, after)
-	local handle = { time = 0, during = during, after = after or _nothing_, limit = delay, count = 1 }
+	local handle = { time = 0, during = during, after = after or _nothing_, limit = delay, count = 1, active = true }
 	self.functions[handle] = true
 	return handle
 end
 
-function Timer:after(delay, func)
-	return self:during(delay, _nothing_, func)
+function Timer:after(delay, func, count)
+	--[[ count = count or 1
+	return self:every(delay, func, count) ]]
+	if count == nil or count <= 1 then
+		return self:during(delay, _nothing_, func)
+	else
+		return self:every(delay, func, count)
+	end
 end
 
 function Timer:every(delay, after, count)
 	local count = count or math.huge -- exploit below: math.huge - 1 = math.huge
-	local handle = { time = 0, during = _nothing_, after = after, limit = delay, count = count }
+	local handle = { time = 0, during = _nothing_, after = after, limit = delay, count = count, active = true }
 	self.functions[handle] = true
 	return handle
 end

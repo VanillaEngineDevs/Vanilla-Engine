@@ -40,7 +40,7 @@ return {
 			self:initUI()
 		end
 
-		weeks:setupCountdown()
+		weeks:performCountdown()
 	end,
 
 	initUI = function(self)

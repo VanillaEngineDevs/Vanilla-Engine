@@ -79,4 +79,24 @@ function camera:getPoint(name)
     return camera.points[name]
 end
 
+--[[camera.x = bfpoint.x
+		camera.y = bfpoint.y
+		camera.defaultX = bfpoint.x
+		camera.defaultY = bfpoint.y
+		camera.targetX = bfpoint.x
+		camera.targetY = bfpoint.y
+		CAM_LERP_POINT.x = bfpoint.x
+		CAM_LERP_POINT.y = bfpoint.y]]
+
+function camera:forcePos(x, y)
+    camera.x = x
+    camera.y = y
+    camera.defaultX = x
+    camera.defaultY = y
+    camera.targetX = x
+    camera.targetY = y
+    CAM_LERP_POINT.x = x
+    CAM_LERP_POINT.y = y
+end
+
 return camera

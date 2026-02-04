@@ -150,7 +150,7 @@ function character:update(dt)
 
     if self:isSinging() then
         self.holdTimer = self.holdTimer + dt
-        local singTimeSec = self.singTime * Conductor.getBeatLengthsMS() / 1000
+        local singTimeSec = self.singTime * weeks.conductor:getBeatLengthsMS() / 1000
         singTimeSec = singTimeSec / 10 + 0.2
 
         if self.sprite and self.sprite.curAnim and self.sprite.curAnim.name:endsWith("-miss") then
@@ -201,7 +201,13 @@ function character:onStepHit(step)
         if not self.sprite.animFinished and self.sprite.curAnim then
             local isidledance = self.sprite.curAnim.name:startsWith("dance") or self.sprite.curAnim.name:startsWith("idle")
 
-            if not isidledance then
+            if not isidledance and not self.sprite.curAnim.name:endsWith("-hold") then
+                return
+            end
+        end
+        if self.characterType == CHARACTER_TYPE.BF then
+            local isidledance = self.sprite.curAnim.name:startsWith("dance") or self.sprite.curAnim.name:startsWith("idle")
+            if self:isHoldingNote() and not isidledance then
                 return
             end
         end
@@ -234,7 +240,7 @@ function character:isSinging()
         return true
     end
 
-    if not self.sprite.curAnim.name:startsWith("sing") and self.sprite.animFinished then
+    if not self.sprite.curAnim.name:startsWith("sing") then
         return false
     end
 

@@ -6,24 +6,9 @@ return {
 	},
 
 	enter = function(self, from, songNum, songAppend, _songExt, _audioAppend)
-		weeks:enter()
+		weeks:enter("normal", songNum, songAppend, _songExt, _audioAppend)
 
-		song = songNum
-		difficulty = songAppend
-		songExt = _songExt
-		audioAppend = _audioAppend
-
-		self:load()
-	end,
-
-	load = function(self, DONT_GENERATE)
-		weeks:load(not DONT_GENERATE)
-		if not DONT_GENERATE then
-			weeks:initUI()
-			weeks:generateNotes(self.songs[song], difficulty)
-		end
-
-		weeks:setupCountdown()
+		weeks:load()
 	end,
 
 	update = function(self, dt)

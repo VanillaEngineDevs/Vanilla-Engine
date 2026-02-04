@@ -39,6 +39,8 @@ maxNPS = 0
 local isResetting = false
 local resettingTime = {0}
 
+UI_VISIBLE = true
+
 local allStates = {
 	sickCounter = 0,
 	goodCounter = 0,
@@ -74,6 +76,12 @@ local CURCHART = {
 sickCounter, goodCounter, badCounter, shitCounter, missCounter, maxCombo, score = 0, 0, 0, 0, 0, 0, 0
 
 NOTES_BATCH = nil
+
+song = 1
+difficulty = "normal"
+songExt = ""
+audioAppend = ""
+CURRENTMODE = "normal"
 
 local function getWife3Condition(acc)
 	if acc >= 99.9935 then return 1 end -- AAAAA
@@ -132,7 +140,8 @@ local healthIconPreloads = {}
 local inHolds = {false, false, false, false}
 
 return {
-	enter = function(self, option)
+	enter = function(self, option, songNum, songAppend, _songExt, _audioAppend)
+		CURRENTMODE = option or "normal"
 		self.gameoverType = "character" -- uses boyfriend.gameOverState
 		IS_CLASSIC_MOVEMENT = false
 		allStates = {
@@ -149,6 +158,11 @@ return {
 		playMenuMusic = false
 		beatHandler.reset()
 		option = option or "normal"
+
+		song = songNum or 1
+		difficulty = songAppend or "normal"
+		songExt = _songExt or ""
+		audioAppend = _audioAppend or ""
 
 		if option ~= "pixel" then
 			pixel = false
@@ -222,7 +236,7 @@ return {
 
 		popupScore:init(sprites.numbers, rating)
 
-		countdownFade = {}
+		countdownFade = {0}
 
 		if settings.middlescroll then
 			if not settings.downscroll then
@@ -235,6 +249,8 @@ return {
 				popupScore:setPlacement(0, -400)
 			end
 		end
+
+		self.conductor = Conductor.new()
 	end,
 
 	load = function(self, wasntRestart)
@@ -339,11 +355,6 @@ return {
 		enemyIcon.y = healthBar.y
 		boyfriendIcon.y = healthBar.y
 
-		if wasntRestart and not graphics.isFading() then
-			previousMusicTime = 0
-			graphics:fadeInWipe(0.6)
-		end
-
 		isResetting = false
 		if boyfriend then boyfriend.playerInputs = true end
 
@@ -383,6 +394,27 @@ return {
 				CAM_LERP_POINT.y = bfpoint.y
 			end
 		end
+
+		previousFrameTime = love.timer.getTime() * 1000
+
+		if wasntRestart and not graphics.isFading() then
+			print("Generating notes for song:", Gamestate.current().songs[song], "with difficulty:", difficulty)
+			self:initUI(CURRENTMODE)
+			self:generateNotes(Gamestate.current().songs[song], difficulty)
+			graphics:fadeInWipe(0.6)
+		end
+
+		local vwoosh = 0.5
+		musicTime = (-vwoosh * 1000) + (self.conductor:getBeatLengthsMS() * -5)
+		for i = 1, 4 do
+			boyfriendArrows[i].alpha = 0
+			enemyArrows[i].alpha = 0
+		end
+		Timer.after(vwoosh, function()
+			self:vwooshArrows(boyfriendArrows)
+			self:vwooshArrows(enemyArrows)
+			self:performCountdown(vwoosh)
+		end)
 	end,
 
 	preloadIcon = function(self, path, name)
@@ -452,9 +484,8 @@ return {
 	end,
 
 	checkSongOver = function(self)
-		--if not (countingDown or graphics.isFading()) and not (inst and inst:isPlaying()) and not paused and not inCutscene then
-		-- use inst, if inst doesn't exist, use voices, else dont use anything
-		if not (countingDown or graphics.isFading()) and not ((inst and inst:isPlaying()) or (voicesBF and voicesBF:isPlaying())) and not paused and not inCutscene and not isResetting then
+		--[[ if not (countingDown or graphics.isFading()) and not ((inst and inst:isPlaying()) or (voicesBF and voicesBF:isPlaying())) and not paused and not inCutscene and not isResetting then ]]
+		if musicTime >= inst:getDuration("seconds") * 1000 then
 			allStates.sickCounter = allStates.sickCounter + sickCounter
 			allStates.goodCounter = allStates.goodCounter + goodCounter
 			allStates.badCounter = allStates.badCounter + badCounter
@@ -633,7 +664,7 @@ return {
 			metadata = love.filesystem.load(metadata)()
 		end
 		self.metadata = metadata
-		Conductor.mapBPMChanges(metadata)
+		self.conductor:mapBPMChanges(metadata)
 		metadata.playData = metadata.playData or {}
 		metadata.playData.characters = metadata.playData.characters or {}
 		metadata.playData.characters.opponent = metadata.playData.characters.opponent or "dad"
@@ -895,79 +926,123 @@ return {
 		end
 	end,
 
-	setupCountdown = function(self, countNumVal, func)
-		countNumVal = countNumVal or 4
+	COUNTDOWN_STEPS = {
+		BEFORE = 1,
+		THREE = 2,
+		TWO = 3,
+		ONE = 4,
+		GO = 5,
+		AFTER = 6
+	},
+	countdownStep = 1,
 
-		if not storyMode and countNumVal == 4 then
-			for i = 1, 4 do
-				boyfriendArrows[i].alpha = 0
-				boyfriendArrows[i].y = boyfriendArrows[i].y - 50
-				enemyArrows[i].alpha = 0
-				enemyArrows[i].y = enemyArrows[i].y - 50
-
-				Timer.after(0.5 + (0.2 * i), function()
-					local targetY = CONSTANTS.WEEKS.STRUM_Y * (settings.downscroll and -1 or 1)
-
-					Timer.tween(1, boyfriendArrows[i], {
-						alpha = boyfriendArrows[i].finishedAlpha,
-						y = targetY
-					}, "out-circ", function()
-						boyfriendArrows[i].alpha = boyfriendArrows[i].finishedAlpha
-					end)
-
-					Timer.tween(1, enemyArrows[i], {
-						alpha = enemyArrows[i].finishedAlpha,
-						y = targetY
-					}, "out-circ", function()
-						enemyArrows[i].alpha = enemyArrows[i].finishedAlpha
-					end)
-				end)
-			end
+	pauseCountdown = function(self)
+		if self.countdownTimer then
+			self.countdownTimer.active = false
 		end
+		countingDown = false
+	end,
 
-		lastReportedPlaytime = 0
-		if countNumVal == 4 then
-			musicTime = ((60 * 4) / bpm) * -1000 -- countdown is 4 beats long
+	resumeCountdown = function(self)
+		if self.countdownTimer then
+			self.countdownTimer.active = true
 		end
-		musicThres = 0
 		countingDown = true
+	end,
+	
+	stopCountdown = function(self)
+		if self.countdownTimer then
+			Timer.cancel(self.countdownTimer)
+			self.countdownTimer = nil
+		end
+		countingDown = false
+	end,
 
-		audio.playSound(sounds.countdown[CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[countNumVal]])
+	vwooshArrows = function(self, arrows)
+		local vwooshTime = 0.5
+		for i = 1, #arrows do
+			arrows[i].alpha = 0
+			arrows[i].y = arrows[i].y - 50
+			local vwooshSteps = vwooshTime / #arrows
+			Timer.after(vwooshSteps * (i - 1), function()
+				local target = CONSTANTS.WEEKS.STRUM_Y * (settings.downscroll and -1 or 1)
 
-		if countNumVal == 4 then
-			countdownFade[1] = 0
-			Timer.after((60 / bpm), function()
-				self:setupCountdown(countNumVal - 1, func)
-			end)
-		else
-			countdownFade[1] = 1
-			countdown:animate(CONSTANTS.WEEKS.COUNTDOWN_ANIMS[countNumVal])
-
-			Timer.tween((60 / bpm), countdownFade, {0}, "linear", function()
-				if countNumVal ~= 1 then
-					self:setupCountdown(countNumVal - 1, func)
-				else
-					countingDown = false
-					previousFrameTime = love.timer.getTime() * 1000
-					lastReportedPlaytime = 0
-					musicThres = 0
-					musicTime = 0
-					beatHandler.reset(0)
-
-					if inst then inst:play() end
-					if voicesBF then voicesBF:play() end
-					if voicesEnemy then voicesEnemy:play() end
-
-					beatHandler.setBeat(0)
-					if func then func() end
-				end
+				Timer.tween(vwooshSteps, arrows[i], {
+					alpha = arrows[i].finishedAlpha,
+					y = target
+				}, "out-circ", function()
+					arrows[i].alpha = arrows[i].finishedAlpha
+					arrows[i].y = target
+				end)
 			end)
 		end
 	end,
 
+	performCountdown = function(self, vwoosh)
+		countingDown = true
+
+		self.countdownStep = self.COUNTDOWN_STEPS.BEFORE
+		local event = eventCreator:countdownStart()
+		self.stage:call("onCountdownStart", event)
+		if event.cancelled then
+			self:stopCountdown()
+			return
+		end
+
+		self:stopCountdown()
+
+		musicTime = self.conductor:getBeatLengthsMS() * -5
+
+		self.countdownTimer = Timer.after(self.conductor:getBeatLengthsMS()/1000, function()
+			if self.countdownStep == self.COUNTDOWN_STEPS.BEFORE then
+				self.countdownStep = self.COUNTDOWN_STEPS.THREE
+				audio.playSound(sounds.countdown[CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[4]])
+			elseif self.countdownStep == self.COUNTDOWN_STEPS.THREE then
+				self.countdownStep = self.COUNTDOWN_STEPS.TWO
+				countdown:animate(CONSTANTS.WEEKS.COUNTDOWN_ANIMS[3])
+				audio.playSound(sounds.countdown[CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[3]])
+			elseif self.countdownStep == self.COUNTDOWN_STEPS.TWO then
+				self.countdownStep = self.COUNTDOWN_STEPS.ONE
+				countdown:animate(CONSTANTS.WEEKS.COUNTDOWN_ANIMS[2])
+				audio.playSound(sounds.countdown[CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[2]])
+			elseif self.countdownStep == self.COUNTDOWN_STEPS.ONE then
+				self.countdownStep = self.COUNTDOWN_STEPS.GO
+				countdown:animate(CONSTANTS.WEEKS.COUNTDOWN_ANIMS[1])
+				audio.playSound(sounds.countdown[CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[1]])
+			else
+				self.countdownStep = self.COUNTDOWN_STEPS.AFTER
+			end
+
+			-- if we are not two, one, or go, do not set countdownFade[1] to 1
+			if self.countdownStep == self.COUNTDOWN_STEPS.TWO or
+				self.countdownStep == self.COUNTDOWN_STEPS.ONE or
+			self.countdownStep == self.COUNTDOWN_STEPS.GO then
+				countdownFade[1] = 1
+				Timer.tween(self.conductor:getBeatLengthsMS()/1000, countdownFade, {0}, "in-out-cubic")
+			else
+				countdownFade[1] = 0
+			end
+
+			local event = eventCreator:countdownTick(self.countdownStep)
+			self.stage:call("onCountdownTick", event)
+			if event.cancelled then
+				self:pauseCountdown()
+				return
+			end
+
+			if self.countdownStep == self.COUNTDOWN_STEPS.AFTER then
+				self:stopCountdown()
+
+				inst:play()
+				if voicesBF then voicesBF:play() end
+				if voicesEnemy then voicesEnemy:play() end
+			end
+		end, 5)
+	end,
+
 	update = function(self, dt)
-		if input:pressed("pause") and not countingDown and not inCutscene and not paused then
-			if not graphics.isFading() then 
+		if input:pressed("pause") and not countingDown and not paused then
+			if not graphics.isFading() then
 				paused = true
 				pauseTime = musicTime
 				if paused then
@@ -1090,7 +1165,7 @@ return {
 								if voicesBF then voicesBF:seek(0) end
 								if voicesEnemy then voicesEnemy:seek(0) end
 
-								Gamestate.current():load(true)
+								self:load(false)
 							end
 						)
 					end
@@ -1107,7 +1182,7 @@ return {
 		end
 		if inCutscene then return end
 		beatHandler.update(dt)
-		Conductor.update(dt)
+		self.conductor:update(dt)
 
 		-- nps table
 		for i, note in ipairs(nps) do
@@ -1117,12 +1192,14 @@ return {
 		end
 
 		oldMusicThres = musicThres
-		if countingDown or love.system.getOS() == "Web" then -- Source:tell() can't be trusted on love.js!
+		if countingDown or love.system.getOS() == "Web" then -- Source:tell() can't be trusted on love.js!\
+			print(countingDown)
 			musicTime = musicTime + 1000 * dt
 		else
-			if not graphics.isFading() then
+			if not graphics.isFading() and inst:isPlaying() then
+				print("Using audio time")
 				local time = love.timer.getTime()
-				local seconds = voicesBF and voicesBF:tell("seconds") or inst:tell("seconds")
+				local seconds = inst:tell("seconds")
 
 				musicTime = musicTime + (time * 1000) - previousFrameTime
 				previousFrameTime = time * 1000
@@ -1131,6 +1208,8 @@ return {
 					lastReportedPlaytime = seconds * 1000
 					musicTime = (musicTime + lastReportedPlaytime) / 2
 				end
+			else
+				previousFrameTime = love.timer.getTime() * 1000
 			end
 		end
 		absMusicTime = math.abs(musicTime)
@@ -1225,7 +1304,7 @@ return {
 							camera.x = targetX
 							camera.y = targetY
 						else
-							local time = (Conductor.getStepLengthMs() * duration) / 1000
+							local time = (self.conductor:getStepLengthMs() * duration) / 1000
 							if camTween then 
 								Timer.cancel(camTween)
 							end
@@ -1278,14 +1357,14 @@ return {
 						print(target)
 
 						if event.value.ease ~= "INSTANT" then
-							local time = Conductor.getStepLengthMs() * (tonumber(event.value.duration) or 4) / 1000
+							local time = self.conductor:getStepLengthMs() * (tonumber(event.value.duration) or 4) / 1000
 							if bumpTween then 
 								Timer.cancel(bumpTween)
 							end
 							bumpTween = Timer.tween(
 								time,
 								camera,
-								{defaultZoom = target },
+								{defaultZoom = target},
 								CONSTANTS.WEEKS.EASING_TYPES[(event.value.ease or "CLASSIC") .. (event.value.easeDir or "")]
 							)
 						else
@@ -1386,7 +1465,7 @@ return {
 			end
 		end
 
-		if (Conductor.onBeat and Conductor.curBeat % camera.camBopInterval == 0 and camera.zooming and camera.zoom < 1.35 and not camera.locked) then 
+		if (self.conductor.onBeat and self.conductor.curBeat % camera.camBopInterval == 0 and camera.zooming and camera.zoom < 1.35 and not camera.locked) then 
 			camera.zoom = camera.zoom + 0.015 * camera.camBopIntensity
 			uiCam.zoom = uiCam.zoom + 0.03 * camera.camBopIntensity
 		end
@@ -1397,11 +1476,11 @@ return {
 		end
 
 		self.stage:call("onUpdate", dt)
-		if Conductor.onStep then
-			self.stage:call("onStepHit", Conductor.curStep)
+		if self.conductor.onStep then
+			self.stage:call("onStepHit", self.conductor.curStep)
 		end
-		if Conductor.onBeat then
-			self.stage:call("onBeatHit", Conductor.curBeat)
+		if self.conductor.onBeat then
+			self.stage:call("onBeatHit", self.conductor.curBeat)
 		end
 		for _, obj in ipairs(self.objects) do
 			if obj.update then
@@ -1411,17 +1490,17 @@ return {
 				end
 			end
 
-			if Conductor.onStep and obj.onStepHit then
-				obj:onStepHit(Conductor.curStep)
+			if self.conductor.onStep and obj.onStepHit then
+				obj:onStepHit(self.conductor.curStep)
 				if obj.call then
-					obj:call("onStepHit", Conductor.curStep)
+					obj:call("onStepHit", self.conductor.curStep)
 				end
 			end
 
-			if Conductor.onBeat and obj.onBeatHit then
-				obj:onBeatHit(Conductor.curBeat)
+			if self.conductor.onBeat and obj.onBeatHit then
+				obj:onBeatHit(self.conductor.curBeat)
 				if obj.call then
-					obj:call("onBeatHit", Conductor.curBeat)
+					obj:call("onBeatHit", self.conductor.curBeat)
 				end
 			end
 		end
@@ -1458,6 +1537,19 @@ return {
 				local score = math.floor(CONSTANTS.WEEKS.MAX_SCORE * factor + CONSTANTS.WEEKS.MIN_SCORE)
 				return score
 			end
+		end
+	end,
+
+	removeAudio = function(self, name)
+		if name == "inst" then
+			if inst then inst:stop() end
+			inst = nil
+		elseif name == "enemy" then
+			if voicesEnemy then voicesEnemy:stop() end
+			voicesEnemy = nil
+		elseif name == "bf" then
+			if voicesBF then voicesBF:stop() end
+			voicesBF = nil
 		end
 	end,
 
@@ -1569,11 +1661,14 @@ return {
 										end
 										whohit.holdTimer = 0
 									else
+										print(enemyArrow.visible)
 										NoteSplash:new(
 											{
 												anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
 												posX = enemyArrow.x,
 												posY = enemyArrow.y,
+												alpha = enemyArrow.alpha,
+												visible = enemyArrow.visible,
 											},
 											i
 										)
@@ -1728,6 +1823,8 @@ return {
 											anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
 											posX = boyfriendArrow.x,
 											posY = boyfriendArrow.y,
+											alpha = boyfriendArrow.alpha,
+											visible = boyfriendArrow.visible,
 										},
 										i
 									)
@@ -1883,7 +1980,7 @@ return {
 		enemyIcon.x = healthBar.x + healthBar.width - 75 - healthLerp * 500
 		boyfriendIcon.x = healthBar.x + healthBar.width + 75 - healthLerp * 500
 
-		if Conductor.onBeat then
+		if self.conductor.onBeat then
 			enemyIcon.sizeX, enemyIcon.sizeY = 1.75, 1.75
 			boyfriendIcon.sizeX, boyfriendIcon.sizeY = -1.75, 1.75
 		end
@@ -1982,6 +2079,7 @@ return {
 	end,
 
 	drawUI = function(self)
+		if not UI_VISIBLE then return end
 		NOTES_BATCH:clear()
 		if paused then
 			love.graphics.push()
@@ -2148,6 +2246,14 @@ return {
 		love.graphics.pop()
 		love.graphics.setFont(lastFont)
 		self:drawRating()
+	end,
+
+	hideUI = function(self)
+		UI_VISIBLE = false
+	end,
+
+	showUI = function(self)
+		UI_VISIBLE = true
 	end,
 
 	debugKeyPressed = function(self, k)

@@ -23,7 +23,7 @@ function gameover:enter(from)
     self:setCameraTarget()
 
     musicTime = 0
-    Conductor.update(0)
+    weeks.conductor:update(0)
 
     hapticUtil:vibrate(0, CONSTANTS.HAPTICS.DEFAULT_VIBRATION_DURATION)
 
@@ -159,7 +159,7 @@ function gameover:confirmDeath()
             local function endShit()
                 Gamestate.pop()
                 if fromState then
-                    fromState:load(true)
+                    weeks:load(true)
                 end
                 if boyfriend then
                     boyfriend.isDead = false
@@ -266,7 +266,7 @@ function gameover:update(dt)
 
     if self.gameOverMusic ~= nil and self.gameOverMusic:isPlaying() then
         musicTime = musicTime + dt
-        Conductor.update(dt)
+        weeks.conductor:update(dt)
     elseif boyfriend then
         if boyfriend:getDeathQuote() ~= nil then
             if not boyfriend.sprite.curAnim then return end

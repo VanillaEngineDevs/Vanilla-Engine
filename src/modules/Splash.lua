@@ -31,6 +31,8 @@ function splash:new(settings, id)
     s.sprite.x = s.posX
     s.sprite.y = s.posY
     s.sprite.id = id
+    s.sprite.alpha = settings.alpha or 1
+    s.sprite.visible = settings.visible
     s.sprite:animate(s.anim)
 
     table.insert(self.cache, s)
@@ -53,6 +55,7 @@ function splash:draw()
         graphics.setColor(1,1,1,0.5)
         v.sprite:draw()
         graphics.setColor(1,1,1,1)
+        ::continue::
     end
 end
 
@@ -62,6 +65,7 @@ function splash:udraw(sx, sy)
         graphics.setColor(1,1,1,0.5)
         v.sprite:udraw(sx, sy)
         graphics.setColor(1,1,1,1)
+        ::continue::
     end
 end
 

@@ -19,6 +19,38 @@ function EXTEND_LIBRARY(assetPath, appendAssets)
     return assetPath
 end
 
+function EXTEND_LIBRARY_SFX(assetPath)
+    local lib, path = assetPath:match("^(.-):(.-)$")
+    if lib and path then
+        if lib ~= "shared" then
+            lib = lib .. "/sounds"
+        end
+        assetPath = "assets/" .. lib:lower() .. "/" .. path
+    else
+        if not assetPath:startsWith("#") and not assetPath:startsWith("assets/") then
+            assetPath = "shared/" .. assetPath
+        end
+    end
+
+    return assetPath
+end
+
+function EXTEND_LIBRARY_MUSIC(assetPath)
+    local lib, path = assetPath:match("^(.-):(.-)$")
+    if lib and path then
+        if lib ~= "shared" then
+            lib = lib .. "/music"
+        end
+        assetPath = "assets/" .. lib:lower() .. "/" .. path
+    else
+        if not assetPath:startsWith("#") and not assetPath:startsWith("assets/") then
+            assetPath = "shared/" .. assetPath
+        end
+    end
+
+    return assetPath
+end
+
 function AnimateAtlasCharacter:new(data, _atlasSettings)
     AnimateAtlasCharacter.super.new(self, data)
 

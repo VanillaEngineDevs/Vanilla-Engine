@@ -1,26 +1,36 @@
-Conductor = {}
-Conductor.bpm = 100
-Conductor.crotchet = (60 / Conductor.bpm) * 1000
-Conductor.stepCrotchet = Conductor.crotchet / 4
-musicTime = 0
-Conductor.curStep = 0
-Conductor.curBeat = 0
-Conductor.curDecStep = 0
-Conductor.curDecBeat = 0
-Conductor.stepsToDo = 0
-Conductor.curSection = 0
-Conductor.lastSongPos = 0
-Conductor.offset = 0
+local Conductor = {}
+Conductor.__index = Conductor
 
-Conductor.ROWS_PER_BEAT = 48 
+Conductor.ROWS_PER_BEAT = 48
 Conductor.BEATS_PER_MEASURE = 4
 Conductor.ROWS_PER_MEASURE = Conductor.ROWS_PER_BEAT * Conductor.BEATS_PER_MEASURE
 Conductor.MAX_NOTE_ROW = bit.lshift(1, 30)
 
-Conductor.bpmChangeMap = {}
+function Conductor.new(bpm)
+    local self = setmetatable({}, Conductor)
 
-function Conductor.new()
-    local self = setmetatable({}, { __index = Conductor })
+    self.bpm = bpm or 100
+    self.crotchet = (60 / self.bpm) * 1000
+    self.stepCrotchet = self.crotchet / 4
+
+    self.musicTime = 0
+
+    self.curStep = 0
+    self.curBeat = 0
+    self.curDecStep = 0
+    self.curDecBeat = 0
+
+    self.stepsToDo = 0
+    self.curSection = 0
+    self.lastSongPos = 0
+    self.offset = 0
+
+    self.bpmChangeMap = {}
+
+    self.onStep = false
+    self.onBeat = false
+    self.onSection = false
+
     return self
 end
 
@@ -32,8 +42,8 @@ function Conductor.rowToBeat(row)
     return row / Conductor.ROWS_PER_BEAT
 end
 
-function Conductor.secsToRow(secs)
-    return math.floor(Conductor.getBeat(secs) * Conductor.ROWS_PER_BEAT + 0.5)
+function Conductor.secsToRow(secs, conductor)
+    return math.floor(conductor:getBeat(secs) * Conductor.ROWS_PER_BEAT + 0.5)
 end
 
 function Conductor.beatToNoteRow(beat)
@@ -44,85 +54,87 @@ function Conductor.noteRowToBeat(row)
     return row / Conductor.ROWS_PER_BEAT
 end
 
-function Conductor.timeSinceLastBPMChange(time)
-    local lastChange = Conductor.getBPMFromSeconds(time)
-    return time - lastChange.songTime
+function Conductor:calculateCrochet(bpm)
+    return (60 / bpm) * 1000
 end
 
-function Conductor.getBeatInMeasure(time)
-    local lastChange = Conductor.getBPMFromSeconds(time)
-    return (time - lastChange.songTime) / (lastChange.stepCrotchet * 4)
+function Conductor:getBeatLengthsMS()
+    return (60 / self.bpm) * 1000
 end
 
-function Conductor.getCrotchetAtTime(time)
-    local lastChange = Conductor.getBPMFromSeconds(time)
-    return lastChange.stepCrotchet * 4
+function Conductor:getStepLengthMs()
+    return (60 / self.bpm) * 1000 / 4
 end
 
-function Conductor.getBPMFromSeconds(time)
+function Conductor:changeBPM(newBpm)
+    self.bpm = newBpm
+    self.crotchet = self:calculateCrochet(newBpm)
+    self.stepCrotchet = self.crotchet / 4
+end
+
+Conductor.setBPM = Conductor.changeBPM
+
+function Conductor:getBPMFromSeconds(time)
     local lastChange = {
         stepTime = 0,
         songTime = 0,
-        bpm = Conductor.bpm,
-        stepCrotchet = Conductor.stepCrotchet
+        bpm = self.bpm,
+        stepCrotchet = self.stepCrotchet
     }
-    for _, change in ipairs(Conductor.bpmChangeMap) do
+
+    for _, change in ipairs(self.bpmChangeMap) do
         if time >= change.songTime then
             lastChange = change
         end
     end
+
     return lastChange
 end
 
-function Conductor.getBeatLengthsMS()
-    return 60 / Conductor.bpm * 1000
-end
-
-function Conductor.getStepLengthMs()
-    return Conductor.getBeatLengthsMS() * (timeSignatureNum / 4)
-end
-
-function Conductor.getBPMFromStep(step)
+function Conductor:getBPMFromStep(step)
     local lastChange = {
         stepTime = 0,
         songTime = 0,
-        bpm = Conductor.bpm,
-        stepCrotchet = Conductor.stepCrotchet
+        bpm = self.bpm,
+        stepCrotchet = self.stepCrotchet
     }
-    for _, change in ipairs(Conductor.bpmChangeMap) do
+
+    for _, change in ipairs(self.bpmChangeMap) do
         if change.stepTime <= step then
             lastChange = change
         end
     end
+
     return lastChange
 end
 
-function Conductor.beatToSeconds(beat)
-    local step = beat * 4
-    local lastChange = Conductor.getBPMFromStep(step)
-    return lastChange.songTime + ((step - lastChange.stepTime) / (lastChange.bpm / 60) / 4) * 1000
-end
-
-function Conductor.getStep(time)
-    local lastChange = Conductor.getBPMFromSeconds(time)
+function Conductor:getStep(time)
+    local lastChange = self:getBPMFromSeconds(time)
     return lastChange.stepTime + (time - lastChange.songTime) / lastChange.stepCrotchet
 end
 
-function Conductor.getStepRounded(time)
-    local lastChange = Conductor.getBPMFromSeconds(time)
+function Conductor:getStepRounded(time)
+    local lastChange = self:getBPMFromSeconds(time)
     return lastChange.stepTime + math.floor((time - lastChange.songTime) / lastChange.stepCrotchet)
 end
 
-function Conductor.getBeat(time)
-    return Conductor.getStep(time) / 4
+function Conductor:getBeat(time)
+    return self:getStep(time) / 4
 end
 
-function Conductor.getBeatRounded(time)
-    return math.floor(Conductor.getStepRounded(time) / 4)
+function Conductor:getBeatRounded(time)
+    return math.floor(self:getStepRounded(time) / 4)
 end
 
-function Conductor.mapBPMChangesLegacy(song)
-    Conductor.bpmChangeMap = {}
+function Conductor:beatToSeconds(beat)
+    local step = beat * 4
+    local lastChange = self:getBPMFromStep(step)
+    return lastChange.songTime
+        + ((step - lastChange.stepTime) / (lastChange.bpm / 60) / 4) * 1000
+end
+
+function Conductor:mapBPMChangesLegacy(song)
+    self.bpmChangeMap = {}
 
     local curBPM = song.bpm
     local totalSteps = 0
@@ -131,150 +143,134 @@ function Conductor.mapBPMChangesLegacy(song)
     for i, note in ipairs(song.notes) do
         if note.changeBPM and note.bpm ~= curBPM then
             curBPM = note.bpm
-            local event = {
+            table.insert(self.bpmChangeMap, {
                 stepTime = totalSteps,
                 songTime = totalPos,
                 bpm = curBPM,
-                stepCrotchet = Conductor.calculateCrochet(curBPM) / 4
-            }
-            table.insert(Conductor.bpmChangeMap, event)
+                stepCrotchet = self:calculateCrochet(curBPM) / 4
+            })
         end
 
-        local deltaSteps = math.floor(Conductor.getSectionBeats(song, i) * 4)
+        local deltaSteps = math.floor(self:getSectionBeats(song, i) * 4)
         totalSteps = totalSteps + deltaSteps
         totalPos = totalPos + ((60 / curBPM) * 1000 / 4) * deltaSteps
     end
 end
 
-function Conductor.mapBPMChanges(meta)
+function Conductor:mapBPMChanges(meta)
+    self.bpmChangeMap = {}
     local totalSteps = 0
+
     for _, bpmChange in ipairs(meta.timeChanges) do
-        -- new fnf's bpm changes show it in seconds, so we need to convert it to stepTime
-        local event = {
+        table.insert(self.bpmChangeMap, {
             stepTime = totalSteps,
             songTime = bpmChange.t,
             bpm = bpmChange.bpm,
-            stepCrotchet = Conductor.calculateCrochet(bpmChange.bpm) / 4
-        }
-        table.insert(Conductor.bpmChangeMap, event)
+            stepCrotchet = self:calculateCrochet(bpmChange.bpm) / 4
+        })
 
-        -- there are no sections in the new format, so we need to calculate the steps manually
-        -- convert our time to steps manually
-        -- so first we convert it to beats
         local beat = (bpmChange.t - meta.timeChanges[1].t) / (60 / bpmChange.bpm)
-        -- then we convert it to steps (1/4 of a beat)
         totalSteps = math.floor(beat * 4)
     end
-
 end
 
-function Conductor.update(dt)
-    Conductor.onSection, Conductor.onBeat, Conductor.onStep = false, false, false
-    local oldStep = Conductor.curStep
+function Conductor:update(dt, localMusicTime)
+    self.onSection = false
+    self.onBeat = false
+    self.onStep = false
 
-    Conductor.updateCurStep()
-    Conductor.updateBeat()
+    local oldStep = self.curStep
+    if localMusicTime then
+        self.musicTime = self.musicTime + dt * 1000
+    end
 
-    if oldStep ~= Conductor.curStep then
-        if Conductor.curStep > 0 then
-            Conductor.stepHit()
+    self:updateCurStep()
+    self:updateBeat()
+
+    if oldStep ~= self.curStep then
+        if self.curStep > 0 then
+            self:stepHit()
         end
 
-        if weeks.SONG ~= nil then
-            if oldStep < Conductor.curStep then
-                Conductor.updateSection()
+        if weeks.SONG then
+            if oldStep < self.curStep then
+                self:updateSection()
             else
-                Conductor.rollbackSection()
+                self:rollbackSection()
             end
         end
     end
 end
 
-function Conductor.getSectionBeats(song, section)
+function Conductor:updateCurStep()
+    local lastChange = self:getBPMFromSeconds(self.musicTime)
+    local offsetPosition = self.musicTime - lastChange.songTime
+    local stepTime = offsetPosition / lastChange.stepCrotchet
+
+    self.curDecStep = lastChange.stepTime + stepTime
+    self.curStep = lastChange.stepTime + math.floor(stepTime)
+end
+
+function Conductor:updateBeat()
+    self.curBeat = math.floor(self.curStep / 4)
+    self.curDecBeat = self.curDecStep / 4
+end
+
+function Conductor:getSectionBeats(song, section)
     return song.notes[section].sectionBeats or 4
 end
 
-function Conductor.calculateCrochet(bpm)
-    return (60 / bpm) * 1000
-end
-
-function Conductor.changeBPM(newBpm)
-    Conductor.bpm = newBpm
-    Conductor.crotchet = Conductor.calculateCrochet(newBpm)
-    Conductor.stepCrotchet = Conductor.crotchet / 4
-end
-
-function Conductor.updateSection()
-    if Conductor.stepsToDo < 1 then
-        Conductor.stepsToDo = math.floor(Conductor.getBeatsOnSection() * 4)
+function Conductor:getBeatsOnSection()
+    if weeks.SONG and weeks.SONG.notes[self.curSection] then
+        return weeks.SONG.notes[self.curSection].sectionBeats or 4
     end
-    while Conductor.curStep >= Conductor.stepsToDo do
-        Conductor.curSection = Conductor.curSection + 1
-        local beats = Conductor.getBeatsOnSection()
-        Conductor.stepsToDo = Conductor.stepsToDo + math.floor(beats * 4)
-        Conductor.sectionHit()
+    return 4
+end
+
+function Conductor:updateSection()
+    if self.stepsToDo < 1 then
+        self.stepsToDo = math.floor(self:getBeatsOnSection() * 4)
+    end
+
+    while self.curStep >= self.stepsToDo do
+        self.curSection = self.curSection + 1
+        local beats = self:getBeatsOnSection()
+        self.stepsToDo = self.stepsToDo + math.floor(beats * 4)
+        self:sectionHit()
     end
 end
 
-function Conductor.rollbackSection()
-    if Conductor.curStep < 0 then return end
+function Conductor:rollbackSection()
+    if self.curStep < 0 then return end
 
-    local lastSection = Conductor.curSection
-    Conductor.curSection = 0
-    Conductor.stepsToDo = 0
+    local lastSection = self.curSection
+    self.curSection = 0
+    self.stepsToDo = 0
+
     for i = 1, #weeks.SONG.notes do
-        if weeks.SONG.notes[i] ~= nil then
-            Conductor.stepsToDo = Conductor.stepsToDo + math.floor(Conductor.getBeatsOnSection() * 4)
-            if Conductor.stepsToDo > Conductor.curStep then
-                break
-            end
-            Conductor.curSection = Conductor.curSection + 1
-        end
+        self.stepsToDo = self.stepsToDo + math.floor(self:getBeatsOnSection() * 4)
+        if self.stepsToDo > self.curStep then break end
+        self.curSection = self.curSection + 1
     end
 
-    if Conductor.curSection > lastSection then
-        Conductor.sectionHit()
+    if self.curSection > lastSection then
+        self:sectionHit()
     end
 end
 
-function Conductor.updateBeat()
-    Conductor.curBeat = math.floor(Conductor.curStep / 4)
-    Conductor.curDecBeat = Conductor.curDecStep / 4
-end
-
-function Conductor.updateCurStep()
-    local lastChange = Conductor.getBPMFromSeconds(musicTime)
-
-    local offsetPosition = musicTime - lastChange.songTime
-    local stepTime = offsetPosition / lastChange.stepCrotchet
-    Conductor.curDecStep = lastChange.stepTime + stepTime
-    Conductor.curStep = lastChange.stepTime + math.floor(stepTime)
-end
-
-function Conductor.getBeatsOnSection()
-    local val = 4  -- Default value
-
-    -- Check if the current section exists and has sectionBeats
-    if weeks.SONG ~= nil and weeks.SONG.notes[Conductor.curSection] ~= nil then
-        val = weeks.SONG.notes[Conductor.curSection].sectionBeats or 4
-    end
-
-    return val
-end
-
-function Conductor.stepHit()
-    Conductor.onStep = true
-    if Conductor.curStep % 4 == 0 then
-        Conductor.beatHit()
+function Conductor:stepHit()
+    self.onStep = true
+    if self.curStep % 4 == 0 then
+        self:beatHit()
     end
 end
 
-function Conductor.beatHit()
-    Conductor.onBeat = true
+function Conductor:beatHit()
+    self.onBeat = true
 end
 
-function Conductor.sectionHit()
-    Conductor.onSection = true
+function Conductor:sectionHit()
+    self.onSection = true
 end
 
 return Conductor
