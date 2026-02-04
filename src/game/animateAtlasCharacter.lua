@@ -100,6 +100,14 @@ function AnimateAtlasCharacter:new(data, _atlasSettings)
     self.animations = data.animations
 end
 
+function AnimateAtlasCharacter:getAllAnimations()
+    local anims = {}
+    for _, anim in ipairs(self.animations) do
+        table.insert(anims, anim.name)
+    end
+    return anims
+end
+
 function AnimateAtlasCharacter:update(dt)
     AnimateAtlasCharacter.super.update(self, dt)
     self.sprite:update(dt)
@@ -116,6 +124,8 @@ function AnimateAtlasCharacter:update(dt)
     self.sprite.flipY = self.flipY
     self.sprite.onFrameChange = self.onFrameChange
     self.sprite.onAnimationFinished = self.onAnimationFinished
+
+    self.sprite.alpha = self.alpha or 0
 end
 
 function AnimateAtlasCharacter:updateHitbox()

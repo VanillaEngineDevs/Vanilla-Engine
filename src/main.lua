@@ -79,7 +79,7 @@ function love.load()
     input = require "input"
 
     debugMenu = require "states.debug.debugMenu"
-    spriteDebug = require "states.debug.sprite-debug"
+    spriteDebug = require "states.debug.fuck"
     stageDebug = require "states.debug.stage-debug"
     frameDebug = require "states.debug.frame-debug"
     stageBuilder = require "states.debug.stage-builder"

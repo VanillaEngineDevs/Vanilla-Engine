@@ -7,8 +7,8 @@
   "healthIcon": {
     "id": "mom"
   },
-  "offsets": [0, 0],
-  "cameraOffsets": [0, -99],
+  "offsets": [200, 25],
+  "cameraOffsets": [125, 99],
   "animations": [
     {
       "name": "idle",
@@ -28,7 +28,7 @@
       "name": "singLEFT",
       "prefix": "Mom Left Pose",
       "animType": "symbol",
-      "offsets": [250, -23]
+      "offsets": [526, 466]
     },
     {
       "name": "singLEFT-hold",
@@ -36,13 +36,13 @@
       "animType": "symbol",
       "looped": true,
       "frameIndices": [2, 3, 4, 5, 6, 7, 8, 9],
-      "offsets": [250, -23]
+      "offsets": [526, 466]
     },
     {
       "name": "singDOWN",
       "prefix": "MOM DOWN POSE",
       "animType": "symbol",
-      "offsets": [20, -150]
+      "offsets": [353, 259]
     },
     {
       "name": "singDOWN-hold",
@@ -50,13 +50,13 @@
       "animType": "symbol",
       "looped": true,
       "frameIndices": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-      "offsets": [20, -150]
+      "offsets": [353, 259]
     },
     {
       "name": "singUP",
       "prefix": "Mom Up Pose",
       "animType": "symbol",
-      "offsets": [20, 96]
+      "offsets": [1, -32]
     },
     {
       "name": "singUP-hold",
@@ -64,13 +64,13 @@
       "animType": "symbol",
       "looped": true,
       "frameIndices": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-      "offsets": [20, 96]
+      "offsets": [1, -32]
     },
     {
       "name": "singRIGHT",
       "prefix": "Mom Pose Left",
       "animType": "symbol",
-      "offsets": [10, -60]
+      "offsets": [344, 385]
     },
     {
       "name": "singRIGHT-hold",
@@ -78,7 +78,7 @@
       "animType": "symbol",
       "looped": true,
       "frameIndices": [2, 3, 4, 5, 6, 7, 8, 9],
-      "offsets": [10, -60]
+      "offsets": [344, 385]
     }
   ]
 }

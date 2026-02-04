@@ -31,6 +31,14 @@ function SparrowCharacter:setAntialiasing(enabled)
     self.sprite:setAntialiasing(enabled)
 end
 
+function SparrowCharacter:getAllAnimations()
+    local anims = {}
+    for _, anim in ipairs(self.animations) do
+        table.insert(anims, anim.name)
+    end
+    return anims
+end
+
 function SparrowCharacter:update(dt)
     SparrowCharacter.super.update(self, dt)
     self.sprite:update(dt)
@@ -56,6 +64,8 @@ function SparrowCharacter:update(dt)
     self.sprite.flipY = self.flipY
     self.sprite.onFrameChange = self.onFrameChange
     self.sprite.onAnimationFinished = self.onAnimationFinished
+
+    self.sprite.alpha = self.alpha or 0
 end
 
 function SparrowCharacter:updateHitbox()

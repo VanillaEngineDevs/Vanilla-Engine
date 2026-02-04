@@ -78,6 +78,9 @@ function character.getCharacter(id)
     char.offsets = data.offsets or {0, 0}
     char.scale = {x = data.scale or 1, y = data.scale or 1}
 
+    char.cameraOffsets = {x = data.cameraOffsets and data.cameraOffsets[1] or 0,
+                          y = data.cameraOffsets and data.cameraOffsets[2] or 0}
+
     char:setAntialiasing(not data.isPixel)
 
     char:call("onCreate")

@@ -95,7 +95,16 @@ function MultiSparrowCharacter:update(dt)
         spr.flipY = self.flipY
         spr.onFrameChange = self.onFrameChange
         spr.onAnimationFinished = self.onAnimationFinished
+        spr.alpha = self.alpha or 0
     end
+end
+
+function MultiSparrowCharacter:getAllAnimations()
+    local anims = {}
+    for _, anim in ipairs(self.animations) do
+        table.insert(anims, anim.name)
+    end
+    return anims
 end
 
 function MultiSparrowCharacter:play(name, forced, loop)

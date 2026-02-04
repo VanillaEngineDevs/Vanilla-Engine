@@ -78,6 +78,7 @@ function MultiAnimateAtlasCharacter:update(dt)
         spr.flipY = self.flipY
         spr.onFrameChange = self.onFrameChange
         spr.onAnimationFinished = self.onAnimationFinished
+        spr.alpha = self.alpha or 0
     end
 end
 
@@ -116,6 +117,14 @@ function MultiAnimateAtlasCharacter:play(name, forced, loop)
             break
         end
     end
+end
+
+function MultiAnimateAtlasCharacter:getAllAnimations()
+    local anims = {}
+    for _, anim in ipairs(self.animations) do
+        table.insert(anims, anim.name)
+    end
+    return anims
 end
 
 function MultiAnimateAtlasCharacter:draw(camera)
