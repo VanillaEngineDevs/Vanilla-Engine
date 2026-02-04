@@ -483,57 +483,75 @@ return {
 		end
 	end,
 
+	songEnded = false,
+
 	checkSongOver = function(self)
 		--[[ if not (countingDown or graphics.isFading()) and not ((inst and inst:isPlaying()) or (voicesBF and voicesBF:isPlaying())) and not paused and not inCutscene and not isResetting then ]]
-		if musicTime >= inst:getDuration("seconds") * 1000 then
-			allStates.sickCounter = allStates.sickCounter + sickCounter
-			allStates.goodCounter = allStates.goodCounter + goodCounter
-			allStates.badCounter = allStates.badCounter + badCounter
-			allStates.shitCounter = allStates.shitCounter + shitCounter
-			allStates.missCounter = allStates.missCounter + misses
-			if maxCombo > allStates.maxCombo then allStates.maxCombo = maxCombo end
-			allStates.score = allStates.score + score
+		if musicTime >= math.floor(inst:getDuration("seconds") * 1000) and not self.songEnded then
+			self.songEnded = true
+			self:endSong()
+		end
+	end,
 
-			if storyMode and song < #weekMeta[weekNum][2] then
-				self:saveData()
-				song = song + 1
-
-				curWeekData:load()
-			else
-				self:saveData()
-
-				status.setLoading(true)
-
-				graphics:fadeOutWipe(
-					0.7,
-					function()
-						if not quitPressed then
-							Gamestate.switch(resultsScreen, {
-								diff = string.lower(CURDIFF or "normal"),
-								song = not storyMode and SONGNAME or weekDesc[weekNum],
-								artist = not storyMode and ARTIST or nil,
-								scores = {
-									sickCount = allStates.sickCounter,
-									goodCount = allStates.goodCounter,
-									badCount = allStates.badCounter,
-									shitCount = allStates.shitCounter,
-									missedCount = allStates.missCounter,
-									maxCombo = allStates.maxCombo,
-									score = allStates.score
-								}
-							})
-						else
-							if storyMode then
-								Gamestate.switch(menuWeek)
-							else
-								Gamestate.switch(menuFreeplay)
-							end
-						end
-
-						status.setLoading(false)
-					end
-				)
+	endSong = function(self)
+		local event = eventCreator:endSong()
+		self.stage:call("onSongEnd", event)
+		self.song:call("onSongEnd", event)
+		for _, obj in ipairs(self.objects) do
+			if obj.call then
+				obj:call("onSongEnd", event)
 			end
+		end
+		if event.cancelled then return end
+		allStates.sickCounter = allStates.sickCounter + sickCounter
+		allStates.goodCounter = allStates.goodCounter + goodCounter
+		allStates.badCounter = allStates.badCounter + badCounter
+		allStates.shitCounter = allStates.shitCounter + shitCounter
+		allStates.missCounter = allStates.missCounter + misses
+		if maxCombo > allStates.maxCombo then allStates.maxCombo = maxCombo end
+		allStates.score = allStates.score + score
+
+		if storyMode and song < #Gamestate.current().songs and not status.getLoading() then
+			self:saveData()
+			song = song + 1
+
+			status.setLoading(true)
+			self:load()
+			status.setLoading(false)
+		elseif not status.getLoading() then
+			self:saveData()
+
+			status.setLoading(true)
+			graphics:fadeOutWipe(
+				0.7,
+				function()
+					graphics.setFade(1)
+					if not quitPressed then
+						Gamestate.switch(resultsScreen, {
+							diff = string.lower(CURDIFF or "normal"),
+							song = not storyMode and SONGNAME or Gamestate.current().songs[song],
+							artist = not storyMode and ARTIST or nil,
+							scores = {
+								sickCount = allStates.sickCounter,
+								goodCount = allStates.goodCounter,
+								badCount = allStates.badCounter,
+								shitCount = allStates.shitCounter,
+								missedCount = allStates.missCounter,
+								maxCombo = allStates.maxCombo,
+								score = allStates.score
+							}
+						})
+					else
+						if storyMode then
+							Gamestate.switch(menuWeek)
+						else
+							Gamestate.switch(menuFreeplay)
+						end
+					end
+
+					status.setLoading(false)
+				end
+			)
 		end
 	end,
 
@@ -642,6 +660,8 @@ return {
 		end
 		print("Loading chart:", chartPath)
 		print("Loading metadata:", metadataPath)
+		-- song id for script is name .. songExt
+		self.song = Song.getSong(name .. songExt)
 		local chart = getFilePath(chartPath)
 		local metadata = getFilePath(metadataPath)
 		if importMods.inMod then
@@ -738,6 +758,7 @@ return {
 		self.stage = Stage.getStage(metadata.playData.stage or "stage")
 		self.stage:build()
 		self.stage:call("postCreate")
+		self.song:call("postCreate")
 		if boyfriend.call then boyfriend:call("postCreate") end
 		if enemy.call then enemy:call("postCreate") end
 		if girlfriend.call then girlfriend:call("postCreate") end
@@ -949,7 +970,7 @@ return {
 		end
 		countingDown = true
 	end,
-	
+
 	stopCountdown = function(self)
 		if self.countdownTimer then
 			Timer.cancel(self.countdownTimer)
@@ -984,6 +1005,7 @@ return {
 		self.countdownStep = self.COUNTDOWN_STEPS.BEFORE
 		local event = eventCreator:countdownStart()
 		self.stage:call("onCountdownStart", event)
+		self.song:call("onCountdownStart", event)
 		if event.cancelled then
 			self:stopCountdown()
 			return
@@ -991,9 +1013,10 @@ return {
 
 		self:stopCountdown()
 
-		musicTime = self.conductor:getBeatLengthsMS() * -5
+		musicTime = self.conductor:getBeatLengthsMS() * -4
 
 		self.countdownTimer = Timer.after(self.conductor:getBeatLengthsMS()/1000, function()
+			countingDown = true
 			if self.countdownStep == self.COUNTDOWN_STEPS.BEFORE then
 				self.countdownStep = self.COUNTDOWN_STEPS.THREE
 				audio.playSound(sounds.countdown[CONSTANTS.WEEKS.COUNTDOWN_SOUNDS[4]])
@@ -1025,17 +1048,25 @@ return {
 
 			local event = eventCreator:countdownTick(self.countdownStep)
 			self.stage:call("onCountdownTick", event)
+			self.song:call("onCountdownTick", event)
 			if event.cancelled then
 				self:pauseCountdown()
 				return
 			end
 
 			if self.countdownStep == self.COUNTDOWN_STEPS.AFTER then
+				print("Countdown finished, starting song!")
 				self:stopCountdown()
 
+				print(musicTime)
+				--[[ musicTime = inst:getDuration("seconds") * 1000 - 5000 ]]
 				inst:play()
 				if voicesBF then voicesBF:play() end
 				if voicesEnemy then voicesEnemy:play() end
+
+				--[[ inst:seek(musicTime / 1000)
+				voicesBF:seek(musicTime / 1000)
+				voicesEnemy:seek(musicTime / 1000) ]]
 			end
 		end, 5)
 	end,
@@ -1155,7 +1186,6 @@ return {
 									table.insert(songEvents, event)
 								end
 
-								musicTime = 0
 								lastReportedPlaytime = 0
 								musicThres = 0
 								beatHandler.reset(0)
@@ -1182,6 +1212,7 @@ return {
 		end
 		if inCutscene then return end
 		beatHandler.update(dt)
+		self.conductor.musicTime = musicTime
 		self.conductor:update(dt)
 
 		-- nps table
@@ -1193,13 +1224,12 @@ return {
 
 		oldMusicThres = musicThres
 		if countingDown or love.system.getOS() == "Web" then -- Source:tell() can't be trusted on love.js!\
-			print(countingDown)
+			previousFrameTime = love.timer.getTime() * 1000
 			musicTime = musicTime + 1000 * dt
 		else
 			if not graphics.isFading() and inst:isPlaying() then
-				print("Using audio time")
 				local time = love.timer.getTime()
-				local seconds = inst:tell("seconds")
+				local seconds = inst:isPlaying() and inst:tell("seconds") or musicTime / 1000
 
 				musicTime = musicTime + (time * 1000) - previousFrameTime
 				previousFrameTime = time * 1000
@@ -1440,6 +1470,7 @@ return {
 
 				Gamestate.onEvent(event)
 				self.stage:call("onSongEvent", event)
+				self.song:call("onSongEvent", event)
 				for _, obj in ipairs(self.objects) do
 					if obj.call then
 						obj:call("onSongEvent", event)
@@ -1455,6 +1486,7 @@ return {
 			if event.time <= absMusicTime then
 				Gamestate.onEvent(event)
 				self.stage:call("onSongEvent", event)
+				self.song:call("onSongEvent", event)
 				for _, obj in ipairs(self.objects) do
 					if obj.call then
 						obj:call("onSongEvent", event)
@@ -1476,11 +1508,14 @@ return {
 		end
 
 		self.stage:call("onUpdate", dt)
+		self.song:call("onUpdate", dt)
 		if self.conductor.onStep then
 			self.stage:call("onStepHit", self.conductor.curStep)
+			self.song:call("onStepHit", self.conductor.curStep)
 		end
 		if self.conductor.onBeat then
 			self.stage:call("onBeatHit", self.conductor.curBeat)
+			self.song:call("onBeatHit", self.conductor.curBeat)
 		end
 		for _, obj in ipairs(self.objects) do
 			if obj.update then
@@ -1558,7 +1593,6 @@ return {
 	end,
 
 	updateUI = function(self, dt)
-		if inCutscene then return end
 		if paused then return end
 
 		if IS_CLASSIC_MOVEMENT then
@@ -1994,8 +2028,10 @@ return {
 		table.insert(self.objects, object)
 		if not object.characterType then
 			self.stage:call("addProp", object, object.name)
+			self.song:call("addProp", object, object.name)
 		else
 			self.stage:call("addCharacter", object, object.name)
+			self.song:call("addCharacter", object, object.name)
 		end
 		if sort then
 			self:sort()
@@ -2020,6 +2056,14 @@ return {
 				end
 			end
 		end
+	end,
+
+	getCamera = function(self)
+		return camera
+	end,
+
+	getCameraLerpPoint = function(self)
+		return CAM_LERP_POINT
 	end,
 
 	remove = function(self, object, sort)
@@ -2421,5 +2465,7 @@ return {
 		inHolds = {false, false, false, false}
 
 		self.inSong = false
+
+		self.songEnded = false
 	end
 }

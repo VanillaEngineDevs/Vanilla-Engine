@@ -20,4 +20,8 @@ function eventCreator:countdownTick()
     return baseEvent()
 end
 
+function eventCreator:endSong()
+    return baseEvent()
+end
+
 return eventCreator

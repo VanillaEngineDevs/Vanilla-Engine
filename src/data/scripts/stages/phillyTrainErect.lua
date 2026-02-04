@@ -12,6 +12,35 @@ local cutsceneMusic
 
 local picoDopplegangerSprite = require("data.scripts.props.picoDopplegangerSprite")
 
+local lightWindow
+local lightWindowAlpha = 0
+local lightWindowColor = {1, 1, 1}
+
+local trainEnabled = true
+local trainMoving = false
+local trainFrameTiming = 0
+local trainCars = 8
+local trainFinishing = false
+local trainCooldown = 0
+
+local fadeSpeed = 1
+
+local startedMoving = false
+
+local lightColors = {
+    hex2rgb(0xFFB66F43),
+    hex2rgb(0xFF329A6D),
+    hex2rgb(0xFF932C28),
+    hex2rgb(0xFF2663AC),
+    hex2rgb(0xFF502D64),
+}
+
+function Stage:build()
+    trainEnabled = true
+    trainSound = love.audio.newSource(EXTEND_LIBRARY_SFX("week3:train_passes.ogg", true), "stream")
+    lightWindow = get("lights")
+end
+
 function Stage:onCountdownStart(event)
     if not hasPlayedInGameCutscene and getBoyfriend().id == "pico-playable" then
         hasPlayedInGameCutscene = true
@@ -210,7 +239,107 @@ function Stage:onUpdate(dt)
     if cutsceneConductor.onBeat then
         self:onCutsceneBeat(cutsceneConductor.curBeat)
     end
+
+    if not lightWindow then return end
+    fadeSpeed = (weeks.conductor:getBeatLengthsMS() / 1000) * dt * 1.5
+    lightWindowAlpha = lightWindowAlpha - fadeSpeed
+    lightWindow.alpha = lightWindowAlpha
+
+    if trainEnabled and trainMoving then
+        trainFrameTiming = trainFrameTiming + dt
+        if trainFrameTiming >= 1/24 then
+            self:updateTrainPos()
+            trainFrameTiming = 0
+        end
+    end
 end
+
+function Stage:onBeatHit(beat)
+    if trainEnabled then
+        if not trainMoving then trainCooldown = trainCooldown + 1 end
+
+        if beat % 8 == 4 and randomBool(30) and not trainMoving and trainCooldown > 8 then
+            trainCooldown = love.math.random(-4, 0)
+            self:trainStart()
+        end
+    end
+
+    if beat % 4 == 0 then
+        lightWindowAlpha = 1
+        lightWindowColor = lightColors[love.math.random(1, #lightColors)]
+        lightWindow.colour = lightWindowColor
+        lightWindow.alpha = 1
+    end
+end
+
+function Stage:onStepHit(step)
+    if trainEnabled and trainSound:tell("seconds") >= 4.7 and trainMoving then
+        hapticUtil:vibrate(0, 0.1, 0.75, 0)
+    end
+end
+
+function Stage:onSongEnd(event)
+    trainMoving = false
+    trainEnabled = false
+    if trainSound then
+        trainSound:stop()
+        trainSound = nil
+    end
+end
+
+function Stage:trainStart()
+    trainMoving = true
+    --[[ trainSound:play() ]]
+    audio.playSound(trainSound)
+end
+
+function Stage:updateTrainPos()
+    if trainSound:tell("seconds") >= 4.7 then
+        startedMoving = true
+        if getGirlfriend().id == "nene" then
+            getGirlfriend():call("setTrainPassing", true)
+        else
+            getGirlfriend():play("hairBlow")
+        end
+    end
+
+    if startedMoving then
+        local train = get("train")
+        train.x = train.x - 400
+
+        if train.x < -2000 and not trainFinishing then
+            train.x = -1150
+            trainCars = trainCars - 1
+
+            if trainCars <= 0 then
+                trainFinishing = true
+            end
+        end
+
+        if train.x < -4000 and trainFinishing then
+            self:trainReset()
+        end
+    end
+end
+
+function Stage:trainReset()
+    if getGirlfriend().id == "nene" then
+            getGirlfriend():call("setTrainPassing", false)
+        else
+            getGirlfriend():play("hairFall")
+        end
+    get("train").x = 1280 + 200
+
+    trainMoving = false
+    trainCars = 8
+    trainFinishing = false
+    startedMoving = false
+end
+
+function Stage:onSongRetry()
+    self:trainReset()
+end
+
 
 function Stage:onCutsceneBeat(beat)
     if getGirlfriend().sprite.animFinished then

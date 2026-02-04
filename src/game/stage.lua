@@ -67,7 +67,6 @@ function stage.getStage(id)
         end
     end
     s.characters.dad = data.characters.dad or {}
-    table.print(data.characters.dad)
     for k, v in pairs(defaultDad) do
         if s.characters.dad[k] == nil then
             s.characters.dad[k] = v
@@ -112,6 +111,19 @@ function stage.getStage(id)
         end,
         getEnemy = function()
             return enemy
+        end,
+        get = function(name)
+            for _, obj in ipairs(weeks.objects) do
+                if obj.name == name then
+                    return obj
+                end
+            end
+        end,
+        getCamera = function()
+            return camera
+        end,
+        getCameraLerpPoint = function()
+            return CAM_LERP_POINT
         end,
     }, {__index = _G})
     if stageLuaChunk then
@@ -173,8 +185,6 @@ function stage.getStage(id)
 end
 
 function stage:build()
-    self:call("build")
-
     for _, propitem in ipairs(self._props) do
         local prop = nil
         local type = propitem.animType or defaultProps.animType
@@ -278,6 +288,7 @@ function stage:build()
         weeks:add(prop)
     end
 
+    self:call("build")
     weeks:sort()
 end
 

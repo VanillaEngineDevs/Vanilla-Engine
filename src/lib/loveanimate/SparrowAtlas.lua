@@ -442,14 +442,13 @@ function SparrowAtlas:update(dt, emitSignals)
     end
 end
 
-
 function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     if not self.visible then
         return
     end
-    camera = camera or {x = 0, y = 0}
-    local cx = camera.x
-    local cy = camera.y
+    camera = camera or {x = 0, y = 0, shakeX = 0, shakeY = 0, centered = false}
+    local cx = camera.x + camera.shakeX
+    local cy = camera.y + camera.shakeY
     if camera.centered then
         cx = cx - (1280 / 2)
         cy = cy - (720 / 2)

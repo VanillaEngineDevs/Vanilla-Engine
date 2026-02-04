@@ -6,7 +6,7 @@
     {
       "name": "bgWalls",
       "assetPath": "christmas/erect/bgWalls",
-      "position": [-726, -566],
+      "position": [-976, -566],
       "scale": [0.9, 0.9],
       "scroll": [0.2, 0.2],
       "zIndex": 10
@@ -118,7 +118,7 @@
     "gf": { "zIndex": 100, "position": [808.5, 854], "cameraOffsets": [0, 0] },
     "dad": {
       "zIndex": 200,
-      "position": [42, 882],
+      "position": [120, 882],
       "cameraOffsets": [150, -100]
     }
   },

@@ -124,6 +124,10 @@ function AnimateAtlasCharacter:updateHitbox()
 end
 
 function AnimateAtlasCharacter:play(name, forced, loop)
+    -- does the sprite even have the animation?
+    if not self.sprite:hasAnimation(name) then
+        return
+    end
     if self:isFunction("play") and not self.inScriptCall then
         self:call("play", name, forced, loop)
     else

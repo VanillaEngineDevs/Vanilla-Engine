@@ -33,6 +33,10 @@ local refreshed = false
 function Character:onCreate()
 end
 
+function Character:setTrainPassing(passing)
+    trainPassing = passing
+end
+
 function Character:postCreate()
     self.data.x = self.data.x + 300
     self.data.y = self.data.y + 60
@@ -49,7 +53,7 @@ function Character:postCreate()
     pupil.x = self.data.x
     pupil.y = self.data.y
     pupil.zIndex = self.data.zIndex - 5
-    pupil:play("", true, false, 18)
+    pupil:playSymbol("", true, false, 18)
     pupil.onFrameChange:connect(function(_, frameNumber, _)
         if frameNumber == 17 then
             pupil:pause()
@@ -62,17 +66,17 @@ function Character:postCreate()
     abot = graphics.newTextureAtlas()
     abot:load(EXTEND_LIBRARY("shared:characters/abot/abotSystem", true))
 
-    abot:play("", true, false, 1)
+    abot:playSymbol("", true, false, 1)
 end
 
 function Character:onSongEvent(event)
     if event.name == "FocusCamera" then
         local char = tonumber(event.value.char or "0") or 0
         if char == 0 and pupilState ~= PUPIL_STATE_NORMAL then
-            pupil:play("", true, false, 17) -- look right
+            pupil:playSymbol("", true, false, 17) -- look right
             pupilState = PUPIL_STATE_NORMAL
         elseif char == 1 and pupilState ~= PUPIL_STATE_LEFT then
-            pupil:play("", true, false, 0) -- look left
+            pupil:playSymbol("", true, false, 0) -- look left
             pupilState = PUPIL_STATE_LEFT
         end
     end
@@ -80,7 +84,7 @@ end
 
 function Character:dance(force)
     if abot then
-        abot:play("", true, false, 1)
+        abot:playSymbol("", true, false, 1)
     end
 
     if state == STATE_DEFAULT then

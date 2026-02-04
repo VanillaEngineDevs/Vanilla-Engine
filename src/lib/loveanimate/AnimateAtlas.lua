@@ -381,7 +381,64 @@ end
 --- @param loop boolean?
 ---
 function AnimateAtlas:play(animName, forced, loop, frameStart)
-    --if not animName:startsWith("idle") then return end
+    if not animName or animName == "" or not self:hasAnimation(animName) then
+        self.curAnim = {
+            name = animName or "__raw__",
+            framerate = self.framerate,
+            loop = (loop == nil) and true or loop,
+            raw = true,
+            startFrame = frameStart or 0,
+            endFrame = self:getLength() - 1
+        }
+
+        self.frame = self.curAnim.startFrame
+        self.playing = true
+        self.animFinished = false
+        self.animPaused = false
+        self._activeSymbol = nil
+        return
+    end
+
+    if self.curAnim
+        and self.curAnim.name == animName
+        and self.playing
+        and not forced
+    then
+        if self.animPaused then
+            self.animPaused = false
+            self.playing = true
+        end
+        return
+    end
+
+    for _, anim in ipairs(self.animations) do
+        if anim.name == animName then
+            self.curAnim = anim
+            self.frame = 1
+            self.playing = true
+            self.looping = loop ~= nil and loop or anim.loop
+            self.animFinished = false
+            self.animPaused = false
+            self.paused = false
+
+            if anim.type == "symbol" then
+                self._activeSymbol =
+                    self._symbolisntanceCache[anim.name]
+                        or AnimateSymbolInstance({data = anim.timeline, optimized = anim.optimized}, self)
+
+                self._activeSymbol:setFrame(anim.frames[1])
+            else
+                self._activeSymbol = nil
+            end
+
+            break
+        end
+    end
+
+    self.width, self.height = self:getBoundDimensions()
+end
+
+function AnimateAtlas:playSymbol(animName, forced, loop, frameStart)
     if not animName or animName == "" or not self:hasAnimation(animName) then
         self.curAnim = {
             name = "__raw__",
@@ -942,6 +999,10 @@ function AnimateAtlas:update(dt, emitSignals)
                 self.onFrameChange:emit("__raw__", self.frame, self.frame)
             end
         else
+            if self.curAnim.name == "cutscene" then
+                print("Cutscene frame: " .. tostring(self.frame))
+                print("Total frames: " .. tostring(#self.curAnim.frames))
+            end
             if not self.animPaused then self.frame = self.frame + 1 end
 
             if self.frame > #self.curAnim.frames then
@@ -979,10 +1040,10 @@ function AnimateAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     if not self.visible then
         return
     end
-    camera = camera or {x = 0, y = 0}
+    camera = camera or {x = 0, y = 0, shakeX = 0, shakeY = 0, centered = false}
     self._camera = camera
-    local cx = camera.x
-    local cy = camera.y
+    local cx = camera.x + camera.shakeX
+    local cy = camera.y + camera.shakeY
     if camera.centered then
         cx = cx - (1280 / 2)
         cy = cy - (720 / 2)
@@ -1569,6 +1630,27 @@ function AnimateAtlas:addAnimBySymbol(name, symbolName, framerate, loop)
         framerate = framerate,
         loop = loop
     })
+end
+
+function AnimateAtlas:addAnimByNameWithFallback(name, sourceNameOrSymbol, framerate, loop)
+    framerate = framerate or 30
+    loop = loop == nil and true or loop
+
+    if self:isSymbol(sourceNameOrSymbol) then
+        return self:addAnimBySymbol(name, sourceNameOrSymbol, framerate, loop)
+    end
+
+    local frameCount = self:getLength()
+    if frameCount > 0 then
+        local frames = {}
+        for i = 0, frameCount - 1 do
+            table.insert(frames, i)
+        end
+        self:addAnimByIndices(name, "", frames, framerate, loop)
+        return true
+    end
+
+    return false
 end
 
 function AnimateAtlas:pause()

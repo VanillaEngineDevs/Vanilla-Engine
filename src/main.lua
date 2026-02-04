@@ -57,6 +57,7 @@ function love.load()
 
 	Character = require "game.character"
 	Stage = require "game.stage"
+	Song = require "game.song"
 	SparrowCharacter = require "game.sparrowCharacter"
 	MultiSparrowCharacter = require "game.multiSparrowCharacter"
 	AnimateAtlasCharacter = require "game.animateAtlasCharacter"
@@ -350,6 +351,7 @@ function love.touchmoved(id, x, y, dx, dy, pressure)
 end
 
 function love.update(dt)
+	if camera then camera:update(dt) end
 	CURRENT_IMAGE_FORMAT = "." .. graphics.getImageType()
 	hapticUtil:update(dt)
 	if volFade > 0 then

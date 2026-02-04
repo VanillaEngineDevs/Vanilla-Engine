@@ -88,13 +88,41 @@ function Timer:after(delay, func, count)
 end
 
 function Timer:every(delay, after, count)
-	local count = count or math.huge -- exploit below: math.huge - 1 = math.huge
-	local handle = { time = 0, during = _nothing_, after = after, limit = delay, count = count, active = true }
+	count = count or math.huge
+
+	if delay == 0 then
+		local handle
+		handle = {
+			time = 0,
+			limit = 0,
+			count = count,
+			active = true,
+			during = _nothing_,
+			after = function(h)
+				if after(h) == false then
+					return false
+				end
+				return true
+			end
+		}
+		self.functions[handle] = true
+		return handle
+	end
+
+	local handle = {
+		time = 0,
+		during = _nothing_,
+		after = after,
+		limit = delay,
+		count = count,
+		active = true
+	}
 	self.functions[handle] = true
 	return handle
 end
 
 function Timer:cancel(handle)
+	if not handle then return end
 	self.functions[handle] = nil
 end
 

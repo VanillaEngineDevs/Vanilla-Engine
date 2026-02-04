@@ -133,6 +133,8 @@ function character:new()
     self.flipY = false
 
     self.zIndex = 0
+
+    self.inScriptCall = false
 end
 
 function character:update(dt)
@@ -197,7 +199,7 @@ function character:justPressedNote()
 end
 
 function character:onStepHit(step)
-    if (self.danceEvery > 0 and (step % (self.danceEvery * CONSTANTS.STEPS_PER_BEAT) == 0)) then
+    if (self.danceEvery > 0 and (step % (self.danceEvery * CONSTANTS.STEPS_PER_BEAT) == 1)) then
         if not self.sprite.animFinished and self.sprite.curAnim then
             local isidledance = self.sprite.curAnim.name:startsWith("dance") or self.sprite.curAnim.name:startsWith("idle")
 

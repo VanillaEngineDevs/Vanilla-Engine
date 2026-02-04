@@ -2,6 +2,8 @@ local camera = {}
 local camTimer
 camera.x = 0
 camera.y = 0
+camera.shakeX = 0
+camera.shakeY = 0
 camera.zoom = 1
 camera.defaultZoom = 1
 camera.zooming = true
@@ -9,6 +11,11 @@ camera.locked = false
 camera.camBopIntensity = 1
 camera.camBopInterval = 4
 camera.lockedMoving = false
+
+camera.shakeIntensity = 0
+camera.shakeDuration = 0
+camera.shakeTime = 0
+camera.shakeTimer = nil
 
 camera.esizeX = 1
 camera.esizeY = 1
@@ -41,6 +48,34 @@ function camera:flash(time, x, col)
         Timer.cancel(camTimer)
     end
     camTimer = Timer.tween(time, camera, {flash = x}, "in-bounce")
+end
+
+function camera:shake(intensity, duration)
+    camera.shakeIntensity = intensity or 0.005
+    camera.shakeDuration = duration or 0.2
+    camera.shakeTime = 0
+end
+
+function camera:update(dt)
+    if camera.shakeTime < camera.shakeDuration then
+        camera.shakeTime = camera.shakeTime + dt
+
+        local progress = camera.shakeTime / camera.shakeDuration
+        if progress >= 1 then
+            camera.shakeX = 0
+            camera.shakeY = 0
+            return
+        end
+
+        local decay = 1 - progress
+        local power = camera.shakeIntensity * decay
+
+        camera.shakeX = (love.math.random() * 2 - 1) * power * 1280
+        camera.shakeY = (love.math.random() * 2 - 1) * power * 720
+    else
+        camera.shakeX = 0
+        camera.shakeY = 0
+    end
 end
 
 function camera:removePoint(name)

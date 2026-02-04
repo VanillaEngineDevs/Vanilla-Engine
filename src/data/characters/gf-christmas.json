@@ -22,19 +22,6 @@
       ],
       "animType": "symbol",
       "offsets": [0, 0]
-    },
-    {
-      "name": "combo50",
-      "prefix": "GF Cheer",
-      "animType": "symbol",
-      "offsets": [0, -15]
-    },
-    {
-      "name": "drop70",
-      "prefix": "gf sad",
-      "animType": "symbol",
-      "frameIndices": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-      "offsets": [0, -17.5]
     }
   ]
 }
