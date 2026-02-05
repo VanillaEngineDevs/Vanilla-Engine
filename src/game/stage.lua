@@ -48,6 +48,7 @@ local defaultProps = {
 }
 
 function stage.getStage(id)
+    print(id)
     local data = json.decode(love.filesystem.read("data/stages/" .. id .. ".json"))
 
     local s = stage()
@@ -144,8 +145,8 @@ function stage.getStage(id)
         y = s.characters.dad.scale[2] * enemy.scale.y
     }
     enemy.cameraOffsets = {
-        x = s.characters.dad.cameraOffsets[1],
-        y = s.characters.dad.cameraOffsets[2]
+        x = enemy.cameraOffsets[1] + s.characters.dad.cameraOffsets[1],
+        y = enemy.cameraOffsets[2] + s.characters.dad.cameraOffsets[2]
     }
     enemy.zIndex = s.characters.dad.zIndex
 
@@ -160,8 +161,8 @@ function stage.getStage(id)
         y = s.characters.bf.scale[2] * boyfriend.scale.y
     }
     boyfriend.cameraOffsets = {
-        x = s.characters.bf.cameraOffsets[1],
-        y = s.characters.bf.cameraOffsets[2]
+        x = boyfriend.cameraOffsets[1] + s.characters.bf.cameraOffsets[1],
+        y = boyfriend.cameraOffsets[2] + s.characters.bf.cameraOffsets[2]
     }
     boyfriend.zIndex = s.characters.bf.zIndex
 
@@ -176,8 +177,8 @@ function stage.getStage(id)
         y = s.characters.gf.scale[2] * girlfriend.scale.y
     }
     girlfriend.cameraOffsets = {
-        x = s.characters.gf.cameraOffsets[1],
-        y = s.characters.gf.cameraOffsets[2]
+        x = girlfriend.cameraOffsets[1] + s.characters.gf.cameraOffsets[1],
+        y = girlfriend.cameraOffsets[2] + s.characters.gf.cameraOffsets[2]
     }
     girlfriend.zIndex = s.characters.gf.zIndex
 
@@ -279,7 +280,9 @@ function stage:build()
         prop.alpha = propitem.alpha or 1
         prop.zIndex = propitem.zIndex
         prop.name = propitem.name
+        prop.thefuckinganim = propitem.startingAnimation
         prop:play(propitem.startingAnimation or "idle", true)
+        prop.bopper = true
 
         prop:updateHitbox()
 

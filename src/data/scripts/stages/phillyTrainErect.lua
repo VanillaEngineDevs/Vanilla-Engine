@@ -35,10 +35,22 @@ local lightColors = {
     hex2rgb(0xFF502D64),
 }
 
+local colorShader
+
 function Stage:build()
     trainEnabled = true
     trainSound = love.audio.newSource(EXTEND_LIBRARY_SFX("week3:train_passes.ogg", true), "stream")
     lightWindow = get("lights")
+
+    colorShader = love.graphics.newShader("shaders/adjustColor.glsl")
+
+    colorShader:send("brightness", -5)
+    colorShader:send("hue", -26)
+    colorShader:send("saturation", -16)
+
+    getEnemy().shader = colorShader
+    getBoyfriend().shader = colorShader
+    getGirlfriend().shader = colorShader
 end
 
 function Stage:onCountdownStart(event)
@@ -148,6 +160,9 @@ function Stage:doppleGangerCutscene()
 
     picoPlayer:doAnim("Player", playerShoots, explode, cutsceneTimer)
     picoOpponent:doAnim("Opponent", not playerShoots, explode, cutsceneTimer)
+
+    picoPlayer.shader = getBoyfriend().shader
+    picoOpponent.shader = getEnemy().shader
 
     IS_CLASSIC_MOVEMENT = true
     CAM_LERP_POINT.x = midpoint[1]

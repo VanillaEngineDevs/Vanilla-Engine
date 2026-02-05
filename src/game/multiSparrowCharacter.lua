@@ -83,8 +83,8 @@ function MultiSparrowCharacter:update(dt)
         spr:update(dt, (self.sprite == spr))
         spr.x = self.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES
         spr.y = self.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
-        spr.x = spr.x - self.curAnimOffset[1]
-        spr.y = spr.y - self.curAnimOffset[2]
+        spr.x = spr.x - (self.curAnimOffset[1] * self.scale.x)
+        spr.y = spr.y - (self.curAnimOffset[2] * self.scale.y)
         spr.scale.x = self.scale.x
         spr.scale.y = self.scale.y
         spr.origin.x = self.origin.x

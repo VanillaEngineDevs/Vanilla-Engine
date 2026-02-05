@@ -78,8 +78,8 @@ function character.getCharacter(id)
     char.offsets = data.offsets or {0, 0}
     char.scale = {x = data.scale or 1, y = data.scale or 1}
 
-    char.cameraOffsets = {x = data.cameraOffsets and data.cameraOffsets[1] or 0,
-                          y = data.cameraOffsets and data.cameraOffsets[2] or 0}
+    char.cameraOffsets = {data.cameraOffsets and data.cameraOffsets[1] or 0,
+                          data.cameraOffsets and data.cameraOffsets[2] or 0}
 
     char:setAntialiasing(not data.isPixel)
 
@@ -122,7 +122,7 @@ function character:new()
     self.x = 0
     self.y = 0
     self.origin = {x = 0, y = 0}
-    self.cameraOffsets = {x = 0, y = 0}
+    self.cameraOffsets = {0, 0}
     self.scroll = {x = 1, y = 1}
     self.curAnimOffset = {0, 0}
 
@@ -138,6 +138,8 @@ function character:new()
     self.zIndex = 0
 
     self.inScriptCall = false
+
+    self.alpha = 1
 end
 
 function character:update(dt)
@@ -224,9 +226,10 @@ function character:getCameraPoint()
     local centerX = self.x + self.width/2
     local centerY = self.y + self.height/2
 
+    table.print(self.cameraOffsets)
     return {
-        x = centerX + self.cameraOffsets.x,
-        y = centerY + self.cameraOffsets.y
+        x = centerX + (self.cameraOffsets[1] or self.cameraOffsets.x or 0),
+        y = centerY + (self.cameraOffsets[2] or self.cameraOffsets.y or 0)
     }
 end
 

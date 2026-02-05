@@ -49,7 +49,7 @@ return {
             audio.playSound(sounds.car[love.math.random(2)])
 
             stageImages["Fast Car"].canDrive = false
-            stageImages["Fast Car"].vx = (love.math.random(170, 220) / dt) * 0.25
+            stageImages["Fast Car"].vx = (love.math.random(170, 220)) * 3
             if carTimer then
                 Timer.cancel(carTimer)
             end

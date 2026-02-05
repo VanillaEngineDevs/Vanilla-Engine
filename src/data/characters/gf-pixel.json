@@ -4,6 +4,7 @@
   "assetPath": "characters/gfPixel",
   "startingAnimation": "danceRight",
   "isPixel": true,
+  "offsets": [0, -250],
   "scale": 6,
   "animations": [
     {

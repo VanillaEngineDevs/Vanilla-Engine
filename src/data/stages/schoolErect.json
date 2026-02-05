@@ -174,14 +174,14 @@
     "bf": {
       "zIndex": 300,
       "cameraOffsets": [-200, -94],
-      "position": [1168, 900]
+      "position": [1168, 600]
     },
     "dad": {
       "zIndex": 200,
       "cameraOffsets": [160, 0],
-      "position": [306, 960]
+      "position": [306, 660]
     },
-    "gf": { "zIndex": 100, "cameraOffsets": [40, 40], "position": [724, 823] }
+    "gf": { "zIndex": 100, "cameraOffsets": [40, 40], "position": [724, 523] }
   },
   "name": "School (Date) [Erect]",
   "directory": "week6"

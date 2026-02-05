@@ -63,14 +63,14 @@
     "bf": {
       "zIndex": 300,
       "cameraOffsets": [-200, -94],
-      "position": [1168, 900]
+      "position": [1168, 600]
     },
     "dad": {
       "zIndex": 200,
-      "position": [0, 648],
+      "position": [0, 348],
       "cameraOffsets": [440, 270]
     },
-    "gf": { "zIndex": 100, "cameraOffsets": [40, 40], "position": [724, 823] }
+    "gf": { "zIndex": 100, "cameraOffsets": [40, 40], "position": [724, 523] }
   },
   "name": "School (Hate) [Erect]",
   "directory": "week6"

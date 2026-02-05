@@ -35,6 +35,7 @@ function picoDopplegangerSprite:new(x, y)
     self.isPlayer = true
     self.cutsceneSound = nil
     self.visible = true
+    self.shader = nil
 end
 
 function picoDopplegangerSprite:doAnim(suffix, shoot, explode, timer)
@@ -90,6 +91,7 @@ function picoDopplegangerSprite:update(dt)
     self.sprite.flipY = self.flipY
     self.sprite.angle = self.angle
     self.sprite.scroll = self.scroll
+    self.sprite.shader = self.shader
     self.sprite:update(dt)
 end
 

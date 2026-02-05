@@ -4,7 +4,7 @@
   "renderType": "multianimateatlas",
   "assetPath": "shared:characters/tankman/basic",
   "offsets": [625, 75],
-  "cameraOffsets": [-3, 32],
+  "cameraOffsets": [-3, -100],
   "healthIcon": {
     "id": "tankman"
   },

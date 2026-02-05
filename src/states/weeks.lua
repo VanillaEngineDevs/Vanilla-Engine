@@ -380,19 +380,6 @@ return {
 			for _, event in ipairs(CURCHART.EVENTS) do
 				table.insert(songEvents, event)
 			end
-
-			if boyfriend then
-				local bfpoint = boyfriend:getCameraPoint()
-
-				camera.x = bfpoint.x
-				camera.y = bfpoint.y
-				camera.defaultX = bfpoint.x
-				camera.defaultY = bfpoint.y
-				camera.targetX = bfpoint.x
-				camera.targetY = bfpoint.y
-				CAM_LERP_POINT.x = bfpoint.x
-				CAM_LERP_POINT.y = bfpoint.y
-			end
 		end
 
 		previousFrameTime = love.timer.getTime() * 1000
@@ -402,6 +389,19 @@ return {
 			self:initUI(CURRENTMODE)
 			self:generateNotes(Gamestate.current().songs[song], difficulty)
 			graphics:fadeInWipe(0.6)
+
+			if boyfriend then
+				local bfpoint = boyfriend:getCameraPoint()
+				print("THE FUCKING POINT", bfpoint.x, bfpoint.y)
+				camera.x = bfpoint.x
+				camera.y = bfpoint.y
+				camera.defaultX = bfpoint.x
+				camera.defaultY = bfpoint.y
+				camera.targetX = bfpoint.x
+				camera.targetY = bfpoint.y
+				CAM_LERP_POINT.x = bfpoint.x
+				CAM_LERP_POINT.y = bfpoint.y
+			end
 		end
 
 		local vwoosh = 0.5
@@ -1537,6 +1537,9 @@ return {
 				if obj.call then
 					obj:call("onBeatHit", self.conductor.curBeat)
 				end
+				if obj.bopper then
+					obj:play(obj.thefuckinganim .. obj.suffix)
+				end
 			end
 		end
 
@@ -2056,6 +2059,10 @@ return {
 				end
 			end
 		end
+	end,
+
+	getSongName = function(self)
+		return self.metadata.songName
 	end,
 
 	getCamera = function(self)

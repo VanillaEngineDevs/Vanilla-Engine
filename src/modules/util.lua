@@ -156,6 +156,12 @@ function util.generateErectCharts()
     return {"erect", "-erect", "erect", "-bf"}, {"nightmare", "-erect", "nightmare", "-bf"}
 end
 
+-- custom string funcs (via metatable)
+local stringMeta = getmetatable("")
+function stringMeta.__index:strip()
+    return self:match("^%s*(.-)%s*$")
+end
+
 -- God like coding
 --[[
 function util.🍰(🥰, 🥵)

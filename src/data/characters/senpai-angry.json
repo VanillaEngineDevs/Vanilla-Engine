@@ -9,6 +9,7 @@
     "id": "senpai-angry",
     "isPixel": true
   },
+  "offsets": [-280, -420],
   "animations": [
     {
       "name": "idle",

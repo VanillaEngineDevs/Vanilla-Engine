@@ -127,6 +127,10 @@ function f:mousemoved(x, y, dx, dy)
     end
 end
 
+--[[ function f:wheelmoved(x, y)
+    camera.zoom = camera.zoom + y / 10
+end ]]
+
 function f:update(dt)
     if state == 2 then
         character:update(dt)
@@ -176,7 +180,7 @@ function f:draw()
                 love.graphics.setColor(1, 1, 1)
                 love.graphics.print("Character Position: (" .. math.floor(character.x) .. ", " .. math.floor(character.y) .. ")", 800, 10)
                 love.graphics.print("Clone Position: (" .. math.floor(clone.x) .. ", " .. math.floor(clone.y) .. ")", 800, 30)
-                love.graphics.print("Offset: (" .. -math.floor(character.x - clone.x) .. ", " .. -math.floor(character.y - clone.y) .. ")", 800, 50)
+                love.graphics.print("Offset: (" .. -math.floor((character.x - clone.x) / character.scale.x) .. ", " .. -math.floor((character.y - clone.y) / character.scale.y) .. ")", 800, 50)
             end
         end
     love.graphics.pop()

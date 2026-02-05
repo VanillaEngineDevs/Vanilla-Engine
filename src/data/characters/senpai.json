@@ -5,6 +5,7 @@
   "singTime": 8.0,
   "isPixel": true,
   "scale": 6,
+  "offsets": [-280, -420],
   "healthIcon": {
     "id": "senpai",
     "isPixel": true
@@ -18,22 +19,22 @@
     {
       "name": "singLEFT",
       "prefix": "SENPAI LEFT NOTE instance 10",
-      "offsets": [6.6, 0]
+      "offsets": [4, 0]
     },
     {
       "name": "singDOWN",
       "prefix": "SENPAI DOWN NOTE instance 10",
-      "offsets": [2.33, 0]
+      "offsets": [2, 0]
     },
     {
       "name": "singUP",
       "prefix": "SENPAI UP NOTE instance 10",
-      "offsets": [0.83, 6.16]
+      "offsets": [2, 6]
     },
     {
       "name": "singRIGHT",
       "prefix": "SENPAI RIGHT NOTE instance 10",
-      "offsets": [0, 0]
+      "offsets": [1, 0]
     }
   ]
 }

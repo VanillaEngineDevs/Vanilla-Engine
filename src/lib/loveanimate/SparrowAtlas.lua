@@ -92,8 +92,16 @@ function SparrowAtlas:constructor()
 
     self.zIndex = 0
 
+    self.suffix = ""
+
     self.onFrameChange = signal.new()
     self.onAnimationFinished = signal.new()
+end
+
+function SparrowAtlas:setSuffix(suffix)
+    self.suffix = suffix
+
+    self:play((self.curAnim and self.curAnim.name or "") .. self.suffix, true)
 end
 
 --- Load the atlas from an image and xml
@@ -463,7 +471,7 @@ function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
 
     if self.flipX then
         sx = sx * -1
-        x = x + (self:getFrameWidth() * self.scale.x)
+        --x = x + (self:getFrameWidth() * -1)
     end
     if self.flipY then
         sy = sy * -1

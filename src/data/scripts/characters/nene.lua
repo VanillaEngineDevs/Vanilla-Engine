@@ -139,6 +139,11 @@ function Character:onUpdate(dt)
         stereoBG.zIndex = eyeWhites.zIndex - 8
         weeks:add(stereoBG)
 
+        abot.shader = self.data.shader
+        eyeWhites.shader = self.data.shader
+        pupil.shader = self.data.shader
+        stereoBG.shader = self.data.shader
+
         weeks:sort()
 
         refreshed = true

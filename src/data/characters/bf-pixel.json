@@ -13,6 +13,7 @@
   "death": {
     "cameraOffsets": [0, 0]
   },
+  "cameraOffsets": [160, 100],
   "scale": 6,
   "animations": [
     {

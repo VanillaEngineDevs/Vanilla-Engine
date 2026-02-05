@@ -8,7 +8,7 @@
     "isPixel": true
   },
   "death": {
-    "cameraOffsets": [10, -40],
+    "cameraOffsets": [1000, 700],
     "cameraZoom": 1.0
   },
   "singTime": 8.0,
@@ -17,7 +17,7 @@
   "flipX": true,
   "renderType": "sparrow",
   "offsets": [15, 0],
-  "cameraOffsets": [15, 0],
+  "cameraOffsets": [160, 100],
   "animations": [
     {
       "name": "idle",

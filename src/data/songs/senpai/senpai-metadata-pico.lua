@@ -27,7 +27,7 @@ return {
                 "pico",
             },
         },
-        stage = "schoolPico",
+        stage = "schoolErect",
         noteStyle = "pixel",
         album = "expansion2",
         ratings = {
