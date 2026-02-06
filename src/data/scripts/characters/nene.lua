@@ -89,24 +89,24 @@ function Character:dance(force)
 
     if state == STATE_DEFAULT then
         if self.data.hasDanced then
-            self.data:play("danceRight", force)
+            self.data:play("danceRight", force, false)
         else
-            self.data:play("danceLeft", force)
+            self.data:play("danceLeft", force, false)
         end
         self.data.hasDanced = not self.data.hasDanced
     elseif state == STATE_PRE_RAISE then
-        self.data:play("danceLeft", false)
+        self.data:play("danceLeft", false, false)
         self.data.hasDanced = false
     elseif state == STATE_READY then
         if blinkCooldown == 0 then
-            self.data:play("idleKnife", false)
+            self.data:play("idleKnife", false, false)
             blinkCooldown = love.math.random(MIN_BLINK_DELAY, MAX_BLINK_DELAY)
         else
             blinkCooldown = blinkCooldown - 1
         end
     elseif state == STATE_LOWER then
         if self.data.sprite.curAnim.name ~= "lowerKnife" then
-            self.data:play("lowerKnife", false)
+            self.data:play("lowerKnife", false, false)
         end
     end
 end
@@ -176,11 +176,11 @@ function Character:checkTrainPassing(raised)
 
     if raised then
         state = STATE_HAIR_BLOWING_RAISE
-        self.data:play("hairBlowKnife")
+        self.data:play("hairBlowKnife", true, false)
         animationFinished = false
     else
         state = STATE_HAIR_BLOWING
-        self.data:play("hairBlow")
+        self.data:play("hairBlow", true, false)
         animationFinished = false
     end
 end
@@ -198,7 +198,7 @@ function Character:transitionState()
             state = STATE_DEFAULT
         elseif animationFinished then
             state = STATE_RAISE
-            self.data:play("raiseKnife")
+            self.data:play("raiseKnife", true, false)
             animationFinished = false
         end
         self:checkTrainPassing()
@@ -222,10 +222,10 @@ function Character:transitionState()
     elseif state == STATE_HAIR_BLOWING then
         if not trainPassing then
             state = STATE_HAIR_FALLING
-            self.data:play("hairFallNormal")
+            self.data:play("hairFallNormal", true, false)
             animationFinished = false
         elseif animationFinished then
-            self.data:play("hairBlowNormal")
+            self.data:play("hairBlowNormal", true, false)
             animationFinished = false
         end
     elseif state == STATE_HAIR_FALLING then
@@ -236,10 +236,10 @@ function Character:transitionState()
     elseif state == STATE_HAIR_BLOWING_RAISE then
         if not trainPassing then
             state = STATE_HAIR_FALLING_RAISE
-            self.data:play("hairFallKnife")
+            self.data:play("hairFallKnife", true, false)
             animationFinished = false
         elseif animationFinished then
-            self.data:play("hairBlowKnife")
+            self.data:play("hairBlowKnife", true, false)
             animationFinished = false
         end
     elseif state == STATE_HAIR_FALLING_RAISE then

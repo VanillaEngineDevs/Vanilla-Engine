@@ -674,8 +674,8 @@ return {
 		print("Loading metadata:", metadataPath)
 		-- song id for script is name .. songExt
 		self.song = Song.getSong(name .. songExt)
-		local chart = getFilePath(chartPath)
-		local metadata = getFilePath(metadataPath)
+		local chart = chartPath
+		local metadata = metadataPath
 		local chartData
 		if string.endsWith(chart, ".json") then
 			chartData = json.decode(love.filesystem.read(chart))
@@ -2328,6 +2328,8 @@ return {
 			x = 250+offsetX
 			y = 400+offsetY
 			format = "left"
+		elseif mode == "Minimal" then
+			x = x - 50
 		end
 
 		local lastFont = love.graphics.getFont()
@@ -2455,6 +2457,12 @@ return {
 			returnStr = "Score: " .. math.floor(score) .. " | Misses: " .. math.floor(misses) .. " | Rating: " .. ratingStr
 		elseif mode == "VSlice" then
 			returnStr = "Score: " .. commaFormat(score)
+		elseif mode == "Minimal" then
+			local ratingStr = math.floor(ratingPercent * 10000) / 100 .. "%"
+			if ratingPercent == 0 then
+				ratingStr = "N/A"
+			end
+			returnStr = math.floor(score) .. " | " .. math.floor(misses) .. " | " .. ratingStr
 		end
 
 		return returnStr

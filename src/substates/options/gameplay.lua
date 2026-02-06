@@ -61,7 +61,9 @@ function gameplay:enter()
             {
                 "KE",
                 "Psych",
-                "VSlice"
+                "VSlice",
+                "Minimal",
+                "None" -- why would you want this
             }
         )
     )

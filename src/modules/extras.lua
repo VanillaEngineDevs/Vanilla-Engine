@@ -1,5 +1,4 @@
 function weeks.legacyGenerateNotes(self, chart)
-    local chart = getFilePath(chart)
     chart = json.decode(love.filesystem.read(chart)).song
 
     for i = 1, #chart.notes do
@@ -130,7 +129,6 @@ end
 
 function weeks.generatePsychEvents(self, eventsChart)
     modEvents = {}
-    local eventsChart = getFilePath(eventsChart)
     eventsChart = json.decode(love.filesystem.read(eventsChart)).song
 
     for i, event in ipairs(eventsChart.events) do
@@ -147,7 +145,6 @@ function weeks.generatePsychEvents(self, eventsChart)
 end
 
 function weeks.cneGenerateNotes(self, chart, metadata)
-    local chart = getFilePath(chart)
     chart = json.decode(love.filesystem.read(chart))
     local metadata = json.decode(love.filesystem.read(metadata))
 
