@@ -49,6 +49,3 @@ function Character:play(name, force, loop)
         lipSyncSprite.angle = 0
     end
 end
-
-function Character:onDraw(camera)
-end

@@ -7,7 +7,7 @@
     "id": "bf"
   },
   "death": {
-    "cameraOffsets": [-75, 140],
+    "cameraOffsets": [0, 0],
     "cameraZoom": 1.5
   },
   "flipX": true,

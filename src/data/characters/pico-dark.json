@@ -7,7 +7,7 @@
     "flipX": false
   },
   "death": {
-    "cameraOffsets": [10, -40],
+    "cameraOffsets": [-50, -40],
     "cameraZoom": 1.0
   },
   "flipX": true,

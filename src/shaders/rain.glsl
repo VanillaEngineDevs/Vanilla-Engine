@@ -100,6 +100,7 @@ struct Light {
 extern float uScale;
 extern float uIntensity;
 extern float uTime;
+uniform float uPuddleY;
 extern float uPuddleScaleY = 1.0;
 extern Image uBlurredScreen;
 extern Image uMask;

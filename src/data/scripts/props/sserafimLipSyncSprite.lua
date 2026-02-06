@@ -13,7 +13,7 @@ function sserafimLipSyncSprite:new(x, y, suffix)
     self.assetPath = "sserafim/images/sserafim-lipsync" .. suffix
 
     self.sprite:load("assets/" .. self.assetPath)
-    self.sprite:addAnimBySymbol("mouth yunjin", "mouth yunjin", 24, false)
+    self.sprite:addAnimBySymbol("mouth default", "mouth yunjin", 24, false)
     self.sprite:play("lipsync", true)
 
     self.x = x

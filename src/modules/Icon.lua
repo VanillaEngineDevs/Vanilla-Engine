@@ -2,7 +2,7 @@ return {
     imagePath = function(path)
         return graphics.imagePath("icons/icon-" .. (path or "bf"))
     end,
-    newIcon = function(path, scale)
+    newIcon = function(path, scale, dontCalculateColour)
         if not graphics.cache[path .. "imgdata"] then
             local newPath = path:gsub("/dds/", "/png/")
             newPath = newPath:gsub(".dds$", ".png")
@@ -13,7 +13,7 @@ return {
         end
         local imgdata = graphics.cache[path .. "imgdata"]
         local img = graphics.cache[path]
-        if path:find("-pixel") then
+        if path:find("pixel") then
             img:setFilter("nearest")
         end
         local frameData = {
@@ -89,6 +89,8 @@ return {
             end
         }
 
+        if dontCalculateColour then return object end
+        
         -- find the most common colour
         local data = {}
         for i = 0, img:getWidth() - 1 do

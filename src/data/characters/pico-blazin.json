@@ -10,7 +10,7 @@
   "singTime": 999.0,
   "death": {
     "preTransitionDelay": 0.125,
-    "cameraOffsets": [1100, 1280],
+    "cameraOffsets": [400, 210],
     "cameraZoom": 0.8
   },
   "offsets": [611, 652],

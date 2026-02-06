@@ -77,6 +77,8 @@ function SparrowAtlas:constructor()
     self.x = 0
     self.y = 0
     self.rotation = 0
+    self.angle = 0 -- this is used instead of rotation to simulate a centered origin rotation
+    -- rotation can still be used to rotate around the origin, though this simulates it
     self.scale = {x = 1, y = 1}
     self.origin = {x = 0, y = 0}
     self.offset = {x = 0, y = 0}
@@ -94,8 +96,12 @@ function SparrowAtlas:constructor()
 
     self.suffix = ""
 
+    self.flipXAnims = {}
+    self.flipYAnims = {}
+
     self.onFrameChange = signal.new()
     self.onAnimationFinished = signal.new()
+
 end
 
 function SparrowAtlas:setSuffix(suffix)
@@ -468,11 +474,24 @@ function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     ox = ox or self.origin.x
     oy = oy or self.origin.y
 
-    if self.flipX then
+    local flipX, flipY = self.flipX, self.flipY
+
+    -- if curanim, check if flipx or flipy anim, if so, set flipx or flipy to true
+    if self.curAnim then
+        if self.flipXAnims[self.curAnim.name] then
+            flipX = true
+        end
+        if self.flipYAnims[self.curAnim.name] then
+            flipY = true
+        end
+        
+    end
+
+    if flipX then
         sx = sx * -1
         --x = x + (self:getFrameWidth() * -1)
     end
-    if self.flipY then
+    if flipY then
         sy = sy * -1
     end
 
@@ -490,6 +509,20 @@ function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
             ox = ox + curFrame.offset.x * (sx < 0 and -1 or 1)
             oy = oy + curFrame.offset.y * (sy < 0 and -1 or 1)
         end
+    end
+
+    -- apply angle
+    if self.angle and self.angle ~= 0 then
+        r = r + self.angle
+        -- sin/cos magic for rotating around the center of the sprite
+        local centerX = self:getFrameWidth() / 2
+        local centerY = self:getFrameHeight() / 2
+        local offsetX = x - centerX
+        local offsetY = y - centerY
+        local cos = math.cos(self.angle)
+        local sin = math.sin(self.angle)
+        x = centerX + offsetX * cos - offsetY * sin
+        y = centerY + offsetX * sin + offsetY * cos
     end
 
     local lastShader = love.graphics.getShader()

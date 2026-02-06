@@ -8,5 +8,6 @@ return {
     require "weeks.week6",
     require "weeks.week7",
     require "weeks.weekend1",
+    require "weeks.spaghetti",
     require "weeks.test",
 }

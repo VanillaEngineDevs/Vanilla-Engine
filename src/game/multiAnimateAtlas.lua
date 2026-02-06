@@ -48,6 +48,8 @@ function MultiAnimateAtlasCharacter:new(data, _atlasSettings)
             24,
             anim.loop or false
         )
+
+        print(self.sprites[anim.asset])
     end
 
     for _, anim in ipairs(self.animations) do

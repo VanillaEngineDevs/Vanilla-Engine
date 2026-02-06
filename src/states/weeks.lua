@@ -265,6 +265,7 @@ return {
 		camera.centered = true
 		dying = false
 		function self:onDeath()
+			if quitPressed then return end
 			if camTween then
 				Timer.cancel(camTween)
 			end
@@ -324,20 +325,6 @@ return {
 			end
 		end
 
-		self:preloadIcon((enemy and enemy.icon) and enemy.icon or "dad", "enemy")
-		self:preloadIcon((boyfriend and boyfriend.icon) and boyfriend.icon or "boyfriend", "boyfriend")
-
-		enemyIcon = healthIconPreloads.enemy
-		boyfriendIcon = healthIconPreloads.boyfriend
-
-		P1HealthColors = boyfriendIcon.mostCommonColour
-		P2HealthColors = enemyIcon.mostCommonColour
-
-		enemyIcon.sizeX = 1.5
-		boyfriendIcon.sizeX = -1.5
-		enemyIcon.sizeY = 1.5
-		boyfriendIcon.sizeY = 1.5
-
 		healthBar = {
 			x = -500,
 			y = not settings.downscroll and 350 or -400,
@@ -351,23 +338,12 @@ return {
 			downscrollOffset = 0
 		end -- For compatibility
 
-		enemyIcon.y = healthBar.y
-		boyfriendIcon.y = healthBar.y
-
 		isResetting = false
 		if boyfriend then boyfriend.playerInputs = true end
 
 		-- reload all the notes
 		if not wasntRestart then
 			-- call onSongRetry for all scripts
-			print("Calling onSongRetry for all scripts...")
-			self.stage:call("onSongRetry")
-			self.song:call("onSongRetry")
-			for _, obj in ipairs(self.objects) do
-				if obj.call then
-					obj:call("onSongRetry")
-				end
-			end
 
 			local bfpoint = boyfriend:getCameraPoint()
 			camera:forcePos(bfpoint.x, bfpoint.y)
@@ -392,6 +368,15 @@ return {
 			for _, event in ipairs(CURCHART.EVENTS) do
 				table.insert(songEvents, event)
 			end
+
+			print("Calling onSongRetry for all scripts...")
+			self.stage:call("onSongRetry")
+			self.song:call("onSongRetry")
+			for _, obj in ipairs(self.objects) do
+				if obj.call then
+					obj:call("onSongRetry")
+				end
+			end
 		end
 
 		previousFrameTime = love.timer.getTime() * 1000
@@ -415,6 +400,23 @@ return {
 				CAM_LERP_POINT.y = bfpoint.y
 			end
 		end
+
+		self:preloadIcon((enemy and enemy.healthIcon) and enemy.healthIcon or "dad", "enemy")
+		self:preloadIcon((boyfriend and boyfriend.healthIcon) and boyfriend.healthIcon or "boyfriend", "boyfriend")
+
+		enemyIcon = healthIconPreloads.enemy
+		boyfriendIcon = healthIconPreloads.boyfriend
+
+		P1HealthColors = boyfriendIcon.mostCommonColour
+		P2HealthColors = enemyIcon.mostCommonColour
+
+		enemyIcon.sizeX = 1.5
+		boyfriendIcon.sizeX = -1.5
+		enemyIcon.sizeY = 1.5
+		boyfriendIcon.sizeY = 1.5
+
+		enemyIcon.y = healthBar.y
+		boyfriendIcon.y = healthBar.y
 
 		local vwoosh = 0.5
 		musicTime = (-vwoosh * 1000) + (self.conductor:getBeatLengthsMS() * -5)
@@ -498,8 +500,7 @@ return {
 	songEnded = false,
 
 	checkSongOver = function(self)
-		--[[ if not (countingDown or graphics.isFading()) and not ((inst and inst:isPlaying()) or (voicesBF and voicesBF:isPlaying())) and not paused and not inCutscene and not isResetting then ]]
-		if musicTime >= math.floor(inst:getDuration("seconds") * 1000) and not self.songEnded then
+		if musicTime >= math.floor(inst:getDuration("seconds") * 1000)-10 and not self.songEnded then
 			self.songEnded = true
 			self:endSong()
 		end
@@ -700,6 +701,11 @@ return {
 		enemy = Character.getCharacter(metadata.playData.characters.opponent)
 		girlfriend = Character.getCharacter(metadata.playData.characters.girlfriend)
 
+		SONGNAME = metadata.songName
+		SONGID = name
+		CURDIFF = difficulty
+		ARTIST = metadata.artist
+
 		inst = love.audio.newSource("songs/" .. name .. "/Inst" .. songExt .. ".ogg", "stream")
 		local voicesBFPath = "songs/" .. name .. "/Voices-" .. metadata.playData.characters.player .. songExt .. ".ogg"
 		local voicesEnemyPath = "songs/" .. name .. "/Voices-" .. metadata.playData.characters.opponent .. songExt .. ".ogg"
@@ -763,6 +769,7 @@ return {
 
 		self.stage = Stage.getStage(metadata.playData.stage or "stage")
 		self.stage:build()
+		--[[ self.stage:call("onCreate") ]]
 		self.stage:call("postCreate")
 		self.song:call("postCreate")
 		if boyfriend.call then boyfriend:call("postCreate") end
@@ -771,8 +778,11 @@ return {
 		camera.zoom = self.stage.cameraZoom or 1.0
 		camera.defaultZoom = camera.zoom
 
+		boyfriend.name = "boyfriend"
 		self:add(boyfriend)
+		enemy.name = "enemy"
 		self:add(enemy)
+		girlfriend.name = "girlfriend"
 		self:add(girlfriend)
 		self:sort()
 
@@ -798,10 +808,6 @@ return {
 		camera.targetY = bfpoint.y
 		CAM_LERP_POINT.x = bfpoint.x
 		CAM_LERP_POINT.y = bfpoint.y
-
-		SONGNAME = metadata.songName
-		CURDIFF = difficulty
-		ARTIST = metadata.artist
 
 		local events = {}
 
@@ -1207,8 +1213,9 @@ return {
 					end
 
 				elseif pauseMenuSelection == 3 then
+					inst:seek(inst:getDuration("seconds"))
+					musicTime = inst:getDuration("seconds") * 1000
 					paused = false
-					if inst then inst:stop() end
 					if voicesBF then voicesBF:stop() end
 					if voicesEnemy then voicesEnemy:stop() end
 					quitPressed = true
@@ -1306,6 +1313,9 @@ return {
 						local ease = event.value.ease or "CLASSIC"
 
 						local targetX, targetY = x, y
+						if self:getSongID() == "2hot" then
+							targetX, targetY = -targetX, -targetY
+						end
 						print("CHARACTER", char)
 
 						if char == -1 then
@@ -1439,8 +1449,9 @@ return {
 							scrollFactor = {boyfriendIcon.scrollFactor[1], boyfriendIcon.scrollFactor[2]},
 							flipX = boyfriendIcon.flipX,
 							visible = boyfriendIcon.visible,
+							mostCommonColour = boyfriendIcon.mostCommonColour
 						}
-						boyfriendIcon = healthIconPreloads[event.value.id] or boyfriendIcon
+						boyfriendIcon = healthIconPreloads[event.value.id] or icon.newIcon(icon.imagePath(event.value.id), nil, true) or boyfriendIcon
 						for k, v in pairs(prevData) do
 							boyfriendIcon[k] = v
 						end
@@ -1459,8 +1470,9 @@ return {
 							scrollFactor = {enemyIcon.scrollFactor[1], enemyIcon.scrollFactor[2]},
 							flipX = enemyIcon.flipX,
 							visible = enemyIcon.visible,
+							mostCommonColour = enemyIcon.mostCommonColour
 						}
-						enemyIcon = healthIconPreloads[event.value.id] or enemyIcon
+						enemyIcon = healthIconPreloads[event.value.id] or icon.newIcon(icon.imagePath(event.value.id, nil, true)) or enemyIcon
 						for k, v in pairs(prevData) do
 							enemyIcon[k] = v
 						end
@@ -1597,6 +1609,20 @@ return {
 		end
 	end,
 
+	getAudio = function(self, name)
+		if name == "inst" then
+			return inst
+		elseif name == "enemy" then
+			return voicesEnemy
+		elseif name == "bf" then
+			return voicesBF
+		end
+	end,
+
+	getHealth = function(self)
+		return health
+	end,
+
 	setAltAnims = function(self, useAlt)
 		useAltAnims = useAlt
 	end,
@@ -1672,8 +1698,14 @@ return {
 								
 								if not didEvent then
 									continue = (Gamestate.onNoteHit(enemy, enemyNote[j].ver, "EnemyHit", i) == nil or false) and true or false
-									if enemy.call then
-										enemy:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i})
+									local event = eventCreator:noteHit(enemyNote[j].ver, i, "EnemyHit", 0)
+									event.isPlayer = false
+									self.stage:call("onNoteHit", event)
+									self.song:call("onNoteHit", event)
+									for _, obj in ipairs(self.objects) do
+										if obj.call then
+											obj:call("onNoteHit", event)
+										end
 									end
 									didEvent = true
 								else
@@ -1688,23 +1720,16 @@ return {
 											HoldCover:hide(i, 2)
 										end
 										if useAltAnims then
-											if whohit then 
+											if whohit then
 												whohit:play(curAnim .. "-alt", false, false)
-												if whohit.call then
-													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim .. "-alt"})
-												end
 											end
 										else
 											if whohit then 
 												whohit:play(curAnim, false, false)
-												if whohit.call then
-													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim})
-												end
 											end
 										end
 										whohit.holdTimer = 0
 									else
-										print(enemyArrow.visible)
 										NoteSplash:new(
 											{
 												anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
@@ -1721,6 +1746,8 @@ return {
 												if whohit.call then
 													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim .. "-alt"})
 												end
+												self.stage:call("onNoteHit", whohit, enemyNote[j].ver, "EnemyHit", i, curAnim .. "-alt")
+												self.song:call("onNoteHit", whohit, enemyNote[j].ver, "EnemyHit", i, curAnim .. "-alt")
 											end
 										else
 											if whohit then 
@@ -1728,6 +1755,8 @@ return {
 												if whohit.call then
 													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim})
 												end
+												self.stage:call("onNoteHit", whohit, enemyNote[j].ver, "EnemyHit", i, curAnim)
+												self.song:call("onNoteHit", whohit, enemyNote[j].ver, "EnemyHit", i, curAnim)
 											end
 										end
 
@@ -1745,10 +1774,15 @@ return {
 					elseif not ableTohit and enemyNote[j].time - musicTime <= 0 and not enemyNote[j].didHit then
 						enemyNote[j].didHit = true
 						Gamestate.onNoteHit(enemy, enemyNote[j].ver, "EnemyHit", i)
-						if enemy.call then
-							enemy:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i})
+						local event = eventCreator:noteHit(enemyNote[j].ver, i, "EnemyHit", 0)
+						event.isPlayer = false
+						self.stage:call("onNoteHit", event)
+						self.song:call("onNoteHit", event)
+						for _, obj in ipairs(self.objects) do
+							if obj.call then
+								obj:call("onNoteHit", event)
+							end
 						end
-
 						break
 					end
 				end
@@ -1760,9 +1794,6 @@ return {
 						if obj.characterType == CHARACTER_TYPE.GF then
 							obj:play(curAnim, true, false)
 							obj.holdTimer = 0
-							if obj.call then
-								obj:call("onNoteHit", {noteType = gfNote[1].ver, direction = i})
-							end
 						end
 					end
 
@@ -1789,15 +1820,20 @@ return {
 
 					table.remove(boyfriendNote, 1)
 
+					local healthChange = -CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult * boyfriendNote[1].healthLossMult
+					local event = eventCreator:noteMiss(boyfriendNote[1].ver, i, nil, healthChange)
+
 					if not continue then
 						for _, obj in ipairs(self.objects) do
 							if obj.characterType == CHARACTER_TYPE.BF then
 								obj:play(curAnim .. "miss", true, false)
-								if obj.call then
-									obj:call("onNoteMiss", curAnim .. "miss")
-								end
+							end
+							if obj.call then
+								obj:call("onNoteMiss", event)
 							end
 						end
+						self.stage:call("onNoteMiss", event)
+						self.song:call("onNoteMiss", event)
 					end
 					
 					if combo >= 5 then
@@ -1911,24 +1947,35 @@ return {
 
 									if continue then
 										if not boyfriendNote[j].causesMiss then
+											local healthChange = (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper(ratingAnim)] or 0) * healthGainMult * boyfriendNote[j].healthGainMult
+											if boyfriendNote[j]:getAnimName() == "hold" or boyfriendNote[j]:getAnimName() == "end" then
+												healthChange = 0.0125 * healthGainMult * boyfriendNote[j].healthGainMult
+											end
+											local event = eventCreator:noteHit(boyfriendNote[j].ver, i, ratingAnim, healthChange)
 											for _, obj in ipairs(self.objects) do
 												if obj.characterType == CHARACTER_TYPE.BF then
 													obj:play(curAnim, true, false)
-													if obj.call then
-														obj:call("onNoteHit", {noteType = boyfriendNote[j].ver, direction = i, anim = curAnim})
-													end
+												end
+												if obj.call then
+													obj:call("onNoteHit", event)
 												end
 											end
+											self.stage:call("onNoteHit", event)
+											self.song:call("onNoteHit", event)
 										else
 											audio.playSound(sounds.miss[love.math.random(3)])
+											local healthChange = -CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult * boyfriendNote[j].healthLossMult
+											local event = eventCreator:noteMiss(boyfriendNote[j].ver, i, ratingAnim, healthChange)
 											for _, obj in ipairs(self.objects) do
 												if obj.characterType == CHARACTER_TYPE.BF then
 													obj:play(curAnim .. "miss", true, false)
 													if obj.call then
-														obj:call("onNoteMiss", curAnim .. "miss")
+														obj:call("onNoteMiss", event)
 													end
 												end
 											end
+											self.stage:call("onNoteMiss", event)
+											self.song:call("onNoteMiss", event)
 										end
 									end
 
@@ -2036,12 +2083,9 @@ return {
 	add = function(self, object, sort)
 		sort = sort == nil and false or sort
 		table.insert(self.objects, object)
-		if not object.characterType then
-			self.stage:call("addProp", object, object.name)
-			self.song:call("addProp", object, object.name)
-		else
-			self.stage:call("addCharacter", object, object.name)
-			self.song:call("addCharacter", object, object.name)
+		if object.characterType then
+			self.stage:call("addCharacter", object, object.name or "")
+			self.song:call("addCharacter", object, object.name or "")
 		end
 		if sort then
 			self:sort()
@@ -2070,6 +2114,10 @@ return {
 
 	getSongName = function(self)
 		return self.metadata.songName
+	end,
+
+	getSongID = function(self)
+		return SONGID:lower():strip()
 	end,
 
 	getCamera = function(self)
@@ -2120,7 +2168,7 @@ return {
 		if not self.stageCanvas then self.stageCanvas = love.graphics.newCanvas(1280, 720) end
 		local lastCanvas = love.graphics.getCanvas()
 
-		love.graphics.setCanvas(self.stageCanvas)
+		love.graphics.setCanvas({self.stageCanvas, stencil = true})
 			love.graphics.clear()
 			love.graphics.push()
 				love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
@@ -2136,7 +2184,7 @@ return {
 					end
 				end
 			love.graphics.pop()
-		love.graphics.setCanvas(lastCanvas)
+		love.graphics.setCanvas({lastCanvas, stencil = true})
 
 		local lastShader = love.graphics.getShader()
 		love.graphics.setShader(self.stageShader)
@@ -2169,7 +2217,7 @@ return {
 		if not self.uiCanvas then self.uiCanvas = love.graphics.newCanvas(1280, 720) end
 
 		local lastCanvas = love.graphics.getCanvas()
-		love.graphics.setCanvas(self.uiCanvas)
+		love.graphics.setCanvas({self.uiCanvas, stencil = true})
 			love.graphics.clear()
 			NOTES_BATCH:clear()
 			if paused then
@@ -2300,7 +2348,7 @@ return {
 				love.graphics.rectangle("fill", -1000, -1000, 25000, 10000)
 				graphics.setColor(1, 1, 1)
 			love.graphics.pop()
-		love.graphics.setCanvas(lastCanvas)
+		love.graphics.setCanvas({lastCanvas, stencil = true})
 
 		local lastShader = love.graphics.getShader()
 		love.graphics.setShader(self.uiShader)
@@ -2329,7 +2377,7 @@ return {
 			y = 400+offsetY
 			format = "left"
 		elseif mode == "Minimal" then
-			x = x - 50
+			x = x - 35
 		end
 
 		local lastFont = love.graphics.getFont()
@@ -2370,7 +2418,10 @@ return {
 			if voicesEnemy then
 				voicesEnemy:stop()
 			end
-			Gamestate.push(gameoverSubstate)
+			--Gamestate.push(gameoverSubstate)
+			Timer.after(boyfriend:getDeathPreTransitionDelay() or 0, function()
+				Gamestate.push(gameoverSubstate)
+			end)
 		end
 	end,
 

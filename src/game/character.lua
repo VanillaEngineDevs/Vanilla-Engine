@@ -21,6 +21,9 @@ function character.getCharacter(id)
     local env = setmetatable({
         Character = {
             --[[ data = char, ]]
+            getCharacter = function(id)
+                return character.getCharacter(id)
+            end,
         },
         add = function(obj)
             weeks:add(obj)
@@ -82,6 +85,8 @@ function character.getCharacter(id)
     char.cameraOffsets = {data.cameraOffsets and data.cameraOffsets[1] or 0,
                           data.cameraOffsets and data.cameraOffsets[2] or 0}
 
+    char.healthIcon = data.healthIcon and data.healthIcon.id or char.id
+
     char:setAntialiasing(not data.isPixel)
 
     char:call("onCreate")
@@ -141,6 +146,8 @@ function character:new()
     self.inScriptCall = false
 
     self.alpha = 1
+
+    self.curAnimOffset = {0, 0}
 end
 
 function character:update(dt)
@@ -214,7 +221,7 @@ function character:onStepHit(step)
             end
         end
         if self.characterType == CHARACTER_TYPE.BF then
-            local isidledance = self.sprite.curAnim.name:startsWith("dance") or self.sprite.curAnim.name:startsWith("idle")
+            local isidledance = self.sprite.curAnim and (self.sprite.curAnim.name:startsWith("dance") or self.sprite.curAnim.name:startsWith("idle"))
             if self:isHoldingNote() and not isidledance then
                 return
             end
@@ -310,6 +317,7 @@ end
 
 function character:getDeathPreTransitionDelay()
     if self._data.death and self._data.death.preTransitionDelay then
+        print("Pre-transition delay for " .. self.id .. ": " .. self._data.death.preTransitionDelay)
         return self._data.death.preTransitionDelay
     end
     return 0

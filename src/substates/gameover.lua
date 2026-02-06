@@ -125,6 +125,8 @@ function gameover:setCameraTarget()
         targetCameraZoom = targetCameraZoom * (boyfriend:getDeathCameraZoom())
     end
 
+    print("Camera target set to: (" .. CAM_LERP_POINT.x .. ", " .. CAM_LERP_POINT.y .. ") with zoom " .. targetCameraZoom)
+
     self.targetCameraZoom = targetCameraZoom
 end
 

@@ -2,9 +2,11 @@ local LipSyncSprite = require("data.scripts.props.sserafimLipSyncSprite")
 local lipSyncSprite = nil
 
 function Character:onCreate()
-    lipSyncSprite = LipSyncSprite(0, 0, '')
+    self.data.sprite:play("idle", true, false)
+    lipSyncSprite = LipSyncSprite(-200, -200, '')
     lipSyncSprite.active = false
     lipSyncSprite.flipX = false
+    self.data.sprite.lipSync = lipSyncSprite
 
     self.data.sprite:addElementToFrames("mouth edit", lipSyncSprite.sprite)
 end
@@ -64,9 +66,6 @@ function Character:play(name, force, loop)
         lipSyncSprite.offsets = {0, 0}
         lipSyncSprite.angle = 0
     end
-end
-
-function Character:onDraw(camera)
 end
 
 function Character:onNoteHit(event)

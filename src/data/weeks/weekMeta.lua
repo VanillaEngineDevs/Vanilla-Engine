@@ -68,7 +68,12 @@ return { -- Add/remove weeks here
             {"Lit Up", diffs = {{"easy", nil, nil, "-pico"}, {"normal", nil, nil, "-pico"}, {"hard", nil, nil, "-pico"}, {"BF Easy", "-bf", "easy", "-bf"}, {"BF Normal", "-bf", "normal", "-bf"}, {"BF Hard", "-bf", "hard", "-bf"}}},
             {"2hot", diffs = {{"easy", nil, nil, "-pico"}, {"normal", nil, nil, "-pico"}, {"hard", nil, nil, "-pico"}}},
             {"Blazin", diffs = {{"easy", nil, nil, "-pico"}, {"normal", nil, nil, "-pico"}, {"hard", nil, nil, "-pico"}}},
-            {"Cutscene", show=false}
+        }
+    },
+    {
+        "Sserafim",
+        {
+            "Spaghetti"
         }
     },
     {

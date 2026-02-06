@@ -143,6 +143,8 @@ function AnimateAtlas:constructor(object)
 
     self.zIndex = 0
 
+    self.alpha = 1
+
     self.atlasSettings = self:getAtlasSettings() or {}
     self._symbolInstances = {}
     self._symbolisntanceCache = {}
@@ -197,13 +199,13 @@ local colorTransforms = {
             colorTransform["redOffset"],
             colorTransform["greenOffset"],
             colorTransform["blueOffset"],
-            colorTransform["AlphaOffset"]
+            (colorTransform["AlphaOffset"] or 1) * self.alpha
         )
         self:setColorMultiplier(
             colorTransform["RedMultiplier"],
             colorTransform["greenMultiplier"],
             colorTransform["blueMultiplier"],
-            colorTransform["alphaMultiplier"]
+            (colorTransform["alphaMultiplier"] or 1) * self.alpha
         )
     end
 }
@@ -726,10 +728,12 @@ local function renderSprite(self, sprite, spritemap, spriteMatrix, matrix, color
     local lastShader = love.graphics.getShader()
     love.graphics.setShader(self.shader)
     if not stencilMode then
-        --love.graphics.setShader(self._colorTransformShader)
+        if not self.shader then
+            love.graphics.setShader(self._colorTransformShader)
+        end
 
         self:setColorOffset(0, 0, 0, 0)
-        self:setColorMultiplier(1, 1, 1, 1)
+        self:setColorMultiplier(1, 1, 1, self.alpha)
 
         if type(colorTransforms[colorTransformMode]) == "function" then
             colorTransforms[colorTransformMode](self, colorTransform)
@@ -908,7 +912,6 @@ function AnimateAtlas:drawTimeline(timeline, frame, matrix, colorTransform)
         local keyframes = layer[optimized and "FR" or "Frames"]
         for j = 1, #keyframes do
             if renderKeyFrame(self, keyframes[j], frame, matrix, colorTransform, optimized) then
-                break
             end
         end
 
@@ -1292,7 +1295,7 @@ function AnimateAtlas:addElementToFrames(keyword, element) --ogurifap.gif
     for i = 1, #frames do
         local frame = frames[i]
         local elements = frame[optimized and "E" or "elements"]
-
+        elements.keywordReference = keyword
         if not elements then
             elements = {}
             frame[optimized and "E" or "elements"] = elements
@@ -1300,6 +1303,8 @@ function AnimateAtlas:addElementToFrames(keyword, element) --ogurifap.gif
 
         table.insert(elements, element)
     end
+
+    print("Added element to " .. #frames .. " frames with keyword '" .. keyword .. "'.")
 end
 
 function AnimateAtlas:getBoundTopLeft()

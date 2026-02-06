@@ -7,5 +7,6 @@ return { -- Add your week description here
     "RED SNOW",
     "HATING SIMULATOR FT. MOAWLING",
     "TANKMAN FT. JOHNYUTAH",
-    "DUE DEBTS"
+    "DUE DEBTS",
+    "fuck",
 }

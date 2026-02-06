@@ -119,6 +119,12 @@ function stage.getStage(id)
                     return obj
                 end
             end
+
+            for _, prop in pairs(s.props) do
+                if prop.name == name then
+                    return s.props[name]
+                end
+            end
         end,
         getCamera = function()
             return camera
@@ -140,10 +146,24 @@ function stage.getStage(id)
         x = s.characters.dad.scroll[1],
         y = s.characters.dad.scroll[2]
     }
-    enemy.scale = {
-        x = s.characters.dad.scale[1] * enemy.scale.x,
-        y = s.characters.dad.scale[2] * enemy.scale.y
-    }
+    if type(enemy.scale) == "number" then
+        enemy.scale = {
+            x = s.characters.dad.scale * enemy.scale,
+            y = s.characters.dad.scale * enemy.scale
+        }
+    else
+        if type(s.characters.dad.scale) == "number" then
+            enemy.scale = {
+                x = s.characters.dad.scale * enemy.scale.x,
+                y = s.characters.dad.scale * enemy.scale.y
+            }
+        else
+            enemy.scale = {
+                x = s.characters.dad.scale[1] * enemy.scale.x,
+                y = s.characters.dad.scale[2] * enemy.scale.y
+            }
+        end
+    end
     enemy.cameraOffsets = {
         x = enemy.cameraOffsets[1] + s.characters.dad.cameraOffsets[1],
         y = enemy.cameraOffsets[2] + s.characters.dad.cameraOffsets[2]
@@ -156,10 +176,24 @@ function stage.getStage(id)
         x = s.characters.bf.scroll[1],
         y = s.characters.bf.scroll[2]
     }
-    boyfriend.scale = {
-        x = s.characters.bf.scale[1] * boyfriend.scale.x,
-        y = s.characters.bf.scale[2] * boyfriend.scale.y
-    }
+    if type(boyfriend.scale) == "number" then
+        boyfriend.scale = {
+            x = s.characters.bf.scale * boyfriend.scale,
+            y = s.characters.bf.scale * boyfriend.scale
+        }
+    else
+        if type(s.characters.bf.scale) == "number" then
+            boyfriend.scale = {
+                x = s.characters.bf.scale * boyfriend.scale.x,
+                y = s.characters.bf.scale * boyfriend.scale.y
+            }
+        else
+            boyfriend.scale = {
+                x = s.characters.bf.scale[1] * boyfriend.scale.x,
+                y = s.characters.bf.scale[2] * boyfriend.scale.y
+            }
+        end
+    end
     boyfriend.cameraOffsets = {
         x = boyfriend.cameraOffsets[1] + s.characters.bf.cameraOffsets[1],
         y = boyfriend.cameraOffsets[2] + s.characters.bf.cameraOffsets[2]
@@ -172,10 +206,24 @@ function stage.getStage(id)
         x = s.characters.gf.scroll[1],
         y = s.characters.gf.scroll[2]
     }
-    girlfriend.scale = {
-        x = s.characters.gf.scale[1] * girlfriend.scale.x,
-        y = s.characters.gf.scale[2] * girlfriend.scale.y
-    }
+    if type(girlfriend.scale) == "number" then
+        girlfriend.scale = {
+            x = s.characters.gf.scale * girlfriend.scale,
+            y = s.characters.gf.scale * girlfriend.scale
+        }
+    else
+        if type(s.characters.gf.scale) == "number" then
+            girlfriend.scale = {
+                x = s.characters.gf.scale * girlfriend.scale.x,
+                y = s.characters.gf.scale * girlfriend.scale.y
+            }
+        else
+            girlfriend.scale = {
+                x = s.characters.gf.scale[1] * girlfriend.scale.x,
+                y = s.characters.gf.scale[2] * girlfriend.scale.y
+            }
+        end
+    end
     girlfriend.cameraOffsets = {
         x = girlfriend.cameraOffsets[1] + s.characters.gf.cameraOffsets[1],
         y = girlfriend.cameraOffsets[2] + s.characters.gf.cameraOffsets[2]
@@ -186,8 +234,10 @@ function stage.getStage(id)
 end
 
 function stage:build()
+    --[[ self:call("onCreate") ]]
     for _, propitem in ipairs(self._props) do
         local prop = nil
+        local _type = type
         local type = propitem.animType or defaultProps.animType
         if type == "sparrow" or type == "packer" then
             prop = graphics.newSparrowAtlas()
@@ -199,6 +249,13 @@ function stage:build()
             prop:setAntialiasing(not propitem.isPixel)
             for _, anim in ipairs(propitem.animations or {}) do
                 if type == "sparrow" then
+                    if not prop.flipXAnims then
+                        prop.flipXAnims = {}
+                        prop.flipYAnims = {}
+                    end
+                    prop.flipXAnims[anim.name] = anim.flipX or false
+                    prop.flipYAnims[anim.name] = anim.flipY or false
+
                     if anim.indiceFrames and #anim.indiceFrames > 0 then
                         prop:addAnimByIndices(
                             anim.name,
@@ -275,8 +332,13 @@ function stage:build()
 
         prop.x = propitem.position[1]
         prop.y = propitem.position[2]
-        prop.scale.x = propitem.scale[1]
-        prop.scale.y = propitem.scale[2]
+        if _type(propitem.scale) == "number" then
+            prop.scale.x = propitem.scale
+            prop.scale.y = propitem.scale
+        else
+            prop.scale.x = propitem.scale and propitem.scale[1] or 1
+            prop.scale.y = propitem.scale and propitem.scale[2] or 1
+        end
         prop.alpha = propitem.alpha or 1
         prop.zIndex = propitem.zIndex
         prop.name = propitem.name
@@ -288,10 +350,20 @@ function stage:build()
 
         self.props[propitem.name] = prop
 
-        weeks:add(prop)
+        --[[ weeks:add(prop) ]]
     end
 
+    self:call("onCreate")
+
     self:call("build")
+
+    for _, prop in pairs(self.props) do
+        weeks:add(prop)
+        self:call("addProp", prop, prop.name or "")
+    end
+
+    self:call("postCreate")
+
     weeks:sort()
 end
 

@@ -1,15 +1,5 @@
 local normalChar
 
-function Character:onAnimationFrame(name, frameNumber, _)
-    if name == "firstDeath" and frameNumber == 28 then
-        hapticUtil:vibrate(0, 0.1, 0.1, 1)
-    end
-
-    if name == "deathLoop" and (frameNumber == 1 or frameNumber == 19) then
-        hapticUtil:vibrate(0, 0.1, 0.1, 1)
-    end
-end
-
 function Character:setAlpha(v)
     self.data.alpha = v
     if normalChar then
@@ -21,22 +11,31 @@ function Character:setAlpha(v)
     end
 end
 
+function Character:onNoteHit(event)
+    if not event.isPlayer and self.data.characterType == CHARACTER_TYPE.DAD then
+        if event.noteType == "cheer" then
+            self.data.holdTimer = 0
+            self:play("cheer", true, false)
+        end
+    end
+end
+
 function Character:play(name, force, loop)
     self.data:play(name, force, loop)
 
     if normalChar then
         normalChar:play(name, force, loop)
-        normalChar.x = self.data.x - 1
-        normalChar.y = self.data.y - 11
+        normalChar.x = self.data.x
+        normalChar.y = self.data.y
     end
 end
 
 function Character:postCreate()
-    normalChar = Character.getCharacter("bf")
+    normalChar = Character.getCharacter("spooky")
     normalChar.zIndex = 199
     normalChar.alpha = 0
     normalChar.flipX = false
-    normalChar.characterType = CHARACTER_TYPE.BF
+    normalChar.characterType = CHARACTER_TYPE.DAD
 
     weeks:add(normalChar)
     weeks:sort()

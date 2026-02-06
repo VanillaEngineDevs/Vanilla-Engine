@@ -30,15 +30,23 @@ local animationFinished = false
 
 local refreshed = false
 
-function Character:setRefreshed(v)
-    refreshed = v
-end
-
-function Character:onCreate()
-end
-
 function Character:setTrainPassing(passing)
     trainPassing = passing
+end
+
+local normalChar
+function Character:setAlpha(v)
+    self.data.alpha = v
+    abot.alpha = v
+    stereoBG.alpha = v
+    pupil.alpha = v
+    if normalChar then
+        if v ~= 1 then
+            normalChar.alpha = 1
+        else
+            normalChar.alpha = 0
+        end
+    end
 end
 
 function Character:postCreate()
@@ -47,10 +55,7 @@ function Character:postCreate()
 
     stereoBG = graphics.newSparrowAtlas()
     stereoBG:load(EXTEND_LIBRARY("shared:characters/abot/stereoBG", false))
-    eyeWhites = graphics.newSparrowAtlas()
-    eyeWhites:load("#FFFFFF")
-    eyeWhites.scale.x = 120
-    eyeWhites.scale.y = 60
+    stereoBG.colour = hex2rgb(0xFF616785)
 
     pupil = graphics.newTextureAtlas()
     pupil:load(EXTEND_LIBRARY("shared:characters/abot/systemEyes", true))
@@ -68,9 +73,22 @@ function Character:postCreate()
     end)
 
     abot = graphics.newTextureAtlas()
-    abot:load(EXTEND_LIBRARY("shared:characters/abot/abotSystem", true))
+    abot:load(EXTEND_LIBRARY("shared:characters/abot/dark/abotSystem", true))
 
     abot:playSymbol("", true, false, 1)
+
+    normalChar = Character.getCharacter("nene")
+    normalChar.zIndex = self.data.zIndex - 20
+    normalChar.alpha = 0
+    normalChar.flipX = false
+    normalChar.characterType = CHARACTER_TYPE.GF
+    normalChar.x = self.data.x - 645
+    normalChar.y = self.data.y - 558
+    normalChar:call("onCreate")
+    weeks:add(normalChar)
+    normalChar:call("postCreate")
+    weeks:sort()
+    normalChar:call("setRefreshed", false)
 end
 
 function Character:onSongEvent(event)
@@ -94,16 +112,28 @@ function Character:dance(force)
     if state == STATE_DEFAULT then
         if self.data.hasDanced then
             self.data:play("danceRight", force, false)
+            if normalChar then
+                normalChar:play("danceRight", force, false)
+            end
         else
             self.data:play("danceLeft", force, false)
+            if normalChar then
+                normalChar:play("danceLeft", force, false)
+            end
         end
         self.data.hasDanced = not self.data.hasDanced
     elseif state == STATE_PRE_RAISE then
         self.data:play("danceLeft", false, false)
+        if normalChar then
+            normalChar:play("danceLeft", false, false)
+        end
         self.data.hasDanced = false
     elseif state == STATE_READY then
         if blinkCooldown == 0 then
             self.data:play("idleKnife", false, false)
+            if normalChar then
+                normalChar:play("idleKnife", false, false)
+            end
             blinkCooldown = love.math.random(MIN_BLINK_DELAY, MAX_BLINK_DELAY)
         else
             blinkCooldown = blinkCooldown - 1
@@ -111,7 +141,20 @@ function Character:dance(force)
     elseif state == STATE_LOWER then
         if self.data.sprite.curAnim.name ~= "lowerKnife" then
             self.data:play("lowerKnife", false, false)
+            if normalChar then
+                normalChar:play("lowerKnife", false, false)
+            end
         end
+    end
+end
+
+function Character:play(name, force, loop)
+    if name == "scared" then return end
+
+    self.data:play(name, force, loop)
+
+    if normalChar then
+        normalChar:play(name, force, loop)
     end
 end
 
@@ -128,23 +171,17 @@ function Character:onUpdate(dt)
 
         -- abotViz
 
-        eyeWhites.x = abot.x + 40
-        eyeWhites.y = abot.y + 250
-        eyeWhites.zIndex = abot.zIndex - 10
-        weeks:add(eyeWhites)
-
         pupil.x = abot.x + 60
         pupil.y = abot.y + 238
-        pupil.zIndex = eyeWhites.zIndex + 5
+        pupil.zIndex = abot.zIndex - 5
         weeks:add(pupil)
 
         stereoBG.x = abot.x + 150
         stereoBG.y = abot.y + 30
-        stereoBG.zIndex = eyeWhites.zIndex - 8
+        stereoBG.zIndex = abot.zIndex - 3
         weeks:add(stereoBG)
 
         abot.shader = self.data.shader
-        eyeWhites.shader = self.data.shader
         pupil.shader = self.data.shader
         stereoBG.shader = self.data.shader
 

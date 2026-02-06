@@ -67,9 +67,11 @@ function Stage:resetCar(left, right)
 end
 
 function Stage:onCreate()
+    print("wtf")
     if love.system.getOS() ~= "NX" then
         shaders["rain"]:send("uScale", 0.0075)
         weeks:setStageShader(shaders["rain"])
+        print("Applied rain shader to stage")
     end
 
     if weeks:getSongID() == "darnell" then

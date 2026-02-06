@@ -24,4 +24,27 @@ function eventCreator:endSong()
     return baseEvent()
 end
 
+function eventCreator:noteHit(type, direction, data, healthChange, judgement)
+    local event = baseEvent()
+    event.noteType = type
+    event.direction = direction
+    event.data = data
+    event.healthChange = healthChange
+    event.judgement = judgement
+
+    return event
+end
+
+function eventCreator:noteMiss(type, direction, data, healthChange)
+    local event = baseEvent()
+    event.noteType = type
+    event.direction = direction
+    event.data = data
+    event.healthChange = healthChange
+    event.judgement = 'miss'
+    event.isPlayer = true
+
+    return event
+end
+
 return eventCreator

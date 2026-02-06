@@ -7,6 +7,7 @@ local lightsDurations = {}
 local lightsIntensities = {}
 
 local baseVisible = {true, false, false, false, false}
+local baseVisible = {true, true, true, true, true}
 local baseSinging = {false, false, false, false, false, false}
 
 local lightsEnabled = false
@@ -262,6 +263,7 @@ end
 
 function Stage:addProp(prop, name)
     prop.shader = stageShader
+    print("Added prop " .. name .. " with shader " .. tostring(prop.shader))
 
     -- TODO: BLENDMODES!!!!
     if name == "truckLight1" then
