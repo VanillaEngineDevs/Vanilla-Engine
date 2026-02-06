@@ -1,4 +1,4 @@
-l.lreturn {
+return {
     require "weeks.tutorial",
     require "weeks.week1",
     require "weeks.week2",

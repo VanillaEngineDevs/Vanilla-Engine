@@ -53,9 +53,11 @@ def compressAssets(imageFormat, blockSize="10x10"):
     print(f"[INFO] Compressing assets to {imageFormat.upper()}...")
 
     sourceFolder = "src/images"
+    sourceFolder2 = "src/assets/"
 
     try:
         run(f"python {compressScript} {imageFormat} {blockSize} {sourceFolder}")
+        run(f"python {compressScript} {imageFormat} {blockSize} {sourceFolder2}")
     except subprocess.CalledProcessError:
         print("[ERROR] Compression failed")
 

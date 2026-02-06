@@ -13,3 +13,9 @@ src/assets/shared/characters/picoPixel/*
 src/assets/shared/characters/nenePixel/*
 src/assets/shared/characters/senpai.png
 src/assets/shared/characters/spirit.png
+
+*.mp3
+*.ogg
+*.wav
+*.mp4
+*.ogv
