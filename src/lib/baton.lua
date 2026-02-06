@@ -511,6 +511,30 @@ function Player:released(name)
 	end
 end
 
+-- resets the current input state
+function Player:pop()
+	self._activeDevice = 'none'
+	for _, control in pairs(self._controls) do
+		control.rawValue = 0
+		control.value = 0
+		control.down = false
+		control.downPrevious = false
+		control.pressed = false
+		control.released = false
+		control.debounce = false
+	end
+	for _, pair in pairs(self._pairs) do
+		pair.rawX = 0
+		pair.rawY = 0
+		pair.x = 0
+		pair.y = 0
+		pair.down = false
+		pair.downPrevious = false
+		pair.pressed = false
+		pair.released = false
+	end
+end
+
 --[[
 	gets the currently active device (either "kbm", "joy", or "none").
 	this is useful for displaying instructional text. you may have

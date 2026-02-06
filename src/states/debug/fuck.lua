@@ -84,6 +84,12 @@ function f:keypressed(k)
             else
                 print("Failed to load character: " .. charName)
             end
+        elseif k == "escape" then
+            settings.showDebug = settings.lastDEBUGOption
+            graphics:fadeOutWipe(0.7, function()
+                Gamestate.switch(menu)
+                input:pop()
+            end)
         end
     elseif state == 2 then
         if k == "down" then
@@ -102,6 +108,12 @@ function f:keypressed(k)
                 weeks.conductor = Conductor.new()
             end
             character:play(animName, true)
+        elseif k == "escape" then
+            state = 1
+            current = 1
+            scrollY = 0
+            character = nil
+            clone = nil
         end
     end
 end
@@ -184,6 +196,11 @@ function f:draw()
             end
         end
     love.graphics.pop()
+end
+
+function f:leave()
+    love.keyboard.setKeyRepeat(false)
+    graphics.setFade(1)
 end
 
 return f

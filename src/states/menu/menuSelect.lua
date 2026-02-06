@@ -52,19 +52,6 @@ return {
                 end
             },
             {
-                sprite = love.filesystem.load("sprites/menu/mods.lua")(),
-                confirm = function()
-                    status.setLoading(true)
-                    graphics:fadeOutWipe(
-                        0.7,
-                        function()
-                            Gamestate.switch(menuMods)
-                            status.setLoading(false)
-                        end
-                    )
-                end
-            },
-            {
                 sprite = love.filesystem.load("sprites/menu/options.lua")(),
                 confirm = function()
                     status.setLoading(true)
@@ -103,7 +90,7 @@ return {
             button.sprite.sizeX = 0.75
             button.sprite.sizeY = 0.75
 
-            button.sprite.y = -200 + (i - 1) * 100
+            button.sprite.y = -200 + (i - 1) * 130
 
             Timer.tween(1, button.sprite, {x = -295 - (i - 1) * 25}, "out-expo")
         end

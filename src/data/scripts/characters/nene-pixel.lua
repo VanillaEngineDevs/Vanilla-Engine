@@ -41,6 +41,8 @@ function Character:postCreate()
     head:load(EXTEND_LIBRARY("shared:characters/abotPixel/abotHead", false))
     head.scale.x = 6
     head.scale.y = 6
+    head:addAnimByPrefix("toleft", "toleft0", 24, false)
+    head:addAnimByPrefix("toright", "toright0", 24, false)
 
     speaker = graphics.newSparrowAtlas()
     speaker:load(EXTEND_LIBRARY("shared:characters/abotPixel/aBotPixelSpeaker", false))
@@ -66,8 +68,10 @@ function Character:onSongEvent(event)
         local char = tonumber(event.value.char or "0") or 0
         if char == 0 and pupilState ~= PUPIL_STATE_NORMAL then
             pupilState = PUPIL_STATE_NORMAL
+            head:animate("toright", false, false)
         elseif char == 1 and pupilState ~= PUPIL_STATE_LEFT then
             pupilState = PUPIL_STATE_LEFT
+            head:animate("toleft", false, false)
         end
     end
 end
@@ -75,26 +79,22 @@ end
 function Character:dance(force)
     if state == STATE_DEFAULT then
         if self.data.hasDanced then
-            self.data:play("danceRight", true)
-            if abot then abot:play("danceRight", true) end
+            self.data:play("danceRight", true, false)
+            if abot then abot:play("danceRight", true, false) end
         else
-            self.data:play("danceLeft", true)
-            if abot then abot:play("danceLeft", true) end
+            self.data:play("danceLeft", true, false)
+            if abot then abot:play("danceLeft", true, false) end
         end
         self.data.hasDanced = not self.data.hasDanced
     elseif state == STATE_PRE_RAISE then
-        self.data:play("danceLeft", false)
+        self.data:play("danceLeft", false, false)
         self.data.hasDanced = false
     elseif state == STATE_READY then
         if blinkCooldown == 0 then
-            self.data:play("idleKnife", false)
+            self.data:play("idleKnife", false, false)
             blinkCooldown = love.math.random(MIN_BLINK_DELAY, MAX_BLINK_DELAY)
         else
             blinkCooldown = blinkCooldown - 1
-        end
-    elseif state == STATE_LOWER then
-        if self.data.sprite.curAnim.name ~= "lowerKnife" then
-            self.data:play("lowerKnife", false)
         end
     end
 end
@@ -113,16 +113,17 @@ function Character:onUpdate(dt)
         abot.y = self.data.y + 212 - (self.data.offsets[2])
         abot.zIndex = self.data.zIndex - 10
 
-        stereoBG.x = abot.x+200
+        stereoBG.x = abot.x+205
         stereoBG.y = abot.y+130
         stereoBG.zIndex = abot.zIndex - 2
 
         speaker.x = abot.x - 144
         speaker.y = abot.y + 9
-        speaker.zIndex = abot.zIndex -3
+        speaker.zIndex = abot.zIndex - 3
 
-        head.x = abot.x - 325
-        head.y = head.y + 72
+        head.x = abot.x - 64
+        head.y = head.y + 675
+        head.zIndex = abot.zIndex - 4
 
         weeks:add(abot)
         weeks:add(stereoBG)
@@ -136,14 +137,15 @@ function Character:onUpdate(dt)
 end
 
 function Character:shouldTransitionState()
-    if not boyfriend then return true end
+    if not boyfriend then return false end
 
     return (boyfriend.id or "") ~= "pico-blazin"
 end
 
 function Character:onAnimationFinished(name)
-    if state == STATE_RAISE or state == STATE_LOWER then
+    if state == STATE_RAISE or state == STATE_LOWER or state == STATE_READY then
         animationFinished = true
+        self:transitionState()
     end
 end
 
@@ -168,7 +170,7 @@ function Character:transitionState()
             state = STATE_DEFAULT
         elseif animationFinished then
             state = STATE_RAISE
-            self.data:play("raiseKnife")
+            self.data:play("raiseKnife", true, false)
             animationFinished = false
         end
     elseif state == STATE_RAISE then
@@ -179,6 +181,10 @@ function Character:transitionState()
     elseif state == STATE_READY then
         if health > VULTURE_THRESHOLD then
             state = STATE_LOWER
+            self.data:play("lowerKnife", true, false)
+        elseif animationFinished then
+            self.data:play("idleKnife", true, false)
+            animationFinished = false
         end
     elseif state == STATE_LOWER then
         if animationFinished then

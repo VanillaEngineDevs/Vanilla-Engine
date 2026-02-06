@@ -59,6 +59,7 @@ function love.load()
 	Stage = require "game.stage"
 	Song = require "game.song"
 	SparrowCharacter = require "game.sparrowCharacter"
+	PackerCharacter = require "game.packerCharacter"
 	MultiSparrowCharacter = require "game.multiSparrowCharacter"
 	AnimateAtlasCharacter = require "game.animateAtlasCharacter"
 	MultiAnimateAtlasCharacter = require "game.multiAnimateAtlas"

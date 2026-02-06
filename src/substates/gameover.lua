@@ -159,7 +159,7 @@ function gameover:confirmDeath()
             local function endShit()
                 Gamestate.pop()
                 if fromState then
-                    weeks:load(true)
+                    weeks:load(false)
                 end
                 if boyfriend then
                     boyfriend.isDead = false

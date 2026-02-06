@@ -360,6 +360,19 @@ return {
 
 		-- reload all the notes
 		if not wasntRestart then
+			-- call onSongRetry for all scripts
+			print("Calling onSongRetry for all scripts...")
+			self.stage:call("onSongRetry")
+			self.song:call("onSongRetry")
+			for _, obj in ipairs(self.objects) do
+				if obj.call then
+					obj:call("onSongRetry")
+				end
+			end
+
+			local bfpoint = boyfriend:getCameraPoint()
+			camera:forcePos(bfpoint.x, bfpoint.y)
+
 			print("Reloading notes from preloaded chart...")
 			for i = 1, 4 do
 				boyfriendArrows[i]:animate(CONSTANTS.WEEKS.NOTE_LIST[i])
@@ -1984,6 +1997,7 @@ return {
 
 			if not input:down(curInput) and not HoldCover:getVisibility(i, 1) then
 				HoldCover:hide(i, 1)
+				inHolds[i] = false
 			end
 
 			if input:released(curInput) then
@@ -2092,21 +2106,49 @@ return {
 		end)
 	end,
 
-	renderStage = function(self)
-		love.graphics.push()
-			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
-			love.graphics.scale(camera.zoom, camera.zoom)
-			love.graphics.translate(-graphics.getWidth() / 2, -graphics.getHeight() / 2)
+	setStageShader = function(self, shader)
+		self.stageShader = shader
+	end,
+	setUIShader = function(self, shader)
+		self.uiShader = shader
+	end,
 
-			for _, object in ipairs(self.objects) do
-				if object.draw then
-					object:draw(camera)
-					if object.call then
-						object:call("onDraw", camera)
+	getScreen = function(self)
+		if not self.stageCanvas then self.stageCanvas = love.graphics.newCanvas(1280, 720) end
+		return self.stageCanvas
+	end,
+
+	getUI = function(self)
+		if not self.uiCanvas then self.uiCanvas = love.graphics.newCanvas(1280, 720) end
+		return self.uiCanvas
+	end,
+
+	renderStage = function(self)
+		if not self.stageCanvas then self.stageCanvas = love.graphics.newCanvas(1280, 720) end
+		local lastCanvas = love.graphics.getCanvas()
+
+		love.graphics.setCanvas(self.stageCanvas)
+			love.graphics.clear()
+			love.graphics.push()
+				love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
+				love.graphics.scale(camera.zoom, camera.zoom)
+				love.graphics.translate(-graphics.getWidth() / 2, -graphics.getHeight() / 2)
+
+				for _, object in ipairs(self.objects) do
+					if object.draw then
+						object:draw(camera)
+						if object.call then
+							object:call("onDraw", camera)
+						end
 					end
 				end
-			end
-		love.graphics.pop()
+			love.graphics.pop()
+		love.graphics.setCanvas(lastCanvas)
+
+		local lastShader = love.graphics.getShader()
+		love.graphics.setShader(self.stageShader)
+		love.graphics.draw(self.stageCanvas)
+		love.graphics.setShader(lastShader)
 	end,
 
 	drawRating = function(self)
@@ -2131,136 +2173,146 @@ return {
 
 	drawUI = function(self)
 		if not UI_VISIBLE then return end
-		NOTES_BATCH:clear()
-		if paused then
-			love.graphics.push()
-				love.graphics.setFont(pauseFont)
-				love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
-				graphics.setColor(0, 0, 0, 0.8)
-				love.graphics.rectangle("fill", -10000, -2000, 25000, 10000)
-				graphics.setColor(1, 1, 1)
-				pauseShadow:draw()
-				pauseBG:draw()
-				if pauseMenuSelection ~= 1 then
-					uitextflarge("Resume", -305, -275, 600, "center", false)
-				else
-					uitextflarge("Resume", -305, -275, 600, "center", true)
-				end
-				if pauseMenuSelection ~= 2 then
-					uitextflarge("Restart", -305, -75, 600, "center", false)
-				else
-					uitextflarge("Restart", -305, -75, 600, "center", true)
-				end
-				if pauseMenuSelection ~= 3 then
-					uitextflarge("Quit", -305, 125, 600, "center", false)
-				else
-					uitextflarge("Quit", -305, 125, 600, "center", true)
-				end
-				love.graphics.setFont(font)
-			love.graphics.pop()
-			return 
-		end
-		if self.overrideDrawHealthbar then
-			self:overrideDrawHealthbar(score, health, misses, ratingPercent, healthLerp)
-		else
-			self:drawHealthbar()
-		end
-		love.graphics.push()
-			love.graphics.translate(push:getWidth() / 2, push:getHeight() / 2)
-			love.graphics.scale(0.7, 0.7)
-			love.graphics.scale(uiCam.zoom, uiCam.zoom)
-			love.graphics.translate(uiCam.x, uiCam.y)
-			graphics.setColor(1, 1, 1)
+		if not self.uiCanvas then self.uiCanvas = love.graphics.newCanvas(1280, 720) end
 
-			for i = 1, 4 do
-				if enemyArrows[i]:getAnimName() == "off" then
-					if not settings.middlescroll then
-						graphics.setColor(0.6, 0.6, 0.6, enemyArrows[i].alpha)
-					else
-						graphics.setColor(0.6, 0.6, 0.6, enemyArrows[i].alpha)
-					end
-				else
-					graphics.setColor(1, 1, 1, enemyArrows[i].alpha)
-				end
-				if pixel and not settings.pixelPerfect then
-					enemyArrows[i]:udraw(8, 8)
-				else
-					enemyArrows[i]:draw()
-				end
-				graphics.setColor(1, 1, 1)
-				if pixel and not settings.pixelPerfect then
-					boyfriendArrows[i]:udraw(8, 8)
-				else
-					boyfriendArrows[i]:draw()
-				end
-				graphics.setColor(1, 1, 1)
-
+		local lastCanvas = love.graphics.getCanvas()
+		love.graphics.setCanvas(self.uiCanvas)
+			love.graphics.clear()
+			NOTES_BATCH:clear()
+			if paused then
 				love.graphics.push()
-					love.graphics.push()
-						for j = #enemyNotes[i], 1, -1 do
-							if enemyNotes[i][j].y+enemyNotes[i][j].offsetY2 <= 600 and enemyNotes[i][j].y+enemyNotes[i][j].offsetY2 >= -600 then
-								local animName = enemyNotes[i][j]:getAnimName()
-								if settings.middlescroll then
-									graphics.setColor(1, 1, 1, 0.8 * enemyNotes[i][j].alpha)
-								else
-									graphics.setColor(1, 1, 1, 1 * enemyNotes[i][j].alpha)
-								end
-
-								if pixel and not settings.pixelPerfect then
-									enemyNotes[i][j]:udraw(8, 8)
-								else
-									enemyNotes[i][j]:draw()
-								end
-								graphics.setColor(1, 1, 1)
-							end
-						end
-					love.graphics.pop()
-					love.graphics.push()
-						for j = #boyfriendNotes[i], 1, -1 do
-							if boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2 <= 600 and boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2 >= -600 then
-								local animName = boyfriendNotes[i][j]:getAnimName()
-								if not settings.downscroll then
-									graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2)) / 75) * boyfriendNotes[i][j].alpha)
-								else
-									graphics.setColor(1, 1, 1, math.min(1, (500 - (boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2)) / 75) * boyfriendNotes[i][j].alpha)
-								end
-
-								if pixel and not settings.pixelPerfect then
-									boyfriendNotes[i][j]:udraw(8, 8)
-								else
-									boyfriendNotes[i][j]:draw()
-								end
-							end
-						end
-					love.graphics.pop()
+					love.graphics.setFont(pauseFont)
+					love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
+					graphics.setColor(0, 0, 0, 0.8)
+					love.graphics.rectangle("fill", -10000, -2000, 25000, 10000)
 					graphics.setColor(1, 1, 1)
+					pauseShadow:draw()
+					pauseBG:draw()
+					if pauseMenuSelection ~= 1 then
+						uitextflarge("Resume", -305, -275, 600, "center", false)
+					else
+						uitextflarge("Resume", -305, -275, 600, "center", true)
+					end
+					if pauseMenuSelection ~= 2 then
+						uitextflarge("Restart", -305, -75, 600, "center", false)
+					else
+						uitextflarge("Restart", -305, -75, 600, "center", true)
+					end
+					if pauseMenuSelection ~= 3 then
+						uitextflarge("Quit", -305, 125, 600, "center", false)
+					else
+						uitextflarge("Quit", -305, 125, 600, "center", true)
+					end
+					love.graphics.setFont(font)
 				love.graphics.pop()
+				return 
 			end
-
-			love.graphics.draw(NOTES_BATCH)
-
-			HoldCover:draw()
-			if pixel and not settings.pixelPerfect then
-				NoteSplash:udraw(8, 8)
+			if self.overrideDrawHealthbar then
+				self:overrideDrawHealthbar(score, health, misses, ratingPercent, healthLerp)
 			else
-				NoteSplash:draw()
+				self:drawHealthbar()
 			end
+			love.graphics.push()
+				love.graphics.translate(push:getWidth() / 2, push:getHeight() / 2)
+				love.graphics.scale(0.7, 0.7)
+				love.graphics.scale(uiCam.zoom, uiCam.zoom)
+				love.graphics.translate(uiCam.x, uiCam.y)
+				graphics.setColor(1, 1, 1)
 
-			graphics.setColor(1, 1, 1, countdownFade[1])
-			if pixel and not settings.pixelPerfect then
-				countdown:udraw(6.75, 6.75)
-			else
-				countdown:draw()
-			end
-			graphics.setColor(1, 1, 1)
-		love.graphics.pop()
+				for i = 1, 4 do
+					if enemyArrows[i]:getAnimName() == "off" then
+						if not settings.middlescroll then
+							graphics.setColor(0.6, 0.6, 0.6, enemyArrows[i].alpha)
+						else
+							graphics.setColor(0.6, 0.6, 0.6, enemyArrows[i].alpha)
+						end
+					else
+						graphics.setColor(1, 1, 1, enemyArrows[i].alpha)
+					end
+					if pixel and not settings.pixelPerfect then
+						enemyArrows[i]:udraw(8, 8)
+					else
+						enemyArrows[i]:draw()
+					end
+					graphics.setColor(1, 1, 1)
+					if pixel and not settings.pixelPerfect then
+						boyfriendArrows[i]:udraw(8, 8)
+					else
+						boyfriendArrows[i]:draw()
+					end
+					graphics.setColor(1, 1, 1)
 
-		love.graphics.push()
-			graphics.setColor(1, 1, 1, FLASH[1])
-			love.graphics.rectangle("fill", -1000, -1000, 25000, 10000)
-			graphics.setColor(1, 1, 1)
-		love.graphics.pop()
+					love.graphics.push()
+						love.graphics.push()
+							for j = #enemyNotes[i], 1, -1 do
+								if enemyNotes[i][j].y+enemyNotes[i][j].offsetY2 <= 600 and enemyNotes[i][j].y+enemyNotes[i][j].offsetY2 >= -600 then
+									local animName = enemyNotes[i][j]:getAnimName()
+									if settings.middlescroll then
+										graphics.setColor(1, 1, 1, 0.8 * enemyNotes[i][j].alpha)
+									else
+										graphics.setColor(1, 1, 1, 1 * enemyNotes[i][j].alpha)
+									end
 
+									if pixel and not settings.pixelPerfect then
+										enemyNotes[i][j]:udraw(8, 8)
+									else
+										enemyNotes[i][j]:draw()
+									end
+									graphics.setColor(1, 1, 1)
+								end
+							end
+						love.graphics.pop()
+						love.graphics.push()
+							for j = #boyfriendNotes[i], 1, -1 do
+								if boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2 <= 600 and boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2 >= -600 then
+									local animName = boyfriendNotes[i][j]:getAnimName()
+									if not settings.downscroll then
+										graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2)) / 75) * boyfriendNotes[i][j].alpha)
+									else
+										graphics.setColor(1, 1, 1, math.min(1, (500 - (boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2)) / 75) * boyfriendNotes[i][j].alpha)
+									end
+
+									if pixel and not settings.pixelPerfect then
+										boyfriendNotes[i][j]:udraw(8, 8)
+									else
+										boyfriendNotes[i][j]:draw()
+									end
+								end
+							end
+						love.graphics.pop()
+						graphics.setColor(1, 1, 1)
+					love.graphics.pop()
+				end
+
+				love.graphics.draw(NOTES_BATCH)
+
+				HoldCover:draw()
+				if pixel and not settings.pixelPerfect then
+					NoteSplash:udraw(8, 8)
+				else
+					NoteSplash:draw()
+				end
+
+				graphics.setColor(1, 1, 1, countdownFade[1])
+				if pixel and not settings.pixelPerfect then
+					countdown:udraw(6.75, 6.75)
+				else
+					countdown:draw()
+				end
+				graphics.setColor(1, 1, 1)
+			love.graphics.pop()
+
+			love.graphics.push()
+				graphics.setColor(1, 1, 1, FLASH[1])
+				love.graphics.rectangle("fill", -1000, -1000, 25000, 10000)
+				graphics.setColor(1, 1, 1)
+			love.graphics.pop()
+		love.graphics.setCanvas(lastCanvas)
+
+		local lastShader = love.graphics.getShader()
+		love.graphics.setShader(self.uiShader)
+		love.graphics.draw(self.uiCanvas)
+		love.graphics.setShader(lastShader)
 	end,
 
 	healthbarText = function(self, text, offsetX, offsetY)
@@ -2474,5 +2526,8 @@ return {
 		self.inSong = false
 
 		self.songEnded = false
+
+		self:setStageShader(nil)
+		self:setUIShader(nil)
 	end
 }

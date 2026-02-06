@@ -168,14 +168,13 @@ function SparrowAtlas:load(imageData, dataString, framerate)
             end
         else
             dataString = dataString:gsub("%.xml$", ".txt")
-            print("WARNING: XML file not found, trying TXT: " .. tostring(dataString))
             local content = getFileContent(dataString)
             for line in content:gmatch("[^\r\n]+") do
-                print(line)
                 local name, x, y, width, height = line:match("^(.-)%s*=%s*(%d+)%s+(%d+)%s+(%d+)%s+(%d+)")
-                local n, frameid = name:match("^(.-)_(%d+)$")
+                local _, frameid = name:match("^(.-)_(%d+)$")
                 frameid = tonumber(frameid)
                 if name and x and y and width and height and frameid then
+                    print(name, x, y, width, height, frameid)
                     table.insert(self.frames, createFrame(
                         name,
                         tonumber(x), tonumber(y),

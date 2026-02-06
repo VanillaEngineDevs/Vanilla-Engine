@@ -53,6 +53,7 @@ function character.getCharacter(id)
     elseif data.renderType == "multianimateatlas" then
         char = MultiAnimateAtlasCharacter(data, _atlasSettings)
     elseif data.renderType == "packer" then
+        char = PackerCharacter(data)
     end
 
     -- set Character.data now

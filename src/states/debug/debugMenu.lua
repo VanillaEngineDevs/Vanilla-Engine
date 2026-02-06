@@ -6,23 +6,13 @@ return {
             {
                 text = "Sprite Viewer",
                 state = spriteDebug
-            },
-            {
-                text = "Stage Editor",
-                state = stageDebug
-            },
-            {
-                text = "Frame Offset Viewer",
-                state = frameDebug
-            },
-            {
-                text = "Stage Builder",
-                state = stageBuilder
             }
         }
         settings.lastDEBUGOption = settings.showDebug
         settings.showDebug = false
 
+        graphics.setFade(1)
+        
         love.audio.stop()
     end,
     
@@ -33,6 +23,12 @@ return {
             choice = choice > #options and 1 or choice + 1
         elseif key == "return" then
             Gamestate.switch(options[choice].state)
+        elseif key == "escape" then
+            settings.showDebug = settings.lastDEBUGOption
+            graphics:fadeOutWipe(0.7, function()
+                Gamestate.switch(menu)
+                input:pop()
+            end)
         end
     end,
 
@@ -48,5 +44,10 @@ return {
             love.graphics.print(i .. ". " .. option.text, 10, 30 + 20 * i)
         end
         graphics.setColor(1, 1, 1, 1)
+    end,
+
+    leave = function()
+        graphics.setFade(1)
+        love.keyboard.setKeyRepeat(false)
     end
 }
