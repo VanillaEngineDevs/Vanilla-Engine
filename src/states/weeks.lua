@@ -211,7 +211,6 @@ return {
 					love.audio.newSource("sounds/pixel/miss2.ogg", "static"),
 					love.audio.newSource("sounds/pixel/miss3.ogg", "static")
 				},
-				death = love.audio.newSource("sounds/pixel/death.ogg", "static"),
 				breakfast = love.audio.newSource("music/breakfast.ogg", "stream")
 			}
 
@@ -677,12 +676,6 @@ return {
 		self.song = Song.getSong(name .. songExt)
 		local chart = getFilePath(chartPath)
 		local metadata = getFilePath(metadataPath)
-		if importMods.inMod then
-			importMods.setupScripts()
-		end
-		self.overrideHealthbarText = importMods.uiHealthbarTextMod or nil
-		self.overrideDrawHealthbar = importMods.uiHealthbarMod or nil
-
 		local chartData
 		if string.endsWith(chart, ".json") then
 			chartData = json.decode(love.filesystem.read(chart))
@@ -1696,14 +1689,14 @@ return {
 										end
 										if useAltAnims then
 											if whohit then 
-												whohit:play(curAnim .. "-alt", (_psychmod and true or false), false)
+												whohit:play(curAnim .. "-alt", false, false)
 												if whohit.call then
 													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim .. "-alt"})
 												end
 											end
 										else
 											if whohit then 
-												whohit:play(curAnim, (_psychmod and true or false), false)
+												whohit:play(curAnim, false, false)
 												if whohit.call then
 													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim})
 												end
@@ -2511,10 +2504,6 @@ return {
 		camera:removePoint("girlfriend")
 
 		Timer.clear()
-
-		fakeBoyfriend = nil
-		importMods.removeScripts()
-		importMods.inMod = false
 
 		noteSprites = nil
 

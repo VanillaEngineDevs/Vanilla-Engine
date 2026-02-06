@@ -28,3 +28,5 @@ tools/funkin-xna/*
 
 # Misc
 *.kra
+
+.backup/

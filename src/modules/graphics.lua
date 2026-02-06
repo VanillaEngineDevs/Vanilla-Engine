@@ -81,25 +81,10 @@ local graphics = {
 
 		local imageType = forcePNG and "png" or imageType
 
-		if not importMods.inMod then
-			if love.filesystem.getInfo(pathStr) then
-				return pathStr
-			else
-				return "images/" .. path .. ".png"
-			end
+		if love.filesystem.getInfo(pathStr) then
+			return pathStr
 		else
-			local currentMod = importMods.getCurrentMod()
-			if currentMod and love.filesystem.getInfo(currentMod.path .. "/images/" .. path .. "." .. imageType) then
-				return currentMod.path .. "/images/" .. path .. "." .. imageType
-			elseif currentMod and love.filesystem.getInfo(currentMod.path .. "/images/" .. path .. ".png") then
-				return currentMod.path .. "/images/" .. path .. ".png"
-			else
-				if love.filesystem.getInfo(pathStr) then
-					return pathStr
-				else
-					return "images/" .. path .. ".png"
-				end
-			end
+			return "images/" .. path .. ".png"
 		end
 	end,
 	setImageType = function(type)

@@ -14,6 +14,8 @@ local difficultyStrs = {
 	"hard"
 }
 
+-- TODO: Revamp this?
+
 return {
 	enter = function(self, previous)
 		if not music:isPlaying() then
@@ -136,7 +138,7 @@ return {
 
 		--week images
 		weekImages = {}
-		for i = 0, modWeekPlacement-2 do 
+		for i = 0, #weekMeta do
 			table.insert(weekImages, graphics.newImage(graphics.imagePath("menu/week" .. i)))
 		end
 		table.insert(weekImages, graphics.newImage(graphics.imagePath("menu/weekend1")))
@@ -160,7 +162,6 @@ return {
 			graphics:fadeOutWipe(
 				0.7,
 				function()
-					_psychmod = false
 					songAppend = difficultyStrs[songDifficulty]
 
 					storyMode = true
@@ -254,8 +255,8 @@ return {
 					currentWeek = currentWeek - 1
 					weekNum = weekNum - 1
 				else
-					currentWeek = modWeekPlacement - 1
-					weekNum = modWeekPlacement
+					currentWeek = #weekMeta - 2
+					weekNum = #weekMeta
 				end
 				if freeplayColours[weekNum] then colourTween() else colourTweenAlt() end
 				menuFunc()
@@ -268,7 +269,7 @@ return {
 					arrowRight:animate("arrow", true)
 				end)
 
-				if currentWeek ~= modWeekPlacement - 1 then
+				if currentWeek ~= #weekMeta - 2 then
 					currentWeek = currentWeek + 1
 					weekNum = weekNum + 1
 				else
@@ -331,7 +332,7 @@ return {
 
 				love.graphics.setColor(freeColour[1]/255, freeColour[2]/255, freeColour[3]/255)
 				love.graphics.scale(camera.zoom, camera.zoom)
-				for i = 1, modWeekPlacement do
+				for i = 1, #weekMeta-1 do
 					weekImages[i]:draw()
 				end
 

@@ -213,14 +213,12 @@ return {
                 graphics:fadeOutWipe(
                     0.7,
                     function()
-                        importMods.inMod = weekNum > modWeekPlacement
-    
                         storyMode = false
-    
+
                         music:stop()
-    
+
                         Gamestate.switch(weekData[weekNum], songNum, allWeeks[weekNum].songs[songNum].diffs[songDifficulty][3], allWeeks[weekNum].songs[songNum].diffs[songDifficulty][2], allWeeks[weekNum].songs[songNum].diffs[songDifficulty][4])
-    
+
                         status.setLoading(false)
                     end
                 )

@@ -64,10 +64,7 @@ function love.load()
 	AnimateAtlasCharacter = require "game.animateAtlasCharacter"
 	MultiAnimateAtlasCharacter = require "game.multiAnimateAtlas"
 
-    importMods = require "modding.importMods"
-
     Sprite = require "modules.xml.Sprite"
-    xmlcamera = require "modules.xml.camera"
     Checkbox = require "modules.Checkbox"
 	hapticUtil = require "modules.hapticUtil"
 	signal = require "modules.signal"
@@ -81,9 +78,6 @@ function love.load()
 
     debugMenu = require "states.debug.debugMenu"
     spriteDebug = require "states.debug.fuck"
-    stageDebug = require "states.debug.stage-debug"
-    frameDebug = require "states.debug.frame-debug"
-    stageBuilder = require "states.debug.stage-builder"
 
     selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
     confirmSound = love.audio.newSource("sounds/menu/confirm.ogg", "static")
@@ -94,10 +88,9 @@ function love.load()
     }
 
     shaders = {}
-    if curOS ~= "NX" then 
+    if curOS ~= "NX" then
         shaders["rain"] = love.graphics.newShader("shaders/rain.glsl")
     end
-    shaders["wiggle"] = love.graphics.newShader("shaders/wiggle.glsl")
 
     menu = require "states.menu.menu"
     menuWeek = require "states.menu.menuWeek"
@@ -112,11 +105,6 @@ function love.load()
     weeks = require "states.weeks"
 
     OptionsMenu = require "states.menu.options.OptionsMenu"
-    --[[ gameOvers = {
-        default = require "substates.gameovers.boyfriend",
-        week7Default = require "substates.gameovers.boyfriend-week7",
-        pixelDefault = require "substates.gameovers.boyfriend-pixel"
-    } ]]
 	gameoverSubstate = require "substates.gameover"
 
     settingsKeybinds = require "substates.settings-keybinds"
@@ -128,7 +116,6 @@ function love.load()
         ["Miscillaneous"] = require "substates.options.miscillaneous"
     }
 
-    TankmanDatingSim = require "misc.dating"
     weekData = require "data.weeks.weekData"
     weekDesc = require "data.weeks.weekDescriptions"
     weekMeta = require "data.weeks.weekMeta"
@@ -145,11 +132,6 @@ function love.load()
             end
         end
     end
-    modWeekPlacement = #weekMeta - 1
-
-    gameOverSounds = {
-        boyfriend = {firstDeath = love.audio.newSource("sounds/death.ogg", "static")}
-    }
 
     require "modules.extras"
     __VERSION__ = love.filesystem.getInfo("version.txt") and love.filesystem.read("version.txt") or "vUnknown"
@@ -202,11 +184,6 @@ function love.load()
 
     fixVol = tonumber(string.format("%.1f", love.audio.getVolume()))
     volumeWidth = {width = 160}
-
-    if CONSTANTS.OPTIONS.DO_MODS then
-        importMods.setup()
-        importMods.loadAllMods()
-    end
 
     love.audio.setVolume(0.1)
     Gamestate.switch(menu)
@@ -261,16 +238,6 @@ function love.keypressed(key)
 		end)
 	elseif key == "7" and not love.keyboard.isDown("lalt") then
 		Gamestate.switch(debugMenu)
-	elseif key == "`" and love.keyboard.isDown("lalt") then
-		status.setLoading(true)
-		graphics:fadeOutWipe(
-			0.7,
-			function()
-				music:stop()
-				Gamestate.switch(TankmanDatingSim)
-				status.setLoading(false)
-			end
-		)
 	elseif key == "0" then
 		volFade = 1
 		if fixVol == 0 then

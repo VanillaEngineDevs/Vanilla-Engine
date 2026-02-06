@@ -1,9 +1,4 @@
 function weeks.legacyGenerateNotes(self, chart)
-    if importMods.inMod then
-        importMods.setupScripts()
-    end
-    self.overrideHealthbarText = importMods.uiHealthbarTextMod or nil
-	self.overrideDrawHealthbar = importMods.uiHealthbarMod or nil
     local chart = getFilePath(chart)
     chart = json.decode(love.filesystem.read(chart)).song
 
@@ -152,11 +147,6 @@ function weeks.generatePsychEvents(self, eventsChart)
 end
 
 function weeks.cneGenerateNotes(self, chart, metadata)
-    if importMods.inMod then
-        importMods.setupScripts()
-    end
-    self.overrideHealthbarText = importMods.uiHealthbarTextMod or nil
-	self.overrideDrawHealthbar = importMods.uiHealthbarMod or nil
     local chart = getFilePath(chart)
     chart = json.decode(love.filesystem.read(chart))
     local metadata = json.decode(love.filesystem.read(metadata))
