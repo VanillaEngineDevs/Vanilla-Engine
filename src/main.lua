@@ -20,7 +20,6 @@ function love.load()
     settings = {}
     curOS = love.system.getOS()
 
-    baton = require("lib.baton")
     ini = require("lib.ini")
     push = require("lib.push")
     Gamestate = require("lib.gamestate")
@@ -44,7 +43,9 @@ function love.load()
     cutscene = require("modules.game.cutscene")
     dialogue = require("modules.game.dialogue")
     Group = require("modules.objects.Group")
-    require("modules.savedata")
+    settings = require("modules.savedata")
+	settings.load()
+	settings.savedataLoad()
     require("modules.objects.Alphabet")
     Option = require("modules.game.Option")
     CONSTANTS = require("modules.constants")
@@ -73,7 +74,7 @@ function love.load()
     volumeWidth = {width = 160}
     volFade = 0
 
-    input = require("modules.input")
+    input = require("modules.input").createController()
     debugMenu = require("states.debug.debugMenu")
     spriteDebug = require("states.debug.fuck")
 
@@ -160,6 +161,7 @@ function love.load()
     FNFFont = love.graphics.newFont("assets/fonts/fnFont.ttf", 24)
     credFont = love.graphics.newFont("assets/fonts/fnFont.ttf", 32)
     uiFont = love.graphics.newFont("assets/fonts/Dosis-SemiBold.ttf", 32)
+	uiFontBold = love.graphics.newFont("assets/fonts/Dosis-Bold.ttf", 32)
     pauseFont = love.graphics.newFont("assets/fonts/Dosis-SemiBold.ttf", 96)
     weekFont = love.graphics.newFont("assets/fonts/Dosis-SemiBold.ttf", 84)
     weekFontSmall = love.graphics.newFont("assets/fonts/Dosis-SemiBold.ttf", 54)
@@ -310,6 +312,18 @@ function love.touchmoved(id, x, y, dx, dy, pressure)
 	Gamestate.touchmoved(id, x, y, dx, dy, pressure)
 end
 
+function love.gamepadpressed(joystick, button)
+	Gamestate.gamepadpressed(joystick, button)
+end
+
+function love.gamepadreleased(joystick, button)
+	Gamestate.gamepadreleased(joystick, button)
+end
+
+function love.gamepadaxis(joystick, axis, value)
+	Gamestate.gamepadaxis(joystick, axis, value)
+end
+
 function love.update(dt)
 	if camera then camera:update(dt) end
 	CURRENT_IMAGE_FORMAT = "." .. graphics.getImageType()
@@ -449,6 +463,6 @@ function love.quit()
 	if settings.lastDEBUGOption then
 		settings.showDebug = settings.lastDEBUGOption
 	end
-	saveSettings(false)
-	saveSavedata()
+	settings.save(false)
+	settings.savedataSave()
 end

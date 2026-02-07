@@ -1,66 +1,168 @@
---[[----------------------------------------------------------------------------
-This file is part of Friday Night Funkin' Rewritten
+local baton = require("lib.baton")
 
-Copyright (C) 2021  HTV04
+local CONFIG_PATH = "inputconfig.lua"
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+local input = {}
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+local function getDefaultControls()
+	local controls = {
+		left = {"key:left",  "axis:leftx-", "button:dpleft"},
+		down = {"key:down",  "axis:lefty+", "button:dpdown"},
+		up = {"key:up",    "axis:lefty-", "button:dpup"},
+		right = {"key:right", "axis:leftx+", "button:dpright"},
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-------------------------------------------------------------------------------]]
+		confirm = {"key:return", "button:a"},
+		back = {"key:escape", "button:b"},
+		tab = {"key:tab", "button:back"},
+		pause = {"button:start", "key:return"},
 
-if love.system.getOS() == "NX" then
-	return baton.new {
-		controls = {
+		debugZoomOut = {"key:["},
+		debugZoomIn = {"key:]"},
+
+		gameLeft = {
+			"key:left",
+			"key:a",
+			"axis:triggerleft+",
+			"axis:leftx-",
+			"axis:rightx-",
+			"button:dpleft",
+			"button:x"
+		},
+		gameDown = {
+			"key:down",
+			"key:s",
+			"axis:lefty+",
+			"axis:righty+",
+			"button:leftshoulder",
+			"button:dpdown",
+			"button:a"
+		},
+		gameUp = {
+			"key:up",
+			"key:w",
+			"axis:lefty-",
+			"axis:righty-",
+			"button:rightshoulder",
+			"button:dpup",
+			"button:y"
+		},
+		gameRight = {
+			"key:right",
+			"key:d",
+			"axis:triggerright+",
+			"axis:leftx+",
+			"axis:rightx+",
+			"button:dpright",
+			"button:b"
+		},
+
+		gameBack = {"key:escape", "button:start"},
+	}
+
+	if love.system.getOS() == "NX" then
+		lume.extend(controls, {
+			confirm = {"button:b", "key:return"},
+			back = {"button:a", "key:escape"},
+
 			left = {"axis:leftx-", "button:dpleft", "key:left"},
 			down = {"axis:lefty+", "button:dpdown", "key:down"},
 			up = {"axis:lefty-", "button:dpup", "key:up"},
 			right = {"axis:leftx+", "button:dpright", "key:right"},
-			confirm = {"button:b", "key:return"},
-			back = {"button:a", "key:escape"},
-			tab = {"key:tab", "button:back"},
-			debugZoomOut = {"key:["},
-			debugZoomIn = {"key:]"},
-			pause = {"button:start", "key:return"},
 
-			gameLeft = {"axis:triggerleft+", "axis:leftx-", "axis:rightx-", "button:dpleft", "button:x", "key:" .. customBindLeft, "key:left"},
-			gameDown = {"axis:lefty+", "axis:righty+", "button:leftshoulder", "button:dpdown", "button:a", "key:" .. customBindDown, "key:down"},
-			gameUp = {"axis:lefty-", "axis:righty-", "button:rightshoulder", "button:dpup", "button:y", "key:" .. customBindUp, "key:up"},
-			gameRight = {"axis:triggerright+", "axis:leftx+", "axis:rightx+", "button:dpright", "button:b", "key:" .. customBindRight, "key:right"},
+			gameLeft = {
+				"axis:triggerleft+",
+				"axis:leftx-",
+				"axis:rightx-",
+				"button:dpleft",
+				"button:x",
+				"key:left",
+				"key:a"
+			},
+			gameDown = {
+				"axis:lefty+",
+				"axis:righty+",
+				"button:leftshoulder",
+				"button:dpdown",
+				"button:a",
+				"key:down",
+				"key:s"
+			},
+			gameUp = {
+				"axis:lefty-",
+				"axis:righty-",
+				"button:rightshoulder",
+				"button:dpup",
+				"button:y",
+				"key:up",
+				"key:w"
+			},
+			gameRight = {
+				"axis:triggerright+",
+				"axis:leftx+",
+				"axis:rightx+",
+				"button:dpright",
+				"button:b",
+				"key:right",
+				"key:d"
+			},
 
 			gameBack = {"button:start", "key:escape"},
-		},
-		joystick = love.joystick.getJoysticks()[1]
+		})
+	end
+
+	return controls
+end
+
+
+local function saveConfig(data)
+	local serialized = "return " .. lume.serialize(data)
+	love.filesystem.write(CONFIG_PATH, serialized)
+end
+
+local function loadConfig()
+	if love.filesystem.getInfo(CONFIG_PATH) then
+		local chunk = love.filesystem.load(CONFIG_PATH)
+		local ok, data = pcall(chunk)
+
+		if ok and type(data) == "table" then
+			return data
+		end
+	end
+
+	local defaults = {
+		controls = getDefaultControls()
 	}
-else
+
+	saveConfig(defaults)
+	return defaults
+end
+
+function input.createController()
+	local data = loadConfig()
+
+	local mergedControls = lume.merge(
+		getDefaultControls(),
+		data.controls or {}
+	)
+
+	data.controls = mergedControls
+	saveConfig(data)
+
 	return baton.new {
-		controls = {
-			left = {"key:left", "axis:leftx-", "button:dpleft"},
-			down = {"key:down", "axis:lefty+", "button:dpdown"},
-			up = {"key:up", "axis:lefty-", "button:dpup"},
-			right = {"key:right", "axis:leftx+", "button:dpright"},
-			confirm = {"key:return", "button:a"},
-			back = {"key:escape", "button:b"},
-			tab = {"key:tab", "button:back"},
-			debugZoomOut = {"key:["},
-			debugZoomIn = {"key:]"},
-			pause = {"button:start", "key:return"},
-
-			gameLeft = {"key:" .. customBindLeft, "key:left", "axis:triggerleft+", "axis:leftx-", "axis:rightx-", "button:dpleft", "button:x"},
-			gameDown = {"key:" .. customBindDown, "key:down", "axis:lefty+", "axis:righty+", "button:leftshoulder", "button:dpdown", "button:a"},
-			gameUp = {"key:" .. customBindUp, "key:up", "axis:lefty-", "axis:righty-", "button:rightshoulder", "button:dpup", "button:y"},
-			gameRight = {"key:" .. customBindRight, "key:right", "axis:triggerright+", "axis:leftx+", "axis:rightx+", "button:dpright", "button:b"},
-
-			gameBack = {"key:escape", "button:start"},
-		},
+		controls = mergedControls,
 		joystick = love.joystick.getJoysticks()[1]
 	}
 end
+
+function input.saveControls(newControls)
+	local data = loadConfig()
+	data.controls = lume.clone(newControls)
+	saveConfig(data)
+end
+
+function input.getControls()
+	local data = loadConfig()
+	return lume.clone(data.controls)
+end
+
+return input

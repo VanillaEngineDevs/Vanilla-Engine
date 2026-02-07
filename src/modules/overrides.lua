@@ -91,7 +91,7 @@ function love.run()
         end
 
         local cap = settings.fpsCap
-        local capDT = 1 / cap
+        local capDT = 1 / (cap or 60)
 
         -- Cap the minimum delta time to 1/30 (30 FPS)
         dt = math_min(t_step(), math_max(capDT, 1 / 30))
