@@ -240,5 +240,12 @@ if __name__ == "__main__":
                     os.remove(os.path.join(root, file))
                     print(f"[CLEANUP] Removed {file} from {root}")
 
+        for root, _, files in os.walk("src/assets/"):
+            for file in files:
+                if file.lower().endswith((".dds", ".astc")):
+                    os.remove(os.path.join(root, file))
+                    print(f"[CLEANUP] Removed {file} from {root}")
+
+
     with open("src/IMAGE_FORMAT.txt", "w") as f:
         f.write("png")

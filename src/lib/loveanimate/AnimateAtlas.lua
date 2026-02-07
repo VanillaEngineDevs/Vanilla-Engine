@@ -1221,7 +1221,7 @@ function AnimateAtlas:_calcS(self, symbol, frame, index, matrix, optimized, boun
 	local is3DMatrix = symbol[optimized and "M3D" or "Matrix3D"] ~= nil
 	local symbolMatrix = love.math.newTransform()
 	local symbolMatrixRaw = is3DMatrix and symbol[optimized and "M3D" or "Matrix3D"] or symbol[optimized and "MX" or "Matrix"]
-	
+
 	if symbolMatrixRaw then
 		symbolMatrix:setMatrix((is3DMatrix and matrix3D or matrix2D)(symbolMatrixRaw, optimized))
 	else
@@ -1454,7 +1454,7 @@ function AnimateAtlas:getSymbolElements(symbol)
     for i = 1, #layers do
         local layer = layers[i]
         local frames = layer[optimized and "FR" or "Frames"]
-        
+
         if frames and #frames > 0 then
             local frameElements = frames[1][optimized and "E" or "elements"] or {}
             for j = 1, #frameElements do
