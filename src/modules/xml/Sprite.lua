@@ -1,5 +1,8 @@
 -- For XML's
 
+-- FOR COMPATIBILITY! PLEASE DO NOT USE THIS MODULE!!!
+-- NEEDS TO BE REMOVED!!!
+
 local xmlCache = {}
 
 function getImage(key)

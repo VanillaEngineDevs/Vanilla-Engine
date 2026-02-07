@@ -62,7 +62,7 @@ local graphics = {
 	end,
 
 	imagePath = function(path)
-		local pathStr = "images/" .. path .. "." .. imageType
+		local pathStr = "assets/images/" .. path .. "." .. imageType
 		local forcePNG = true
 		if imageType == "dds" then
 			if supported.dxt5 then
@@ -84,7 +84,7 @@ local graphics = {
 		if love.filesystem.getInfo(pathStr) then
 			return pathStr
 		else
-			return "images/" .. path .. ".png"
+			return "assets/images/" .. path .. ".png"
 		end
 	end,
 	setImageType = function(type)
@@ -100,7 +100,7 @@ local graphics = {
 			if love.filesystem.getInfo(pathStr) then
 				graphics.cache[pathStr] = love.graphics.newImage(pathStr)
 			else
-				graphics.cache[pathStr] = love.graphics.newImage("images/missing.png")
+				graphics.cache[pathStr] = love.graphics.newImage("assets/images/missing.png")
 			end
 		end
 		local image, width, height
@@ -356,7 +356,7 @@ local graphics = {
 				if love.filesystem.getInfo(imageData) then
 					graphics.cache[imageData] = love.graphics.newImage(imageData)
 				else
-					graphics.cache[imageData] = love.graphics.newImage("images/missing.png")
+					graphics.cache[imageData] = love.graphics.newImage("assets/images/missing.png")
 				end
 			end
 			imageData = graphics.cache[imageData]
@@ -1360,17 +1360,17 @@ local graphics = {
 
 function graphics:initStickerData()
 	self.stickerGroup = Group()
-	self.stickerInfo = json.decode(love.filesystem.read("data/stickers/stickers-set1.json"))
+	self.stickerInfo = json.decode(love.filesystem.read("assets/data/stickers/stickers-set1.json"))
 	self.unnamedIndexStickers = {}
 	for _, BALLS in pairs(self.stickerInfo.stickers) do
 		table.insert(self.unnamedIndexStickers, BALLS)
 	end
 
-	self.stickerSoundsPaths = love.filesystem.getDirectoryItems("sounds/stickers/keys/")
+	self.stickerSoundsPaths = love.filesystem.getDirectoryItems("assets/sounds/stickers/keys/")
 	self.allStickerSounds = {}
 
 	for i, _ in ipairs(self.stickerSoundsPaths) do
-		table.insert(self.allStickerSounds, love.audio.newSource("sounds/stickers/keys/" .. self.stickerSoundsPaths[i], "stream"))
+		table.insert(self.allStickerSounds, love.audio.newSource("assets/sounds/stickers/keys/" .. self.stickerSoundsPaths[i], "stream"))
 	end
 end
 

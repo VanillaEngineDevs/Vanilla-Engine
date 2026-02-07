@@ -8,7 +8,7 @@ buildDir = "build"
 releaseDir = os.path.join(buildDir, "release")
 lovefileName = "funkin-vanilla-engine.love"
 blacklistFile = "blacklistCompileFolders.txt"
-versionFile = "src/version.txt"
+versionFile = "src/data/version.txt"
 compressScript = "compressImages.py"
 
 def getBlacklist():
@@ -67,6 +67,7 @@ def run(command):
 
 def buildLovefile():
     print("[INFO] Building .love file...")
+    shutil.copy("LICENSE", "src/LICENSE.txt")
     lovefileDir = os.path.join(buildDir, "lovefile")
     os.makedirs(lovefileDir, exist_ok=True)
     zipPath = os.path.join(lovefileDir, lovefileName)
@@ -82,6 +83,8 @@ def buildLovefile():
     if os.path.exists(releaseZip):
         os.remove(releaseZip)
     zipDir(lovefileDir, releaseZip)
+
+    os.remove(os.path.join(srcDir, "LICENSE.txt"))
 
 def buildWin64():
     print("[INFO] Building Windows 64-bit package...")
@@ -188,7 +191,7 @@ if __name__ == "__main__":
     if args.imageformat not in ["png", "dxt5", "astc"]:
         print(f"[ERROR] Invalid image format: {args.imageformat}. Defaulting to 'dxt5'.")
 
-    with open("src/IMAGE_FORMAT.txt", "w") as f:
+    with open("src/data/IMAGE_FORMAT.txt", "w") as f:
         f.write(args.imageformat)
 
     videoBlacklist = []
@@ -247,5 +250,5 @@ if __name__ == "__main__":
                     print(f"[CLEANUP] Removed {file} from {root}")
 
 
-    with open("src/IMAGE_FORMAT.txt", "w") as f:
+    with open("src/data/IMAGE_FORMAT.txt", "w") as f:
         f.write("png")

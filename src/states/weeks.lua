@@ -168,17 +168,17 @@ return {
 			pixel = false
 			sounds = {
 				countdown = {
-					three = love.audio.newSource("sounds/countdown-3.ogg", "static"),
-					two = love.audio.newSource("sounds/countdown-2.ogg", "static"),
-					one = love.audio.newSource("sounds/countdown-1.ogg", "static"),
-					go = love.audio.newSource("sounds/countdown-go.ogg", "static")
+					three = love.audio.newSource("assets/sounds/countdown-3.ogg", "static"),
+					two = love.audio.newSource("assets/sounds/countdown-2.ogg", "static"),
+					one = love.audio.newSource("assets/sounds/countdown-1.ogg", "static"),
+					go = love.audio.newSource("assets/sounds/countdown-go.ogg", "static")
 				},
 				miss = {
-					love.audio.newSource("sounds/miss1.ogg", "static"),
-					love.audio.newSource("sounds/miss2.ogg", "static"),
-					love.audio.newSource("sounds/miss3.ogg", "static")
+					love.audio.newSource("assets/sounds/miss1.ogg", "static"),
+					love.audio.newSource("assets/sounds/miss2.ogg", "static"),
+					love.audio.newSource("assets/sounds/miss3.ogg", "static")
 				},
-				breakfast = love.audio.newSource("music/breakfast.ogg", "stream")
+				breakfast = love.audio.newSource("assets/music/breakfast.ogg", "stream")
 			}
 
 			images = {
@@ -187,31 +187,31 @@ return {
 			}
 
 			sprites = {
-				numbers = love.filesystem.load("sprites/numbers.lua"),
+				numbers = love.filesystem.load("assets/sprites/numbers.lua"),
 			}
 
-			rating = love.filesystem.load("sprites/rating.lua")
+			rating = love.filesystem.load("assets/sprites/rating.lua")
 
-			--[[ girlfriend = BaseCharacter("sprites/characters/girlfriend.lua")
-			boyfriend = BaseCharacter("sprites/characters/boyfriend.lua") ]]
+			--[[ girlfriend = BaseCharacter("assets/sprites/characters/girlfriend.lua")
+			boyfriend = BaseCharacter("assets/sprites/characters/boyfriend.lua") ]]
 
-			countdown = love.filesystem.load("sprites/countdown.lua")()
+			countdown = love.filesystem.load("assets/sprites/countdown.lua")()
 		else
 			pixel = true
 			love.graphics.setDefaultFilter("nearest", "nearest")
 			sounds = {
 				countdown = {
-					three = love.audio.newSource("sounds/pixel/countdown-3.ogg", "static"),
-					two = love.audio.newSource("sounds/pixel/countdown-2.ogg", "static"),
-					one = love.audio.newSource("sounds/pixel/countdown-1.ogg", "static"),
-					go = love.audio.newSource("sounds/pixel/countdown-date.ogg", "static")
+					three = love.audio.newSource("assets/sounds/pixel/countdown-3.ogg", "static"),
+					two = love.audio.newSource("assets/sounds/pixel/countdown-2.ogg", "static"),
+					one = love.audio.newSource("assets/sounds/pixel/countdown-1.ogg", "static"),
+					go = love.audio.newSource("assets/sounds/pixel/countdown-date.ogg", "static")
 				},
 				miss = {
-					love.audio.newSource("sounds/pixel/miss1.ogg", "static"),
-					love.audio.newSource("sounds/pixel/miss2.ogg", "static"),
-					love.audio.newSource("sounds/pixel/miss3.ogg", "static")
+					love.audio.newSource("assets/sounds/pixel/miss1.ogg", "static"),
+					love.audio.newSource("assets/sounds/pixel/miss2.ogg", "static"),
+					love.audio.newSource("assets/sounds/pixel/miss3.ogg", "static")
 				},
-				breakfast = love.audio.newSource("music/breakfast.ogg", "stream")
+				breakfast = love.audio.newSource("assets/music/breakfast.ogg", "stream")
 			}
 
 			images = {
@@ -220,15 +220,15 @@ return {
 			}
 
 			sprites = {
-				numbers = love.filesystem.load("sprites/pixel/numbers.lua"),
+				numbers = love.filesystem.load("assets/sprites/pixel/numbers.lua"),
 			}
 
-			rating = love.filesystem.load("sprites/pixel/rating.lua")
+			rating = love.filesystem.load("assets/sprites/pixel/rating.lua")
 
-			--[[ girlfriend = BaseCharacter("sprites/characters/girlfriend-pixel.lua")
-			boyfriend = BaseCharacter("sprites/characters/boyfriend-pixel.lua") ]]
+			--[[ girlfriend = BaseCharacter("assets/sprites/characters/girlfriend-pixel.lua")
+			boyfriend = BaseCharacter("assets/sprites/characters/boyfriend-pixel.lua") ]]
 
-			countdown = love.filesystem.load("sprites/pixel/countdown.lua")()
+			countdown = love.filesystem.load("assets/sprites/pixel/countdown.lua")()
 
 			love.graphics.setDefaultFilter("linear", "nearest")
 		end
@@ -588,19 +588,19 @@ return {
 		if not noteSprites then
 			if not pixel then
 				self:setNoteSprites( -- the default sprites
-					love.filesystem.load("sprites/receptor.lua"),
-					love.filesystem.load("sprites/left-arrow.lua"),
-					love.filesystem.load("sprites/down-arrow.lua"),
-					love.filesystem.load("sprites/up-arrow.lua"),
-					love.filesystem.load("sprites/right-arrow.lua")
+					love.filesystem.load("assets/sprites/receptor.lua"),
+					love.filesystem.load("assets/sprites/left-arrow.lua"),
+					love.filesystem.load("assets/sprites/down-arrow.lua"),
+					love.filesystem.load("assets/sprites/up-arrow.lua"),
+					love.filesystem.load("assets/sprites/right-arrow.lua")
 				)
 			else
 				self:setNoteSprites( -- the pixel sprites
-					love.filesystem.load("sprites/pixel/receptor.lua"),
-					love.filesystem.load("sprites/pixel/left-arrow.lua"),
-					love.filesystem.load("sprites/pixel/down-arrow.lua"),
-					love.filesystem.load("sprites/pixel/up-arrow.lua"),
-					love.filesystem.load("sprites/pixel/right-arrow.lua")
+					love.filesystem.load("assets/sprites/pixel/receptor.lua"),
+					love.filesystem.load("assets/sprites/pixel/left-arrow.lua"),
+					love.filesystem.load("assets/sprites/pixel/down-arrow.lua"),
+					love.filesystem.load("assets/sprites/pixel/up-arrow.lua"),
+					love.filesystem.load("assets/sprites/pixel/right-arrow.lua")
 				)
 			end
 		end
@@ -665,13 +665,13 @@ return {
 
 	generateNotes = function(self, name, diff)
 		local eventBpm
-		local chartPath = "data/songs/" .. name .. "/" .. name .. "-chart" .. songExt .. ".lua"
-		local metadataPath = "data/songs/" .. name .. "/" .. name .. "-metadata" .. songExt .. ".lua"
+		local chartPath = "assets/data/songs/" .. name .. "/" .. name .. "-chart" .. songExt .. ".lua"
+		local metadataPath = "assets/data/songs/" .. name .. "/" .. name .. "-metadata" .. songExt .. ".lua"
 		if not love.filesystem.getInfo(chartPath) then
-			chartPath = "data/songs/" .. name .. "/" .. name .. "-chart" .. songExt .. ".json"
+			chartPath = "assets/data/songs/" .. name .. "/" .. name .. "-chart" .. songExt .. ".json"
 		end
 		if not love.filesystem.getInfo(metadataPath) then
-			metadataPath = "data/songs/" .. name .. "/" .. name .. "-metadata" .. songExt .. ".json"
+			metadataPath = "assets/data/songs/" .. name .. "/" .. name .. "-metadata" .. songExt .. ".json"
 		end
 		print("Loading chart:", chartPath)
 		print("Loading metadata:", metadataPath)
@@ -709,9 +709,9 @@ return {
 		CURDIFF = difficulty
 		ARTIST = metadata.artist
 
-		inst = love.audio.newSource("songs/" .. name .. "/Inst" .. songExt .. ".ogg", "stream")
-		local voicesBFPath = "songs/" .. name .. "/Voices-" .. metadata.playData.characters.player .. songExt .. ".ogg"
-		local voicesEnemyPath = "songs/" .. name .. "/Voices-" .. metadata.playData.characters.opponent .. songExt .. ".ogg"
+		inst = love.audio.newSource("assets/songs/" .. name .. "/Inst" .. songExt .. ".ogg", "stream")
+		local voicesBFPath = "assets/songs/" .. name .. "/Voices-" .. metadata.playData.characters.player .. songExt .. ".ogg"
+		local voicesEnemyPath = "assets/songs/" .. name .. "/Voices-" .. metadata.playData.characters.opponent .. songExt .. ".ogg"
 		local voiceConversions = {
 			["pico-playable"] = "pico",
 			["pico-pixel"] = "pico",
@@ -734,12 +734,12 @@ return {
 		}
 		if voiceConversions[metadata.playData.characters.player] then
 			if not love.filesystem.getInfo(voicesBFPath) then
-				voicesBFPath = "songs/" .. name .. "/Voices-" .. voiceConversions[metadata.playData.characters.player] .. songExt .. ".ogg"
+				voicesBFPath = "assets/songs/" .. name .. "/Voices-" .. voiceConversions[metadata.playData.characters.player] .. songExt .. ".ogg"
 			end
 		end
 		if voiceConversions[metadata.playData.characters.opponent] then
 			if not love.filesystem.getInfo(voicesEnemyPath) then
-				voicesEnemyPath = "songs/" .. name .. "/Voices-" .. voiceConversions[metadata.playData.characters.opponent] .. songExt .. ".ogg"
+				voicesEnemyPath = "assets/songs/" .. name .. "/Voices-" .. voiceConversions[metadata.playData.characters.opponent] .. songExt .. ".ogg"
 			end
 		end
 		if love.filesystem.getInfo(voicesBFPath) then

@@ -49,7 +49,7 @@ local defaultProps = {
 
 function stage.getStage(id)
     print(id)
-    local data = json.decode(love.filesystem.read("data/stages/" .. id .. ".json"))
+    local data = json.decode(love.filesystem.read("assets/data/stages/" .. id .. ".json"))
 
     local s = stage()
     s._data = data
@@ -92,7 +92,7 @@ function stage.getStage(id)
     s.props = {}
     s.script = nil
 
-    local stageLuaChunk = love.filesystem.getInfo("data/scripts/stages/" .. s.id .. ".lua")
+    local stageLuaChunk = love.filesystem.getInfo("assets/data/scripts/stages/" .. s.id .. ".lua")
     -- environment that holds ALL of global and defines Stage as self
     local env = setmetatable({
         Stage = {
@@ -134,7 +134,7 @@ function stage.getStage(id)
         end,
     }, {__index = _G})
     if stageLuaChunk then
-        local chunk = love.filesystem.load("data/scripts/stages/" .. s.id .. ".lua")
+        local chunk = love.filesystem.load("assets/data/scripts/stages/" .. s.id .. ".lua")
         setfenv(chunk, env)
         chunk()
         s.script = env.Stage

@@ -39,10 +39,10 @@ return {
             notes = love.graphics.newImage(graphics.imagePath("NOTE_assets")),
         } 
         sprites = {
-            leftArrow = love.filesystem.load("sprites/left-arrow.lua"),
-		    downArrow = love.filesystem.load("sprites/down-arrow.lua"),
-		    upArrow = love.filesystem.load("sprites/up-arrow.lua"),
-		    rightArrow = love.filesystem.load("sprites/right-arrow.lua")
+            leftArrow = love.filesystem.load("assets/sprites/left-arrow.lua"),
+		    downArrow = love.filesystem.load("assets/sprites/down-arrow.lua"),
+		    upArrow = love.filesystem.load("assets/sprites/up-arrow.lua"),
+		    rightArrow = love.filesystem.load("assets/sprites/right-arrow.lua")
         }
         arrows = {
             sprites.leftArrow(),

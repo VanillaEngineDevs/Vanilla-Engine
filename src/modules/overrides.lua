@@ -1,6 +1,6 @@
 ---@diagnostic disable: duplicate-set-field
 ---@diagnostic disable: redundant-parameter, missing-parameter, inject-field
-local threadEvent = love.thread.newThread("threads/eventThread.lua")
+local threadEvent = love.thread.newThread("modules/threads/eventThread.lua")
 
 local channel_event = love.thread.getChannel("thread.event")
 local channel_active = love.thread.getChannel("thread.event.active")

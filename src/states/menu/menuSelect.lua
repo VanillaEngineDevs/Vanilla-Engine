@@ -26,7 +26,7 @@ return {
 
         buttons = {
             {
-                sprite = love.filesystem.load("sprites/menu/storymode.lua")(),
+                sprite = love.filesystem.load("assets/sprites/menu/storymode.lua")(),
                 confirm = function()
                     status.setLoading(true)
                     graphics:fadeOutWipe(
@@ -39,7 +39,7 @@ return {
                 end
             },
             {
-                sprite = love.filesystem.load("sprites/menu/freeplay.lua")(),
+                sprite = love.filesystem.load("assets/sprites/menu/freeplay.lua")(),
                 confirm = function()
                     status.setLoading(true)
                     graphics:fadeOutWipe(
@@ -52,7 +52,7 @@ return {
                 end
             },
             {
-                sprite = love.filesystem.load("sprites/menu/options.lua")(),
+                sprite = love.filesystem.load("assets/sprites/menu/options.lua")(),
                 confirm = function()
                     status.setLoading(true)
                     graphics:fadeOutWipe(
@@ -65,7 +65,7 @@ return {
                 end
             },
             {
-                sprite = love.filesystem.load("sprites/menu/credits.lua")(),
+                sprite = love.filesystem.load("assets/sprites/menu/credits.lua")(),
                 confirm = function()
                     status.setLoading(true)
                     graphics:fadeOutWipe(

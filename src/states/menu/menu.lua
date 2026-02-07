@@ -45,7 +45,7 @@ return {
 			logo = GIF.new("assets/ishowmeat.gif")
 		end
 
-		--[[ girlfriendTitle = love.filesystem.load("sprites/menu/girlfriend-title.lua")() ]]
+		--[[ girlfriendTitle = love.filesystem.load("assets/sprites/menu/girlfriend-title.lua")() ]]
 		girlfriendTitle = graphics.newSparrowAtlas(1280 * 0.5, 720 * 0.07)
 		print(girlfriendTitle.x, girlfriendTitle.y)
 		girlfriendTitle:load("states/title/gfDanceTitle")

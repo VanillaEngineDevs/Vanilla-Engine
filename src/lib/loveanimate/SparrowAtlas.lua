@@ -82,7 +82,7 @@ function SparrowAtlas:constructor()
     self.scale = {x = 1, y = 1}
     self.origin = {x = 0, y = 0}
     self.offset = {x = 0, y = 0}
-    self.colour = {1, 1, 1}
+    self.color = {1, 1, 1}
     self.scroll = {x = 1, y = 1}
     self.alpha = 1
 
@@ -137,7 +137,7 @@ function SparrowAtlas:load(imageData, dataString, framerate)
         local r = tonumber("0x" .. colorCode:sub(1, 2)) / 255
         local g = tonumber("0x" .. colorCode:sub(3, 4)) / 255
         local b = tonumber("0x" .. colorCode:sub(5, 6)) / 255
-        self.colour = {r, g, b}
+        self.color = {r, g, b}
     end
 
     -- if no image, print FAILED TO LOAD IMAGE: path
@@ -528,7 +528,7 @@ function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     local lastShader = love.graphics.getShader()
     love.graphics.setShader(self.shader)
     local lastColor = {love.graphics.getColor()}
-    love.graphics.setColor(self.colour[1] * lastColor[1], self.colour[2] * lastColor[2], self.colour[3] * lastColor[3], self.alpha * lastColor[4])
+    love.graphics.setColor(self.color[1] * lastColor[1], self.color[2] * lastColor[2], self.color[3] * lastColor[3], self.alpha * lastColor[4])
     if curFrame and not self.IS_RECTANGLE then
         love.graphics.draw(self.image, curFrame.quad, x, y, r, sx, sy, ox, oy)
     elseif not curFrame and not self.IS_RECTANGLE then
@@ -566,7 +566,7 @@ function SparrowAtlas:clone() -- i gnot no idea if this works ngl
     clone.scale = {x = self.scale.x, y = self.scale.y}
     clone.origin = {x = self.origin.x, y = self.origin.y}
     clone.offset = {x = self.offset.x, y = self.offset.y}
-    clone.colour = {self.colour[1], self.colour[2], self.colour[3]}
+    clone.color = {self.color[1], self.color[2], self.color[3]}
     clone.alpha = self.alpha
     clone.shader = self.shader
     clone.visible = self.visible

@@ -1,11 +1,11 @@
 src/assets/week6/*
-src/images/pixel/*
+src/assets/images/pixel/*
 
-src/images/icons/icon-bf-pixel.png
-src/images/icons/icon-pico-pixel.png
-src/images/icons/icon-senpai.png
-src/images/icons/icon-senpai-angry.png
-src/images/icons/icon-spirit.png
+src/assets/images/icons/icon-bf-pixel.png
+src/assets/images/icons/icon-pico-pixel.png
+src/assets/images/icons/icon-senpai.png
+src/assets/images/icons/icon-senpai-angry.png
+src/assets/images/icons/icon-spirit.png
 
 src/assets/shared/characters/bfPixels.png
 src/assets/shared/characters/bfPixelsDEAD.png

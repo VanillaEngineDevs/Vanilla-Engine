@@ -99,10 +99,10 @@ return {
 		
 		titleBG = graphics.newImage(graphics.imagePath("menu/weekMenu"))
 
-		arrowUp = love.filesystem.load("sprites/menu/menuArrow.lua")()
-		arrowDown = love.filesystem.load("sprites/menu/menuArrow.lua")()
-		arrowLeft = love.filesystem.load("sprites/menu/menuArrow.lua")()
-		arrowRight = love.filesystem.load("sprites/menu/menuArrow.lua")()
+		arrowUp = love.filesystem.load("assets/sprites/menu/menuArrow.lua")()
+		arrowDown = love.filesystem.load("assets/sprites/menu/menuArrow.lua")()
+		arrowLeft = love.filesystem.load("assets/sprites/menu/menuArrow.lua")()
+		arrowRight = love.filesystem.load("assets/sprites/menu/menuArrow.lua")()
 
 		arrowUp.x, arrowUp.y = 0, 175
 		arrowDown.x, arrowDown.y = 0, 305
@@ -117,13 +117,13 @@ return {
 		arrowDown.orientation = 1.5707963267949*3
 		arrowRight.orientation = 1.5707963267949*2
 
-		enemyDanceLines = love.filesystem.load("sprites/menu/idlelines.lua")()
+		enemyDanceLines = love.filesystem.load("assets/sprites/menu/idlelines.lua")()
 
-		difficultyAnim = love.filesystem.load("sprites/menu/difficulty.lua")()
+		difficultyAnim = love.filesystem.load("assets/sprites/menu/difficulty.lua")()
 
-		bfDanceLines = love.filesystem.load("sprites/menu/idlelines.lua")()
+		bfDanceLines = love.filesystem.load("assets/sprites/menu/idlelines.lua")()
 
-		gfDanceLines = love.filesystem.load("sprites/menu/idlelines.lua")()
+		gfDanceLines = love.filesystem.load("assets/sprites/menu/idlelines.lua")()
 
 		enemyDanceLines.sizeX, enemyDanceLines.sizeY = 0.5, 0.5
 

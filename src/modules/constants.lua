@@ -195,10 +195,10 @@ CONSTANTS.WEEKS = {
     SCORING_SLOPE = 0.080,
     SCORE_HOLD_BONUS_PER_SECOND = 250,
     LANE_SHADERS = {
-        love.graphics.newShader("shaders/RGBPallette.glsl"),
-        love.graphics.newShader("shaders/RGBPallette.glsl"),
-        love.graphics.newShader("shaders/RGBPallette.glsl"),
-        love.graphics.newShader("shaders/RGBPallette.glsl")
+        love.graphics.newShader("assets/shaders/RGBPallette.glsl"),
+        love.graphics.newShader("assets/shaders/RGBPallette.glsl"),
+        love.graphics.newShader("assets/shaders/RGBPallette.glsl"),
+        love.graphics.newShader("assets/shaders/RGBPallette.glsl")
     }
 }
 

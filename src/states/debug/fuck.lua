@@ -14,7 +14,7 @@ local state = 0
 
 function f:enter()
     list = {}
-    for _, file in ipairs(love.filesystem.getDirectoryItems("data/characters/")) do
+    for _, file in ipairs(love.filesystem.getDirectoryItems("assets/data/characters/")) do
         if file:sub(-5) == ".json" then
             table.insert(list, file:sub(1, -6))
         end

@@ -8,7 +8,7 @@ Y_OFFSET_AMOUNT_FOR_SPRITES = 30
 
 function character.getCharacter(id)
     print("Loading character: " .. id)
-    local data = json.decode(love.filesystem.read("data/characters/" .. id .. ".json"))
+    local data = json.decode(love.filesystem.read("assets/data/characters/" .. id .. ".json"))
     if not data.renderType then
         data.renderType = "sparrow"
     end
@@ -17,7 +17,7 @@ function character.getCharacter(id)
 
     print("Creating character of type: " .. data.renderType, id)
 
-    local characterLuaChunk = love.filesystem.getInfo("data/scripts/characters/" .. id .. ".lua")
+    local characterLuaChunk = love.filesystem.getInfo("assets/data/scripts/characters/" .. id .. ".lua")
     local env = setmetatable({
         Character = {
             --[[ data = char, ]]
@@ -33,7 +33,7 @@ function character.getCharacter(id)
         end,
     }, {__index = _G})
     if characterLuaChunk then
-        local chunk = love.filesystem.load("data/scripts/characters/" .. id .. ".lua")
+        local chunk = love.filesystem.load("assets/data/scripts/characters/" .. id .. ".lua")
         
         setfenv(chunk, env)
         chunk()

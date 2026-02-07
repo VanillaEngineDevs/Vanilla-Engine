@@ -1,6 +1,6 @@
 ---@diagnostic disable: param-type-mismatch
 
-__VERSION__ = love.filesystem.read("version.txt")
+__VERSION__ = love.filesystem.read("assets/data/version.txt")
 if love.filesystem.isFused() then function print() end end
 
 local capturedScreenshot = {x=0, y=0, flash=0, alpha=0, img=nil, hovered=false, timers={}}
@@ -12,113 +12,111 @@ end
 
 __DEBUG__ = not love.filesystem.isFused()
 
-require "modules.overrides"
-require "modules.uitext"
+require("modules.overrides")
+require("modules.game.uitext")
 
 function love.load()
     paused = false
     settings = {}
     curOS = love.system.getOS()
 
-    baton = require "lib.baton"
-    ini = require "lib.ini"
-    push = require "lib.push"
-    Gamestate = require "lib.gamestate"
-    Timer = require "lib.timer"
-    json = require "lib.json"
-    lume = require "lib.lume"
-    Object = require "lib.classic"
-    xml = require "lib.xml"
-    lovefftINST = require "lib.fft.lovefft"
-	GIF = require "lib.gif"
+    baton = require("lib.baton")
+    ini = require("lib.ini")
+    push = require("lib.push")
+    Gamestate = require("lib.gamestate")
+    Timer = require("lib.timer")
+    json = require("lib.json")
+    lume = require("lib.lume")
+    Object = require("lib.classic")
+    xml = require("lib.xml")
+    lovefftINST = require("lib.fft.lovefft")
+	GIF = require("lib.gif")
 
-    status = require "modules.status"
-    audio = require "modules.audio"
-    graphics = require "modules.graphics"
-	require "lib.loveanimate"
-    icon = require "modules.Icon"
-    camera = require "modules.camera"
-    beatHandler = require "modules.beatHandler"
-    Conductor = require "modules.Conductor"
-    util = require "modules.util"
-    cutscene = require "modules.cutscene"
-    dialogue = require "modules.dialogue"
-    Group = require "modules.Group"
-    require "modules.savedata"
-    require "modules.Alphabet"
-    Option = require "modules.Option"
-    CONSTANTS = require "modules.constants"
-    NoteSplash = require "modules.Splash"
-    HoldCover = require "modules.Cover"
-    waveform = require "modules.waveform"
-    popupScore = require "modules.popupScore"
-	eventCreator = require "modules.eventCreator"
+    status = require("modules.status")
+    audio = require("modules.audio.audio")
+    graphics = require("modules.graphics")
+	require("lib.loveanimate")
+    icon = require("modules.game.Icon")
+    camera = require("modules.objects.camera")
+    beatHandler = require("modules.audio.beatHandler")
+    Conductor = require("modules.audio.Conductor")
+    util = require("modules.util")
+    cutscene = require("modules.game.cutscene")
+    dialogue = require("modules.game.dialogue")
+    Group = require("modules.objects.Group")
+    require("modules.savedata")
+    require("modules.objects.Alphabet")
+    Option = require("modules.game.Option")
+    CONSTANTS = require("modules.constants")
+    NoteSplash = require("modules.game.Splash")
+    HoldCover = require("modules.game.Cover")
+    popupScore = require("modules.game.popupScore")
+	eventCreator = require("modules.game.eventCreator")
     settings.pixelPerfect = false
 
-	Character = require "game.character"
-	Stage = require "game.stage"
-	Song = require "game.song"
-	SparrowCharacter = require "game.sparrowCharacter"
-	PackerCharacter = require "game.packerCharacter"
-	MultiSparrowCharacter = require "game.multiSparrowCharacter"
-	AnimateAtlasCharacter = require "game.animateAtlasCharacter"
-	MultiAnimateAtlasCharacter = require "game.multiAnimateAtlas"
+	Character = require("game.character")
+	Stage = require("game.stage")
+	Song = require("game.song")
+	SparrowCharacter = require("game.sparrowCharacter")
+	PackerCharacter = require("game.packerCharacter")
+	MultiSparrowCharacter = require("game.multiSparrowCharacter")
+	AnimateAtlasCharacter = require("game.animateAtlasCharacter")
+	MultiAnimateAtlasCharacter = require("game.multiAnimateAtlas")
 
-    Sprite = require "modules.xml.Sprite"
-    Checkbox = require "modules.Checkbox"
-	hapticUtil = require "modules.hapticUtil"
-	signal = require "modules.signal"
+    Sprite = require("modules.xml.Sprite")
+    Checkbox = require("modules.objects.Checkbox")
+	hapticUtil = require("modules.game.hapticUtil")
+	signal = require("modules.signal")
 
     playMenuMusic = true
-    graphics.setImageType(love.filesystem.read("IMAGE_FORMAT.txt"))
+    graphics.setImageType(love.filesystem.read("assets/data/IMAGE_FORMAT.txt"))
     volumeWidth = {width = 160}
     volFade = 0
 
-    input = require "input"
+    input = require("modules.input")
+    debugMenu = require("states.debug.debugMenu")
+    spriteDebug = require("states.debug.fuck")
 
-    debugMenu = require "states.debug.debugMenu"
-    spriteDebug = require "states.debug.fuck"
-
-    selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
-    confirmSound = love.audio.newSource("sounds/menu/confirm.ogg", "static")
+    selectSound = love.audio.newSource("assets/sounds/menu/select.ogg", "static")
+    confirmSound = love.audio.newSource("assets/sounds/menu/confirm.ogg", "static")
 
     noteTypes = {
-        ["normal"] = require "notetypes.normal",
-        ["Hurt Note"] = require "notetypes.hurt"
+        ["normal"] = require("assets.data.scripts.notetypes.normal"),
+        ["Hurt Note"] = require("assets.data.scripts.notetypes.hurt"),
     }
 
     shaders = {}
     if curOS ~= "NX" then
-        shaders["rain"] = love.graphics.newShader("shaders/rain.glsl")
+        shaders["rain"] = love.graphics.newShader("assets/shaders/rain.glsl")
     end
 
-    menu = require "states.menu.menu"
-    menuWeek = require "states.menu.menuWeek"
-    menuFreeplay = require "states.menu.menuFreeplay"
-    menuSettings = require "states.menu.options.OptionsState"
-    menuCredits = require "states.menu.menuCredits"
-    menuSelect = require "states.menu.menuSelect"
-    menuMods = require "states.menu.menuMods"
-    resultsScreen = require "states.menu.results"
+    menu = require("states.menu.menu")
+    menuWeek = require("states.menu.menuWeek")
+    menuFreeplay = require("states.menu.menuFreeplay")
+    menuSettings = require("states.menu.options.OptionsState")
+    menuCredits = require("states.menu.menuCredits")
+    menuSelect = require("states.menu.menuSelect")
+    menuMods = require("states.menu.menuMods")
+    resultsScreen = require("states.menu.results")
 
     firstStartup = true
-    weeks = require "states.weeks"
+    weeks = require("states.weeks")
 
-    OptionsMenu = require "states.menu.options.OptionsMenu"
-	gameoverSubstate = require "substates.gameover"
+    OptionsMenu = require("states.menu.options.OptionsMenu")
+	gameoverSubstate = require("substates.gameover")
 
-    settingsKeybinds = require "substates.settings-keybinds"
+    settingsKeybinds = require("substates.settings-keybinds")
     optionSubstates = {
-        ["Gamemodes"] = require "substates.options.gamemodes",
-        ["Gameplay"] = require "substates.options.gameplay",
-        ["Graphics"] = require "substates.options.graphics",
-        ["Controls"] = require "substates.settings-keybinds",
-        ["Miscillaneous"] = require "substates.options.miscillaneous"
+        ["Gamemodes"] = require("substates.options.gamemodes"),
+        ["Gameplay"] = require("substates.options.gameplay"),
+        ["Graphics"] = require("substates.options.graphics"),
+        ["Controls"] = require("substates.settings-keybinds"),
+        ["Miscillaneous"] = require("substates.options.miscillaneous")
     }
 
-    weekData = require "data.weeks.weekData"
-    weekDesc = require "data.weeks.weekDescriptions"
-    weekMeta = require "data.weeks.weekMeta"
+    weekData = require("assets.data.weeks.weekData")
+    weekDesc = require("assets.data.weeks.weekDescriptions")
+    weekMeta = require("assets.data.weeks.weekMeta")
 
     for _, week in ipairs(weekMeta) do
         for _, song in ipairs(week[2]) do
@@ -133,14 +131,8 @@ function love.load()
         end
     end
 
-    require "modules.extras"
-    __VERSION__ = love.filesystem.getInfo("version.txt") and love.filesystem.read("version.txt") or "vUnknown"
-
-    if curOS == "OS X" then
-        love.window.setIcon(love.image.newImageData("icons/macos.png"))
-    else
-        love.window.setIcon(love.image.newImageData("icons/default.png"))
-    end
+    require("modules.game.extras")
+    __VERSION__ = love.filesystem.getInfo("assets/data/version.txt") and love.filesystem.read("assets/data/version.txt") or "vUnknown"
 
     push.setupScreen(1280, 720, {upscale="normal", canvas = true, stencil = true})
 
@@ -161,16 +153,16 @@ function love.load()
         end
     end
 
-    font = love.graphics.newFont("fonts/vcr.ttf", 24)
-    scoringFont = love.graphics.newFont("fonts/vcr.ttf", 26)
-    psychScoringFont = love.graphics.newFont("fonts/vcr.ttf", 36)
-    optionsFont = love.graphics.newFont("fonts/vcr.ttf", 32)
-    FNFFont = love.graphics.newFont("fonts/fnFont.ttf", 24)
-    credFont = love.graphics.newFont("fonts/fnFont.ttf", 32)
-    uiFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 32)
-    pauseFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 96)
-    weekFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 84)
-    weekFontSmall = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 54)
+    font = love.graphics.newFont("assets/fonts/vcr.ttf", 24)
+    scoringFont = love.graphics.newFont("assets/fonts/vcr.ttf", 26)
+    psychScoringFont = love.graphics.newFont("assets/fonts/vcr.ttf", 36)
+    optionsFont = love.graphics.newFont("assets/fonts/vcr.ttf", 32)
+    FNFFont = love.graphics.newFont("assets/fonts/fnFont.ttf", 24)
+    credFont = love.graphics.newFont("assets/fonts/fnFont.ttf", 32)
+    uiFont = love.graphics.newFont("assets/fonts/Dosis-SemiBold.ttf", 32)
+    pauseFont = love.graphics.newFont("assets/fonts/Dosis-SemiBold.ttf", 96)
+    weekFont = love.graphics.newFont("assets/fonts/Dosis-SemiBold.ttf", 84)
+    weekFontSmall = love.graphics.newFont("assets/fonts/Dosis-SemiBold.ttf", 54)
 
     weekNum = 1
     songDifficulty = 2
@@ -179,7 +171,7 @@ function love.load()
     uiCam = {zoom = 1, x = 1, y = 1, sizeX = 1, sizeY = 1}
     musicTime, health = 0, 0
 
-    music = love.audio.newSource("music/menu/menu.ogg", "stream")
+    music = love.audio.newSource("assets/music/menu/menu.ogg", "stream")
     music:setLooping(true)
 
     fixVol = tonumber(string.format("%.1f", love.audio.getVolume()))

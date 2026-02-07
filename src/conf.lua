@@ -18,8 +18,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
 -- Modified by Vanilla Engine Team
+require("love.system")
+local icon = "default"
+if love.system.getOS() == "OS X" then
+	icon = "macos"
+end
 
-local version = love.filesystem.getInfo("version.txt") and love.filesystem.read("version.txt") or "vUnknown"
+local version = love.filesystem.getInfo("assets/data/version.txt") and love.filesystem.read("assets/data/version.txt") or "vUnknown"
 local _debug = not love.filesystem.isFused()
 local loveVer
 function love.conf(t)
@@ -30,6 +35,8 @@ function love.conf(t)
 
 	t.window.width = 1280
 	t.window.height = 720
+	
+	t.window.icon = "assets/icons/" .. icon .. ".png"
 
 	t.window.resizable = true
 
