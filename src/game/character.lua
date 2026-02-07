@@ -86,6 +86,7 @@ function character.getCharacter(id)
                           data.cameraOffsets and data.cameraOffsets[2] or 0}
 
     char.healthIcon = data.healthIcon and data.healthIcon.id or char.id
+    char.healthIconScale = data.healthIcon and data.healthIcon.scale or 1
 
     char:setAntialiasing(not data.isPixel)
 

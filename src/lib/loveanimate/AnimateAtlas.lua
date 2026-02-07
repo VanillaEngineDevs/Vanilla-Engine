@@ -1635,6 +1635,8 @@ function AnimateAtlas:addAnimBySymbol(name, symbolName, framerate, loop)
         framerate = framerate,
         loop = loop
     })
+
+    print(#frames .. " frames added for symbol '" .. symbolName .. "' with animation name '" .. name .. "'.")
 end
 
 function AnimateAtlas:addAnimByNameWithFallback(name, sourceNameOrSymbol, framerate, loop)
@@ -1671,5 +1673,12 @@ function AnimateAtlas:resume()
     self.playing = true
 end
 
+function AnimateAtlas:clone()
+    local clone = AnimateAtlas(self.atlasSettings)
+    clone.libraries = self.libraries
+    clone.timeline = self.timeline
+    clone.spritemaps = self.spritemaps
+    return clone
+end
 
 return AnimateAtlas

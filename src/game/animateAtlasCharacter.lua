@@ -63,7 +63,7 @@ function AnimateAtlasCharacter:new(data, _atlasSettings)
     self.sprite:load(self.assetPath .. "")
 
     for i, anim in ipairs(data.animations) do
-        local isIndices = anim.frameIndices ~= nil
+        local isIndices = anim.frameIndices ~= nil and #anim.frameIndices > 0
 
         local animType = anim.animType or "prefix"
         if animType == "prefix" then

@@ -2,7 +2,7 @@ local function onAnimationComplete(name)
     if name == "deathConfirm" then
         Character.data:play("deathConfirm-loop", true, true)
     elseif name == "laughEnd" then
-        Character.data:play("laughEnd-loop", true, false)
+        Character.data:play("laughEnd-loop", true, true)
     end
 end
 

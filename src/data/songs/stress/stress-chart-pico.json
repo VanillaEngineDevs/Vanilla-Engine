@@ -551,7 +551,7 @@
     {
       "t": 115912.168539326,
       "e": "PlayAnimation",
-      "v": { "force": true, "anim": "hehPrettyGood", "target": "dad" }
+      "v": { "force": true, "anim": "hehPrettyGood-bloody", "target": "dad" }
     },
     {
       "t": 115955.157303371,

@@ -25,9 +25,9 @@ function Group:update(dt)
     end
 end
 
-function Group:draw()
+function Group:draw(camera)
     for i, member in ipairs(self.members) do
-        if member.draw then member:draw() end
+        if member.draw then member:draw(camera) end
     end
 end
 

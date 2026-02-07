@@ -1,12 +1,22 @@
+local picoEndSound
+
 function Character:onCreate()
     self.isBloody = false
+
+    picoEndSound = picoEndSound or love.audio.newSource(EXTEND_LIBRARY_SFX("week7:erect/endCutscene.ogg"), "static")
 end
 
 function Character:play(name, forced, loop)
-    if self.isBloody then
+    if name == "hehPrettyGood-bloody" then
+        self.isBloody = false
+    end
+    if self.isBloody and name ~= "stressPicoEnding" and name ~= "redheadsAnim" and name ~= "hehPrettyGood-bloody" then
         self.data:play(name .. "-bloody", forced, loop)
     else
         self.data:play(name, forced, loop)
+        if name == "hehPrettyGood-bloody" then
+            self.isBloody = true
+        end
     end
 
     if name == "redheadsAnim" then
@@ -14,7 +24,8 @@ function Character:play(name, forced, loop)
     end
 
     if name == "stressPicoEnding" then
-        -- the ending !!!
+        audio.playSound(picoEndSound)
+        self.data:play("stressPicoEnding", forced, false)
     end
 end
 

@@ -130,6 +130,11 @@ function Character:onUpdate(dt)
         weeks:add(speaker)
         weeks:add(head)
 
+        abot.shader = self.data.shader
+        stereoBG.shader = self.data.shader
+        speaker.shader = self.data.shader
+        head.shader = self.data.shader
+
         weeks:sort()
 
         refreshed = true

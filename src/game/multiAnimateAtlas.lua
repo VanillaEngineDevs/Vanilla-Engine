@@ -28,7 +28,11 @@ function MultiAnimateAtlasCharacter:new(data, _atlasSettings)
                 name = anim.name,
                 atlasanim = anim.prefix,
                 asset = anim.assetPath,
-                offsets = anim.offsets
+                offsets = anim.offsets,
+                frameIndices = anim.frameIndices,
+                animType = anim.animType,
+                framerate = anim.framerate,
+                loop = anim.loop
             }
         )
     end
@@ -42,12 +46,30 @@ function MultiAnimateAtlasCharacter:new(data, _atlasSettings)
             self.sprites[anim.asset]:load(anim.asset)
         end
 
-        self.sprites[anim.asset]:addAnimByPrefix(
+        --[[ self.sprites[anim.asset]:addAnimByPrefix(
             anim.name,
             anim.atlasanim,
             24,
             anim.loop or false
-        )
+        ) ]]
+        local isIndices = anim.frameIndices ~= nil and #anim.frameIndices > 0
+        local animType = anim.animType or "prefix"
+        print(animType)
+        if animType == "prefix" then
+            if isIndices then
+                self.sprites[anim.asset]:addAnimByIndices(anim.name, anim.atlasanim, anim.frameIndices, anim.framerate or 24, anim.loop or false)
+            else
+                self.sprites[anim.asset]:addAnimByPrefix(anim.name, anim.atlasanim, anim.framerate or 24, anim.loop or false)
+            end
+        elseif animType == "symbol" then
+            print("Adding symbol animation with name '" .. anim.name .. "' and atlas symbol '" .. anim.atlasanim .. "'. Is indices? " .. tostring(isIndices))
+            if isIndices then
+                self.sprites[anim.asset]:addAnimBySymbolIndices(anim.name, anim.atlasanim, anim.frameIndices, anim.framerate or 24, anim.loop or false)
+            else
+                self.sprites[anim.asset]:addAnimBySymbol(anim.name, anim.atlasanim, anim.framerate or 24, anim.loop or false)
+            end
+        end
+        
 
         print(self.sprites[anim.asset])
     end

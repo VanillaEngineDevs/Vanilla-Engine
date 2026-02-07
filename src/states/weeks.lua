@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 DefaultTimeSignatureNum = 4
 timeSignatureNum = DefaultTimeSignatureNum
 
-local camTween, bumpTween
+camTween, bumpTween = nil, nil
 
 local ratingTimers = {}
 
@@ -65,7 +65,7 @@ local function commaFormat(n)
 	return str:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
 end
 
-local IS_CLASSIC_MOVEMENT = false
+IS_CLASSIC_MOVEMENT = false
 CAM_LERP_POINT = {x = 0, y = 0}
 SMOOTH_RESET = true
 
@@ -229,6 +229,8 @@ return {
 			boyfriend = BaseCharacter("sprites/characters/boyfriend-pixel.lua") ]]
 
 			countdown = love.filesystem.load("sprites/pixel/countdown.lua")()
+
+			love.graphics.setDefaultFilter("linear", "nearest")
 		end
 
 		NOTES_BATCH = love.graphics.newSpriteBatch(images.notes, 1000)
@@ -401,8 +403,8 @@ return {
 			end
 		end
 
-		self:preloadIcon((enemy and enemy.healthIcon) and enemy.healthIcon or "dad", "enemy")
-		self:preloadIcon((boyfriend and boyfriend.healthIcon) and boyfriend.healthIcon or "boyfriend", "boyfriend")
+		self:preloadIcon((enemy and enemy.healthIcon) and enemy.healthIcon or "dad", "enemy", (enemy and enemy.healthIconScale) or 1)
+		self:preloadIcon((boyfriend and boyfriend.healthIcon) and boyfriend.healthIcon or "boyfriend", "boyfriend", (boyfriend and boyfriend.healthIconScale) or 1)
 
 		enemyIcon = healthIconPreloads.enemy
 		boyfriendIcon = healthIconPreloads.boyfriend
@@ -431,10 +433,10 @@ return {
 		end)
 	end,
 
-	preloadIcon = function(self, path, name)
+	preloadIcon = function(self, path, name, scale)
 		name = name or path
 		if not healthIconPreloads[name] then
-			healthIconPreloads[name] = icon.newIcon(icon.imagePath(path), 1)
+			healthIconPreloads[name] = icon.newIcon(icon.imagePath(path), scale or 1)
 		end
 	end,
 
@@ -690,6 +692,7 @@ return {
 		else
 			metadata = love.filesystem.load(metadata)()
 		end
+		self.chart = chartData
 		self.metadata = metadata
 		self.conductor:mapBPMChanges(metadata)
 		metadata.playData = metadata.playData or {}
@@ -2120,6 +2123,14 @@ return {
 		return SONGID:lower():strip()
 	end,
 
+	getMetadata = function(self)
+		return self.metadata
+	end,
+
+	getChart = function(self)
+		return self.chart
+	end,
+
 	getCamera = function(self)
 		return camera
 	end,
@@ -2152,6 +2163,10 @@ return {
 	end,
 	setUIShader = function(self, shader)
 		self.uiShader = shader
+	end,
+
+	setClassicMovement = function(self, isClassic)
+		IS_CLASSIC_MOVEMENT = isClassic
 	end,
 
 	getScreen = function(self)

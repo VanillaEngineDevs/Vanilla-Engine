@@ -544,4 +544,39 @@ function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     love.graphics.setShader(lastShader)
 end
 
+function SparrowAtlas:clone() -- i gnot no idea if this works ngl
+    local clone = SparrowAtlas()
+    if not self.IS_RECTANGLE then
+        clone.image = self.image
+    end
+    clone.framerate = self.framerate
+    clone.frames = self.frames
+    clone.animations = self.animations
+    clone.curAnim = {
+        name = self.curAnim and self.curAnim.name or nil,
+        framerate = self.curAnim and self.curAnim.framerate or nil,
+        looped = self.curAnim and self.curAnim.looped or nil,
+        frames = self.curAnim and self.curAnim.frames or nil
+    }
+    clone.currentFrame = self.currentFrame
+    clone.x = self.x
+    clone.y = self.y
+    clone.rotation = self.rotation
+    clone.angle = self.angle
+    clone.scale = {x = self.scale.x, y = self.scale.y}
+    clone.origin = {x = self.origin.x, y = self.origin.y}
+    clone.offset = {x = self.offset.x, y = self.offset.y}
+    clone.colour = {self.colour[1], self.colour[2], self.colour[3]}
+    clone.alpha = self.alpha
+    clone.shader = self.shader
+    clone.visible = self.visible
+    clone.flipX = self.flipX
+    clone.flipY = self.flipY
+    clone.zIndex = self.zIndex
+    clone.suffix = self.suffix
+    clone.flipXAnims = self.flipXAnims
+    clone.flipYAnims = self.flipYAnims
+    return clone
+end
+
 return SparrowAtlas
