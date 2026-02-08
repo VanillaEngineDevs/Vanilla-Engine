@@ -141,6 +141,7 @@ local inHolds = {false, false, false, false}
 
 return {
 	enter = function(self, option, songNum, songAppend, _songExt, _audioAppend)
+		self:showUI()
 		self.mayPauseGame = false
 		self.isInCutscene = false
 		CURRENTMODE = option or "normal"

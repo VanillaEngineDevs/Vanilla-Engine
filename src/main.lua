@@ -242,6 +242,8 @@ function love.keypressed(key)
 			lastAudioVolume = love.audio.getVolume()
 			love.audio.setVolume(0)
 		end
+	elseif key == "f11" or (key == "return" and love.keyboard.isDown("lalt")) then
+		love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
 	--[[ elseif key == "-" and love.keyboard.isDown("lalt") then
 		Gamestate.switch(resultsScreen, {
 			diff = "hard",
