@@ -28,6 +28,8 @@ function tankmanSprite:new(x, y)
     self.runSpeed = 0
     self.strumTime = 0
     self.goingRight = false
+
+    self.zIndex = 0
 end
 
 function tankmanSprite:update(dt)
@@ -37,6 +39,7 @@ function tankmanSprite:update(dt)
     self.sprite.flipY = self.flipY
     self.sprite.angle = self.angle
     self.sprite.scroll = self.scroll
+    self.sprite.zIndex = self.zIndex
 
     self.sprite:update(dt)
 

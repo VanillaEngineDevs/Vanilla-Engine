@@ -60,6 +60,7 @@ local function replaceSlot(action, slotIndex, value, isJoy, isAxis)
 end
 
 function state:enter()
+    graphics:fadeInWipe(0.6)
     menuIndex = 1
     keySlotIndex = 1
     rebinding = false
@@ -101,8 +102,8 @@ function state:update(dt)
         end
 
     elseif input:pressed("back") then
-        graphics:fadeOutWipe(0.3, function()
-            Gamestate.pop()
+        graphics:fadeOutWipe(0.6, function()
+            Gamestate.switch(Gamestate.last())
         end)
     end
 end

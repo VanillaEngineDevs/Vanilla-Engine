@@ -48,10 +48,12 @@ local function change_state(stack_offset, to, ...)
 	return (to.enter or __NULL__)(to, pre, ...)
 end
 
+local last
 function GS.switch(to, ...)
 	assert(to, "Missing argument: Gamestate to switch to")
 	assert(to ~= GS, "Can't call switch with colon operator")
 	;(stack[#stack].leave or __NULL__)(stack[#stack])
+	last = stack[#stack]
 	collectgarbage()
 	return change_state(0, to, ...)
 end
@@ -75,6 +77,10 @@ function GS.current()
 	return stack[#stack]
 end
 
+function GS.last()
+	return last
+end
+
 -- XXX: don't overwrite love.errorhandler by default:
 --      this callback is different than the other callbacks
 --      (see http://love2d.org/wiki/love.errorhandler)
@@ -82,6 +88,7 @@ end
 local all_callbacks = { 'draw', 'update' }
 
 -- fetch event callbacks from love.handlers
+---@diagnostic disable-next-line: undefined-field
 for k in pairs(love.handlers) do
 	all_callbacks[#all_callbacks+1] = k
 end

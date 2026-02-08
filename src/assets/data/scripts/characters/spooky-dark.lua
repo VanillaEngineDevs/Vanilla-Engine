@@ -12,7 +12,7 @@ function Character:setAlpha(v)
 end
 
 function Character:onNoteHit(event)
-    if not event.isPlayer and self.data.characterType == CHARACTER_TYPE.DAD then
+    if not event.mustHit and self.data.characterType == CHARACTER_TYPE.DAD then
         if event.noteType == "cheer" then
             self.data.holdTimer = 0
             self:play("cheer", true, false)

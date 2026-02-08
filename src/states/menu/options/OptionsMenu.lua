@@ -13,6 +13,7 @@ OptionsMenu.group = Group()
 OptionsMenu.title = ""
 
 function OptionsMenu:enter()
+    graphics:fadeInWipe(0.6)
     if self.title == "" then self.title = "Options" end
     bg = Sprite():load(graphics.imagePath("menu/menuDesat"))
     bg.color = 0xFFea71fd
@@ -160,7 +161,9 @@ function OptionsMenu:update(dt)
     end
 
     if input:pressed("back") then
-        Gamestate.pop()
+        graphics:fadeOutWipe(0.6, function()
+            Gamestate.switch(Gamestate.last())
+        end)
     end
 
     if self.nextAccept <= 0 then

@@ -32,7 +32,7 @@ function picoDopplegangerSprite:new(x, y)
     self.shouldSing = false
     self.active = true
     self.suffix = ""
-    self.isPlayer = true
+    self.mustHit = true
     self.cutsceneSound = nil
     self.visible = true
     self.shader = nil

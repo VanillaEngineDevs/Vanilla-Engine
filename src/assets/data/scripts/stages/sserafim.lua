@@ -240,7 +240,7 @@ function Stage:setLightState(enabled, colors, durations, intensities)
     end
     lightsColors = {}
     for i = 1, #colors do
-        table.insert(lightsColors, {hexToRGB(colors[i])})
+        table.insert(lightsColors, hex2rgb(colors[i]))
     end
     lightsDurations = durations
     lightsIntensities = intensities
@@ -276,7 +276,7 @@ function Stage:addProp(prop, name)
         prop.shader = nil
         --prop.blend=12
         --prop.visible = false
-        prop.color = hexToRGB(0xFFCC3300)
+        prop.color = hex2rgb(0xFFCC3300)
     elseif name == "backLightWhite" then
         prop.shader = nil
         --prop.visible = false

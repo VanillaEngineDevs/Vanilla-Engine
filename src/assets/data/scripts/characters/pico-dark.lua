@@ -109,7 +109,7 @@ function Character:onSongRetry()
 end
 
 function Character:onNoteHit(event)
-    if event.isPlayer and self.data.characterType == CHARACTER_TYPE.BF then
+    if event.mustHit and self.data.characterType == CHARACTER_TYPE.BF then
         if event.noteType == "hey" then
             self.data.holdTimer = 0
             self:play("hey", true, false)

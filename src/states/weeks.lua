@@ -141,6 +141,8 @@ local inHolds = {false, false, false, false}
 
 return {
 	enter = function(self, option, songNum, songAppend, _songExt, _audioAppend)
+		self.mayPauseGame = false
+		self.isInCutscene = false
 		CURRENTMODE = option or "normal"
 		self.gameoverType = "character" -- uses boyfriend.gameOverState
 		IS_CLASSIC_MOVEMENT = false
@@ -235,7 +237,7 @@ return {
 
 		NOTES_BATCH = love.graphics.newSpriteBatch(images.notes, 1000)
 
-		popupScore:init(sprites.numbers, rating)
+		popupScore:init(rating)
 
 		countdownFade = {0}
 
@@ -255,6 +257,7 @@ return {
 	end,
 
 	load = function(self, wasntRestart)
+		self.mayPauseGame = false
 		self.inSong = true
 		if wasntRestart == nil then
 			wasntRestart = true
@@ -674,6 +677,7 @@ return {
 		else
 			chartData = love.filesystem.load(chart)()
 		end
+
 		chart = chartData.notes[diff] or chartData.notes["normal"]
 
 		if string.endsWith(metadata, ".json") then
@@ -688,11 +692,10 @@ return {
 		metadata.playData.characters = metadata.playData.characters or {}
 		metadata.playData.characters.opponent = metadata.playData.characters.opponent or "dad"
 		metadata.playData.characters.player = metadata.playData.characters.player or "bf"
-		metadata.playData.characters.girlfriend = metadata.playData.characters.girlfriend or "gf"
+		metadata.playData.characters.girlfriend = metadata.playData.characters.girlfriend
 		boyfriend = Character.getCharacter(metadata.playData.characters.player)
 		enemy = Character.getCharacter(metadata.playData.characters.opponent)
 		girlfriend = Character.getCharacter(metadata.playData.characters.girlfriend)
-		print(boyfriend.healthIconScale, enemy.healthIconScale, girlfriend.healthIconScale)
 
 		SONGNAME = metadata.songName
 		SONGID = name
@@ -745,20 +748,20 @@ return {
 
 		boyfriend.zIndex = 10
 		enemy.zIndex = 8
-		girlfriend.zIndex = 9
+		if girlfriend then girlfriend.zIndex = 9 end
 
 		boyfriend.characterType = CHARACTER_TYPE.BF
 		enemy.characterType = CHARACTER_TYPE.DAD
-		girlfriend.characterType = CHARACTER_TYPE.GF
+		if girlfriend then girlfriend.characterType = CHARACTER_TYPE.GF end
 
 		boyfriend.flipX = not boyfriend._data.flipX
 		enemy.flipX = enemy._data.flipX
 		print(enemy.flipX)
-		girlfriend.flipX = girlfriend._data.flipX
+		if girlfriend then girlfriend.flipX = girlfriend._data.flipX end
 
 		boyfriend:dance()
 		enemy:dance()
-		girlfriend:dance()
+		if girlfriend then girlfriend:dance() end
 
 		self.stage = Stage.getStage(metadata.playData.stage or "stage")
 		self.stage:build()
@@ -767,16 +770,16 @@ return {
 		self.song:call("postCreate")
 		if boyfriend.call then boyfriend:call("postCreate") end
 		if enemy.call then enemy:call("postCreate") end
-		if girlfriend.call then girlfriend:call("postCreate") end
+		if girlfriend and girlfriend.call then girlfriend:call("postCreate") end
 		camera.zoom = self.stage.cameraZoom or 1.0
 		camera.defaultZoom = camera.zoom
 
-		boyfriend.name = "boyfriend"
+		boyfriend.name = "bf"
 		self:add(boyfriend)
 		enemy.name = "enemy"
 		self:add(enemy)
-		girlfriend.name = "girlfriend"
-		self:add(girlfriend)
+		if girlfriend then girlfriend.name = "gf" end
+		if girlfriend then self:add(girlfriend) end
 		self:sort()
 
 		boyfriend:updateHitbox()
@@ -787,9 +790,11 @@ return {
 		enemy.x = enemy.x - enemy.width / 2
 		enemy.y = enemy.y - enemy.height
 
-		girlfriend:updateHitbox()
-		girlfriend.x = girlfriend.x - girlfriend.width / 2 - 150
-		girlfriend.y = girlfriend.y - girlfriend.height
+		if girlfriend then
+			girlfriend:updateHitbox()
+			girlfriend.x = girlfriend.x - girlfriend.width / 2 - 150
+			girlfriend.y = girlfriend.y - girlfriend.height
+		end
 
 		local bfpoint = boyfriend:getCameraPoint()
 
@@ -1006,6 +1011,7 @@ return {
 	end,
 
 	performCountdown = function(self, vwoosh)
+		self.mayPauseGame = false
 		countingDown = true
 
 		self.countdownStep = self.COUNTDOWN_STEPS.BEFORE
@@ -1063,6 +1069,7 @@ return {
 			if self.countdownStep == self.COUNTDOWN_STEPS.AFTER then
 				print("Countdown finished, starting song!")
 				self:stopCountdown()
+				self.mayPauseGame = true
 
 				print(musicTime)
 				--[[ musicTime = inst:getDuration("seconds") * 1000 - 5000 ]]
@@ -1078,7 +1085,7 @@ return {
 	end,
 
 	update = function(self, dt)
-		if input:pressed("pause") and not countingDown and not paused then
+		if input:pressed("pause") and self.mayPauseGame and not paused then
 			if not graphics.isFading() then
 				paused = true
 				pauseTime = musicTime
@@ -1113,10 +1120,12 @@ return {
 			if input:pressed("confirm") then
 				love.audio.stop(sounds.breakfast)
 				if pauseMenuSelection == 1 then
-					if inst then inst:play() end
-					if voicesBF then voicesBF:play() end
-					if voicesEnemy then voicesEnemy:play() end
-					paused = false 
+					if not countingDown then
+						if inst then inst:play() end
+						if voicesBF then voicesBF:play() end
+						if voicesEnemy then voicesEnemy:play() end
+					end
+					paused = false
 				elseif pauseMenuSelection == 2 then
 					if not SMOOTH_RESET then
 						pauseRestart = true
@@ -1207,9 +1216,39 @@ return {
 					end
 
 				elseif pauseMenuSelection == 3 then
-					inst:seek(inst:getDuration("seconds"))
-					musicTime = inst:getDuration("seconds") * 1000
-					paused = false
+					self:saveData()
+
+					status.setLoading(true)
+					graphics:fadeOutWipe(
+						0.7,
+						function()
+							graphics.setFade(1)
+							if not quitPressed then
+								Gamestate.switch(resultsScreen, {
+									diff = string.lower(CURDIFF or "normal"),
+									song = not storyMode and SONGNAME or Gamestate.current().songs[song],
+									artist = not storyMode and ARTIST or nil,
+									scores = {
+										sickCount = allStates.sickCounter,
+										goodCount = allStates.goodCounter,
+										badCount = allStates.badCounter,
+										shitCount = allStates.shitCounter,
+										missedCount = allStates.missCounter,
+										maxCombo = allStates.maxCombo,
+										score = allStates.score
+									}
+								})
+							else
+								if storyMode then
+									Gamestate.switch(menuWeek)
+								else
+									Gamestate.switch(menuFreeplay)
+								end
+							end
+
+							status.setLoading(false)
+						end
+					)
 					if voicesBF then voicesBF:stop() end
 					if voicesEnemy then voicesEnemy:stop() end
 					quitPressed = true
@@ -1634,11 +1673,39 @@ return {
 		HoldCover:update(dt)
 		for i = 1, 4 do
 			for _, note in ipairs(enemyNotes[i]) do
-				note.y = enemyArrows[i].y - calculateNoteYPos(note.time)
+				--note.y = enemyArrows[i].y - calculateNoteYPos(note.time)
+				if math.abs(note.time - musicTime) <= 15000 then
+					note.y = enemyArrows[i].y - calculateNoteYPos(note.time)
+					if not note.emitted then
+						note.emitted = false
+						local event = eventCreator:onNoteOncoming(note.ver, note.col, note)
+						self.stage:call("onNoteOncoming", event)
+						self.song:call("onNoteOncoming", event)
+						for _, obj in ipairs(self.objects) do
+							if obj.call then
+								obj:call("onNoteOncoming", event)
+							end
+						end
+					end
+				end
 			end
 
 			for _, note in ipairs(boyfriendNotes[i]) do
-				note.y = boyfriendArrows[i].y - calculateNoteYPos(note.time)
+				--note.y = boyfriendArrows[i].y - calculateNoteYPos(note.time)
+				if math.abs(note.time - musicTime) <= 15000 then
+					note.y = boyfriendArrows[i].y - calculateNoteYPos(note.time)
+					if not note.emitted then
+						note.emitted = false
+						local event = eventCreator:onNoteOncoming(note.ver, note.col, note)
+						self.stage:call("onNoteOncoming", event)
+						self.song:call("onNoteOncoming", event)
+						for _, obj in ipairs(self.objects) do
+							if obj.call then
+								obj:call("onNoteOncoming", event)
+							end
+						end
+					end
+				end
 			end
 		end
 
@@ -1693,7 +1760,7 @@ return {
 								if not didEvent then
 									continue = (Gamestate.onNoteHit(enemy, enemyNote[j].ver, "EnemyHit", i) == nil or false) and true or false
 									local event = eventCreator:noteHit(enemyNote[j].ver, i, "EnemyHit", 0)
-									event.isPlayer = false
+									event.mustHit = false
 									self.stage:call("onNoteHit", event)
 									self.song:call("onNoteHit", event)
 									for _, obj in ipairs(self.objects) do
@@ -1769,7 +1836,7 @@ return {
 						enemyNote[j].didHit = true
 						Gamestate.onNoteHit(enemy, enemyNote[j].ver, "EnemyHit", i)
 						local event = eventCreator:noteHit(enemyNote[j].ver, i, "EnemyHit", 0)
-						event.isPlayer = false
+						event.mustHit = false
 						self.stage:call("onNoteHit", event)
 						self.song:call("onNoteHit", event)
 						for _, obj in ipairs(self.objects) do
@@ -1804,31 +1871,29 @@ return {
 						voicesBF:setVolume(0)
 					end
 					local continue
+					local healthChange = -CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult * boyfriendNote[1].healthLossMult
+					local event = eventCreator:noteMiss(boyfriendNote[1].ver, i, nil, healthChange)
+
+					for _, obj in ipairs(self.objects) do
+						if obj.characterType == CHARACTER_TYPE.BF then
+							obj:play(curAnim .. "miss", true, false)
+						end
+						if obj.call then
+							obj:call("onNoteMiss", event)
+						end
+					end
+					self.stage:call("onNoteMiss", event)
+					self.song:call("onNoteMiss", event)
+	
 					if boyfriendNote[1]:getAnimName() ~= "hold" and boyfriendNote[1]:getAnimName() ~= "end" then 
-						health = health - CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult * boyfriendNote[1].healthLossMult
+						health = health - event.healthChange
 						misses = misses + 1
 					else
-						health = health - (CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * 0.1) * healthLossMult * boyfriendNote[1].healthLossMult
+						health = health - event.healthChange
 						continue = Gamestate.onNoteMiss(boyfriend, boyfriendNote[1].ver, "BoyfriendMiss", i)
 					end
 
 					table.remove(boyfriendNote, 1)
-
-					local healthChange = -CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult * boyfriendNote[1].healthLossMult
-					local event = eventCreator:noteMiss(boyfriendNote[1].ver, i, nil, healthChange)
-
-					if not continue then
-						for _, obj in ipairs(self.objects) do
-							if obj.characterType == CHARACTER_TYPE.BF then
-								obj:play(curAnim .. "miss", true, false)
-							end
-							if obj.call then
-								obj:call("onNoteMiss", event)
-							end
-						end
-						self.stage:call("onNoteMiss", event)
-						self.song:call("onNoteMiss", event)
-					end
 					
 					if combo >= 5 then
 						
@@ -2095,6 +2160,10 @@ return {
 		return nil
 	end,
 
+	getProps = function(self)
+		return self.objects
+	end,
+
 	getCharacter = function(self, name)
 		name = name or "boyfriend"
 		for _, obj in ipairs(self.objects) do
@@ -2250,9 +2319,15 @@ return {
 					else
 						uitextflarge("Quit", -305, 125, 600, "center", true)
 					end
+					graphics.setColor(1,1,1)
 					love.graphics.setFont(font)
 				love.graphics.pop()
-				return 
+
+				love.graphics.setCanvas(lastCanvas)
+				local lastShader = love.graphics.getShader()
+				love.graphics.draw(self.uiCanvas)
+				love.graphics.setShader(lastShader)
+				return
 			end
 			if self.overrideDrawHealthbar then
 				self:overrideDrawHealthbar(score, health, misses, ratingPercent, healthLerp)

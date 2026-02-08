@@ -669,6 +669,15 @@ local graphics = {
 
 			getFrameQuad = function(self, frame, sheet)
 				local sheet = sheets[sheet or anim.sheet]
+				frame = math.floor(frame or self:getFrameNumber())
+
+				return sheet:getAllFrameQuads()[frame]
+			end,
+
+			getCurrentFrameQuad = function(self, frame)
+				local sheet = sheets[anim.sheet]
+				local frame = math.floor(frame or self:getFrameNumber())
+				print(frame)
 
 				return sheet:getAllFrameQuads()[frame]
 			end,

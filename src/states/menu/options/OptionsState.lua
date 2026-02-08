@@ -14,6 +14,7 @@ OptionsState.selectorLeft = nil
 OptionsState.selectorRight = nil
 
 function OptionsState:enter()
+    graphics:fadeInWipe(0.6)
     local bg = Sprite():load(graphics.imagePath("menu/menuDesat"))
     bg.color = 0xFFea71fd
     bg:updateHitbox()
@@ -41,7 +42,7 @@ end
 
 function OptionsState:changeSelection(change)
     local change = change or 0
-    
+
     self.curSelected = self.curSelected + change
     if self.curSelected < 1 then
         self.curSelected = #self.options
@@ -79,11 +80,15 @@ function OptionsState:update(dt)
         end
     
         if input:pressed("back") then
-            Gamestate.switch(menuSelect)
+            graphics:fadeOutWipe(0.6, function()
+                Gamestate.switch(menuSelect)
+            end)
         end
     
         if input:pressed("confirm") then
-            Gamestate.push(optionSubstates[self.options[self.curSelected]])
+            graphics:fadeOutWipe(0.6, function()
+                Gamestate.switch(optionSubstates[self.options[self.curSelected]])
+            end)
         end
     end
 end

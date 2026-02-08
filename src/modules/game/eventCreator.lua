@@ -42,7 +42,18 @@ function eventCreator:noteMiss(type, direction, data, healthChange)
     event.data = data
     event.healthChange = healthChange
     event.judgement = 'miss'
-    event.isPlayer = true
+    event.mustHit = true
+
+    return event
+end
+
+function eventCreator:onNoteOncoming(type, direction, data)
+    local event = baseEvent()
+    event.noteType = type
+    event.direction = direction
+    event.data = data
+    event.judgement = 'miss'
+    event.mustHit = true
 
     return event
 end

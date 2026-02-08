@@ -7,6 +7,12 @@ X_OFFSET_AMOUNT_FOR_SPITES = 25
 Y_OFFSET_AMOUNT_FOR_SPRITES = 30
 
 function character.getCharacter(id)
+    if not id then
+        return
+    end
+    if not love.filesystem.getInfo("assets/data/characters/" .. id .. ".json") then
+        id = "bf"
+    end
     print("Loading character: " .. id)
     local data = json.decode(love.filesystem.read("assets/data/characters/" .. id .. ".json"))
     if not data.renderType then

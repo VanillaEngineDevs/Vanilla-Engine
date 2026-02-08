@@ -200,35 +200,37 @@ function stage.getStage(id)
     }
     boyfriend.zIndex = s.characters.bf.zIndex
 
-    girlfriend.x = s.characters.gf.position[1]
-    girlfriend.y = s.characters.gf.position[2]
-    girlfriend.scroll = {
-        x = s.characters.gf.scroll[1],
-        y = s.characters.gf.scroll[2]
-    }
-    if type(girlfriend.scale) == "number" then
-        girlfriend.scale = {
-            x = s.characters.gf.scale * girlfriend.scale,
-            y = s.characters.gf.scale * girlfriend.scale
+    if girlfriend then
+        girlfriend.x = s.characters.gf.position[1]
+        girlfriend.y = s.characters.gf.position[2]
+        girlfriend.scroll = {
+            x = s.characters.gf.scroll[1],
+            y = s.characters.gf.scroll[2]
         }
-    else
-        if type(s.characters.gf.scale) == "number" then
+        if type(girlfriend.scale) == "number" then
             girlfriend.scale = {
-                x = s.characters.gf.scale * girlfriend.scale.x,
-                y = s.characters.gf.scale * girlfriend.scale.y
+                x = s.characters.gf.scale * girlfriend.scale,
+                y = s.characters.gf.scale * girlfriend.scale
             }
         else
-            girlfriend.scale = {
-                x = s.characters.gf.scale[1] * girlfriend.scale.x,
-                y = s.characters.gf.scale[2] * girlfriend.scale.y
-            }
+            if type(s.characters.gf.scale) == "number" then
+                girlfriend.scale = {
+                    x = s.characters.gf.scale * girlfriend.scale.x,
+                    y = s.characters.gf.scale * girlfriend.scale.y
+                }
+            else
+                girlfriend.scale = {
+                    x = s.characters.gf.scale[1] * girlfriend.scale.x,
+                    y = s.characters.gf.scale[2] * girlfriend.scale.y
+                }
+            end
         end
+        girlfriend.cameraOffsets = {
+            x = girlfriend.cameraOffsets[1] + s.characters.gf.cameraOffsets[1],
+            y = girlfriend.cameraOffsets[2] + s.characters.gf.cameraOffsets[2]
+        }
+        girlfriend.zIndex = s.characters.gf.zIndex
     end
-    girlfriend.cameraOffsets = {
-        x = girlfriend.cameraOffsets[1] + s.characters.gf.cameraOffsets[1],
-        y = girlfriend.cameraOffsets[2] + s.characters.gf.cameraOffsets[2]
-    }
-    girlfriend.zIndex = s.characters.gf.zIndex
 
     return s
 end

@@ -151,6 +151,11 @@ function AnimateAtlas:constructor(object)
 
     self.onFrameChange = signal.new()
     self.onAnimationFinished = signal.new()
+
+    self.spriteBatches = {}
+    self.quads = {}
+
+    self.batchDisabled = false
 end
 
 function AnimateAtlas:setColorOffset(r, g, b, a)
@@ -233,7 +238,10 @@ function AnimateAtlas:load(folder, listAllSymbols)
             
             local data = json.decode(jsonStr)
             local texture = love.graphics.newImage(folder .. "/" .. string.sub(item, 1, #item - 5) .. ".png")
-            table.insert(self.spritemaps, { data = data, texture = texture })
+            table.insert(self.spritemaps, { data = data, texture = texture, quads = {} })
+            for _, spritedata in ipairs(data.ATLAS.SPRITES) do
+                self.spritemaps[#self.spritemaps].quads[spritedata.SPRITE.name] = love.graphics.newQuad(spritedata.SPRITE.x, spritedata.SPRITE.y, spritedata.SPRITE.w, spritedata.SPRITE.h, texture:getWidth(), texture:getHeight())
+            end
         end
     end
     self.libraries = {}
@@ -709,38 +717,47 @@ local function renderSymbol(self, symbolData, frame, index, matrix, colorTransfo
 end
 
 local function renderSprite(self, sprite, spritemap, spriteMatrix, matrix, colorTransform, stencilMode)
-    -- store thecolor transform mode somewhere
-    local colorTransformMode = colorTransform and colorTransform.mode or nil
-    if not colorTransformMode then
-        colorTransformMode = "none"
-    end
-    --- @type "brightness"|"tint"|"alpha"|"advanced"|"none"
+    local colorTransformMode = colorTransform and colorTransform.mode or "none"
     colorTransformMode = colorTransformMode:lower()
 
-    local texture = spritemap.texture --- @type love.Image
-    local quad = love.graphics.newQuad(sprite.x, sprite.y, sprite.w, sprite.h, texture:getWidth(), texture:getHeight())
+    local texture = spritemap.texture
+    local quad = spritemap.quads[sprite.name or "0000"] or love.graphics.newQuad(sprite.x, sprite.y, sprite.w, sprite.h, texture:getWidth(), texture:getHeight())
 
     local drawMatrix = matrix * spriteMatrix
     if sprite.rotated then
-        drawMatrix:translate(0,sprite.w)
+        drawMatrix:translate(0, sprite.w)
         drawMatrix:rotate(-math.pi/2)
     end
-    local lastShader = love.graphics.getShader()
-    love.graphics.setShader(self.shader)
-    if not stencilMode then
-        if not self.shader then
-            love.graphics.setShader(self._colorTransformShader)
+
+    local useBatch = (colorTransformMode == "none")
+    if not useBatch or stencilMode then
+        local lastShader = love.graphics.getShader()
+        love.graphics.setShader(self.shader or self._colorTransformShader)
+
+        if not stencilMode then
+            self:setColorOffset(0, 0, 0, 0)
+            self:setColorMultiplier(1, 1, 1, self.alpha)
+
+            if colorTransforms[colorTransformMode] then
+                colorTransforms[colorTransformMode](self, colorTransform)
+            end
         end
 
-        self:setColorOffset(0, 0, 0, 0)
-        self:setColorMultiplier(1, 1, 1, self.alpha)
-
-        if type(colorTransforms[colorTransformMode]) == "function" then
-            colorTransforms[colorTransformMode](self, colorTransform)
-        end
+        love.graphics.draw(texture, quad, drawMatrix)
+        love.graphics.setShader(lastShader)
+        return
     end
-    love.graphics.draw(texture, quad, drawMatrix)
-    love.graphics.setShader(lastShader)
+
+    if not self.spriteBatches[texture] then
+        self.spriteBatches[texture] = love.graphics.newSpriteBatch(texture, 1024)
+    end
+    local batch = self.spriteBatches[texture]
+
+    local x, y = drawMatrix:translate(0, 0)
+    local sx, sy = drawMatrix:scale(1)
+    local rotation = drawMatrix:rotate(0)
+
+    batch:add(quad, x, y, rotation, sx, sy)
 end
 
 local function renderAtlasSprite(self, atlasSprite, matrix, colorTransform, optimized)
@@ -1121,8 +1138,23 @@ function AnimateAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
             end
             self._curSymbol = nil
         end
-        
+
         self:drawTimeline(timeline, frameIndex, identity, nil)
+    end
+
+
+    self:drawBatches()
+end
+
+function AnimateAtlas:drawBatches()
+    for _, batch in pairs(self.spriteBatches) do
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.setShader(self.shader)
+        graphics.setColor(1, 1, 1, self.alpha)
+        love.graphics.draw(batch)
+        graphics.setColor(1, 1, 1)
+        love.graphics.setShader()
+        batch:clear()
     end
 end
 
@@ -1303,6 +1335,8 @@ function AnimateAtlas:addElementToFrames(keyword, element) --ogurifap.gif
 
         table.insert(elements, element)
     end
+
+    self.batchDisabled = true
 
     print("Added element to " .. #frames .. " frames with keyword '" .. keyword .. "'.")
 end

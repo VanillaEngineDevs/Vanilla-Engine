@@ -8,22 +8,6 @@ function Stage:onCreate()
     end
 end
 
-function Stage:build()
-    get("bgLight").alpha = 0
-    get("stairsLight").alpha = 0
-end
-
-function Stage:onUpdate(dt)
-end
-
-local tweenedAlphas = {
-    girlfriend = 1,
-    boyfriend = 1,
-    enemy = 1,
-    bgLight = 0,
-    stairsLight = 0
-}
-
 function Stage:doLightningStrike(playSound, beat)
     if not getGirlfriend() and not getBoyfriend() and not getEnemy() then return end
 
@@ -31,28 +15,7 @@ function Stage:doLightningStrike(playSound, beat)
         audio.playSound(sounds["thunder_" .. love.math.random(1, 2)])
     end
 
-    get("bgLight").alpha = 1
-    get("stairsLight").alpha = 1
-    getBoyfriend():call("setAlpha", 0)
-    getGirlfriend():call("setAlpha", 0)
-    getEnemy():call("setAlpha", 0)
-
-    Timer.after(0.06, function()
-        get("bgLight").alpha = 0
-        get("stairsLight").alpha = 0
-        tweenedAlphas.boyfriend = 1
-        tweenedAlphas.girlfriend = 1
-        tweenedAlphas.enemy = 1
-    end)
-
-    Timer.after(0.12, function()
-        get("bgLight").alpha = 1
-        get("stairsLight").alpha = 1
-        tweenedAlphas.boyfriend = 0
-        tweenedAlphas.girlfriend = 0
-        tweenedAlphas.enemy = 0
-        Timer.tween(1.5, tweenedAlphas, {boyfriend = 1, girlfriend = 1, enemy = 1, bgLight = 0, stairsLight = 0})
-    end)
+    get("halloweenBG"):play("lightning", false, false)
 
     lightningStrikeBeat = beat
     lightningStrikeOffset = love.math.random(8, 24)
@@ -109,12 +72,4 @@ end
 function Stage:onSongRetry()
     lightningStrikeBeat = 0
     lightningStrikeOffset = 8
-end
-
-function Stage:onUpdate(dt)
-    if getBoyfriend() then getBoyfriend():call("setAlpha", tweenedAlphas.boyfriend) end
-    if getGirlfriend() then getGirlfriend():call("setAlpha", tweenedAlphas.girlfriend) end
-    if getEnemy() then getEnemy():call("setAlpha", tweenedAlphas.enemy) end
-    get("bgLight").alpha = tweenedAlphas.bgLight
-    get("stairsLight").alpha = tweenedAlphas.stairsLight
 end
