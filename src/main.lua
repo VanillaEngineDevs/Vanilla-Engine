@@ -70,7 +70,9 @@ function love.load()
 	signal = require("modules.signal")
 
     playMenuMusic = true
-    graphics.setImageType(love.filesystem.read("assets/data/IMAGE_FORMAT.txt"))
+	local type = love.filesystem.read("assets/data/IMAGE_FORMAT.txt")
+	if type == "dxt5" then type = "dds" end
+    graphics.setImageType(type)
     volumeWidth = {width = 160}
     volFade = 0
 

@@ -8,7 +8,7 @@ buildDir = "build"
 releaseDir = os.path.join(buildDir, "release")
 lovefileName = "funkin-vanilla-engine.love"
 blacklistFile = "blacklistCompileFolders.txt"
-versionFile = "src/data/version.txt"
+versionFile = "src/assets/data/version.txt"
 compressScript = "compressImages.py"
 
 def getBlacklist():
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     if args.imageformat not in ["png", "dxt5", "astc"]:
         print(f"[ERROR] Invalid image format: {args.imageformat}. Defaulting to 'dxt5'.")
 
-    with open("src/data/IMAGE_FORMAT.txt", "w") as f:
+    with open("src/assets/data/IMAGE_FORMAT.txt", "w") as f:
         f.write(args.imageformat)
 
     videoBlacklist = []
@@ -250,5 +250,5 @@ if __name__ == "__main__":
                     print(f"[CLEANUP] Removed {file} from {root}")
 
 
-    with open("src/data/IMAGE_FORMAT.txt", "w") as f:
+    with open("src/assets/data/IMAGE_FORMAT.txt", "w") as f:
         f.write("png")
