@@ -86,7 +86,12 @@ function character.getCharacter(id)
                           data.cameraOffsets and data.cameraOffsets[2] or 0}
 
     char.healthIcon = data.healthIcon and data.healthIcon.id or char.id
-    char.healthIconScale = data.healthIcon and data.healthIcon.scale or 1
+    if data.healthIcon and data.healthIcon.isPixel then
+        print("Health icon for " .. char.id .. " is pixel art, setting health icon scale to 6")
+        char.healthIconScale = 5
+    end
+    char.healthIconScale = (data.healthIcon and data.healthIcon.scale ~= nil) and data.healthIcon.scale or char.healthIconScale or 1
+    print("Health icon scale for " .. char.id .. ": " .. char.healthIconScale)
 
     char:setAntialiasing(not data.isPixel)
 

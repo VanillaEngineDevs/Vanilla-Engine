@@ -3,7 +3,7 @@
 local Settings = {}
 local Savedata = {}
 
-local SETTINGS_VERSION = 8
+local SETTINGS_VERSION = 9
 local SETTINGS_FILE = "settings.lua"
 local SAVEDATA_FILE = "savedata.lua"
 
@@ -28,6 +28,8 @@ local defaults = {
     popupScoreMode = "Stack",
     judgePreset = "PBot1",
     flashinglights = false,
+    ignoreHaptics = false,
+    colouredHealthbar = false,
     settingsVer = SETTINGS_VERSION
 }
 
@@ -54,29 +56,22 @@ function Settings.load()
             dataStore[k] = loaded[k] ~= nil and loaded[k] or v
         end
     else
-        love.window.showMessageBox("Uh Oh!", "Settings have been reset to defaults.", "warning")
         Settings.reset()
     end
 end
 
 function Settings.save(restartOnChange)
-    restartOnChange = restartOnChange ~= false
-
-    local newSettings = {}
+    local toSave = {}
     for k, _ in pairs(defaults) do
-        newSettings[k] = dataStore[k]
+        toSave[k] = dataStore[k]
     end
-    newSettings.settingsVer = SETTINGS_VERSION
+    toSave.settingsVer = SETTINGS_VERSION
 
-    local currentSerialized = lume.serialize(dataStore)
-    local newSerialized = lume.serialize(newSettings)
+    love.filesystem.write(SETTINGS_FILE, lume.serialize(toSave))
 
-    if currentSerialized ~= newSerialized then
-        save(SETTINGS_FILE, newSettings)
-        if restartOnChange then
-            love.window.showMessageBox("Settings Saved!", "Settings saved. Restarting Vanilla Engine to apply changes.")
-            love.event.quit("restart")
-        end
+    if restartOnChange then
+        love.window.showMessageBox("Settings Saved!", "Settings saved. Restarting Vanilla Engine to apply changes.")
+        love.event.quit("restart")
     end
 end
 
@@ -106,6 +101,7 @@ function Savedata.load()
     else
         savedataStore = {}
     end
+    hapticUtil.ignoreHaptics = savedataStore.ignoreHaptics or false
 end
 
 function Savedata.save()
@@ -147,6 +143,10 @@ ret.save = function() return Settings.save() end
 ret.reset = function() return Settings.reset() end
 ret.savedataSave = function() return Savedata.save() end
 ret.savedataLoad = function() return Savedata.load() end
+ret.get = function(key) return Settings.get(key) end
+ret.set = function(key, value) return Settings.set(key, value) end
+ret.getSavedata = function(key) return Savedata.get(key) end
+ret.setSavedata = function(key, value) return Savedata.set(key, value) end
 
 setmetatable(ret, {
     __index = function(_, key)

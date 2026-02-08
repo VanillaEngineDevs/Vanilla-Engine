@@ -43,6 +43,7 @@ function love.load()
     cutscene = require("modules.game.cutscene")
     dialogue = require("modules.game.dialogue")
     Group = require("modules.objects.Group")
+	hapticUtil = require("modules.game.hapticUtil")
     settings = require("modules.savedata")
 	settings.load()
 	settings.savedataLoad()
@@ -66,7 +67,6 @@ function love.load()
 
     Sprite = require("modules.xml.Sprite")
     Checkbox = require("modules.objects.Checkbox")
-	hapticUtil = require("modules.game.hapticUtil")
 	signal = require("modules.signal")
 
     playMenuMusic = true

@@ -69,4 +69,10 @@ function splash:udraw(sx, sy)
     end
 end
 
+function splash:clear()
+    preloadedImage = nil
+    preloadedSprite = nil
+    self.cache = {}
+end
+
 return splash

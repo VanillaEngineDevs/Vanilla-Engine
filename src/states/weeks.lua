@@ -466,38 +466,27 @@ return {
 	end,
 
 	saveData = function(self)
-		if not CONSTANTS.OPTIONS.DO_SAVE_DATA then return end
+		--[[ if not CONSTANTS.OPTIONS.DO_SAVE_DATA then return end
+
 		local diff = difficulty ~= "" and difficulty or "normal"
-		if savedata[weekNum] then
-			if savedata[weekNum][song] then
-				if savedata[weekNum][song][diff] then
-					local score2 = savedata[weekNum][song][diff].score or 0
-					if score > score2 then
-						savedata[weekNum][song][diff].score = score
-						savedata[weekNum][song][diff].accuracy = ((math.floor(ratingPercent * 10000) / 100))
-					end
-				else
-					savedata[weekNum][song][diff] = {
-						score = score,
-						accuracy = ((math.floor(ratingPercent * 10000) / 100))
-					}
-				end
-			else
-				savedata[weekNum][song] = {}
-				savedata[weekNum][song][diff] = {
-					score = score,
-					accuracy = ((math.floor(ratingPercent * 10000) / 100))
-				}
-			end
-		else
-			savedata[weekNum] = {}
-			savedata[weekNum][song] = {}
-			savedata[weekNum][song][diff] = {
-				score = score,
-				accuracy = ((math.floor(ratingPercent * 10000) / 100))
-			}
+
+		local weekData = settings.getSavedata(weekNum) or {}
+		local songData = weekData[song] or {}
+		local diffData = songData[diff] or {}
+
+		local prevScore = diffData.score or 0
+
+		if score > prevScore then
+			diffData.score = score
+			diffData.accuracy = math.floor(ratingPercent * 10000) / 100
 		end
+
+		songData[diff] = diffData
+		weekData[song] = songData
+		settings.Savedata.set(weekNum, weekData)
+		settings.Savedata.save() ]]
 	end,
+
 
 	songEnded = false,
 
@@ -703,6 +692,7 @@ return {
 		boyfriend = Character.getCharacter(metadata.playData.characters.player)
 		enemy = Character.getCharacter(metadata.playData.characters.opponent)
 		girlfriend = Character.getCharacter(metadata.playData.characters.girlfriend)
+		print(boyfriend.healthIconScale, enemy.healthIconScale, girlfriend.healthIconScale)
 
 		SONGNAME = metadata.songName
 		SONGID = name
@@ -888,6 +878,7 @@ return {
 					local holdNote = noteSprites[data]()
 					holdNote.col = data
 					holdNote.y = CONSTANTS.WEEKS.STRUM_Y + (time + k) * 0.6 * speed
+					--[[ holdNote.flipY = settings.downscroll ]]
 					holdNote.ver = noteData.k or "normal"
 					holdNote.time = time + k
 					holdNote:animate("hold")
@@ -902,7 +893,7 @@ return {
 				end
 
 				notesTable[data][#notesTable[data]]:animate("end")
-				notesTable[data][#notesTable[data]].sizeY = settings.downscroll and -1 or 1
+				notesTable[data][#notesTable[data]].flipY = settings.downscroll
 			end
 		end
 
@@ -2390,6 +2381,9 @@ return {
 		if mode == "VSlice" then
 			x = 250+offsetX
 			y = 400+offsetY
+			if downscrollOffset == -750 then
+				y = y + downscrollOffset - 50
+			end
 			format = "left"
 		elseif mode == "Minimal" then
 			x = x - 35
@@ -2522,7 +2516,7 @@ return {
 
 			returnStr = "Score: " .. math.floor(score) .. " | Misses: " .. math.floor(misses) .. " | Rating: " .. ratingStr
 		elseif mode == "VSlice" then
-			returnStr = "Score: " .. commaFormat(score)
+			returnStr = "Score: " .. commaFormat(math.floor(score))
 		elseif mode == "Minimal" then
 			local ratingStr = math.floor(ratingPercent * 10000) / 100 .. "%"
 			if ratingPercent == 0 then
@@ -2542,9 +2536,17 @@ return {
 			love.graphics.scale(uiCam.zoom, uiCam.zoom)
 			love.graphics.translate(uiCam.x, uiCam.y)
 			graphics.setColor(1, 1, 1, visibility * hudFade[1])
-			graphics.setColor(P2HealthColors[1], P2HealthColors[2], P2HealthColors[3], hudFade[1])
+			if settings.colouredHealthbar then
+				graphics.setColor(P2HealthColors[1], P2HealthColors[2], P2HealthColors[3], hudFade[1])
+			else
+				graphics.setColor(1, 0, 0, hudFade[1])
+			end
 			love.graphics.rectangle("fill", healthBar.x, healthBar.y, healthBar.width, healthBar.height)
-			graphics.setColor(P1HealthColors[1], P1HealthColors[2], P1HealthColors[3], hudFade[1])
+			if settings.colouredHealthbar then
+				graphics.setColor(P1HealthColors[1], P1HealthColors[2], P1HealthColors[3], hudFade[1])
+			else
+				graphics.setColor(0, 1, 0, hudFade[1])
+			end
 			love.graphics.rectangle("fill", -healthBar.x, healthBar.y, -healthLerp * (healthBar.width/2), healthBar.height)
 			graphics.setColor(0, 0, 0, hudFade[1])
 			love.graphics.setLineWidth(8)
@@ -2592,5 +2594,7 @@ return {
 
 		self:setStageShader(nil)
 		self:setUIShader(nil)
+
+		NoteSplash:clear()
 	end
 }

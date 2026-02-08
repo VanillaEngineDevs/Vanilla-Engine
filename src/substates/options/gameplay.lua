@@ -32,12 +32,21 @@ function gameplay:enter()
 
     self:addOption(
         Option:new(
+            "Haptics",
+            "If checked, the game will use haptic feedback (vibration) if available",
+            not hapticUtil.ignoreHaptics,
+            "bool"
+        )
+    )
+
+    --[[ self:addOption(
+        Option:new(
             "Bot Play",
             "If checked, the game will play for you",
             settings.botPlay,
             "bool"
         )
-    )
+    ) ]]
 
     self:addOption(
         Option:new(
@@ -104,7 +113,7 @@ function gameplay:enter()
     o.decimals = 2
     self:addOption(o)
 
-    o = Option:new(
+    --[[ o = Option:new(
         "Scroll Underlay Transparency",
         "How opaque the scroll underlay is",
         settings.scrollUnderlayTrans,
@@ -116,7 +125,7 @@ function gameplay:enter()
     o.scrollSpeed = 0.5
     o.changeValue = 0.01
     o.decimals = 2
-    self:addOption(o)
+    self:addOption(o) ]]
 
     self.super.enter(self)
 end
@@ -126,13 +135,15 @@ function gameplay:leave()
     settings.downscroll = self.optionsArray[1]:getValue()
     settings.middlescroll = self.optionsArray[2]:getValue()
     settings.ghostTapping = self.optionsArray[3]:getValue()
-    settings.botPlay = self.optionsArray[4]:getValue()
+    hapticUtil.ignoreHaptics = not self.optionsArray[4]:getValue()
+    settings.ignoreHaptics = hapticUtil.ignoreHaptics
+    --[[ settings.botPlay = self.optionsArray[4]:getValue() ]]
     settings.accuracyMode = self.optionsArray[5]:getValue()
     settings.scoringType = self.optionsArray[6]:getValue()
     settings.popupScoreMode = self.optionsArray[7]:getValue()
     settings.judgePreset = self.optionsArray[8]:getValue()
     settings.customScrollSpeed = self.optionsArray[9]:getValue()
-    settings.scrollUnderlayTrans = self.optionsArray[10]:getValue()
+    --[[ settings.scrollUnderlayTrans = self.optionsArray[9]:getValue() ]]
 
     self.super.leave(self)
 end

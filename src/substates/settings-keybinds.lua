@@ -15,6 +15,9 @@ local actions = {
     { id = "gameRight", label = "Note Right" },
 }
 
+local axisThres = 0.5
+local axisActive = {}
+
 local menuIndex = 1
 local keySlotIndex = 1
 local rebinding = false
@@ -105,7 +108,12 @@ function state:update(dt)
 end
 
 function state:keypressed(key)
-    if not rebinding or activeDevice ~= "keyboard" then return end
+    if activeDevice ~= "keyboard" then
+        activeDevice = "keyboard"
+        menuIndex = 1
+        keySlotIndex = 1
+    end
+    if not rebinding then return end
     key = invalidKeys[key] or key
 
     local action = actions[menuIndex].id
@@ -142,7 +150,16 @@ function state:gamepadpressed(_, button)
 end
 
 function state:gamepadaxis(_, axis, value)
-    if math.abs(value) < 0.5 then return end
+    if math.abs(value) < axisThres then
+        axisActive[axis] = false
+        return
+    end
+
+    if axisActive[axis] then
+        return
+    end
+
+    axisActive[axis] = true
     if activeDevice ~= "joy" then
         activeDevice = "joy"
         menuIndex = 1

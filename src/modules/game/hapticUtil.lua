@@ -1,5 +1,6 @@
 local hapticUtil = {}
 hapticUtil.activeTweens = {}
+hapticUtil.ignoreHaptics = false
 
 local sdlHaptics = nil
 pcall(function()
@@ -64,7 +65,9 @@ function hapticUtil:vibrate(period, duration, amplitude, sharpness, targetModes)
     amplitude = amplitude or Constants.DEFAULT_VIBRATION_AMPLITUDE
     sharpness = sharpness or Constants.DEFAULT_VIBRATION_SHARPNESS
 
-    if not self:isHapticsAvailable() then return end
+    if not self:isHapticsAvailable() or self.ignoreHaptics then
+        return
+    end
 
     targetModes = targetModes or { HAPTICS_MODE.ALL }
 
@@ -101,7 +104,7 @@ function hapticUtil:_vibrateOnce(duration, amplitude)
     end
 
     for _, js in ipairs(love.joystick.getJoysticks()) do
-        if js:isGamepad() and js:isVibrationSupported() then
+        if js:isGamepad() and js:isVibrationSupported() and not self.ignoreHaptics then
             js:setVibration(amplitude, amplitude, duration)
         end
     end
