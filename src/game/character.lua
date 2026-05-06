@@ -10,20 +10,18 @@ function character.getCharacter(id)
     if not id then
         return
     end
-    if not love.filesystem.getInfo("assets/data/characters/" .. id .. ".json") then
+    if not love.filesystem.getInfo("data/characters/" .. id .. ".json") then
         id = "bf"
     end
-    print("Loading character: " .. id)
-    local data = json.decode(love.filesystem.read("assets/data/characters/" .. id .. ".json"))
+    local data = json.decode(love.filesystem.read("data/characters/" .. id .. ".json"))
     if not data.renderType then
         data.renderType = "sparrow"
     end
 
     local char
 
-    print("Creating character of type: " .. data.renderType, id)
 
-    local characterLuaChunk = love.filesystem.getInfo("assets/data/scripts/characters/" .. id .. ".lua")
+    local characterLuaChunk = love.filesystem.getInfo("scripts/characters/" .. id .. ".lua")
     local env = setmetatable({
         Character = {
             --[[ data = char, ]]
@@ -39,7 +37,7 @@ function character.getCharacter(id)
         end,
     }, {__index = _G})
     if characterLuaChunk then
-        local chunk = love.filesystem.load("assets/data/scripts/characters/" .. id .. ".lua")
+        local chunk = love.filesystem.load("scripts/characters/" .. id .. ".lua")
         
         setfenv(chunk, env)
         chunk()
@@ -93,15 +91,15 @@ function character.getCharacter(id)
 
     char.healthIcon = data.healthIcon and data.healthIcon.id or char.id
     if data.healthIcon and data.healthIcon.isPixel then
-        print("Health icon for " .. char.id .. " is pixel art, setting health icon scale to 6")
         char.healthIconScale = 5
     end
     char.healthIconScale = (data.healthIcon and data.healthIcon.scale ~= nil) and data.healthIcon.scale or char.healthIconScale or 1
-    print("Health icon scale for " .. char.id .. ": " .. char.healthIconScale)
 
     char:setAntialiasing(not data.isPixel)
 
     char:call("onCreate")
+
+    char:dance(true)
 
     return char
 end
@@ -246,7 +244,6 @@ function character:getCameraPoint()
     local centerX = self.x + self.width/2
     local centerY = self.y + self.height/2
 
-    table.print(self.cameraOffsets)
     return {
         x = centerX + (self.cameraOffsets[1] or self.cameraOffsets.x or 0),
         y = centerY + (self.cameraOffsets[2] or self.cameraOffsets.y or 0)
@@ -329,7 +326,6 @@ end
 
 function character:getDeathPreTransitionDelay()
     if self._data.death and self._data.death.preTransitionDelay then
-        print("Pre-transition delay for " .. self.id .. ": " .. self._data.death.preTransitionDelay)
         return self._data.death.preTransitionDelay
     end
     return 0

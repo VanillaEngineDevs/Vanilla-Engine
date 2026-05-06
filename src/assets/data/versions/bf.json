@@ -1,0 +1,9 @@
+{
+    "name": "Boyfriend",
+    "extension": "-bf",
+    "diffs": [
+        ["easy", "-bf", "BF-Easy"],
+        ["normal", "-bf", "BF-Normal"],
+        ["hard", "-bf", "BF-Hard"]
+    ]
+}

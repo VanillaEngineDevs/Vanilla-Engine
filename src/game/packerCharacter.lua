@@ -13,7 +13,6 @@ function PackerCharacter:new(data)
         if isIndices then
             self.sprite:addAnimByIndices(anim.name, anim.prefix, anim.frameIndices, anim.framerate, anim.loop)
         else
-            print("WARNING: Animation '" .. anim.name .. "' does not have frame indices defined, trying to add by prefix")
             self.sprite:addAnimByPrefix(anim.name, anim.prefix, anim.framerate, anim.loop or false)
         end
     end

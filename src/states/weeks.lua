@@ -140,11 +140,12 @@ local healthIconPreloads = {}
 local inHolds = {false, false, false, false}
 
 return {
-	enter = function(self, option, songNum, songAppend, _songExt, _audioAppend)
+	songs = {},
+
+	enter = function(self, _, songNum, songAppend, _songExt, _audioAppend)
 		self:showUI()
 		self.mayPauseGame = false
 		self.isInCutscene = false
-		CURRENTMODE = option or "normal"
 		self.gameoverType = "character" -- uses boyfriend.gameOverState
 		IS_CLASSIC_MOVEMENT = false
 		allStates = {
@@ -170,91 +171,33 @@ return {
 		if option ~= "pixel" then
 			pixel = false
 			sounds = {
-				countdown = {
-					three = love.audio.newSource("assets/sounds/countdown-3.ogg", "static"),
-					two = love.audio.newSource("assets/sounds/countdown-2.ogg", "static"),
-					one = love.audio.newSource("assets/sounds/countdown-1.ogg", "static"),
-					go = love.audio.newSource("assets/sounds/countdown-go.ogg", "static")
-				},
 				miss = {
-					love.audio.newSource("assets/sounds/miss1.ogg", "static"),
-					love.audio.newSource("assets/sounds/miss2.ogg", "static"),
-					love.audio.newSource("assets/sounds/miss3.ogg", "static")
+					love.audio.newSource("sounds/miss1.ogg", "static"),
+					love.audio.newSource("sounds/miss2.ogg", "static"),
+					love.audio.newSource("sounds/miss3.ogg", "static")
 				},
-				breakfast = love.audio.newSource("assets/music/breakfast.ogg", "stream")
+				breakfast = love.audio.newSource("music/breakfast.ogg", "stream")
 			}
-
-			images = {
-				notes = love.graphics.newImage(graphics.imagePath("NOTE_assets")),
-				numbers = love.graphics.newImage(graphics.imagePath("numbers")),
-			}
-
-			sprites = {
-				numbers = love.filesystem.load("assets/sprites/numbers.lua"),
-			}
-
-			rating = love.filesystem.load("assets/sprites/rating.lua")
-
-			--[[ girlfriend = BaseCharacter("assets/sprites/characters/girlfriend.lua")
-			boyfriend = BaseCharacter("assets/sprites/characters/boyfriend.lua") ]]
-
-			countdown = love.filesystem.load("assets/sprites/countdown.lua")()
 		else
 			pixel = true
 			love.graphics.setDefaultFilter("nearest", "nearest")
 			sounds = {
-				countdown = {
-					three = love.audio.newSource("assets/sounds/pixel/countdown-3.ogg", "static"),
-					two = love.audio.newSource("assets/sounds/pixel/countdown-2.ogg", "static"),
-					one = love.audio.newSource("assets/sounds/pixel/countdown-1.ogg", "static"),
-					go = love.audio.newSource("assets/sounds/pixel/countdown-date.ogg", "static")
-				},
 				miss = {
-					love.audio.newSource("assets/sounds/pixel/miss1.ogg", "static"),
-					love.audio.newSource("assets/sounds/pixel/miss2.ogg", "static"),
-					love.audio.newSource("assets/sounds/pixel/miss3.ogg", "static")
+					love.audio.newSource("sounds/pixel/miss1.ogg", "static"),
+					love.audio.newSource("sounds/pixel/miss2.ogg", "static"),
+					love.audio.newSource("sounds/pixel/miss3.ogg", "static")
 				},
-				breakfast = love.audio.newSource("assets/music/breakfast.ogg", "stream")
+				breakfast = love.audio.newSource("music/breakfast.ogg", "stream")
 			}
-
-			images = {
-				notes = love.graphics.newImage(graphics.imagePath("pixel/notes")),
-				numbers = love.graphics.newImage(graphics.imagePath("pixel/numbers")),
-			}
-
-			sprites = {
-				numbers = love.filesystem.load("assets/sprites/pixel/numbers.lua"),
-			}
-
-			rating = love.filesystem.load("assets/sprites/pixel/rating.lua")
-
-			--[[ girlfriend = BaseCharacter("assets/sprites/characters/girlfriend-pixel.lua")
-			boyfriend = BaseCharacter("assets/sprites/characters/boyfriend-pixel.lua") ]]
-
-			countdown = love.filesystem.load("assets/sprites/pixel/countdown.lua")()
 
 			love.graphics.setDefaultFilter("linear", "nearest")
 		end
 
-		NOTES_BATCH = love.graphics.newSpriteBatch(images.notes, 1000)
-
-		popupScore:init(rating)
-
 		countdownFade = {0}
 
-		if settings.middlescroll then
-			if not settings.downscroll then
-				popupScore:setPlacement(-300, -400)
-			else
-				popupScore:setPlacement(-300, 400)
-			end
-		else
-			if not settings.downscroll then
-				popupScore:setPlacement(0, -400)
-			end
-		end
-
 		self.conductor = Conductor.new()
+
+		self:load()
 	end,
 
 	load = function(self, wasntRestart)
@@ -389,7 +332,6 @@ return {
 
 		if wasntRestart and not graphics.isFading() then
 			print("Generating notes for song:", Gamestate.current().songs[song], "with difficulty:", difficulty)
-			self:initUI(CURRENTMODE)
 			self:generateNotes(Gamestate.current().songs[song], difficulty)
 			graphics:fadeInWipe(0.6)
 
@@ -563,7 +505,12 @@ return {
 		end
 	end,
 
-	initUI = function(self)
+	initUI = function(self, mode)
+		CURRENTMODE = mode
+		if CURRENTMODE == "pixel" then
+			pixel = true
+			print("Using pixel note style for this song because of pixel mode")
+		end
 		events = {}
 		modEvents = {}
 		songEvents = {}
@@ -581,20 +528,52 @@ return {
 		if not noteSprites then
 			if not pixel then
 				self:setNoteSprites( -- the default sprites
-					love.filesystem.load("assets/sprites/receptor.lua"),
-					love.filesystem.load("assets/sprites/left-arrow.lua"),
-					love.filesystem.load("assets/sprites/down-arrow.lua"),
-					love.filesystem.load("assets/sprites/up-arrow.lua"),
-					love.filesystem.load("assets/sprites/right-arrow.lua")
+					love.filesystem.load("sprites/receptor.lua"),
+					love.filesystem.load("sprites/left-arrow.lua"),
+					love.filesystem.load("sprites/down-arrow.lua"),
+					love.filesystem.load("sprites/up-arrow.lua"),
+					love.filesystem.load("sprites/right-arrow.lua")
 				)
+
+				sounds.countdown = {
+					three = love.audio.newSource("sounds/countdown-3.ogg", "static"),
+					two = love.audio.newSource("sounds/countdown-2.ogg", "static"),
+					one = love.audio.newSource("sounds/countdown-1.ogg", "static"),
+					go = love.audio.newSource("sounds/countdown-go.ogg", "static")
+				}
+				rating = love.filesystem.load("sprites/rating.lua")
+				countdown = love.filesystem.load("sprites/countdown.lua")()
+				popupScore:init(rating)
 			else
 				self:setNoteSprites( -- the pixel sprites
-					love.filesystem.load("assets/sprites/pixel/receptor.lua"),
-					love.filesystem.load("assets/sprites/pixel/left-arrow.lua"),
-					love.filesystem.load("assets/sprites/pixel/down-arrow.lua"),
-					love.filesystem.load("assets/sprites/pixel/up-arrow.lua"),
-					love.filesystem.load("assets/sprites/pixel/right-arrow.lua")
+					love.filesystem.load("sprites/pixel/receptor.lua"),
+					love.filesystem.load("sprites/pixel/left-arrow.lua"),
+					love.filesystem.load("sprites/pixel/down-arrow.lua"),
+					love.filesystem.load("sprites/pixel/up-arrow.lua"),
+					love.filesystem.load("sprites/pixel/right-arrow.lua")
 				)
+				
+				sounds.countdown = {
+					three = love.audio.newSource("sounds/pixel/countdown-3.ogg", "static"),
+					two = love.audio.newSource("sounds/pixel/countdown-2.ogg", "static"),
+					one = love.audio.newSource("sounds/pixel/countdown-1.ogg", "static"),
+					go = love.audio.newSource("sounds/pixel/countdown-date.ogg", "static")
+				}
+				rating = love.filesystem.load("sprites/pixel/rating.lua")
+				countdown = love.filesystem.load("sprites/pixel/countdown.lua")()
+				popupScore:init(rating, true)
+			end
+		end
+
+		if settings.middlescroll then
+			if not settings.downscroll then
+				popupScore:setPlacement(-300, -400)
+			else
+				popupScore:setPlacement(-300, 400)
+			end
+		else
+			if not settings.downscroll then
+				popupScore:setPlacement(0, -400)
 			end
 		end
 
@@ -610,6 +589,11 @@ return {
 			noteSprites[5](),
 			noteSprites[5]()
 		}
+
+		NOTES_BATCH = love.graphics.newSpriteBatch(boyfriendArrows[1]:getSheet(), 1000)
+		if pixel then
+			boyfriendArrows[1]:getSheet():setFilter("nearest", "nearest")
+		end
 
 		for i = 1, 4 do
 			if settings.middlescroll then 
@@ -647,6 +631,8 @@ return {
 	end,
 
 	setNoteSprites = function(self, receptors, left, down, up, right)
+		if pixel then
+		end
 		noteSprites = {
 			left,
 			down,
@@ -658,13 +644,13 @@ return {
 
 	generateNotes = function(self, name, diff)
 		local eventBpm
-		local chartPath = "assets/data/songs/" .. name .. "/" .. name .. "-chart" .. songExt .. ".lua"
-		local metadataPath = "assets/data/songs/" .. name .. "/" .. name .. "-metadata" .. songExt .. ".lua"
+		local chartPath = "data/songs/" .. name .. "/" .. name .. "-chart" .. songExt .. ".lua"
+		local metadataPath = "data/songs/" .. name .. "/" .. name .. "-metadata" .. songExt .. ".lua"
 		if not love.filesystem.getInfo(chartPath) then
-			chartPath = "assets/data/songs/" .. name .. "/" .. name .. "-chart" .. songExt .. ".json"
+			chartPath = "data/songs/" .. name .. "/" .. name .. "-chart" .. songExt .. ".json"
 		end
 		if not love.filesystem.getInfo(metadataPath) then
-			metadataPath = "assets/data/songs/" .. name .. "/" .. name .. "-metadata" .. songExt .. ".json"
+			metadataPath = "data/songs/" .. name .. "/" .. name .. "-metadata" .. songExt .. ".json"
 		end
 		print("Loading chart:", chartPath)
 		print("Loading metadata:", metadataPath)
@@ -686,6 +672,17 @@ return {
 		else
 			metadata = love.filesystem.load(metadata)()
 		end
+
+		if metadata.playData and metadata.playData.noteStyle then
+			if metadata.playData.noteStyle == "pixel" then
+				self:initUI("pixel")
+			else
+				self:initUI("normal")
+			end
+		else
+			self:initUI("normal")
+		end
+
 		self.chart = chartData
 		self.metadata = metadata
 		self.conductor:mapBPMChanges(metadata)
@@ -703,9 +700,9 @@ return {
 		CURDIFF = difficulty
 		ARTIST = metadata.artist
 
-		inst = love.audio.newSource("assets/songs/" .. name .. "/Inst" .. songExt .. ".ogg", "stream")
-		local voicesBFPath = "assets/songs/" .. name .. "/Voices-" .. metadata.playData.characters.player .. songExt .. ".ogg"
-		local voicesEnemyPath = "assets/songs/" .. name .. "/Voices-" .. metadata.playData.characters.opponent .. songExt .. ".ogg"
+		inst = love.audio.newSource("songs/" .. name .. "/Inst" .. songExt .. ".ogg", "stream")
+		local voicesBFPath = "songs/" .. name .. "/Voices-" .. metadata.playData.characters.player .. songExt .. ".ogg"
+		local voicesEnemyPath = "songs/" .. name .. "/Voices-" .. metadata.playData.characters.opponent .. songExt .. ".ogg"
 		local voiceConversions = {
 			["pico-playable"] = "pico",
 			["pico-pixel"] = "pico",
@@ -726,14 +723,19 @@ return {
 
 			["spooky-dark"] = "spooky",
 		}
-		if voiceConversions[metadata.playData.characters.player] then
-			if not love.filesystem.getInfo(voicesBFPath) then
-				voicesBFPath = "assets/songs/" .. name .. "/Voices-" .. voiceConversions[metadata.playData.characters.player] .. songExt .. ".ogg"
+		local vocals = metadata.playData.characters.playerVocals and metadata.playData.characters.playerVocals[1] or metadata.playData.characters.player
+		local vocalsEnemy = metadata.playData.characters.opponentVocals and metadata.playData.characters.opponentVocals[1] or metadata.playData.characters.opponent
+		if not love.filesystem.getInfo(voicesBFPath) then
+			voicesBFPath = "songs/" .. name .. "/Voices-" .. vocals .. songExt .. ".ogg"
+			if not love.filesystem.getInfo(voicesBFPath) and voiceConversions[vocals] then
+				voicesBFPath = "songs/" .. name .. "/Voices-" .. voiceConversions[vocals] .. songExt .. ".ogg"
 			end
 		end
-		if voiceConversions[metadata.playData.characters.opponent] then
-			if not love.filesystem.getInfo(voicesEnemyPath) then
-				voicesEnemyPath = "assets/songs/" .. name .. "/Voices-" .. voiceConversions[metadata.playData.characters.opponent] .. songExt .. ".ogg"
+	
+		if not love.filesystem.getInfo(voicesEnemyPath) then
+			voicesEnemyPath = "songs/" .. name .. "/Voices-" .. vocalsEnemy .. songExt .. ".ogg"
+			if not love.filesystem.getInfo(voicesEnemyPath) and voiceConversions[vocalsEnemy] then
+				voicesEnemyPath = "songs/" .. name .. "/Voices-" .. voiceConversions[vocalsEnemy] .. songExt .. ".ogg"
 			end
 		end
 		if love.filesystem.getInfo(voicesBFPath) then
@@ -1600,6 +1602,10 @@ return {
 				score = score + CONSTANTS.WEEKS.SCORE_HOLD_BONUS_PER_SECOND * dt
 			end
 		end
+
+		self:checkSongOver()
+
+		self:updateUI(dt)
 	end,
 
 	judgeNote = function(self, msTiming)
@@ -2644,6 +2650,11 @@ return {
 		love.graphics.pop()
 	end,
 
+	draw = function(self)
+		self:renderStage()
+		self:drawUI()
+	end,
+
 	leave = function(self)
 		if inst then inst:stop(); inst = nil end
 		if voicesBF then voicesBF:stop(); voicesBF = nil end
@@ -2672,5 +2683,7 @@ return {
 		self:setUIShader(nil)
 
 		NoteSplash:clear()
+
+		graphics.clearCache()
 	end
 }

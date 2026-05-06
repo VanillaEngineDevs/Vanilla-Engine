@@ -64,7 +64,7 @@ function gameover:resolveMusicPath(suffix, starting, ending)
         basePath = basePath .. "Start"
     end
 
-    local musicPath = "assets/shared/music/" .. basePath .. suffix .. ".ogg"
+    local musicPath = "shared/music/" .. basePath .. suffix .. ".ogg"
     while not love.filesystem.getInfo(musicPath) and #suffix > 0 do
         local parts = {}
         for part in string.gmatch(suffix, "[^-]+") do
@@ -72,7 +72,7 @@ function gameover:resolveMusicPath(suffix, starting, ending)
         end
         table.remove(parts)
         suffix = table.concat(parts, "-")
-        musicPath = "assets/shared/music/" .. basePath .. suffix .. ".ogg"
+        musicPath = "shared/music/" .. basePath .. suffix .. ".ogg"
     end
     if not love.filesystem.getInfo(musicPath) then
         return nil
@@ -133,10 +133,10 @@ end
 function gameover:playBlueBalledSFX()
     self.blueballed = true
 
-    if love.filesystem.getInfo("assets/shared/sounds/gameplay/gameover/fnf_loss_sfx" .. self.blueBallSuffix .. ".ogg") then
-        love.audio.newSource("assets/shared/sounds/gameplay/gameover/fnf_loss_sfx" .. self.blueBallSuffix .. ".ogg", "static"):play()
+    if love.filesystem.getInfo("shared/sounds/gameplay/gameover/fnf_loss_sfx" .. self.blueBallSuffix .. ".ogg") then
+        love.audio.newSource("shared/sounds/gameplay/gameover/fnf_loss_sfx" .. self.blueBallSuffix .. ".ogg", "static"):play()
     else
-        print("No blueballed SFX found at: " .. "assets/shared/sounds/gameplay/gameover/fnf_loss_sfx" .. self.blueBallSuffix .. ".ogg")
+        print("No blueballed SFX found at: " .. "shared/sounds/gameplay/gameover/fnf_loss_sfx" .. self.blueBallSuffix .. ".ogg")
     end
 end
 

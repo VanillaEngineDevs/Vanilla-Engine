@@ -1,5 +1,5 @@
 return graphics.newSprite(
-    images.notes,
+    graphics.imagePath("NOTE_assets"),
 	{
 		{x = 488, y = 238, width = 155, height = 158, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0, rotated = false}, -- 1: arrow static instance 10000
 		{x = 647, y = 238, width = 157, height = 155, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0, rotated = false}, -- 2: arrow static instance 20000

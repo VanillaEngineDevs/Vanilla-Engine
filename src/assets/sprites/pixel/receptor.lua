@@ -1,5 +1,5 @@
 return graphics.newSprite(
-    images.notes,
+    graphics.imagePath("pixel/notes"),
     {
         { x = 51, y = 0,  width = 17, height = 17, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0 }, -- 1: Right Arrow
         { x = 51, y = 17, width = 17, height = 17, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0 }, -- 2: Right Arrow On

@@ -42,12 +42,11 @@ return {
 			logo:addAnimByPrefix("bump", "logo bumpin", 24, false)
 			logo:updateHitbox()
 		else
-			logo = GIF.new("assets/ishowmeat.gif")
+			logo = GIF.new("ishowmeat.gif")
 		end
 
-		--[[ girlfriendTitle = love.filesystem.load("assets/sprites/menu/girlfriend-title.lua")() ]]
+		--[[ girlfriendTitle = love.filesystem.load("sprites/menu/girlfriend-title.lua")() ]]
 		girlfriendTitle = graphics.newSparrowAtlas(1280 * 0.5, 720 * 0.07)
-		print(girlfriendTitle.x, girlfriendTitle.y)
 		girlfriendTitle:load("states/title/gfDanceTitle")
 		girlfriendTitle:addAnimByIndices("danceLeft", "gfDance", {
 			30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14

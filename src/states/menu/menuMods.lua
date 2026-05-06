@@ -17,7 +17,7 @@ return {
             local mod = modList[i]
             local icon = mod.path .. "/icon.png"
             if not love.filesystem.getInfo(icon) then
-                icon = "assets/defaultIcon.png"
+                icon = "defaultIcon.png"
                 if not love.filesystem.getInfo(icon) then
                     icon = nil
                 end

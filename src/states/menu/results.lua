@@ -71,19 +71,19 @@ return {
     enter = function(self, last, scoreData_)
         music:stop()
 
-        soundSystem = love.filesystem.load("assets/sprites/resultsScreen/soundSystem.lua")()
+        soundSystem = love.filesystem.load("sprites/resultsScreen/soundSystem.lua")()
         soundSystem.visible = false
         soundSystem.x, soundSystem.y = 425, 300
 
-        resultsGF = love.filesystem.load("assets/sprites/resultsScreen/resultGirlfriend" .. variationToFile[resultsVariation] .. ".lua")()
+        resultsGF = love.filesystem.load("sprites/resultsScreen/resultGirlfriend" .. variationToFile[resultsVariation] .. ".lua")()
         resultsGF.visible = false
         resultsGF.x, resultsGF.y = 760, 500
 
-        resultsBF = love.filesystem.load("assets/sprites/resultsScreen/resultBoyfriend" .. variationToFile[resultsVariation] .. ".lua")()
+        resultsBF = love.filesystem.load("sprites/resultsScreen/resultBoyfriend" .. variationToFile[resultsVariation] .. ".lua")()
         resultsBF.visible = false
         resultsBF.x, resultsBF.y = 965, 265
 
-        resultsMusic = love.audio.newSource("assets/music/results/results" .. resultsVariation .. ".ogg", "stream")
+        resultsMusic = love.audio.newSource("music/results/results" .. resultsVariation .. ".ogg", "stream")
         resultsMusic:setLooping(true)
         resultsMusic:play()
 
@@ -113,7 +113,7 @@ return {
             )
         end)
 
-        resultsAnim = love.filesystem.load("assets/sprites/resultsScreen/resultsAnim.lua")()
+        resultsAnim = love.filesystem.load("sprites/resultsScreen/resultsAnim.lua")()
         resultsAnim.x = 1280/2 - resultsAnim:getFrameWidth()/2
         resultsAnim.y = resultsAnim:getFrameHeight() + 35
         resultsAnim:animate("idle", false)
@@ -123,11 +123,11 @@ return {
         _resultsCache.tallieNumber = love.graphics.newImage(graphics.imagePath("resultsScreen/tallieNumber"))
         _resultsCache.scoreDigitalNumbers = love.graphics.newImage(graphics.imagePath("resultsScreen/score-digital-numbers"))
 
-        ratingsPopin = love.filesystem.load("assets/sprites/resultsScreen/ratingsPopin.lua")()
+        ratingsPopin = love.filesystem.load("sprites/resultsScreen/ratingsPopin.lua")()
         ratingsPopin.x, ratingsPopin.y = 110, 330
         ratingsPopin.visible = false
 
-        scorePopin = love.filesystem.load("assets/sprites/resultsScreen/scorePopin.lua")()
+        scorePopin = love.filesystem.load("sprites/resultsScreen/scorePopin.lua")()
         scorePopin.x, scorePopin.y = 180, 590
         scorePopin.visible = false
 
@@ -150,7 +150,7 @@ return {
         end
 
         for i = 1, #tostring(scores.totalNotes) do
-            table.insert(tallies[1].sprites, love.filesystem.load("assets/sprites/resultsScreen/tallieNumber.lua")())
+            table.insert(tallies[1].sprites, love.filesystem.load("sprites/resultsScreen/tallieNumber.lua")())
             tallies[1].sprites[i]:animate("0", false)
             tallies[1].sprites[i].x = 400 + (i - 1) * 38
             tallies[1].sprites[i].y = 155
@@ -169,7 +169,7 @@ return {
         end
 
         for i = 1, #tostring(scores.maxCombo) do
-            table.insert(tallies[2].sprites, love.filesystem.load("assets/sprites/resultsScreen/tallieNumber.lua")())
+            table.insert(tallies[2].sprites, love.filesystem.load("sprites/resultsScreen/tallieNumber.lua")())
             tallies[2].sprites[i]:animate("0", false)
             tallies[2].sprites[i].x = 400 + (i - 1) * 38
             tallies[2].sprites[i].y = 225
@@ -188,7 +188,7 @@ return {
         end
 
         for i = 1, #tostring(scores.sickCount) do
-            table.insert(tallies[3].sprites, love.filesystem.load("assets/sprites/resultsScreen/tallieNumber.lua")())
+            table.insert(tallies[3].sprites, love.filesystem.load("sprites/resultsScreen/tallieNumber.lua")())
             tallies[3].sprites[i]:animate("0", false)
             tallies[3].sprites[i].x = 255 + (i - 1) * 38
             tallies[3].sprites[i].y = 285
@@ -207,7 +207,7 @@ return {
         end
 
         for i = 1, #tostring(scores.goodCount) do
-            table.insert(tallies[4].sprites, love.filesystem.load("assets/sprites/resultsScreen/tallieNumber.lua")())
+            table.insert(tallies[4].sprites, love.filesystem.load("sprites/resultsScreen/tallieNumber.lua")())
             tallies[4].sprites[i]:animate("0", false)
             tallies[4].sprites[i].x = 235 + (i - 1) * 38
             tallies[4].sprites[i].y = 340
@@ -226,7 +226,7 @@ return {
         end
 
         for i = 1, #tostring(scores.badCount) do
-            table.insert(tallies[5].sprites, love.filesystem.load("assets/sprites/resultsScreen/tallieNumber.lua")())
+            table.insert(tallies[5].sprites, love.filesystem.load("sprites/resultsScreen/tallieNumber.lua")())
             tallies[5].sprites[i]:animate("0", false)
             tallies[5].sprites[i].x = 210 + (i - 1) * 38
             tallies[5].sprites[i].y = 390
@@ -245,7 +245,7 @@ return {
         end
 
         for i = 1, #tostring(scores.shitCount) do
-            table.insert(tallies[6].sprites, love.filesystem.load("assets/sprites/resultsScreen/tallieNumber.lua")())
+            table.insert(tallies[6].sprites, love.filesystem.load("sprites/resultsScreen/tallieNumber.lua")())
             tallies[6].sprites[i]:animate("0", false)
             tallies[6].sprites[i].x = 235 + (i - 1) * 38
             tallies[6].sprites[i].y = 440
@@ -264,7 +264,7 @@ return {
         end
 
         for i = 1, #tostring(scores.missedCount) do
-            table.insert(tallies[7].sprites, love.filesystem.load("assets/sprites/resultsScreen/tallieNumber.lua")())
+            table.insert(tallies[7].sprites, love.filesystem.load("sprites/resultsScreen/tallieNumber.lua")())
             tallies[7].sprites[i]:animate("0", false)
             tallies[7].sprites[i].x = 265 + (i - 1) * 38
             tallies[7].sprites[i].y = 500
@@ -290,7 +290,7 @@ return {
             local char = paddedScoreStr:sub(i, i)
             local num = tonumber(char)
             if num then
-                table.insert(scoreNumbers.sprites, love.filesystem.load("assets/sprites/resultsScreen/scoreDigitalNumbers.lua")())
+                table.insert(scoreNumbers.sprites, love.filesystem.load("sprites/resultsScreen/scoreDigitalNumbers.lua")())
                 scoreNumbers.sprites[i]:animate("DISABLED", false)
                 scoreNumbers.sprites[i].x = 130 + (i - 1) * (scoreNumbers.sprites[i]:getFrameWidth()-15)
                 scoreNumbers.sprites[i].y = 670

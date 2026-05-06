@@ -1,10 +1,9 @@
 local songscript = Object:extend()
 
 function songscript.getSong(id)
-    print("Loading song script: " .. id)
     local s = songscript()
 
-    local songLuaChunk = love.filesystem.getInfo("assets/data/scripts/songs/" .. id .. ".lua")
+    local songLuaChunk = love.filesystem.getInfo("scripts/songs/" .. id .. ".lua")
     local env = setmetatable({
         Song = {
         },
@@ -34,7 +33,7 @@ function songscript.getSong(id)
         end,
     }, {__index = _G})
     if songLuaChunk then
-        local chunk = love.filesystem.load("assets/data/scripts/songs/" .. id .. ".lua")
+        local chunk = love.filesystem.load("scripts/songs/" .. id .. ".lua")
 
         setfenv(chunk, env)
         chunk()

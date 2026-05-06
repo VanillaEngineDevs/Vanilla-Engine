@@ -9,9 +9,9 @@ function EXTEND_LIBRARY(assetPath, appendAssets)
         if lib ~= "shared" then
             lib = lib .. "/images"
         end
-        assetPath = (appendAssets and "assets/" or "") .. lib:lower() .. "/" .. path
+        assetPath = (appendAssets and "" or "") .. lib:lower() .. "/" .. path
     else
-        if not assetPath:startsWith("#") and not assetPath:startsWith("assets/") then
+        if not assetPath:startsWith("#") and not assetPath:startsWith("") then
             assetPath = "shared/" .. assetPath
         end
     end
@@ -25,9 +25,9 @@ function EXTEND_LIBRARY_SFX(assetPath)
         if lib ~= "shared" then
             lib = lib .. "/sounds"
         end
-        assetPath = "assets/" .. lib:lower() .. "/" .. path
+        assetPath = "" .. lib:lower() .. "/" .. path
     else
-        if not assetPath:startsWith("#") and not assetPath:startsWith("assets/") then
+        if not assetPath:startsWith("#") and not assetPath:startsWith("") then
             assetPath = "shared/" .. assetPath
         end
     end
@@ -41,9 +41,9 @@ function EXTEND_LIBRARY_MUSIC(assetPath)
         if lib ~= "shared" then
             lib = lib .. "/music"
         end
-        assetPath = "assets/" .. lib:lower() .. "/" .. path
+        assetPath = "" .. lib:lower() .. "/" .. path
     else
-        if not assetPath:startsWith("#") and not assetPath:startsWith("assets/") then
+        if not assetPath:startsWith("#") and not assetPath:startsWith("") then
             assetPath = "shared/" .. assetPath
         end
     end
@@ -72,7 +72,7 @@ function AnimateAtlasCharacter:new(data, _atlasSettings)
             else
                 self.sprite:addAnimByPrefix(anim.name, anim.prefix, anim.framerate or 24, anim.loop or false)
             end
-        elseif animType == "symbol" then
+        elseif animType == "symbol" or animType == "framelabel" then
             if isIndices then
                 self.sprite:addAnimBySymbolIndices(anim.name, anim.prefix, anim.frameIndices, anim.framerate or 24, anim.loop or false)
             else
@@ -106,6 +106,10 @@ function AnimateAtlasCharacter:getAllAnimations()
         table.insert(anims, anim.name)
     end
     return anims
+end
+
+function AnimateAtlasCharacter:setAntialiasing(enabled)
+    self.sprite:setAntialiasing(enabled)
 end
 
 function AnimateAtlasCharacter:update(dt)
@@ -162,7 +166,7 @@ function AnimateAtlasCharacter:play(name, forced, loop)
 end
 
 function AnimateAtlasCharacter:setAntialiasing(enabled)
-    --self.sprite:setAntiAliasing(enabled)
+    --self.sprite:setAntialiasing(enabled)
 end
 
 function AnimateAtlasCharacter:draw(camera)

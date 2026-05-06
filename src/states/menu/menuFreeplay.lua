@@ -21,54 +21,73 @@ function table.print(t)
 end
 
 local function CreateWeek(weekIndex, hasErect)
+    local wk = weekData[weekIndex]
+
     local week = {
-        name = weekMeta[weekIndex][1],
+        name = wk.id,
         songs = {}
     }
 
-    for _, song in ipairs(weekMeta[weekIndex][2]) do
-        if type(song) == "table" then
-            local hasErect, hasPico = song.erect, song.pico
-            if not song.show then goto continue end
-            local newSong = {
-                name = song[1],
-                diffs = {}
+    for _, song in ipairs(wk.songs or {}) do
+        local name = song
+
+        local s = {
+            name = name,
+            diffs = {
             }
-            for _, diff in ipairs(song.diffs or {}) do
-                table.insert(newSong.diffs, {diff[1] or "???", diff[2] or "", diff[3] or diff[1] or "???", diff[4] or "-bf"})
-            end
+        }
 
-            if hasErect then
-                table.insert(newSong.diffs, {"erect", "-erect", "erect", "-bf"})
-                table.insert(newSong.diffs, {"nightmare", "-erect", "nightmare", "-bf"})
-            end
-            if hasPico then
-                table.insert(newSong.diffs, {"easy-Pico", "-pico", "easy", "-pico"})
-                table.insert(newSong.diffs, {"normal-Pico", "-pico", "normal", "-pico"})
-                table.insert(newSong.diffs, {"hard-Pico", "-pico", "hard", "-pico"})
-            end
+        local id = songNameToFolder(name)
 
-            table.insert(week.songs, newSong)
-        elseif type(song) == "string" then
-            local song = {
-                name = song,
-                diffs = {
-                    {"easy", "", "easy", "-bf"},
-                    {"normal", "", "normal", "-bf"},
-                    {"hard", "", "hard", "-bf"}
-                }
-            }
-
-            table.insert(week.songs, song)
+        for _, ver in ipairs(versionData) do
+            local path = "data/songs/" .. id .. "/" .. id .. "-chart" .. ver.extension .. ".json"
+            if poly.checkAllDirs(path) then
+                for _, diff in ipairs(ver.diffs) do
+                    local diffName, songAppend, display = unpack(diff)
+                    local dontAppend = songAppend == "-bf"
+                    if not dontAppend then
+                        diffName = diffName .. songAppend
+                    end
+                    table.insert(s.diffs, {diffName, ver.extension, ver.extension, ver.extension, display})
+                end
+            else
+                path = "data/songs/" .. id .. "/" .. id .. "-chart-" .. ver.extension .. ".json"
+                if poly.checkAllDirs(path) then
+                    for _, diff in ipairs(ver.diffs) do
+                        local diffName, songAppend, display = unpack(diff)
+                        local dontAppend = songAppend == "-bf"
+                        if not dontAppend then
+                            diffName = diffName .. songAppend
+                        end
+                        local mod = poly.getModFromDirectory(path)
+                        table.insert(s.diffs, {diffName, "-" .. ver.extension, "-" .. ver.extension, "-" .. ver.extension, display, mod = mod})
+                    end
+                end
+            end
         end
 
+        table.insert(week.songs, s)
+
         ::continue::
+    end
+
+    if #week.songs == 0 then
+        table.insert(week.songs, {name = "", diffs = {{"", "", "", ""}}})
     end
 
     return week
 end
 
+
 local allWeeks = {}
+
+local function getSongCount(wi)
+    return #(((allWeeks[wi] or {}).songs or {}))
+end
+
+local function getDiffCount(wi, si)
+    return #((((allWeeks[wi] or {}).songs or {})[si] or {}).diffs or {{""}})
+end
 
 local function calculateRatingText(accuracy)
     if averageAccuracy >= 101 then
@@ -133,75 +152,88 @@ return {
         
         averageAccuracy = string.format("%.2f%%", averageAccuracy)
 
-        for i = 1, #weekMeta do
+        for i = 1, #weekData do
             allWeeks[i] = CreateWeek(i)
         end
 
-        songDifficulty = util.clamp(2, 1, #allWeeks[weekNum].songs[songNum].diffs)
+        local diffs = (((allWeeks[weekNum] or {}).songs or {})[songNum] or {}).diffs or {{""}}
+        songDifficulty = util.clamp(2, 1, #diffs)
     end,
     
     update = function(self, dt)
         if input:pressed("down") then
             if menuNum == 1 then
                 weekNum = weekNum + 1
-                if weekNum > #weekMeta then
+                if weekNum > #weekData then
                     weekNum = 1
                 end
-                if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
-                    songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
+                local songCount = getSongCount(weekNum)
+                if songNum > songCount then
+                    songNum = 1
+                end
+                if songDifficulty > getDiffCount(weekNum, songNum) then
+                    songDifficulty = getDiffCount(weekNum, songNum)
                 end
             elseif menuNum == 2 then
                 songNum = songNum + 1
-                if songNum > #allWeeks[weekNum].songs then
+                if songNum > getSongCount(weekNum) then
                     songNum = 1
                 end
-                if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
-                    songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
+                if songDifficulty > getDiffCount(weekNum, songNum) then
+                    songDifficulty = getDiffCount(weekNum, songNum)
                 end
             end
             if menuNum ~= 1 then
-                songBefore = weekMeta[weekNum][2][songNum-1] and weekMeta[weekNum][2][songNum-1][1] or ""
-                songAfter = weekMeta[weekNum][2][songNum+1] and weekMeta[weekNum][2][songNum+1][1] or ""
+                local prev = weekData[weekNum-1]
+                local nextw = weekData[weekNum+1]
+                songBefore = prev and prev.songs and prev.songs[songNum] and prev.songs[songNum].name or ""
+                songAfter = nextw and nextw.songs and nextw.songs[songNum] and nextw.songs[songNum].name or ""
             end
             audio.playSound(selectSound)
         elseif input:pressed("up") then
             if menuNum == 1 then
                 weekNum = weekNum - 1
                 if weekNum < 1 then
-                    weekNum = #weekMeta
+                    weekNum = #weekData
                 end
 
-                if songDifficulty > #(((allWeeks[weekNum] or {}).songs[songNum] or {}).diffs or {}) then
-                    songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
+                local songCount = getSongCount(weekNum)
+                if songNum > songCount then
+                    songNum = 1
+                end
+                if songDifficulty > getDiffCount(weekNum, songNum) then
+                    songDifficulty = getDiffCount(weekNum, songNum)
                 end
             elseif menuNum == 2 then
                 songNum = songNum - 1
                 if songNum < 1 then
-                    songNum = #allWeeks[weekNum].songs
+                    songNum = getSongCount(weekNum)
                 end
-                if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
-                    songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
+                if songDifficulty > getDiffCount(weekNum, songNum) then
+                    songDifficulty = getDiffCount(weekNum, songNum)
                 end
             elseif menuNum == 3 then
                 songDifficulty = songDifficulty - 1
                 if songDifficulty < 1 then
-                    songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
+                    songDifficulty = getDiffCount(weekNum, songNum)
                 end
             end
             if menuNum ~= 1 then
-                songBefore = weekMeta[weekNum][2][songNum-1] and weekMeta[weekNum][2][songNum-1][1] or ""
-                songAfter = weekMeta[weekNum][2][songNum+1] and weekMeta[weekNum][2][songNum+1][1] or ""
+                local prev = weekData[weekNum-1]
+                local nextw = weekData[weekNum+1]
+                songBefore = prev and prev.songs and prev.songs[songNum] and prev.songs[songNum].name or ""
+                songAfter = nextw and nextw.songs and nextw.songs[songNum] and nextw.songs[songNum].name or ""
             end
             audio.playSound(selectSound)
         elseif input:pressed("left") then
             songDifficulty = songDifficulty - 1 
             if songDifficulty < 1 then
-                songDifficulty = #allWeeks[weekNum].songs[songNum].diffs
+                songDifficulty = getDiffCount(weekNum, songNum)
             end
             audio.playSound(selectSound)
         elseif input:pressed("right") then
             songDifficulty = songDifficulty + 1
-            if songDifficulty > #allWeeks[weekNum].songs[songNum].diffs then
+            if songDifficulty > getDiffCount(weekNum, songNum) then
                 songDifficulty = 1
             end
             audio.playSound(selectSound)
@@ -217,7 +249,14 @@ return {
 
                         music:stop()
 
-                        Gamestate.switch(weekData[weekNum], songNum, allWeeks[weekNum].songs[songNum].diffs[songDifficulty][3], allWeeks[weekNum].songs[songNum].diffs[songDifficulty][2], allWeeks[weekNum].songs[songNum].diffs[songDifficulty][4])
+                        local selectedWeek = weekData[weekNum]
+                        local dif = allWeeks[weekNum].songs[songNum].diffs[songDifficulty]
+
+                        weeks.songs = { allWeeks[weekNum].songs[songNum].name }
+
+                        print("MOD: ", selectedWeek.mod)
+                        poly:setPriority(allWeeks[weekNum].songs[songNum].diffs[songDifficulty].mod)
+                        Gamestate.switch(weeks, 1, dif[1], dif[2], dif[3], dif[4])
 
                         status.setLoading(false)
                     end
@@ -232,8 +271,10 @@ return {
                 curSongAccuracy = string.format("%.2f%%", curSongAccuracy)
             end
             
-            songBefore = weekMeta[weekNum][2][songNum-1] and weekMeta[weekNum][2][songNum-1][1] or ""
-            songAfter = weekMeta[weekNum][2][songNum+1] and weekMeta[weekNum][2][songNum+1][1] or ""
+            local prev = weekData[weekNum-1]
+            local nextw = weekData[weekNum+1]
+            songBefore = prev and prev.songs and prev.songs[songNum] and prev.songs[songNum].name or ""
+            songAfter = nextw and nextw.songs and nextw.songs[songNum] and nextw.songs[songNum].name or ""
             audio.playSound(confirmSound)
         elseif input:pressed("back") then
             if menuNum ~= 1 then
@@ -248,8 +289,10 @@ return {
             if menuNum == 1 then
                 songNum = 1
                 menuNum = 2
-                songBefore = weekMeta[weekNum][2][songNum-1] and weekMeta[weekNum][2][songNum-1][1] or ""
-                songAfter = weekMeta[weekNum][2][songNum+1] and weekMeta[weekNum][2][songNum+1][1] or ""
+                local prev = weekData[weekNum-1]
+                local nextw = weekData[weekNum+1]
+                songBefore = prev and prev.songs and prev.songs[songNum] and prev.songs[songNum].name or ""
+                songAfter = nextw and nextw.songs and nextw.songs[songNum] and nextw.songs[songNum].name or ""
             else
                 menuNum = 1
             end
@@ -262,30 +305,40 @@ return {
             menuBG:draw()
             tabs:draw()
             if menuNum == 1 then weekSelect:draw() else songSelect:draw() end
+            local selWeek = weekData[weekNum]
             if menuNum == 1 then
                 weekStats:draw()
                 love.graphics.setFont(weekFont)
                 graphics.setColor(1,1,1,1)
-                uitextf(weekMeta[weekNum][1] or "", -55, -18, 600, "center")
+                uitextf(selWeek.id or "", -55, -18, 600, "center")
             else
                 songStats:draw()
                 
                 graphics.setColor(1,1,1,1)
                 love.graphics.setFont(weekFont)
-                love.graphics.printf(allWeeks[weekNum].songs[songNum].name, 65, -18, 600, "center")
+                graphics.setColor(1,1,1,0.5)
+                love.graphics.printf(songBefore, -300, -18, 250, "right")
+                love.graphics.printf(songAfter, 50, -18, 250, "left")
+                graphics.setColor(1,1,1,1)
+                local selSong = selWeek.songs[songNum]
+                uitextf(selSong, 0, -18, 600, "center")
 
                 graphics.setColor(1,1,1,1)
             end
-            --if menuNum == 1 then weekStats:draw() else songStats:draw() end
+
             love.graphics.setFont(weekFont)
-            -- make the current dificulties first letter uppercase
-            local difficultyStr = allWeeks[weekNum].songs[songNum].diffs[songDifficulty][1]
+
+            local selWeek = allWeeks[weekNum]
+            local difficultyStr = ((selWeek.songs[songNum] or {}).diffs or {{""}})[songDifficulty] and ((selWeek.songs[songNum] or {}).diffs or {{""}})[songDifficulty][1] or ""
             if difficultyStr == "" then 
                 difficultyStr = "Normal"
             else
-                -- make the first letter uppercase
                 difficultyStr = difficultyStr:sub(1,1):upper() .. difficultyStr:sub(2)
-                --difficultyStr:gsub("-", "")
+            end
+            -- if the difficulty has a display, set it to that instead
+            local display = ((selWeek.songs[songNum] or {}).diffs or {{""}})[songDifficulty] and ((selWeek.songs[songNum] or {}).diffs or {{""}})[songDifficulty][5]
+            if display and display ~= "" then
+                difficultyStr = display
             end
             uitextf(difficultyStr, 65, -370, 600, "center")
             backButton:draw()

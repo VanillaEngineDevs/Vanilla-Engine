@@ -1,4 +1,4 @@
----@diagnostic disable: param-type-mismatch
+---@diagnostic disable: param-type-mismatch, assign-type-mismatch
 local baseDirectory = (...):match("(.-)[^%.]+$")
 local Classic = require(baseDirectory .. "libs.Classic")
 
@@ -21,7 +21,7 @@ end
 
 local function getFileContent(path)
     if fileExists(path) then
-        local content, _, _, _ = love.filesystem.read("string", path, nil)
+        local content, _, _, _ = love.filesystem.read(path)
         return content --- @type string
     end
     return ""
@@ -102,6 +102,8 @@ function SparrowAtlas:constructor()
     self.onFrameChange = signal.new()
     self.onAnimationFinished = signal.new()
 
+    self.blendMode = "alpha"
+    self.blendModeAlpha = "alphamultiply"
 end
 
 function SparrowAtlas:setSuffix(suffix)
@@ -121,13 +123,14 @@ function SparrowAtlas:load(imageData, dataString, framerate)
     dataString = dataString or imageData
     local ogPath = imageData
     if type(imageData) == "string" and not imageData:startsWith("#") then
-        imageData = "assets/" .. imageData .. currentImageFormat
+        imageData = "" .. imageData .. currentImageFormat
         if fileExists(imageData) then
             if graphics.cache[imageData] then
                 imageData = graphics.cache[imageData]
             else
+                local ogPath = imageData
                 imageData = love.graphics.newImage(imageData)
-                graphics.cache[imageData] = imageData
+                graphics.cache[ogPath] = imageData
             end
         end
         self.IS_RECTANGLE = false
@@ -140,15 +143,78 @@ function SparrowAtlas:load(imageData, dataString, framerate)
         self.color = {r, g, b}
     end
 
-    -- if no image, print FAILED TO LOAD IMAGE: path
-    if not love.filesystem.getInfo("assets/" .. ogPath .. currentImageFormat, "file") and not self.IS_RECTANGLE then
-        print("FAILED TO LOAD IMAGE: " .. tostring(ogPath))
+    if not love.filesystem.getInfo("" .. ogPath .. currentImageFormat, "file") and not self.IS_RECTANGLE then
+        local cleanedPath = ogPath:gsub("//", "/")
+        local newPath = cleanedPath:match("^[^/]+/(.+)$")
+        if newPath and love.filesystem.getInfo("" .. newPath .. currentImageFormat, "file") then
+            ogPath = newPath
+            if graphics.cache[ogPath] then
+                imageData = graphics.cache[ogPath]
+            else
+                imageData = love.graphics.newImage(ogPath)
+                graphics.cache[ogPath] = imageData
+            end
+        end
+
+        if not love.filesystem.getInfo(newPath .. currentImageFormat, "file") then
+            local path = newPath .. currentImageFormat
+            path = path:gsub("^images/", "shared/images/")
+            local o = path
+            if path:startsWith("characters/") then
+                path = path:gsub("^characters/", "shared/images/characters/")
+            else
+                path = "shared/images/characters/" .. path
+                if not love.filesystem.getInfo(path, "file") then
+                    path = o
+                end
+            end
+            if love.filesystem.getInfo(path, "file") then
+                imageData = love.graphics.newImage(path)
+                graphics.cache[path] = imageData
+            else
+                --error("Could not find image file: " .. path)
+                -- lastly, check shared/characters/
+                local o = path
+                path = "shared/characters/" .. path
+                if love.filesystem.getInfo(path, "file") then
+                    imageData = love.graphics.newImage(path)
+                    graphics.cache[path] = imageData
+                else
+                    path = o
+                    if love.filesystem.getInfo(path, "file") then
+                        imageData = love.graphics.newImage(path)
+                        graphics.cache[path] = imageData
+                    else
+                        error("Could not find image file: " .. path)
+                    end
+                end
+            end
+        end
     end
 
     self.image = imageData
     self.framerate = framerate or 24
     if dataString then
-        dataString = "assets/" .. dataString .. ".xml"
+        dataString = "" .. dataString .. ".xml"
+        -- do the same image bullshit with the xml
+        if not fileExists(dataString) then
+            dataString = "shared/images/" .. dataString
+            if not fileExists(dataString) then
+                dataString = dataString:gsub("^shared/images/", "shared/characters/")
+                if not fileExists(dataString) then
+                    local o = dataString
+                    dataString = "shared/" .. dataString
+                    -- remove dupe shared/ and dupe characters/
+                    dataString = dataString:gsub("shared/shared/", "shared/")
+                    dataString = dataString:gsub("characters/characters/", "characters/")
+                    if not fileExists(dataString) then
+                        --print("Could not find data file: " .. dataString)
+                        print("Could not find data file: " .. o)
+                        dataString = o:gsub("^shared/characters/", "")
+                    end
+                end
+            end
+        end
         if fileExists(dataString) then
             dataString = getFileContent(dataString)
             local xmlData = xml.parse(dataString)
@@ -180,7 +246,6 @@ function SparrowAtlas:load(imageData, dataString, framerate)
                 local _, frameid = name:match("^(.-)_(%d+)$")
                 frameid = tonumber(frameid)
                 if name and x and y and width and height and frameid then
-                    print(name, x, y, width, height, frameid)
                     table.insert(self.frames, createFrame(
                         name,
                         tonumber(x), tonumber(y),
@@ -331,7 +396,6 @@ end
 function SparrowAtlas:centerOffsets(width, height)
 	self.offset.x = (width or self:getFrameWidth()) / 2
 	self.offset.y = (height or self:getFrameHeight()) / 2
-	print(self.offset.x, self.offset.y)
 end
 
 ---@param width number
@@ -475,6 +539,7 @@ function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     oy = oy or self.origin.y
 
     local flipX, flipY = self.flipX, self.flipY
+    local lastBlendMode, lastBlendModeAlpha = love.graphics.getBlendMode()
 
     -- if curanim, check if flipx or flipy anim, if so, set flipx or flipy to true
     if self.curAnim then
@@ -484,7 +549,6 @@ function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
         if self.flipYAnims[self.curAnim.name] then
             flipY = true
         end
-        
     end
 
     if flipX then
@@ -529,6 +593,7 @@ function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     love.graphics.setShader(self.shader)
     local lastColor = {love.graphics.getColor()}
     love.graphics.setColor(self.color[1] * lastColor[1], self.color[2] * lastColor[2], self.color[3] * lastColor[3], self.alpha * lastColor[4])
+    love.graphics.setBlendMode(self.blendMode, self.blendModeAlpha)
     if curFrame and not self.IS_RECTANGLE then
         love.graphics.draw(self.image, curFrame.quad, x, y, r, sx, sy, ox, oy)
     elseif not curFrame and not self.IS_RECTANGLE then
@@ -540,6 +605,7 @@ function SparrowAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
         love.graphics.rectangle("fill", x - nox, y - noy, sx, sy)
     end
 
+    love.graphics.setBlendMode(lastBlendMode, lastBlendModeAlpha)
     love.graphics.setColor(lastColor)
     love.graphics.setShader(lastShader)
 end

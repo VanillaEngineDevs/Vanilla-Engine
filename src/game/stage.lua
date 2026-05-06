@@ -48,8 +48,7 @@ local defaultProps = {
 }
 
 function stage.getStage(id)
-    print(id)
-    local data = json.decode(love.filesystem.read("assets/data/stages/" .. id .. ".json"))
+    local data = json.decode(love.filesystem.read("data/stages/" .. id .. ".json"))
 
     local s = stage()
     s._data = data
@@ -92,7 +91,7 @@ function stage.getStage(id)
     s.props = {}
     s.script = nil
 
-    local stageLuaChunk = love.filesystem.getInfo("assets/data/scripts/stages/" .. s.id .. ".lua")
+    local stageLuaChunk = love.filesystem.getInfo("scripts/stages/" .. s.id .. ".lua")
     -- environment that holds ALL of global and defines Stage as self
     local env = setmetatable({
         Stage = {
@@ -134,10 +133,29 @@ function stage.getStage(id)
         end,
     }, {__index = _G})
     if stageLuaChunk then
-        local chunk = love.filesystem.load("assets/data/scripts/stages/" .. s.id .. ".lua")
+        local chunk = love.filesystem.load("scripts/stages/" .. s.id .. ".lua")
         setfenv(chunk, env)
         chunk()
         s.script = env.Stage
+    --[[else
+        local hscriptChunk = love.filesystem.getInfo("scripts/stages/" .. s.id .. ".hxc")
+        if hscriptChunk then
+            local hscriptCode = love.filesystem.read("scripts/stages/" .. s.id .. ".hxc")
+            local ast = HScript.mainParser:parseString(hscriptCode)
+            if ast then
+                HScript.setGlobals()
+                HScript.setImports()
+                local result, err = HScript.main:execute(ast)
+                if err then
+                    print("Error executing HScript for stage " .. s.id .. ": " .. err)
+                else
+                    s.script = result
+                end
+            else
+                print("Error parsing HScript for stage " .. s.id)
+            end
+        end
+    --]]
     end
 
     enemy.x = s.characters.dad.position[1]
@@ -288,7 +306,7 @@ function stage:build()
             prop = graphics.newTextureAtlas()
             local assetPath = propitem.assetPath
             if not assetPath:startsWith("#") then
-                assetPath = "assets/" .. self.directory .. "/images/" .. propitem.assetPath
+                assetPath = "" .. self.directory .. "/images/" .. propitem.assetPath
             end
             prop:load(assetPath)
             --prop:setAntialiasing(not propitem.isPixel)
@@ -377,6 +395,9 @@ function stage:call(funcName, ...)
     if self.script and self.script[funcName] and type(self.script[funcName]) == "function" then
         return self.script[funcName](self.script, ...)
     end
+    --HScript.main:call(funcName, ...)
+    -- call Stage (class) fnname from interp
+    --HScript.main:getClass("Stage"):call(funcName, ...)
 end
 
 return stage

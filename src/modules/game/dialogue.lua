@@ -1,8 +1,8 @@
 local dialogue = {}
 
 dialogue.sounds = {
-    text = love.audio.newSource("assets/sounds/pixel/text.ogg", "static"),
-    confirm = love.audio.newSource("assets/sounds/pixel/continue-text.ogg", "static"),
+    text = love.audio.newSource("sounds/pixel/text.ogg", "static"),
+    confirm = love.audio.newSource("sounds/pixel/continue-text.ogg", "static"),
     music = false
 }
 

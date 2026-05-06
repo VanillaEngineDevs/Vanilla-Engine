@@ -54,24 +54,22 @@ function MultiAnimateAtlasCharacter:new(data, _atlasSettings)
         ) ]]
         local isIndices = anim.frameIndices ~= nil and #anim.frameIndices > 0
         local animType = anim.animType or "prefix"
-        print(animType)
         if animType == "prefix" then
             if isIndices then
                 self.sprites[anim.asset]:addAnimByIndices(anim.name, anim.atlasanim, anim.frameIndices, anim.framerate or 24, anim.loop or false)
             else
                 self.sprites[anim.asset]:addAnimByPrefix(anim.name, anim.atlasanim, anim.framerate or 24, anim.loop or false)
             end
+        elseif animType == "framelabel" then
+            self.sprites[anim.asset]:addAnimByFrameLabel(anim.name, anim.atlasanim, anim.framerate or 24, anim.loop or false)
         elseif animType == "symbol" then
-            print("Adding symbol animation with name '" .. anim.name .. "' and atlas symbol '" .. anim.atlasanim .. "'. Is indices? " .. tostring(isIndices))
             if isIndices then
                 self.sprites[anim.asset]:addAnimBySymbolIndices(anim.name, anim.atlasanim, anim.frameIndices, anim.framerate or 24, anim.loop or false)
             else
                 self.sprites[anim.asset]:addAnimBySymbol(anim.name, anim.atlasanim, anim.framerate or 24, anim.loop or false)
             end
         end
-        
 
-        print(self.sprites[anim.asset])
     end
 
     for _, anim in ipairs(self.animations) do
@@ -85,6 +83,12 @@ end
 function MultiAnimateAtlasCharacter:updateHitbox()
     self.sprite:updateHitbox()
     self.width, self.height = self.sprite.width, self.sprite.height
+end
+
+function MultiAnimateAtlasCharacter:setAntialiasing(enabled)
+    for _, spr in pairs(self.sprites) do
+        spr:setAntialiasing(enabled)
+    end
 end
 
 function MultiAnimateAtlasCharacter:update(dt)
@@ -108,7 +112,7 @@ end
 
 function MultiAnimateAtlasCharacter:setAntialiasing(enabled)
     for _, spr in pairs(self.sprites) do
-        --spr:setAntiAliasing(enabled)
+        --spr:setAntialiasing(enabled)
     end
 end
 

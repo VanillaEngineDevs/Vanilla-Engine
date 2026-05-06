@@ -1,6 +1,8 @@
 ---@diagnostic disable: param-type-mismatch
 
-__VERSION__ = love.filesystem.read("assets/data/version.txt")
+poly = require("modules.modding.poly")
+
+__VERSION__ = love.filesystem.read("data/version.txt")
 if love.filesystem.isFused() then function print() end end
 
 local capturedScreenshot = {x=0, y=0, flash=0, alpha=0, img=nil, hovered=false, timers={}}
@@ -30,6 +32,8 @@ function love.load()
     xml = require("lib.xml")
     lovefftINST = require("lib.fft.lovefft")
 	GIF = require("lib.gif")
+	HScript = require("lib.hscript")
+	require("game.hscript")
 
     status = require("modules.status")
     audio = require("modules.audio.audio")
@@ -70,7 +74,7 @@ function love.load()
 	signal = require("modules.signal")
 
     playMenuMusic = true
-	local t = love.filesystem.read("assets/data/IMAGE_FORMAT.txt")
+	local t = love.filesystem.read("data/IMAGE_FORMAT.txt")
 	if t == "dxt5" then t = "dds" end
     graphics.setImageType(t)
     volumeWidth = {width = 160}
@@ -80,17 +84,17 @@ function love.load()
     debugMenu = require("states.debug.debugMenu")
     spriteDebug = require("states.debug.fuck")
 
-    selectSound = love.audio.newSource("assets/sounds/menu/select.ogg", "static")
-    confirmSound = love.audio.newSource("assets/sounds/menu/confirm.ogg", "static")
+    selectSound = love.audio.newSource("sounds/menu/select.ogg", "static")
+    confirmSound = love.audio.newSource("sounds/menu/confirm.ogg", "static")
 
     noteTypes = {
-        ["normal"] = require("assets.data.scripts.notetypes.normal"),
-        ["Hurt Note"] = require("assets.data.scripts.notetypes.hurt"),
+        ["normal"] = require("assets.scripts.notetypes.normal"),
+        ["Hurt Note"] = require("assets.scripts.notetypes.hurt"),
     }
 
     shaders = {}
     if curOS ~= "NX" then
-        shaders["rain"] = love.graphics.newShader("assets/shaders/rain.glsl")
+        shaders["rain"] = love.graphics.newShader("shaders/rain.glsl")
     end
 
     menu = require("states.menu.menu")
@@ -101,6 +105,38 @@ function love.load()
     menuSelect = require("states.menu.menuSelect")
     menuMods = require("states.menu.menuMods")
     resultsScreen = require("states.menu.results")
+
+	gameEntryIds = { -- these are hard coded as they will be sorted alphabetically if not.
+		"tutorial",
+		"week1",
+		"week2",
+		"week3",
+		"week4",
+		"week5",
+		"week6",
+		"week7",
+		"weekend1",
+		"sserafim"
+	}
+
+	weekData = {}
+	for i, id in ipairs(gameEntryIds) do
+		weekData[i] = json.decode(love.filesystem.read("data/levels/" .. id .. ".json"))
+		weekData[i].id = id
+	end
+
+	gameEntryVersions = {
+		"normal",
+		"erect",
+		"pico",
+		"bf"
+	}
+
+	versionData = {}
+	for i, id in ipairs(gameEntryVersions) do
+		versionData[i] = json.decode(love.filesystem.read("data/versions/" .. id .. ".json"))
+		versionData[i].id = id
+	end
 
     firstStartup = true
     weeks = require("states.weeks")
@@ -117,25 +153,8 @@ function love.load()
         ["Miscillaneous"] = require("substates.options.miscillaneous")
     }
 
-    weekData = require("assets.data.weeks.weekData")
-    weekDesc = require("assets.data.weeks.weekDescriptions")
-    weekMeta = require("assets.data.weeks.weekMeta")
-
-    for _, week in ipairs(weekMeta) do
-        for _, song in ipairs(week[2]) do
-            if type(song) == "table" then
-                song.show = song.show or true
-                if not song.diffs then
-                    song.diffs = {{"easy", ext=""}, {"normal", ext=""}, {"hard", ext=""}}
-                else
-                    for _, v in ipairs(song.diffs) do v.ext = v[2] end
-                end
-            end
-        end
-    end
-
     require("modules.game.extras")
-    __VERSION__ = love.filesystem.getInfo("assets/data/version.txt") and love.filesystem.read("assets/data/version.txt") or "vUnknown"
+    __VERSION__ = love.filesystem.getInfo("data/version.txt") and love.filesystem.read("data/version.txt") or "vUnknown"
 
     push.setupScreen(1280, 720, {upscale="normal", canvas = true, stencil = true})
 
@@ -156,17 +175,17 @@ function love.load()
         end
     end
 
-    font = love.graphics.newFont("assets/fonts/vcr.ttf", 24)
-    scoringFont = love.graphics.newFont("assets/fonts/vcr.ttf", 26)
-    psychScoringFont = love.graphics.newFont("assets/fonts/vcr.ttf", 36)
-    optionsFont = love.graphics.newFont("assets/fonts/vcr.ttf", 32)
-    FNFFont = love.graphics.newFont("assets/fonts/fnFont.ttf", 24)
-    credFont = love.graphics.newFont("assets/fonts/fnFont.ttf", 32)
-    uiFont = love.graphics.newFont("assets/fonts/Dosis-SemiBold.ttf", 32)
-	uiFontBold = love.graphics.newFont("assets/fonts/Dosis-Bold.ttf", 32)
-    pauseFont = love.graphics.newFont("assets/fonts/Dosis-SemiBold.ttf", 96)
-    weekFont = love.graphics.newFont("assets/fonts/Dosis-SemiBold.ttf", 84)
-    weekFontSmall = love.graphics.newFont("assets/fonts/Dosis-SemiBold.ttf", 54)
+    font = love.graphics.newFont("fonts/vcr.ttf", 24)
+    scoringFont = love.graphics.newFont("fonts/vcr.ttf", 26)
+    psychScoringFont = love.graphics.newFont("fonts/vcr.ttf", 36)
+    optionsFont = love.graphics.newFont("fonts/vcr.ttf", 32)
+    FNFFont = love.graphics.newFont("fonts/fnFont.ttf", 24)
+    credFont = love.graphics.newFont("fonts/fnFont.ttf", 32)
+    uiFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 32)
+	uiFontBold = love.graphics.newFont("fonts/Dosis-Bold.ttf", 32)
+    pauseFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 96)
+    weekFont = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 84)
+    weekFontSmall = love.graphics.newFont("fonts/Dosis-SemiBold.ttf", 54)
 
     weekNum = 1
     songDifficulty = 2
@@ -175,11 +194,14 @@ function love.load()
     uiCam = {zoom = 1, x = 1, y = 1, sizeX = 1, sizeY = 1}
     musicTime, health = 0, 0
 
-    music = love.audio.newSource("assets/music/menu/menu.ogg", "stream")
+    music = love.audio.newSource("music/menu/menu.ogg", "stream")
     music:setLooping(true)
 
     fixVol = tonumber(string.format("%.1f", love.audio.getVolume()))
     volumeWidth = {width = 160}
+
+	modmanager = require("modules.modding.modmanager")
+	modmanager:loadMods()
 
     love.audio.setVolume(0.1)
     Gamestate.switch(menu)

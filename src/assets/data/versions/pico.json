@@ -1,0 +1,9 @@
+{
+    "name": "Pico",
+    "extension": "-pico",
+    "diffs": [
+        ["easy", "-pico"],
+        ["normal", "-pico"],
+        ["hard", "-pico"]
+    ]
+}

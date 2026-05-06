@@ -12,10 +12,10 @@ function splash:setup()
     if not preloadedImage or not preloadedSprite then
         if not pixel then
             preloadedImage = love.graphics.newImage(graphics.imagePath("noteSplashes"))
-            preloadedSprite = love.filesystem.load("assets/sprites/noteSplashes.lua")
+            preloadedSprite = love.filesystem.load("sprites/noteSplashes.lua")
         else
             preloadedImage = love.graphics.newImage(graphics.imagePath("pixel/pixelSplashes"))
-            preloadedSprite = love.filesystem.load("assets/sprites/pixel/pixelSplashes.lua")
+            preloadedSprite = love.filesystem.load("sprites/pixel/pixelSplashes.lua")
         end
     end
     self.image = preloadedImage

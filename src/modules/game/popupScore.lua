@@ -4,7 +4,10 @@ popupScore.__tweenObject = Timer.new()
 
 local BATCH
 
-function popupScore:init(sprite)
+function popupScore:init(sprite, noAntialiasing)
+    if noAntialiasing then
+        love.graphics.setDefaultFilter("nearest", "nearest")
+    end
     self.__sprite = sprite()
     self.__ratingSprite = sprite()
 
@@ -15,21 +18,37 @@ function popupScore:init(sprite)
     self.ratingAnim = "sick"
     self.sep = pixel and 50 or 65
 
-    self.alpha = 1
+    self.alpha = 0
     self.placement = {x = 0, y = 375}
+    if noAntialiasing then
+        self.placement.x = self.placement.x - 75
+    end
 
     self.__ratingSprite.x, self.__ratingSprite.y = 0, 400
-    self.__ratingSprite.sizeX, self.__ratingSprite.sizeX = 0.85, 0.85
+    self.__ratingSprite.sizeX, self.__ratingSprite.sizeY = 0.85, 0.85
+    self.__ratingSprite.alpha = 1
+    self.__ratingScale = 0.85
+    self.__digitScale = 0.725
+
+    self.timer = 0
+    self.timerMax = 1
 
     self.comboSprs = {}
     for i = 1, 4 do
         local spr = sprite()
         spr.x = self.__ratingSprite.x + (i-1) * (pixel and 50 or 65) + 30
+        if settings.popupScoreMode == "Simple" then
+            spr.x = spr.x - 70
+            spr.y = spr.y + 10
+        end
         spr.y = self.__ratingSprite.y + 35
-        spr.sizeX, spr.sizeY = 0.725, 0.725
+        spr.sizeX, spr.sizeY = self.__digitScale, self.__digitScale
+        spr.visible = false
         table.insert(self.comboSprs, spr)
     end
     self.comboSprs[1].visible = false
+
+    love.graphics.setDefaultFilter("linear", "linear")
 end
 
 function popupScore:setPlacement(x, y)
@@ -42,6 +61,10 @@ function popupScore:setPlacement(x, y)
         spr.x = x + (i - 1) * self.sep + 30
         spr.y = y + 35
     end
+end
+
+function popupScore:getPlacement()
+    return self.placement.x, self.placement.y
 end
 
 function popupScore:create(anim, combo)
@@ -89,12 +112,24 @@ function popupScore:create(anim, combo)
             table.insert(self.__members, numObj)
         end
     elseif mode == "Simple" then
+        local obj = self.__ratingSprite
+
         self.combo = combo
         self.ratingAnim = anim
         self.alpha = 1
         self.cooldown = 0.25
+        self.timer = 0
+        self.timerMax = weeks.conductor:getBeatLengthsMS()/1000
 
-        self.obj:animate(anim)
+        obj:animate(anim)
+        obj:update(0)
+
+        obj.sizeX, obj.sizeY = self.__ratingScale * 1.2, self.__ratingScale * 1.2
+        self.__tweenObject:clear()
+        self.__tweenObject:tween(0.12, obj, {
+            sizeX = self.__ratingScale,
+            sizeY = self.__ratingScale
+        }, "out-back")
 
         if combo >= 1000 then
             self.comboSprs[1]:animate(tostring(math.floor(combo / 1000) % 10))
@@ -105,10 +140,29 @@ function popupScore:create(anim, combo)
         self.comboSprs[2]:animate(tostring(math.floor(combo / 100) % 10))
         self.comboSprs[3]:animate(tostring(math.floor(combo / 10) % 10))
         self.comboSprs[4]:animate(tostring(math.floor(combo) % 10))
+
+        for i = 2, 4 do
+            self.comboSprs[i].visible = true
+            self.comboSprs[i].sizeX, self.comboSprs[i].sizeY = self.__digitScale * 1.2, self.__digitScale * 1.2
+            self.__tweenObject:tween(weeks.conductor:getBeatLengthsMS()/4000, self.comboSprs[i], {
+                sizeX = self.__digitScale,
+                sizeY = self.__digitScale
+            }, "out-back")
+        end
+
+        if self.comboSprs[1].visible then
+            self.comboSprs[1].sizeX, self.comboSprs[1].sizeY = self.__digitScale * 1.2, self.__digitScale * 1.2
+            self.__tweenObject:tween(weeks.conductor:getBeatLengthsMS()/4000, self.comboSprs[1], {
+                sizeX = self.__digitScale,
+                sizeY = self.__digitScale
+            }, "out-back")
+        end
     end
 end
 
 function popupScore:update(dt)
+    self.__tweenObject:update(dt)
+
     local mode = settings.popupScoreMode
 
     if mode == "Stack" then
@@ -153,12 +207,14 @@ function popupScore:drawStack()
 end
 
 function popupScore:drawSimple()
+    graphics.setColor(1, 1, 1, self.alpha)
     self.__ratingSprite:draw()
     for _, spr in ipairs(self.comboSprs) do
         if spr.visible then
             spr:draw()
         end
     end
+    graphics.setColor(1, 1, 1, 1)
 end
 
 function popupScore:draw()
@@ -166,6 +222,37 @@ function popupScore:draw()
         self:drawStack()
     else
         self:drawSimple()
+    end
+end
+
+function popupScore:udrawStack()
+    BATCH:clear()
+    for _, obj in ipairs(self.__members) do
+        graphics.setColor(1, 1, 1, obj.alpha)
+        local _, _, w, h = obj.frame:getViewport()
+        BATCH:setColor(1, 1, 1, obj.alpha)
+        BATCH:add(obj.frame, obj.x - w/2, obj.y - h/2, 0, obj.sizeX * 8, obj.sizeY * 8)
+    end
+    graphics.setColor(1, 1, 1)
+    love.graphics.draw(BATCH)
+end
+
+function popupScore:udrawSimple()
+    graphics.setColor(1, 1, 1, self.alpha)
+    self.__ratingSprite:udraw(self.__ratingSprite.sizeX * 7, self.__ratingSprite.sizeY * 7)
+    for _, spr in ipairs(self.comboSprs) do
+        if spr.visible then
+            spr:udraw(spr.sizeX * 7, spr.sizeY * 7)
+        end
+    end
+    graphics.setColor(1, 1, 1, 1)
+end
+
+function popupScore:udraw()
+    if settings.popupScoreMode == "Stack" then
+        self:udrawStack()
+    else
+        self:udrawSimple()
     end
 end
 

@@ -24,19 +24,13 @@ return {
 		songNum = 0
 		weekNum = 1
 		theTracks = ""
-		for trackLength = 1, #weekMeta[weekNum][2] do
-			if type(weekMeta[weekNum][2][trackLength]) == "table" then
-				if not weekMeta[weekNum][2][trackLength].show then goto continue end
+		for trackLength = 1, #(weekData[weekNum].songs or {}) do
+			local song = weekData[weekNum].songs[trackLength]
+			if type(song) == "string" then
 				if theTracks ~= "" then
-					theTracks = theTracks .. " | " .. weekMeta[weekNum][2][trackLength][1]
+					theTracks = theTracks .. " | " .. song
 				else
-					theTracks = weekMeta[weekNum][2][trackLength][1]
-				end
-			elseif type(weekMeta[weekNum][2][trackLength]) == "string" then
-				if theTracks ~= "" then
-					theTracks = theTracks .. " | " .. weekMeta[weekNum][2][trackLength]
-				else
-					theTracks = weekMeta[weekNum][2][trackLength]
+					theTracks = song
 				end
 			end
 
@@ -99,10 +93,10 @@ return {
 		
 		titleBG = graphics.newImage(graphics.imagePath("menu/weekMenu"))
 
-		arrowUp = love.filesystem.load("assets/sprites/menu/menuArrow.lua")()
-		arrowDown = love.filesystem.load("assets/sprites/menu/menuArrow.lua")()
-		arrowLeft = love.filesystem.load("assets/sprites/menu/menuArrow.lua")()
-		arrowRight = love.filesystem.load("assets/sprites/menu/menuArrow.lua")()
+		arrowUp = love.filesystem.load("sprites/menu/menuArrow.lua")()
+		arrowDown = love.filesystem.load("sprites/menu/menuArrow.lua")()
+		arrowLeft = love.filesystem.load("sprites/menu/menuArrow.lua")()
+		arrowRight = love.filesystem.load("sprites/menu/menuArrow.lua")()
 
 		arrowUp.x, arrowUp.y = 0, 175
 		arrowDown.x, arrowDown.y = 0, 305
@@ -117,39 +111,19 @@ return {
 		arrowDown.orientation = 1.5707963267949*3
 		arrowRight.orientation = 1.5707963267949*2
 
-		enemyDanceLines = love.filesystem.load("assets/sprites/menu/idlelines.lua")()
-
-		difficultyAnim = love.filesystem.load("assets/sprites/menu/difficulty.lua")()
-
-		bfDanceLines = love.filesystem.load("assets/sprites/menu/idlelines.lua")()
-
-		gfDanceLines = love.filesystem.load("assets/sprites/menu/idlelines.lua")()
-
-		enemyDanceLines.sizeX, enemyDanceLines.sizeY = 0.5, 0.5
-
-		bfDanceLines.sizeX, bfDanceLines.sizeY = 0.5, 0.5
-		gfDanceLines.sizeX, gfDanceLines.sizeY = 0.5, 0.5
-
-		bfDanceLines.x, bfDanceLines.y = 400, 0
-		gfDanceLines.x, gfDanceLines.y = 0, -20
-		enemyDanceLines.x, enemyDanceLines.y = -400, 0
+		difficultyAnim = love.filesystem.load("sprites/menu/difficulty.lua")()
 
 		difficultyAnim.x, difficultyAnim.y = 0, 240
 
 		--week images
 		weekImages = {}
-		for i = 0, #weekMeta do
-			table.insert(weekImages, graphics.newImage(graphics.imagePath("menu/week" .. i)))
+		for i = 1, #weekData do
+			table.insert(weekImages, graphics.newImage(graphics.imagePath("menu/" .. weekData[i].id)))
 		end
-		table.insert(weekImages, graphics.newImage(graphics.imagePath("menu/weekend1")))
 
 		for i = 1, #weekImages do
 			weekImages[i].y = -270
 		end
-
-		bfDanceLines:animate("boyfriend", true)
-		gfDanceLines:animate("girlfriend", true)
-		enemyDanceLines:animate("week1", true)
 
 		graphics:fadeInWipe(0.6)
 
@@ -162,26 +136,21 @@ return {
 			graphics:fadeOutWipe(
 				0.7,
 				function()
-					songAppend = difficultyStrs[songDifficulty]
-
 					storyMode = true
-					local charAppend = "-bf"
-					for _, song in ipairs(weekMeta[weekNum][2]) do
-						if type(song) == "table" then
-							if song.diffs then
-								for _, diff in ipairs(song.diffs) do
-									if diff[4] then
-										charAppend = diff[4]
-										break
-									end
-								end
-							end
-						end
+
+					music:stop()
+
+					local selectedWeek = weekData[weekNum]
+					local dif = difficultyStrs[songDifficulty] or "normal"
+					
+					weeks.songs = {}
+					-- add all songs from weekData
+					for _, song in ipairs(selectedWeek.songs or {}) do
+						table.insert(weeks.songs, song)
 					end
-
-					Gamestate.switch(weekData[weekNum], songNum, songAppend, "", charAppend)
-
-					status.setLoading(false)
+					
+					poly:setPriority(selectedWeek.mod)
+					Gamestate.switch(weeks, 1, dif, nil, nil, nil)
 				end
 			)
 		end
@@ -189,43 +158,21 @@ return {
 
 	update = function(self, dt)
 		function menuFunc()
-			if weekNum == 7 or weekNum == 8 then -- Due to senpais (and tankmans) idlelines being smaller than the rest, we resize it             not every part of him is small tho :hot_face:
-				enemyDanceLines.sizeX, enemyDanceLines.sizeY = 1, 1
-			elseif weekNum == 4 then
-				enemyDanceLines.sizeX = -0.5  -- pico's dumb ass was facing the wrong way
-			else
-				enemyDanceLines.sizeX, enemyDanceLines.sizeY = 0.5, 0.5
-			end
 			theTracks = ""
-			for trackLength = 1, #weekMeta[weekNum][2] do
-				if type(weekMeta[weekNum][2][trackLength]) == "table" then
-					if not weekMeta[weekNum][2][trackLength].show then goto continue end
+			for trackLength = 1, #(weekData[weekNum].songs or {}) do
+				local song = weekData[weekNum].songs[trackLength]
+				if type(song) == "string" then
 					if theTracks ~= "" then
-						theTracks = theTracks .. " | " .. weekMeta[weekNum][2][trackLength][1]
+						theTracks = theTracks .. " | " .. song
 					else
-						theTracks = weekMeta[weekNum][2][trackLength][1]
-					end
-				elseif type(weekMeta[weekNum][2][trackLength]) == "string" then
-					if theTracks ~= "" then
-						theTracks = theTracks .. " | " .. weekMeta[weekNum][2][trackLength]
-					else
-						theTracks = weekMeta[weekNum][2][trackLength]
+						theTracks = song
 					end
 				end
-	
+
 				::continue::
-			end
-			if enemyDanceLines:isAnimName("week" .. weekNum-1) then
-				enemyDanceLines:animate("week" .. weekNum-1, true)
-			else
-				enemyDanceLines:animate("none")
 			end
 		end
 
-		
-		enemyDanceLines:update(dt)
-		bfDanceLines:update(dt)
-		gfDanceLines:update(dt)
 		arrowUp:update(dt)
 		arrowDown:update(dt)
 		arrowLeft:update(dt)
@@ -255,8 +202,8 @@ return {
 					currentWeek = currentWeek - 1
 					weekNum = weekNum - 1
 				else
-					currentWeek = #weekMeta - 2
-					weekNum = #weekMeta
+					currentWeek = #weekData - 1
+					weekNum = #weekData
 				end
 				if freeplayColours[weekNum] then colourTween() else colourTweenAlt() end
 				menuFunc()
@@ -269,7 +216,7 @@ return {
 					arrowRight:animate("arrow", true)
 				end)
 
-				if currentWeek ~= #weekMeta - 2 then
+				if currentWeek ~= #weekData - 1 then
 					currentWeek = currentWeek + 1
 					weekNum = weekNum + 1
 				else
@@ -310,7 +257,6 @@ return {
 
 			elseif input:pressed("confirm") then
 				audio.playSound(confirmSound)
-                bfDanceLines:animate("boyfriend confirm", false)
 
 				confirmFunc()
 			elseif input:pressed("back") then
@@ -332,8 +278,8 @@ return {
 
 				love.graphics.setColor(freeColour[1]/255, freeColour[2]/255, freeColour[3]/255)
 				love.graphics.scale(camera.zoom, camera.zoom)
-				for i = 1, #weekMeta-1 do
-					weekImages[i]:draw()
+				for i = 1, #weekData do
+					if weekImages[i] then weekImages[i]:draw() end
 				end
 
 				titleBG:draw()
@@ -341,18 +287,13 @@ return {
 				love.graphics.setColor(1, 1, 1)
 
 				difficultyAnim:draw()
-				if weekNum ~= 1 and enemyDanceLines:isAnimName("week" .. weekNum-1) then
-					enemyDanceLines:draw()
-				end
-				bfDanceLines:draw()
-				gfDanceLines:draw()
 
 				--weekImages[currentWeek + 1]:draw()
 				love.graphics.setColor(freeColour[1]/255, freeColour[2]/255, freeColour[3]/255)
 
 				if weekImages[currentWeek+1]then weekImages[currentWeek+1]:draw() end
 
-				love.graphics.printf({{freeColour[1], freeColour[2], freeColour[3]}, weekDesc[weekNum]}, -639, -395, 853, "center", nil, 1.5, 1.5)
+				love.graphics.printf({{freeColour[1], freeColour[2], freeColour[3]}, weekData[weekNum].name or ""}, -639, -395, 853, "center", nil, 1.5, 1.5)
 
 				love.graphics.printf({{freeColour[1], freeColour[2], freeColour[3]}, theTracks}, -639, 350, 853, "center", nil, 1.5, 1.5)
 
@@ -367,9 +308,6 @@ return {
 	end,
 
 	leave = function(self)
-		enemyDanceLines = nil
-		bfDanceLines = nil
-		gfDanceLines = nil
 		titleBG = nil
 		difficultyAnim = nil
 		Timer.clear()

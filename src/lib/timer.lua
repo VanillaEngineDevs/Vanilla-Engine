@@ -238,6 +238,7 @@ local function def_tween(func)
 	 sine   = function(s) return 1-math.cos(s*math.pi/2) end,
 	 expo   = function(s) return 2^(10*(s-1)) end,
 	 circ   = function(s) return 1 - math.sqrt(1-s*s) end,
+	 quintic = function(s) return s*s*s*s*s end,
 
 	 back = function(s,bounciness)
 	    bounciness = bounciness or 1.70158

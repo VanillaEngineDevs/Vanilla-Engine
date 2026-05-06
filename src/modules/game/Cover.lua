@@ -5,7 +5,7 @@ cover.image = nil
 
 function cover:setup()
     self.image = love.graphics.newImage(graphics.imagePath("holdCovers"))
-    self.spr = love.filesystem.load("assets/sprites/holdCover.lua")
+    self.spr = love.filesystem.load("sprites/holdCover.lua")
 
     for i = 1, 2 do
         self.covers[i] = {}

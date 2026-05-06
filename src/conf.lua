@@ -24,7 +24,7 @@ if love.system.getOS() == "OS X" then
 	icon = "macos"
 end
 
-local version = love.filesystem.getInfo("assets/data/version.txt") and love.filesystem.read("assets/data/version.txt") or "vUnknown"
+local version = love.filesystem.getInfo("data/version.txt") and love.filesystem.read("data/version.txt") or "vUnknown"
 local _debug = not love.filesystem.isFused()
 local loveVer
 function love.conf(t)

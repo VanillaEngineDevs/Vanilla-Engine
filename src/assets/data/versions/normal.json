@@ -1,0 +1,9 @@
+{
+    "name": "Regular",
+    "extension": "",
+    "diffs": [
+        ["easy", ""],
+        ["normal", ""],
+        ["hard", ""]
+    ]
+}

@@ -1,0 +1,8 @@
+{
+    "name": "Erect",
+    "extension": "-erect",
+    "diffs": [
+        ["erect", "-bf"],
+        ["nightmare", "-bf"]
+    ]
+}
