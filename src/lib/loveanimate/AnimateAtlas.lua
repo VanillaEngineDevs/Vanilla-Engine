@@ -230,28 +230,44 @@ function AnimateAtlas:load(folder, listAllSymbols)
     if not love.filesystem.getInfo(folder) then
         folder = folder:gsub("^shared/", "shared/images/")
     end
+    print(folder)
     self.timeline.data = json.decode(love.filesystem.read(folder .. "/" .. "Animation.json"))
     self.timeline.optimized = self.timeline.data.AN ~= nil
 
     self.spritemaps = {}
 
-    for _, item in ipairs(love.filesystem.getDirectoryItems(folder)) do
-        if string.startsWith(item, "spritemap") and string.endsWith(item, ".json") then
-            local jsonStr = love.filesystem.read(folder .. "/" .. item)
-            jsonStr = jsonStr:gsub("^[^%[%{]*", "")
-            jsonStr = jsonStr:gsub("[^%]%}]*$", "")
-            jsonStr = jsonStr:gsub("・", "")
+    --for _, item in ipairs(love.filesystem.getDirectoryItems(folder)) do
+    --    print("Found item in atlas folder: " .. item)
+    --    if string.startsWith(item, "spritemap") and string.endsWith(item, ".json") then
+    --        local jsonStr = love.filesystem.read(folder .. "/" .. item)
+    --        jsonStr = jsonStr:gsub("^[^%[%{]*", "")
+    --        jsonStr = jsonStr:gsub("[^%]%}]*$", "")
+    --        jsonStr = jsonStr:gsub("・", "")
             
-            local data = json.decode(jsonStr)
-            local texture = graphics.cache[folder .. "/" .. string.sub(item, 1, #item - 5) .. ".png"] or love.graphics.newImage(folder .. "/" .. string.sub(item, 1, #item - 5) .. ".png")
-            if not graphics.cache[folder .. "/" .. string.sub(item, 1, #item - 5) .. ".png"] then
-                graphics.cache[folder .. "/" .. string.sub(item, 1, #item - 5) .. ".png"] = texture
-            end
-            table.insert(self.spritemaps, { data = data, texture = texture, quads = {} })
-            for _, spritedata in ipairs(data.ATLAS.SPRITES) do
-                self.spritemaps[#self.spritemaps].quads[spritedata.SPRITE.name] = love.graphics.newQuad(spritedata.SPRITE.x, spritedata.SPRITE.y, spritedata.SPRITE.w, spritedata.SPRITE.h, texture:getWidth(), texture:getHeight())
-            end
-        end
+    --        local data = json.decode(jsonStr)
+    --        local texture = graphics.cache[folder .. "/" .. string.sub(item, 1, #item - 5) .. ".png"] or love.graphics.newImage(folder .. "/" .. string.sub(item, 1, #item - 5) .. ".png")
+    --        if not graphics.cache[folder .. "/" .. string.sub(item, 1, #item - 5) .. ".png"] then
+    --            graphics.cache[folder .. "/" .. string.sub(item, 1, #item - 5) .. ".png"] = texture
+    --        end
+    --        table.insert(self.spritemaps, { data = data, texture = texture, quads = {} })
+    --        for _, spritedata in ipairs(data.ATLAS.SPRITES) do
+    --            self.spritemaps[#self.spritemaps].quads[spritedata.SPRITE.name] = love.graphics.newQuad(spritedata.SPRITE.x, spritedata.SPRITE.y, spritedata.SPRITE.w, spritedata.SPRITE.h, texture:getWidth(), texture:getHeight())
+    --        end
+    --    end
+    --end
+    -- FUCK bta format.
+    local jsonStr = love.filesystem.read(folder .. "/" .. "spritemap1.json")
+    jsonStr = jsonStr:gsub("^[^%[%{]*", "")
+    jsonStr = jsonStr:gsub("[^%]%}]*$", "")
+    jsonStr = jsonStr:gsub("・", "")
+    local data = json.decode(jsonStr)
+    local texture = graphics.cache[folder .. "/" .. "spritemap1.png"] or love.graphics.newImage(folder .. "/" .. "spritemap1.png")
+    if not graphics.cache[folder .. "/" .. "spritemap1.png"] then
+        graphics.cache[folder .. "/" .. "spritemap1.png"] = texture
+    end
+    table.insert(self.spritemaps, { data = data, texture = texture, quads = {} })
+    for _, spritedata in ipairs(data.ATLAS.SPRITES) do
+        self.spritemaps[#self.spritemaps].quads[spritedata.SPRITE.name] = love.graphics.newQuad(spritedata.SPRITE.x, spritedata.SPRITE.y, spritedata.SPRITE.w, spritedata.SPRITE.h, texture:getWidth(), texture:getHeight())
     end
     self.libraries = {}
     if self.timeline.data.SD ~= nil or self.timeline.data.SYMBOL_DICTIONARY ~= nil then

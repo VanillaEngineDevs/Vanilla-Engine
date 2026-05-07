@@ -6,6 +6,9 @@ return {
         if not graphics.cache[path .. "imgdata"] then
             local newPath = path:gsub("/dds/", "/png/")
             newPath = newPath:gsub(".dds$", ".png")
+            if not love.filesystem.getInfo(newPath) then
+                newPath = newPath:gsub("^images/icons/", "shared/images/icons/")
+            end
             graphics.cache[path .. "imgdata"] = love.image.newImageData(newPath)
         end
         if not graphics.cache[path] then

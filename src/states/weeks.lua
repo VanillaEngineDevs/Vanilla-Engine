@@ -51,6 +51,10 @@ local allStates = {
 	score = 0
 }
 
+local function calculateScale(ws, scale)
+	return (ws.x - 1) * scale.x + (ws.y - 1) * scale.y
+end
+
 local ratingTextScale = 1
 local hudFade = {1}
 
@@ -82,6 +86,8 @@ difficulty = "normal"
 songExt = ""
 audioAppend = ""
 CURRENTMODE = "normal"
+
+local camZoomTween
 
 local function getWife3Condition(acc)
 	if acc >= 99.9935 then return 1 end -- AAAAA
@@ -143,6 +149,7 @@ return {
 	songs = {},
 
 	enter = function(self, _, songNum, songAppend, _songExt, _audioAppend)
+		camera.currentZoom = 1
 		self:showUI()
 		self.mayPauseGame = false
 		self.isInCutscene = false
@@ -201,6 +208,11 @@ return {
 	end,
 
 	load = function(self, wasntRestart)
+		camera.bopIntensity = CONSTANTS.DEFAULT_BOP_INTENSITY
+		camera.zoomRate = CONSTANTS.DEFAULT_ZOOM_RATE
+		camera.zoomRateOffset = CONSTANTS.DEFAULT_ZOOM_OFFSET
+		camera.bopMultiplier = 1
+		uiCam.bopIntensity = 0.015 * 2
 		self.mayPauseGame = false
 		self.inSong = true
 		if wasntRestart == nil then
@@ -775,7 +787,7 @@ return {
 		if enemy.call then enemy:call("postCreate") end
 		if girlfriend and girlfriend.call then girlfriend:call("postCreate") end
 		camera.zoom = self.stage.cameraZoom or 1.0
-		camera.defaultZoom = camera.zoom
+		camera.defaultZoom = 1
 
 		boyfriend.name = "bf"
 		self:add(boyfriend)
@@ -1425,36 +1437,23 @@ return {
 						end
 					end
 				elseif event.name == "ZoomCamera" then
-					if type(event.value) == "number" then
-						camera.zoom = event.value
-						uiCam.zoom = event.value
-					elseif type(event.value) == "table" then
-						event.value.mode = event.value.mode or "stage"
-						local taget = 1
-						if event.value.mode == "stage" then
-							target = tonumber(event.value.zoom) * self.stage.cameraZoom
-						else
-							target = tonumber(event.value.zoom) * camera.defaultZoom
-						end
-						print(target)
+					local zoom = tonumber(event.value.zoom) or 1
+					--local widescreenScaleX = tonumber(event.value.widescreenScaleX) or 0
+					--local widescreenScaleY = tonumber(event.value.widescreenScaleY) or 0
 
-						if event.value.ease ~= "INSTANT" then
-							local time = self.conductor:getStepLengthMs() * (tonumber(event.value.duration) or 4) / 1000
-							if bumpTween then 
-								Timer.cancel(bumpTween)
-							end
-							bumpTween = Timer.tween(
-								time,
-								camera,
-								{defaultZoom = target},
-								CONSTANTS.WEEKS.EASING_TYPES[(event.value.ease or "CLASSIC") .. (event.value.easeDir or "")]
-							)
-						else
-							if bumpTween then 
-								Timer.cancel(bumpTween)
-							end
-							camera.defaultZoom = target
-						end
+					local duration = tonumber(event.value.duration) or 4
+					local mode = event.value.mode or "direct"
+					local isDirectMode = mode == "direct"
+
+					local ease = event.value.ease or "linear"
+					local easeDir = event.value.easeDir or "In"
+
+					if ease == "INSTANT" then
+						self:tweenCameraZoom(zoom, 0, isDirectMode)
+					else
+						local durSeconds = (self.conductor:getStepLengthMs() * duration) / 1000
+						local easeFunction = CONSTANTS.WEEKS.EASING_TYPES[ease .. easeDir] or CONSTANTS.WEEKS.EASING_TYPES.linear
+						self:tweenCameraZoom(zoom, durSeconds, isDirectMode, easeFunction)
 					end
 				elseif event.name == "SetHealthIcon" then
 					local who = "boyfriend"
@@ -1514,12 +1513,14 @@ return {
 						end
 					end
 				elseif event.name == "SetCameraBop" then
-					if type(event.value) == "number" then
-						camera.camBopIntensity = event.value
-					elseif type(event.value) == "table" then
-						camera.camBopIntensity = event.value.intensity or 1
-						camera.camBopInterval = event.value.rate or 4
-					end
+					local rate = tonumber(event.value.rate) or CONSTANTS.DEFAULT_ZOOM_RATE
+					local offset = tonumber(event.value.offset) or CONSTANTS.DEFAULT_ZOOM_OFFSET
+					local intensity = tonumber(event.value.intensity) or 1
+
+					camera.bopIntensity = (CONSTANTS.DEFAULT_BOP_INTENSITY - 1) * intensity + 1
+					uiCam.bopIntensity = (CONSTANTS.DEFAULT_BOP_INTENSITY - 1) * intensity * 2
+					camera.zoomRate = rate
+					camera.zoomRateOffset = offset or CONSTANTS.DEFAULT_ZOOM_OFFSET
 				end
 
 				Gamestate.onEvent(event)
@@ -1551,14 +1552,15 @@ return {
 			end
 		end
 
-		if (self.conductor.onBeat and self.conductor.curBeat % camera.camBopInterval == 0 and camera.zooming and camera.zoom < 1.35 and not camera.locked) then 
-			camera.zoom = camera.zoom + 0.015 * camera.camBopIntensity
-			uiCam.zoom = uiCam.zoom + 0.03 * camera.camBopIntensity
-		end
+		local decayRate = 0.95
+		local elapsed = dt * 60
 
-		if camera.zooming and not camera.locked then
-			camera.zoom = util.lerp(camera.defaultZoom, camera.zoom, util.clamp(1 - (dt * 3.125), 0, 1))
-			uiCam.zoom = util.lerp(1, uiCam.zoom, util.clamp(1 - (dt * 3.125), 0, 1))
+		if camera.zoomRate > 0 then
+			camera.bopMultiplier = util.lerp(1.0, camera.bopMultiplier, math.pow(decayRate, elapsed))
+			local zoomPlusBop = camera.currentZoom * camera.bopMultiplier
+			camera.zoom = zoomPlusBop
+
+			uiCam.zoom = util.lerp(1, uiCam.zoom, math.pow(decayRate, elapsed))
 		end
 
 		self.stage:call("onUpdate", dt)
@@ -1566,6 +1568,17 @@ return {
 		if self.conductor.onStep then
 			self.stage:call("onStepHit", self.conductor.curStep)
 			self.song:call("onStepHit", self.conductor.curStep)
+
+			local MAX_RELATIVE_CAM_ZOOM = 1.35
+
+			if camera.zooming and
+				uiCam.zoom < (MAX_RELATIVE_CAM_ZOOM * 1) and
+				camera.zoomRate > 0 and
+				(self.conductor.curStep + (camera.zoomRateOffset or CONSTANTS.DEFAULT_ZOOM_OFFSET) * CONSTANTS.STEPS_PER_BEAT) % (camera.zoomRate * CONSTANTS.STEPS_PER_BEAT) == 0 
+			then
+				camera.bopMultiplier = camera.bopIntensity
+				uiCam.zoom = uiCam.zoom + uiCam.bopIntensity * 1
+			end
 		end
 		if self.conductor.onBeat then
 			self.stage:call("onBeatHit", self.conductor.curBeat)
@@ -1606,6 +1619,35 @@ return {
 		self:checkSongOver()
 
 		self:updateUI(dt)
+	end,
+
+	cancelCameraZoomTween = function(self)
+		if camZoomTween then
+			Timer.cancel(camZoomTween)
+			camZoomTween = nil
+		end
+	end,
+
+	tweenCameraZoom = function(self, zoom, duration, direct, ease)
+		zoom = zoom or 1
+		duration = duration or 1
+		direct = direct or false
+		self:cancelCameraZoomTween()
+
+		local target = zoom * (direct and camera.defaultZoom or self.stage.cameraZoom)
+
+		if duration == 0 then
+			camera.currentZoom = target
+		else
+			camZoomTween = Timer.tween(
+				duration,
+				camera,
+				{
+					currentZoom = target
+				},
+				ease or "linear"
+			)
+		end
 	end,
 
 	judgeNote = function(self, msTiming)
@@ -2461,10 +2503,12 @@ return {
 		local mode = settings.scoringType
 
 		if mode == "VSlice" then
-			x = 250+offsetX
+			x = 300+offsetX
 			y = 400+offsetY
 			if downscrollOffset == -750 then
 				y = y + downscrollOffset - 50
+			else
+				y = y - 60
 			end
 			format = "left"
 		elseif mode == "Minimal" then

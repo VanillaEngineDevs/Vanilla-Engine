@@ -39,6 +39,10 @@ end
 
 CONSTANTS.MS_PER_SEC = 1000
 
+CONSTANTS.DEFAULT_BOP_INTENSITY = 1.015
+CONSTANTS.DEFAULT_ZOOM_RATE = 4
+CONSTANTS.DEFAULT_ZOOM_OFFSET = 0
+
 CONSTANTS.HAPTICS = {
     DEFAULT_VIBRATION_PERIOD = 0.1,
     DEFAULT_VIBRATION_DURATION = 0.1,
@@ -73,6 +77,9 @@ CONSTANTS.WEEKS = {
     EASING_TYPES = {
         ["CLASSIC"] = "out-quad",
         ["linear"] = "linear",
+        ["linearIn"] = "linear",
+        ["linearOut"] = "linear",
+        ["linearInOut"] = "linear",
         ["sineIn"] = "in-sine",
         ["sineOut"] = "out-sine",
         ["sineInOut"] = "in-out-sine",

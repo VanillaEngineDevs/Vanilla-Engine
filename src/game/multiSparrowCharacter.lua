@@ -18,7 +18,7 @@ function MultiSparrowCharacter:new(data)
             anim.assetPath = EXTEND_LIBRARY(nuts)
         end
 
-        local isIndices = anim.frameIndices ~= nil
+        local isIndices = anim.frameIndices ~= nil and #anim.frameIndices > 0
 
         table.insert(
             self.animations,

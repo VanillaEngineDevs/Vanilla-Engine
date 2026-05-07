@@ -51,9 +51,18 @@ local function createFrame(name, x, y, width, height, sheetWidth, sheetHeight, o
 end
 
 local function sortFramesByIndices(prefix, postfix)
-	local s, e = #prefix + 1, - #postfix - 1
 	return function(a, b)
-		return string.sub(a.name, s, e) < string.sub(b.name, s, e)
+		local anum = tonumber(a.name:match("(%d+)$")) or 0
+		local bnum = tonumber(b.name:match("(%d+)$")) or 0
+
+		local abase = a.name:gsub("%d+$", "")
+		local bbase = b.name:gsub("%d+$", "")
+
+		if abase ~= bbase then
+			return abase < bbase
+		end
+
+		return anum < bnum
 	end
 end
 
@@ -315,7 +324,7 @@ function SparrowAtlas:addAnimByIndices(name, prefix, indices, postfix, framerate
 	end
 	if not foundFrame then return end
 
-	table.sort(allFrames, sortFramesByIndices(prefix, postfix))
+    table.sort(allFrames, sortFramesByIndices(prefix, postfix))
 
 	for _, i in ipairs(indices) do
 		local f = allFrames[i + 1]

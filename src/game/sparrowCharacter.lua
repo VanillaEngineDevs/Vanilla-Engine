@@ -8,7 +8,7 @@ function SparrowCharacter:new(data)
     self.sprite:load(self.assetPath .. "")
 
     for i, anim in ipairs(data.animations) do
-        local isIndices = anim.frameIndices ~= nil
+        local isIndices = anim.frameIndices ~= nil and #anim.frameIndices > 0
 
         if isIndices then
             self.sprite:addAnimByIndices(anim.name, anim.prefix, anim.frameIndices, anim.framerate, anim.loop)
