@@ -1,5 +1,5 @@
 local tankmanSpriteGroup = Group:extend()
-local tankmanSprite = require("data.scripts.props.tankmanSprite")
+local tankmanSprite = require("assets.scripts.props.tankmanSprite")
 
 local MAX_SIZE = 4
 local tankmanTimes = {}

@@ -24,8 +24,8 @@ return {
 		songNum = 0
 		weekNum = 1
 		theTracks = ""
-		for trackLength = 1, #(weekData[weekNum].songs or {}) do
-			local song = weekData[weekNum].songs[trackLength]
+		for trackLength = 1, #(weekData[weekNum].songDisplayNames or {}) do
+			local song = weekData[weekNum].songDisplayNames[trackLength]
 			if type(song) == "string" then
 				if theTracks ~= "" then
 					theTracks = theTracks .. " | " .. song
@@ -144,13 +144,13 @@ return {
 					local dif = difficultyStrs[songDifficulty] or "normal"
 					
 					weeks.songs = {}
-					-- add all songs from weekData
+
 					for _, song in ipairs(selectedWeek.songs or {}) do
 						table.insert(weeks.songs, song)
 					end
 					
 					poly:setPriority(selectedWeek.mod)
-					Gamestate.switch(weeks, 1, dif, nil, nil, nil)
+					Gamestate.switch(weeks, 1, dif, nil, nil, nil, weekData[weekNum].id)
 				end
 			)
 		end
@@ -159,8 +159,8 @@ return {
 	update = function(self, dt)
 		function menuFunc()
 			theTracks = ""
-			for trackLength = 1, #(weekData[weekNum].songs or {}) do
-				local song = weekData[weekNum].songs[trackLength]
+			for trackLength = 1, #(weekData[weekNum].songDisplayNames or {}) do
+				local song = weekData[weekNum].songDisplayNames[trackLength]
 				if type(song) == "string" then
 					if theTracks ~= "" then
 						theTracks = theTracks .. " | " .. song

@@ -10,7 +10,7 @@ local cutsceneTimer = Timer.new()
 
 local cutsceneMusic
 
-local picoDopplegangerSprite = require("data.scripts.props.picoDopplegangerSprite")
+local picoDopplegangerSprite = require("assets.scripts.props.picoDopplegangerSprite")
 
 local lightWindow
 local lightWindowAlpha = 0

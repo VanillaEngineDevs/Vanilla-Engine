@@ -148,7 +148,7 @@ local inHolds = {false, false, false, false}
 return {
 	songs = {},
 
-	enter = function(self, _, songNum, songAppend, _songExt, _audioAppend)
+	enter = function(self, _, songNum, songAppend, _songExt, _audioAppend, _, weekID)
 		camera.currentZoom = 1
 		self:showUI()
 		self.mayPauseGame = false
@@ -203,6 +203,8 @@ return {
 		countdownFade = {0}
 
 		self.conductor = Conductor.new()
+
+		WEEKID = weekID or "tutorial"
 
 		self:load()
 	end,
@@ -389,6 +391,10 @@ return {
 			self:vwooshArrows(enemyArrows)
 			self:performCountdown(vwoosh)
 		end)
+
+		self.songEnded = false
+
+		status.setLoading(false)
 	end,
 
 	preloadIcon = function(self, path, name, scale)
@@ -424,25 +430,9 @@ return {
 	end,
 
 	saveData = function(self)
-		--[[ if not CONSTANTS.OPTIONS.DO_SAVE_DATA then return end
-
-		local diff = difficulty ~= "" and difficulty or "normal"
-
-		local weekData = settings.getSavedata(weekNum) or {}
-		local songData = weekData[song] or {}
-		local diffData = songData[diff] or {}
-
-		local prevScore = diffData.score or 0
-
-		if score > prevScore then
-			diffData.score = score
-			diffData.accuracy = math.floor(ratingPercent * 10000) / 100
+		if storyMode then
+			settings.getSavedata().setBeatenLevel(WEEKID, true)
 		end
-
-		songData[diff] = diffData
-		weekData[song] = songData
-		settings.Savedata.set(weekNum, weekData)
-		settings.Savedata.save() ]]
 	end,
 
 
@@ -474,14 +464,13 @@ return {
 		allStates.score = allStates.score + score
 
 		if storyMode and song < #Gamestate.current().songs and not status.getLoading() then
-			self:saveData()
+			print("Loading next song...")
 			song = song + 1
 
 			status.setLoading(true)
 			self:load()
 			status.setLoading(false)
 		elseif not status.getLoading() then
-			self:saveData()
 
 			status.setLoading(true)
 			graphics:fadeOutWipe(
@@ -489,6 +478,7 @@ return {
 				function()
 					graphics.setFade(1)
 					if not quitPressed then
+						self:saveData()
 						Gamestate.switch(resultsScreen, {
 							diff = string.lower(CURDIFF or "normal"),
 							song = not storyMode and SONGNAME or Gamestate.current().songs[song],
@@ -1231,34 +1221,15 @@ return {
 					end
 
 				elseif pauseMenuSelection == 3 then
-					self:saveData()
-
 					status.setLoading(true)
 					graphics:fadeOutWipe(
 						0.7,
 						function()
 							graphics.setFade(1)
-							if not quitPressed then
-								Gamestate.switch(resultsScreen, {
-									diff = string.lower(CURDIFF or "normal"),
-									song = not storyMode and SONGNAME or Gamestate.current().songs[song],
-									artist = not storyMode and ARTIST or nil,
-									scores = {
-										sickCount = allStates.sickCounter,
-										goodCount = allStates.goodCounter,
-										badCount = allStates.badCounter,
-										shitCount = allStates.shitCounter,
-										missedCount = allStates.missCounter,
-										maxCombo = allStates.maxCombo,
-										score = allStates.score
-									}
-								})
+							if storyMode then
+								Gamestate.switch(menuWeek)
 							else
-								if storyMode then
-									Gamestate.switch(menuWeek)
-								else
-									Gamestate.switch(menuFreeplay)
-								end
+								Gamestate.switch(menuFreeplay)
 							end
 
 							status.setLoading(false)
@@ -2557,6 +2528,15 @@ return {
 			Timer.after(boyfriend:getDeathPreTransitionDelay() or 0, function()
 				Gamestate.push(gameoverSubstate)
 			end)
+		elseif k == "]" then
+			musicTime = (inst:getDuration() - 1) * 1000
+			inst:seek(musicTime / 1000)
+			if voicesBF then
+				voicesBF:seek(musicTime / 1000)
+			end
+			if voicesEnemy then
+				voicesEnemy:seek(musicTime / 1000)
+			end
 		end
 	end,
 

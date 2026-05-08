@@ -15,6 +15,28 @@ function modmanager:loadMods()
                         local data = json.decode(love.filesystem.read("mods/" .. mod .. "/" .. "data/levels/" .. level))
                         data.id = level:sub(1, -6)
                         data.mod = poly.list[#poly.list]
+                        
+                        data.songDisplayNames = {}
+                        for _, song in ipairs(data.songs) do
+                            table.insert(data.songDisplayNames, folderToSongName(song))
+                        end
+
+                        local hasScript = love.filesystem.getInfo("assets/scripts/levels/" .. data.id .. ".lua")
+                        if hasScript then
+                            local chunk = love.filesystem.load("assets/scripts/levels/" .. data.id .. ".lua")
+                            local env = setmetatable({Level = {}}, {__index = _G})
+                            setfenv(chunk, env)
+                            chunk()
+
+                            if env.Level.isUnlocked then
+                            end
+                            if env.Level.getSongDisplayNames then
+                                data.songDisplayNames = env.Level.getSongDisplayNames()
+                                if type(data.songDisplayNames) ~= "table" then
+                                    error("getSongDisplayNames must return a table of strings.")
+                                end
+                            end
+                        end
                         table.insert(weekData, data)
 
                         print("Loaded level: " .. data.id)

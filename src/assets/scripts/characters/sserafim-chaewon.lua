@@ -1,4 +1,4 @@
-local LipSyncSprite = require("data.scripts.props.sserafimLipSyncSprite")
+local LipSyncSprite = require("assets.scripts.props.sserafimLipSyncSprite")
 local lipSyncSprite = nil
 
 function Character:onCreate()

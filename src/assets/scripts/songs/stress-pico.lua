@@ -1,7 +1,7 @@
 local hasPlayedCutscene = false
 local hasPlayedEndCutscene = false
 
-local TankmanGroup = require("data.scripts.props.tankmanSpriteGroup")
+local TankmanGroup = require("assets.scripts.props.tankmanSpriteGroup")
 local _tankmanGroup
 
 function Song:onCreate()

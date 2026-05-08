@@ -1,7 +1,7 @@
 local gunCocked = false
 local spawnedCans = {}
 
-local spraycan = require("data.scripts.props.spraycan")
+local spraycan = require("assets.scripts.props.spraycan")
 
 function Song:onNoteHit(event)
     if event.noteType == "weekend-1-lightcan" then
@@ -86,6 +86,7 @@ function Song:onUpdate(dt)
             goto continue
         end
 
+        prop.color = prop.color or {1, 1, 1}
         prop.color[1] = globalColor[1]
         prop.color[2] = globalColor[2]
         prop.color[3] = globalColor[3]

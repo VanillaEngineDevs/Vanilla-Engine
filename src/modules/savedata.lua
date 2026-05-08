@@ -116,6 +116,14 @@ function Savedata.set(key, value)
     savedataStore[key] = value
 end
 
+function Savedata.hasBeatenLevel(levelID)
+    return savedataStore["beaten_" .. levelID]
+end
+
+function Savedata.setBeatenLevel(levelID, beaten)
+    savedataStore["beaten_" .. levelID] = beaten
+end
+
 Savedata.load()
 Settings.load()
 
@@ -145,8 +153,7 @@ ret.savedataSave = function() return Savedata.save() end
 ret.savedataLoad = function() return Savedata.load() end
 ret.get = function(key) return Settings.get(key) end
 ret.set = function(key, value) return Settings.set(key, value) end
-ret.getSavedata = function(key) return Savedata.get(key) end
-ret.setSavedata = function(key, value) return Savedata.set(key, value) end
+ret.getSavedata = function(key) return Savedata end
 
 setmetatable(ret, {
     __index = function(_, key)

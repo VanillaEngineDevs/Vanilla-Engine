@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 return {
 	playSound = function(sound)
+		if not sound then return end
 		sound:stop()
 		sound:play()
 	end

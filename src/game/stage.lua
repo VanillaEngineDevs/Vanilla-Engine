@@ -57,6 +57,7 @@ function stage.getStage(id)
     s.directory = (data.directory or "stages/")
 
     s.cameraZoom = data.cameraZoom or 1
+    camera.currentZoom = s.cameraZoom
     s.version = data.version or "1.0.0"
     s.characters = data.characters or {}
     s.characters.bf = data.characters.bf or {}

@@ -12,6 +12,12 @@ function songNameToFolder(str)
     return str:gsub(" ", "-"):lower()
 end
 
+function folderToSongName(str)
+	--return str:gsub("-", " "):gsub("%f[%w]%a", string.upper)
+	local ret = str:gsub("-", " "):gsub("%f[%w]%a", string.upper)
+	return ret
+end
+
 __DEBUG__ = not love.filesystem.isFused()
 
 require("modules.overrides")
@@ -123,6 +129,27 @@ function love.load()
 	for i, id in ipairs(gameEntryIds) do
 		weekData[i] = json.decode(love.filesystem.read("data/levels/" .. id .. ".json"))
 		weekData[i].id = id
+		weekData[i].songDisplayNames = {}
+		for _, song in ipairs(weekData[i].songs) do
+			table.insert(weekData[i].songDisplayNames, folderToSongName(song))
+		end
+
+		local hasScript = love.filesystem.getInfo("assets/scripts/levels/" .. id .. ".lua")
+		if hasScript then
+			local chunk = love.filesystem.load("assets/scripts/levels/" .. id .. ".lua")
+			local env = setmetatable({Level = {}}, {__index = _G})
+			setfenv(chunk, env)
+			chunk()
+
+			if env.Level.isUnlocked then
+			end
+			if env.Level.getSongDisplayNames then
+				weekData[i].songDisplayNames = env.Level.getSongDisplayNames()
+				if type(weekData[i].songDisplayNames) ~= "table" then
+					error("getSongDisplayNames must return a table of strings.")
+				end
+			end
+		end
 	end
 
 	gameEntryVersions = {
