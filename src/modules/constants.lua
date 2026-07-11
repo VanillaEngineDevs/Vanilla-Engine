@@ -176,7 +176,7 @@ CONSTANTS.WEEKS = {
         "Week7",
         "Legacy",
         "Judge7", -- For people who like stricter inputs!
-        "Harmoni", -- They asked nicely
+        "Harmoni", -- They asked meanly
     },
     HEALTH = {
         MAX = 2,
