@@ -48,19 +48,27 @@ local function CreateWeek(weekIndex, hasErect)
                     if not dontAppend then
                         diffName = diffName .. songAppend
                     end
-                    table.insert(s.diffs, {diffName, ver.extension, ver.extension, ver.extension, display})
+                    table.insert(s.diffs, {
+                        name = songAppend,
+                        diffName, ver.extension, ver.extension, ver.extension, display
+                    })
                 end
             else
                 path = "data/songs/" .. id .. "/" .. id .. "-chart-" .. ver.extension .. ".json"
                 if poly.checkAllDirs(path) then
                     for _, diff in ipairs(ver.diffs) do
-                        local diffName, songAppend, display = unpack(diff)
+                        local songAppend, diffName, display = unpack(diff)
                         local dontAppend = songAppend == "-bf"
                         if not dontAppend then
                             diffName = diffName .. songAppend
                         end
                         local mod = poly.getModFromDirectory(path)
-                        table.insert(s.diffs, {diffName, "-" .. ver.extension, "-" .. ver.extension, "-" .. ver.extension, display, mod = mod})
+                        table.insert(s.diffs, {
+                            name = songAppend,
+                            diffName, "-" .. ver.extension, "-" .. ver.extension, "-" .. ver.extension,
+                            display, 
+                            mod = mod
+                        })
                     end
                 end
             end
@@ -256,7 +264,7 @@ return {
 
                         print("MOD: ", selectedWeek.mod)
                         poly:setPriority(allWeeks[weekNum].songs[songNum].diffs[songDifficulty].mod)
-                        Gamestate.switch(weeks, 1, dif[1], dif[2], dif[3], dif[4])
+                        Gamestate.switch(weeks, 1, dif.name, dif[2], dif[3], dif[4])
 
                         status.setLoading(false)
                     end

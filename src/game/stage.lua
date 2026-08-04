@@ -350,6 +350,10 @@ function stage:build()
                 end
             end
         end
+        
+        if not prop then
+            goto continue
+        end
 
         prop.x = propitem.position[1]
         prop.y = propitem.position[2]
@@ -371,6 +375,7 @@ function stage:build()
 
         self.props[propitem.name] = prop
 
+        ::continue::
         --[[ weeks:add(prop) ]]
     end
 

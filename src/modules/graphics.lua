@@ -887,11 +887,21 @@ local graphics = {
 				end
 			end,
 
-			udraw = function(self, sx, sy)
+			udraw = function(self, sx, sy, scaleWithBase)
 				sx = sx or 7
 				sy = sy or sx
+				if sx == -1 then sx = self.sizeX end
+				if sy == -1 then sy = self.sizeY end
 				if not self.visible then
 					return
+				end
+				if scaleWithBase then
+					if sx ~= self.sizeX then
+						sx = sx * self.sizeX
+					end
+					if sy ~= self.sizeY then
+						sy = sy * self.sizeY
+					end
 				end
 				self.curFrame = math.floor(frame or 1)
 				anim = self:getCurrentAnim()
