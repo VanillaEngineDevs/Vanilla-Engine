@@ -131,8 +131,7 @@ return {
         scorePopin.x, scorePopin.y = 180, 590
         scorePopin.visible = false
 
-        local t = diffToFile[scoreData_.diff or "normal"] or "difNormal"
-        curDiff = graphics.newImage(graphics.imagePath("resultsScreen/" .. t))
+        curDiff = graphics.newImage(graphics.imagePath("resultsScreen/" .. diffToFile[scoreData_.diff]))
         curDiff.x, curDiff.y = 570 + curDiff:getWidth()/2, 160
         thePosEverX = curDiff.x
         thePosEverY = {curDiff.y}
