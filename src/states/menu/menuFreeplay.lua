@@ -43,15 +43,14 @@ local function CreateWeek(weekIndex, hasErect)
             local path = "data/songs/" .. id .. "/" .. id .. "-chart" .. ver.extension .. ".json"
             if poly.checkAllDirs(path) then
                 for _, diff in ipairs(ver.diffs) do
-                    local diffName, songAppend, display = unpack(diff)
+                    local songAppend, diffName, display = unpack(diff)
                     local dontAppend = songAppend == "-bf"
                     if not dontAppend then
                         diffName = diffName .. songAppend
                     end
                     table.insert(s.diffs, {
                         name = songAppend,
-                        diffName, ver.extension, ver.extension, ver.extension, display
-                    })
+                        diffName, ver.extension, ver.extension, ver.extension, display})
                 end
             else
                 path = "data/songs/" .. id .. "/" .. id .. "-chart-" .. ver.extension .. ".json"
@@ -66,8 +65,8 @@ local function CreateWeek(weekIndex, hasErect)
                         table.insert(s.diffs, {
                             name = songAppend,
                             diffName, "-" .. ver.extension, "-" .. ver.extension, "-" .. ver.extension,
-                            display, 
-                            mod = mod
+                             display, 
+                             mod = mod
                         })
                     end
                 end

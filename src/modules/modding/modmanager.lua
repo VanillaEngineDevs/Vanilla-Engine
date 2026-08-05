@@ -1,6 +1,7 @@
 local modmanager = {}
 
 function modmanager:loadMods()
+    love.filesystem.createDirectory("mods")
     local modList = love.filesystem._originalGetDirectoryItems("mods")
     for _, mod in ipairs(modList) do
         local info = love.filesystem.getInfo("mods/" .. mod)
