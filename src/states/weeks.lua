@@ -145,105 +145,8 @@ downscrollOffset = 0 -- for compatibility
 local healthIconPreloads = {}
 local inHolds = {false, false, false, false}
 
-local enemyNoteGameplay = {}
-
-local scrollSpeedTweens = {}
-local prevTargets = {}
-
-speeds = {
-	enemy = 1,
-	boyfriend = 1
-}
-
 return {
 	songs = {},
-
-	initPositions = function(self)
-		for i = 1, 4 do
-			for _, note in ipairs(boyfriendNotes[i]) do
-				note.initialTrackPosition = self:getPositionFromTime(note.time)
-				note.latestTrackPosition = note.initialTrackPosition
-				if note.children then
-					note.endTrackPosition = self:getPositionFromTime(note.endTime)
-				end
-			end
-			for _, note in ipairs(enemyNotes[i]) do
-				note.initialTrackPosition = self:getPositionFromTime(note.time)
-				note.latestTrackPosition = note.initialTrackPosition
-				if note.children then
-					note.endTrackPosition = self:getPositionFromTime(note.endTime)
-				end
-			end
-		end
-	end,
-	getPositionFromTime = function(self, time)
-		return time * 100
-	end,
-	updateCurrentTrackPosition = function(self)
-		self.currentTrackPosition = self:getPositionFromTime(musicTime)
-	end,
-	getNotePosition = function(self, offset, initialPos, strumLineY, speed)
-		if not settings.downscroll then
-			return strumLineY + (((initialPos or 0) - (offset or 0)) * (speed*0.5) / 100)
-		else
-			return strumLineY - (((initialPos or 0) - (offset or 0)) * (speed*0.5) / 100)
-		end
-	end,
-	updateNotePosition = function(self, offset, curTime)
-		local spritePosition = 0
-
-		for i = 1, 4 do
-			local strumLineY = boyfriendArrows[i].y
-			for _, note in ipairs(boyfriendNotes[i]) do
-				spritePosition = self:getNotePosition(offset, note.initialTrackPosition, strumLineY, speeds.boyfriend)
-				note.y = spritePosition
-				if not note.moveWithScroll then
-					note.y = strumLineY
-				end
-				if note.children and #note.children > 0 then
-					note.endY = self:getNotePosition(offset, note.endTrackPosition, strumLineY, speeds.boyfriend)
-					local tailH = note.children[2]:getFrameHeight()
-					local bodyH = note.children[1]:getFrameHeight()
-					local distance = note.endY - note.y
-					local pixelDistance = math.abs(distance) - tailH
-					if pixelDistance < 0 then pixelDistance = 0 end
-					note.children[1].sizeY = pixelDistance / bodyH
-					local dir = distance >= 0 and 1 or -1
-					note.children[1].y = (note.y + note.endY) / 2 - (tailH / 2) * dir
-					local tailOffset = 35
-					note.children[2].y = note.endY + tailOffset
-				end
-
-				note.canBeHit = note.time - musicTime < 160 and note.time - musicTime > -160
-				if note.time < musicTime - 160 then
-					note.tooLate = false
-				end
-			end
-			strumLineY = enemyArrows[i].y
-			for _, note in ipairs(enemyNotes[i]) do
-				spritePosition = self:getNotePosition(offset, note.initialTrackPosition, strumLineY, speeds.enemy)
-				note.y = spritePosition
-				if not note.moveWithScroll then
-					note.y = strumLineY
-				end
-				if note.children and #note.children > 0 then
-					note.endY = self:getNotePosition(offset, note.endTrackPosition, strumLineY, speeds.enemy)
-					local tailH = note.children[2]:getFrameHeight()
-					local bodyH = note.children[1]:getFrameHeight()
-					local distance = note.endY - note.y
-					local pixelDistance = math.abs(distance) - tailH
-					if pixelDistance < 0 then pixelDistance = 0 end
-					note.children[1].sizeY = pixelDistance / bodyH
-					local dir = distance >= 0 and 1 or -1
-					note.children[1].y = (note.y + note.endY) / 2 - (tailH / 2) * dir
-					local tailOffset = 35
-					note.children[2].y = note.endY + tailOffset
-				end
-
-				note.canBeHit = true
-			end
-		end
-	end,
 
 	enter = function(self, _, songNum, songAppend, _songExt, _audioAppend, _, weekID)
 		camera.currentZoom = 1
@@ -307,12 +210,6 @@ return {
 	end,
 
 	load = function(self, wasntRestart)
-		speeds = {
-			enemy = 1,
-			boyfriend = 1
-		}
-		enemyNoteGameplay = {}
-		self.pressedNotes = {}
 		camera.bopIntensity = CONSTANTS.DEFAULT_BOP_INTENSITY
 		camera.zoomRate = CONSTANTS.DEFAULT_ZOOM_RATE
 		camera.zoomRateOffset = CONSTANTS.DEFAULT_ZOOM_OFFSET
@@ -381,6 +278,15 @@ return {
 
 		if enemy then enemy:play("idle") end
 		if boyfriend then boyfriend:play("idle") end
+
+		function calculateNoteYPos(strumtime)
+			--[[ return CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - strumtime) * speed * (settings.downscroll and -1 or 1) ]]
+			if not isResetting then
+				return CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - strumtime) * speed * (settings.downscroll and -1 or 1)
+			else
+				return CONSTANTS.WEEKS.PIXELS_PER_MS * (resettingTime[1] - strumtime) * speed * (settings.downscroll and -1 or 1)
+			end
+		end
 
 		healthBar = {
 			x = -500,
@@ -922,21 +828,21 @@ return {
 		if not bpm then bpm = 120 end
 
 		local _speed = 1
-
 		if chartData.scrollSpeed[difficulty] then
 			_speed = chartData.scrollSpeed[difficulty]
 		elseif chartData.scrollSpeed["default"] then
 			_speed = chartData.scrollSpeed["default"]
 		end
 
-		speed = _speed
+		if settings.customScrollSpeed == 1 then
+			speed = _speed
+		else
+			speed = settings.customScrollSpeed
+		end
 
 		if not speed then speed = _speed end
 
 		speed = speed * 1.06
-
-		speeds.enemy = speed
-		speeds.boyfriend = speed
 
 		for _, noteData in ipairs(chart) do
 			local data = noteData.d % 4 + 1
@@ -966,7 +872,6 @@ return {
 			local arrowsTable = enemyNote and enemyArrows or boyfriendArrows
 
 			noteObject.x = arrowsTable[data].x
-			noteObject.moveWithScroll = true
 			if dataStuff.r then r = {decToRGB(dataStuff.r)} end
 			if dataStuff.g then g = {decToRGB(dataStuff.g)} end
 			if dataStuff.b then b = {decToRGB(dataStuff.b)} end
@@ -977,36 +882,28 @@ return {
 
 			noteObject.causesMiss = dataStuff.causesMiss or false
 
-			local enemyTiming = {}
-
-			if enemyNote then
-				enemyTiming.time = time
-				enemyTiming.releasedTime = time + holdTime
-				enemyTiming.key = data
-				enemyTiming.hit = false
-
-				table.insert(enemyNoteGameplay, enemyTiming)
-			end
-
 			table.insert(notesTable[data], noteObject)
 			if holdTime > 0 then
-				noteObject.children = {}
+				for k = 71 / speed, holdTime, 71 / speed do
+					local holdNote = noteSprites[data]()
+					holdNote.col = data
+					holdNote.y = CONSTANTS.WEEKS.STRUM_Y + (time + k) * 0.6 * speed
+					--[[ holdNote.flipY = settings.downscroll ]]
+					holdNote.ver = noteData.k or "normal"
+					holdNote.time = time + k
+					holdNote:animate("hold")
 
-				noteObject.children[1] = noteSprites[data]()
-				noteObject.children[1].col = data
-				noteObject.children[1].y = -400 + time * 0.6 * speed
-				noteObject.children[1].ver = noteData.k or "normal"
-				noteObject.children[1]:animate("hold")
-				noteObject.children[1].x = arrowsTable[data].x
+					holdNote.x = arrowsTable[data].x
+					holdNote.healthGainMult = noteObject.healthGainMult
+					holdNote.healthLossMult = noteObject.healthLossMult
+					holdNote.causesMiss = noteObject.causesMiss
+					holdNote.hitNote = noteObject.hitNote
+					holdNote.batchReference = NOTES_BATCH
+					table.insert(notesTable[data], holdNote)
+				end
 
-				noteObject.children[2] = noteSprites[data]()
-				noteObject.children[2].col = data
-				noteObject.children[2].y = -400 + (time + holdTime) * 0.6 * speed
-				noteObject.children[2].ver = noteData.k or "normal"
-				noteObject.children[2]:animate("end")
-				noteObject.children[2].x = arrowsTable[data].x
-
-				noteObject.endTime = time + holdTime
+				notesTable[data][#notesTable[data]]:animate("end")
+				notesTable[data][#notesTable[data]].flipY = settings.downscroll
 			end
 		end
 
@@ -1046,8 +943,6 @@ return {
 		for _, event in ipairs(songEvents) do
 			table.insert(CURCHART.EVENTS, event)
 		end
-
-		self:initPositions()
 	end,
 
 	generateGFNotes = function(self, chartG, diff)
@@ -1381,8 +1276,6 @@ return {
 		end
 		absMusicTime = math.abs(musicTime)
 		musicThres = math.floor(absMusicTime / 100) -- Since "musicTime" isn't precise, this is needed
-		self:updateCurrentTrackPosition()
-		self:updateNotePosition(self.currentTrackPosition, musicTime)
 
 		for i = 1, #events do
 			if events[i].eventTime <= musicTime then
@@ -1599,43 +1492,6 @@ return {
 					uiCam.bopIntensity = (CONSTANTS.DEFAULT_BOP_INTENSITY - 1) * intensity * 2
 					camera.zoomRate = rate
 					camera.zoomRateOffset = offset or CONSTANTS.DEFAULT_ZOOM_OFFSET
-				elseif event.name == "ScrollSpeed" then
-					local defaultScroll = 1
-					local defaultDuration = 4
-					local defaultAbsolute = false
-					local defaultStrumline = "both"
-
-					local scroll = tonumber(event.value.scroll) or defaultScroll
-					local duration = tonumber(event.value.duration) or defaultDuration
-					local ease = event.value.ease or "linear"
-					local easeDir = event.value.easeDir or "In"
-
-					local strumline = event.value.strumline or defaultStrumline
-					local absolute = event.value.absolute or defaultAbsolute
-
-					if not absolute then
-						scroll = scroll * speed
-					end
-
-					local speeds = {}
-					if strumline:lower() == "both" then
-						table.insert(speeds, "player")
-						table.insert(speeds, "opponent")
-					elseif strumline:lower() == "player" then
-						table.insert(speeds, "player")
-					elseif strumline:lower() == "opponent" then
-						table.insert(speeds, "opponent")
-					end
-
-					if ease == "INSTANT" then
-						for _, s in ipairs(speeds) do
-							self:tweenScrollSpeed(scroll, 0, nil, speeds)
-						end
-					else
-						local durSeconds = (self.conductor:getStepLengthMs() * duration) / 1000
-						local easeFunction = CONSTANTS.WEEKS.EASING_TYPES[ease .. easeDir] or CONSTANTS.WEEKS.EASING_TYPES.linear
-						self:tweenScrollSpeed(scroll, durSeconds, easeFunction, speeds)
-					end
 				end
 
 				Gamestate.onEvent(event)
@@ -1765,38 +1621,6 @@ return {
 		end
 	end,
 
-	cancelScrollSpeedTween = function(self)
-		for _, tween in ipairs(scrollSpeedTweens) do
-			Timer.cancel(tween)
-		end
-
-		scrollSpeedTweens = {}
-	end,
-
-	tweenScrollSpeed = function(self, speed, duration, ease, alslsl)
-		self:cancelScrollSpeedTween()
-
-		speeds.boyfriend = prevTargets.boyfriend or speeds.boyfriend
-		speeds.enemy = prevTargets.enemy or speeds.enemy
-
-		prevTargets = {
-			boyfriend = boyfriendScrollSpeed,
-			enemy = enemyScrollSpeed
-		}
-
-		for _, s in ipairs(alslsl) do
-			local tgt
-			if s == "player" then
-				tgt = "boyfriend"
-			else
-				tgt = "enemy"
-			end
-
-			print(duration, speed, ease, tgt, speeds[tgt])
-			Timer.tween(duration, speeds, {[tgt] = speed}, ease or "linear")
-		end
-	end,
-
 	judgeNote = function(self, msTiming)
 		if msTiming <= CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].SICK_THRES then
 			return "sick"
@@ -1867,6 +1691,43 @@ return {
 
 		NoteSplash:update(dt)
 		HoldCover:update(dt)
+		for i = 1, 4 do
+			for _, note in ipairs(enemyNotes[i]) do
+				--note.y = enemyArrows[i].y - calculateNoteYPos(note.time)
+				if math.abs(note.time - musicTime) <= 15000 then
+					note.y = enemyArrows[i].y - calculateNoteYPos(note.time)
+					if not note.emitted then
+						note.emitted = false
+						local event = eventCreator:onNoteOncoming(note.ver, note.col, note)
+						self.stage:call("onNoteOncoming", event)
+						self.song:call("onNoteOncoming", event)
+						for _, obj in ipairs(self.objects) do
+							if obj.call then
+								obj:call("onNoteOncoming", event)
+							end
+						end
+					end
+				end
+			end
+
+			for _, note in ipairs(boyfriendNotes[i]) do
+				--note.y = boyfriendArrows[i].y - calculateNoteYPos(note.time)
+				if math.abs(note.time - musicTime) <= 15000 then
+					note.y = boyfriendArrows[i].y - calculateNoteYPos(note.time)
+					if not note.emitted then
+						note.emitted = false
+						local event = eventCreator:onNoteOncoming(note.ver, note.col, note)
+						self.stage:call("onNoteOncoming", event)
+						self.song:call("onNoteOncoming", event)
+						for _, obj in ipairs(self.objects) do
+							if obj.call then
+								obj:call("onNoteOncoming", event)
+							end
+						end
+					end
+				end
+			end
+		end
 
 		healthLerp = util.coolLerp(healthLerp, health, 0.15)
 
@@ -1895,35 +1756,116 @@ return {
 				enemyArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i], false)
 			end
 
-			if input:pressed(curInput) then
-				self:keyPressed(i)
-			end
-			if input:released(curInput) then
-				self:keyReleased(i)
-			end
-			if input:down(curInput) then
-				self:keyDown(i)
-			end
-
 			if #enemyNote > 0 then
-				if (enemyNote[1].time <= -100) then
-					table.remove(enemyNote, 1)
-				end
-			end
+				for j = 1, #enemyNote do
+					local ableTohit = true
+					if enemyNote[j].hitNote ~= nil then
+						ableTohit = enemyNote[j].hitNote
+					end
+					if isResetting then
+						ableTohit = false
+					end
 
-			for _, hit in ipairs(enemyNoteGameplay) do
-				if hit.time - musicTime <= 0 and not hit.press then
-					self:enemyKeyPressed(hit.key)
-					hit.press = true
-				end
+					if (enemyNote[j].time - musicTime <= 0) and ableTohit and not enemyNote[j].causesMiss then
+						enemyArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
+						useAltAnims = false
+	
+						local didEvent = false
+						for _, obj in ipairs(self.objects) do
+							if obj.characterType == CHARACTER_TYPE.DAD then
+								local whohit = obj
+								-- default to true if nothing is returned
+								local continue
+								
+								if not didEvent then
+									continue = (Gamestate.onNoteHit(enemy, enemyNote[j].ver, "EnemyHit", i) == nil or false) and true or false
+									local event = eventCreator:noteHit(enemyNote[j].ver, i, "EnemyHit", 0)
+									event.mustHit = false
+									self.stage:call("onNoteHit", event)
+									self.song:call("onNoteHit", event)
+									for _, obj in ipairs(self.objects) do
+										if obj.call then
+											obj:call("onNoteHit", event)
+										end
+									end
+									didEvent = true
+								else
+									continue = true
+								end
+			
+								if continue then
+									if enemyNote[j]:getAnimName() == "hold" or enemyNote[j]:getAnimName() == "end" then
+										if enemyNote[j]:getAnimName() == "hold" then
+											HoldCover:show(i, 2, enemyNote[j].x, enemyNote[j].y)
+										else
+											HoldCover:hide(i, 2)
+										end
+										if useAltAnims then
+											if whohit then
+												whohit:play(curAnim .. "-alt", false, false)
+											end
+										else
+											if whohit then 
+												whohit:play(curAnim, false, false)
+											end
+										end
+										whohit.holdTimer = 0
+									else
+										NoteSplash:new(
+											{
+												anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
+												posX = enemyArrow.x,
+												posY = enemyArrow.y,
+												alpha = enemyArrow.alpha,
+												visible = enemyArrow.visible,
+											},
+											i
+										)
+										if useAltAnims then
+											if whohit then 
+												whohit:play(curAnim .. "-alt", true, false)
+												if whohit.call then
+													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim .. "-alt"})
+												end
+												self.stage:call("onNoteHit", whohit, enemyNote[j].ver, "EnemyHit", i, curAnim .. "-alt")
+												self.song:call("onNoteHit", whohit, enemyNote[j].ver, "EnemyHit", i, curAnim .. "-alt")
+											end
+										else
+											if whohit then 
+												whohit:play(curAnim, true, false)
+												if whohit.call then
+													whohit:call("onNoteHit", {noteType = enemyNote[j].ver, direction = i, anim = curAnim})
+												end
+												self.stage:call("onNoteHit", whohit, enemyNote[j].ver, "EnemyHit", i, curAnim)
+												self.song:call("onNoteHit", whohit, enemyNote[j].ver, "EnemyHit", i, curAnim)
+											end
+										end
 
-				if hit.press and not hit.release then
-					self:enemyKeyDown(hit.key, enemy)
-				end
+										whohit.holdTimer = 0
+									end
+								end
+			
+								if whohit then whohit.lastHit = musicTime end
+							end
+						end
+	
+						table.remove(enemyNote, 1)
 
-				if hit.releasedTime - musicTime <= 0 and not hit.release then
-					self:enemyKeyReleased(hit.key)
-					hit.release = true
+						break
+					elseif not ableTohit and enemyNote[j].time - musicTime <= 0 and not enemyNote[j].didHit then
+						enemyNote[j].didHit = true
+						Gamestate.onNoteHit(enemy, enemyNote[j].ver, "EnemyHit", i)
+						local event = eventCreator:noteHit(enemyNote[j].ver, i, "EnemyHit", 0)
+						event.mustHit = false
+						self.stage:call("onNoteHit", event)
+						self.song:call("onNoteHit", event)
+						for _, obj in ipairs(self.objects) do
+							if obj.call then
+								obj:call("onNoteHit", event)
+							end
+						end
+						break
+					end
 				end
 			end
 
@@ -1944,7 +1886,7 @@ return {
 				if isResetting then
 					goto continue
 				end
-				if (boyfriendNote[1].time - musicTime <= -200) and not boyfriendNote[1].causesMiss and not boyfriendNote[1].wasGoodHit then
+				if (boyfriendNote[1].time - musicTime <= -200) and not boyfriendNote[1].causesMiss then
 					if voicesBF then 
 						voicesBF:setVolume(0)
 					end
@@ -1989,6 +1931,187 @@ return {
 				end
 
 				::continue::
+			end
+
+			if input:pressed(curInput) and not isResetting then
+				local success = false
+				local didHitNote = false
+
+				if settings.ghostTapping then
+					success = true
+					didHitNote = false
+				end
+
+				boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " press", false)
+
+				if #boyfriendNote > 0 then
+					for j = 1, #boyfriendNote do
+						if boyfriendNote[j] and boyfriendNote[j]:getAnimName() == "on" then
+							if (boyfriendNote[j].time - musicTime <= CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].MISS_THRES and ((boyfriendNote[j].causesMiss and boyfriendNote[j].time - musicTime > 0) or true)) and not boyfriendNote[j].didHit then
+								local notePos
+								local ratingAnim
+
+								notePos = math.abs(boyfriendNote[j].time - musicTime)
+
+								if voicesBF then voicesBF:setVolume(1) end
+
+								if boyfriend then boyfriend.lastHit = musicTime end
+
+								ratingAnim = self:judgeNote(notePos)
+								table.insert(nps, love.timer.getTime())
+								maxNPS = math.max(maxNPS, #nps)
+								score = score + self:scoreNote(notePos)
+								if ratingAnim == "sick" then
+									sickCounter = sickCounter + 1
+								elseif ratingAnim == "good" then
+									goodCounter = goodCounter + 1
+								elseif ratingAnim == "bad" then
+									badCounter = badCounter + 1
+								elseif ratingAnim == "shit" then
+									shitCounter = shitCounter + 1
+								end
+
+								if settings.scoringType == "Psych" then
+									ratingTextScale = 1.075
+								end
+
+								if ratingAnim == "sick" then
+									NoteSplash:new(
+										{
+											anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
+											posX = boyfriendArrow.x,
+											posY = boyfriendArrow.y,
+											alpha = boyfriendArrow.alpha,
+											visible = boyfriendArrow.visible,
+										},
+										i
+									)
+								end
+
+								combo = combo + 1
+								if combo == 50 then
+									for _, obj in ipairs(self.objects) do
+										if obj.characterType == CHARACTER_TYPE.GF then
+											obj:play("combo50", true, false)
+											obj.holdTimer = 0
+										end
+									end
+								elseif combo == 200 then
+									for _, obj in ipairs(self.objects) do
+										if obj.characterType == CHARACTER_TYPE.GF then
+											obj:play("combo200", true, false)
+											obj.holdTimer = 0
+										end
+									end
+								end
+								if combo > maxCombo then maxCombo = combo end
+								noteCounter = noteCounter + 1
+
+								popupScore:create(ratingAnim, combo)
+
+								for i = 1, 5 do
+									if ratingTimers[i] then Timer.cancel(ratingTimers[i]) end
+								end
+
+								if not settings.ghostTapping or success then
+									boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
+
+									if boyfriendNote[j]:getAnimName() ~= "hold" and boyfriendNote[j]:getAnimName() ~= "end" then
+										health = health + (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper(ratingAnim)] or 0) * healthGainMult * boyfriendNote[j].healthGainMult
+									else
+										health = health + 0.0125 * healthGainMult * boyfriendNote[j].healthGainMult
+									end
+
+									local continue = Gamestate.onNoteHit(boyfriend, boyfriendNote[j].ver, ratingAnim, i) == nil and true or false 
+
+									if continue then
+										if not boyfriendNote[j].causesMiss then
+											local healthChange = (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper(ratingAnim)] or 0) * healthGainMult * boyfriendNote[j].healthGainMult
+											if boyfriendNote[j]:getAnimName() == "hold" or boyfriendNote[j]:getAnimName() == "end" then
+												healthChange = 0.0125 * healthGainMult * boyfriendNote[j].healthGainMult
+											end
+											local event = eventCreator:noteHit(boyfriendNote[j].ver, i, ratingAnim, healthChange)
+											for _, obj in ipairs(self.objects) do
+												if obj.characterType == CHARACTER_TYPE.BF then
+													obj:play(curAnim, true, false)
+												end
+												if obj.call then
+													obj:call("onNoteHit", event)
+												end
+											end
+											self.stage:call("onNoteHit", event)
+											self.song:call("onNoteHit", event)
+										else
+											audio.playSound(sounds.miss[love.math.random(3)])
+											local healthChange = -CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * healthLossMult * boyfriendNote[j].healthLossMult
+											local event = eventCreator:noteMiss(boyfriendNote[j].ver, i, ratingAnim, healthChange)
+											for _, obj in ipairs(self.objects) do
+												if obj.characterType == CHARACTER_TYPE.BF then
+													obj:play(curAnim .. "miss", true, false)
+													if obj.call then
+														obj:call("onNoteMiss", event)
+													end
+												end
+											end
+											self.stage:call("onNoteMiss", event)
+											self.song:call("onNoteMiss", event)
+										end
+									end
+
+									success = true
+									didHitNote = true
+								end
+
+								table.remove(boyfriendNote, j)
+
+								self:calculateRating()
+							else
+								break
+							end
+						end
+					end
+
+					if not success then
+						audio.playSound(sounds.miss[love.math.random(3)])
+
+						for _, obj in ipairs(self.objects) do
+							if obj.characterType == CHARACTER_TYPE.BF then
+								obj:play(curAnim .. "miss", true, false)
+								if obj.call then
+									obj:call("onNoteMiss", curAnim .. "miss")
+								end
+							end
+						end
+
+						if didHitNote then
+							score = math.max(0, score - 100) -- if note was "missed" but hit, remove 100 points
+						else
+							score = math.max(0, score - 10)  -- If ghost tapped, remove 10 points
+						end
+						health = health - (CONSTANTS.WEEKS.HEALTH.MISS_PENALTY or 0.2) * (healthLossMult or 1) * (boyfriendNote[1].healthLossMult or 1)
+						misses = misses + 1
+					end
+				end
+			end
+
+			if #boyfriendNote > 0 and input:down(curInput) and ((boyfriendNote[1].time - musicTime <= 0))
+				and (boyfriendNote[1]:getAnimName() == "hold" or boyfriendNote[1]:getAnimName() == "end") then
+
+				if boyfriendNote[1]:getAnimName() == "hold" then
+					HoldCover:show(i, 1, boyfriendNote[1].x, boyfriendNote[1].y)
+					inHolds[i] = true
+				else
+					HoldCover:hide(i, 1)
+					inHolds[i] = false
+				end
+				if voicesBF then voicesBF:setVolume(1) end
+
+				boyfriendArrow:animate(CONSTANTS.WEEKS.NOTE_LIST[i] .. " confirm", false)
+				health = health + 0.0125 * healthGainMult * boyfriendNote[1].healthGainMult
+
+				if boyfriend then boyfriend.lastHit = musicTime end
+
+				table.remove(boyfriendNote, 1)
 			end
 
 			if not input:down(curInput) and not HoldCover:getVisibility(i, 1) then
@@ -2264,76 +2387,40 @@ return {
 					love.graphics.push()
 						love.graphics.push()
 							for j = #enemyNotes[i], 1, -1 do
-							if enemyNotes[i][j].y <= 800 then
-								local animName = enemyNotes[i][j]:getAnimName()
-								if animName ~= "hold" and animName ~= "end" then
-									if settings.middleScroll then
+								if enemyNotes[i][j].y+enemyNotes[i][j].offsetY2 <= 600 and enemyNotes[i][j].y+enemyNotes[i][j].offsetY2 >= -600 then
+									local animName = enemyNotes[i][j]:getAnimName()
+									if settings.middlescroll then
 										graphics.setColor(1, 1, 1, 0.8 * enemyNotes[i][j].alpha)
 									else
 										graphics.setColor(1, 1, 1, 1 * enemyNotes[i][j].alpha)
 									end
 
-									if not pixel then
-										if enemyNotes[i][j].children then
-											enemyNotes[i][j].children[1]:draw()
-											if settings.downscroll then
-												enemyNotes[i][j].children[2].sizeY = -1
-											end
-											enemyNotes[i][j].children[2]:draw()
-										end
-										enemyNotes[i][j]:draw()
+									if pixel and not settings.pixelPerfect then
+										enemyNotes[i][j]:udraw(8, 8)
 									else
-										if not settings.downscroll then
-											if enemyNotes[i][j].children then
-												enemyNotes[i][j].children[1]:udraw(8, -1, true)
-												enemyNotes[i][j].children[2]:udraw(8, 8, true)
-											end
-											enemyNotes[i][j]:udraw(8, 8)
-										else
-											if enemyNotes[i][j].children then
-												enemyNotes[i][j].children[1]:udraw(8, -1, true)
-												enemyNotes[i][j].children[2]:udraw(8, 8 * -1, true)
-											end
-											enemyNotes[i][j]:udraw(8, 8)
-										end
+										enemyNotes[i][j]:draw()
 									end
 									graphics.setColor(1, 1, 1)
 								end
 							end
-						end
 						love.graphics.pop()
 						love.graphics.push()
 							for j = #boyfriendNotes[i], 1, -1 do
-							if boyfriendNotes[i][j].y <= 800 then
-								local animName = boyfriendNotes[i][j]:getAnimName()
-								if animName ~= "hold" and animName ~= "end" then
-									if not pixel then 
-										if boyfriendNotes[i][j].children then
-											boyfriendNotes[i][j].children[1]:draw()
-											if settings.downscroll then
-												boyfriendNotes[i][j].children[2].sizeY = -1
-											end
-											boyfriendNotes[i][j].children[2]:draw()
-										end
-										boyfriendNotes[i][j]:draw()
+								if boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2 <= 600 and boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2 >= -600 then
+									local animName = boyfriendNotes[i][j]:getAnimName()
+									if not settings.downscroll then
+										graphics.setColor(1, 1, 1, math.min(1, (500 + (boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2)) / 75) * boyfriendNotes[i][j].alpha)
 									else
-										if not settings.downscroll then
-											if boyfriendNotes[i][j].children then
-												boyfriendNotes[i][j].children[1]:udraw(8, -1, true)
-												boyfriendNotes[i][j].children[2]:udraw(8, 8, true)
-											end
-											boyfriendNotes[i][j]:udraw(8, 8)
-										else
-											if boyfriendNotes[i][j].children then
-												boyfriendNotes[i][j].children[1]:udraw(8, -1, true)
-												boyfriendNotes[i][j].children[2]:udraw(8, 8 * -1, true)
-											end
-											boyfriendNotes[i][j]:udraw(8, 8)
-										end
+										graphics.setColor(1, 1, 1, math.min(1, (500 - (boyfriendNotes[i][j].y+boyfriendNotes[i][j].offsetY2)) / 75) * boyfriendNotes[i][j].alpha)
+									end
+
+									if pixel and not settings.pixelPerfect then
+										boyfriendNotes[i][j]:udraw(8, 8)
+									else
+										boyfriendNotes[i][j]:draw()
 									end
 								end
 							end
-						end
 						love.graphics.pop()
 						graphics.setColor(1, 1, 1)
 					love.graphics.pop()
@@ -2419,245 +2506,6 @@ return {
 
 	showUI = function(self)
 		UI_VISIBLE = true
-	end,
-
-	keyPressed = function(self, key)
-		boyfriendArrows[key]:animate(CONSTANTS.WEEKS.NOTE_LIST[key] .. " press")
-		if #boyfriendNotes[key] > 0 then
-			local note
-			for i = 1, #boyfriendNotes[key] do
-				if boyfriendNotes[key][i].visible then
-					note = boyfriendNotes[key][i]
-					break
-				end
-			end
-
-			if not note then return end
-			
-			if note.canBeHit and not note.tooLate and not note.wasGoodHit then
-				boyfriendArrows[key]:animate(CONSTANTS.WEEKS.NOTE_LIST[key] .. " confirm")
-				self.pressedNotes[key] = note
-				self:goodNoteHit(note, note.time - musicTime)
-			end 
-		end
-	end,
-
-	keyReleased = function(self, key)
-		boyfriendArrows[key]:animate(CONSTANTS.WEEKS.NOTE_LIST[key])
-		HoldCover:hide(key, 1)
-		for i = 1, #boyfriendNotes[key] do
-			if boyfriendNotes[key][i] == self.pressedNotes[key] then
-				table.remove(boyfriendNotes[key], i)
-			end
-		end
-	end,
-
-	keyDown = function(self, key)
-		for _, note in ipairs(boyfriendNotes[key]) do
-			if note.wasGoodHit and note.children then
-				boyfriendArrows[key]:animate(CONSTANTS.WEEKS.NOTE_LIST[key] .. " confirm")
-				HoldCover:show(key, 1)
-				for _, obj in ipairs(self.objects) do
-					if obj.characterType == CHARACTER_TYPE.BF then
-						obj:play(CONSTANTS.WEEKS.ANIM_LIST[note.col], true, false)
-					end
-				end
-				if (note.children and note.endTime - musicTime <= 30) or (note.children and note.children[1].sizeY < 0) then
-					table.remove(boyfriendNotes[key], 1)
-				end
-			end
-		end
-	end,
-
-	goodNoteHit = function(self, note, time)
-		if not note.wasGoodHit then
-			if voicesBF then voicesBF:setVolume(1) end
-			note.wasGoodHit = true
-			health = health + 0.095
-
-			combo = combo + 1
-			noteCounter = noteCounter + 1
-
-			local judge = self:judgeNote(time)
-			score = score + self:scoreNote(time)
-
-			local continue = (Gamestate.onNoteHit(boyfriend, note.ver, judge, note.col) == nil or false) and true or false
-
-			local healthChange = (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper(judge)] or 0) * healthGainMult * note.healthGainMult
-			if note:getAnimName() == "hold" or note:getAnimName() == "end" then
-				healthChange = 0.0125 * healthGainMult * note.healthGainMult
-			end
-
-			if continue then
-				local event = eventCreator:noteHit(note.ver, note.col, judge, healthChange)
-				for _, obj in ipairs(self.objects) do
-					if obj.characterType == CHARACTER_TYPE.BF then
-						obj:play(CONSTANTS.WEEKS.ANIM_LIST[note.col], true, false)
-					end
-					if obj.call then
-						obj:call("onNoteHit", event)
-					end
-				end
-			end
-
-			if boyfriend then boyfriend.lastHit = musicTime end
-
-			self:calculateRating()
-
-			note.visible = false
-			if note.children and #note.children > 0 then
-				note.moveWithScroll = false
-			end
-		end
-	end,
-
-	enemyKeyPressed = function(self, key)
-		enemyArrows[key]:animate(CONSTANTS.WEEKS.NOTE_LIST[key] .. " press")
-		if #enemyNotes[key] > 0 then
-			local note
-			for i = 1, #enemyNotes[key] do
-				if enemyNotes[key][i].visible then
-					note = enemyNotes[key][i]
-					break
-				end
-			end
-
-			if not note then return end
-
-			if note.canBeHit and not note.tooLate and not note.wasGoodHit then
-				enemyArrows[key]:animate(CONSTANTS.WEEKS.NOTE_LIST[key] .. " confirm")
-				self.pressedNotes[key+4] = note
-				self:enemyGoodNoteHit(note, note.time - musicTime)
-			end
-		end
-	end,
-
-	enemyGoodNoteHit = function(self, note, time)
-		if not note.wasGoodHit then
-			note.wasGoodHit = true
-
-			note.visible = false
-			if note.children and #note.children > 0 then
-				note.moveWithScroll = false
-			end
-
-			useAltAnims = false
-			local whohit = enemy
-
-			for _, obj in ipairs(self.objects) do
-				if obj.characterType == CHARACTER_TYPE.DAD then
-					local whohit = obj
-					local continue = true
-					local enemyArrow = enemyArrows[note.col]
-					local curAnim = CONSTANTS.WEEKS.ANIM_LIST[note.col]
-					
-					if not didEvent then
-						continue = (Gamestate.onNoteHit(enemy, note.ver, "EnemyHit", note.col) == nil or false) and true or false
-						local event = eventCreator:noteHit(note.ver, note.col, "EnemyHit", 0)
-						event.mustHit = false
-						self.stage:call("onNoteHit", event)
-						self.song:call("onNoteHit", event)
-						for _, obj in ipairs(self.objects) do
-							if obj.call then
-								obj:call("onNoteHit", event)
-							end
-						end
-						didEvent = true
-					else
-						continue = true
-					end
-
-					if continue then
-						if note:getAnimName() == "hold" or note:getAnimName() == "end" then
-							if note:getAnimName() == "hold" then
-								HoldCover:show(i, 2, note.x, note.y)
-							else
-								HoldCover:hide(i, 2)
-							end
-							if useAltAnims then
-								if whohit then
-									whohit:play(curAnim .. "-alt", false, false)
-								end
-							else
-								if whohit then 
-									whohit:play(curAnim, false, false)
-								end
-							end
-							whohit.holdTimer = 0
-						else
-							NoteSplash:new(
-								{
-									anim = CONSTANTS.WEEKS.NOTE_LIST[note.col] .. tostring(love.math.random(1, 2)),
-									posX = enemyArrow.x,
-									posY = enemyArrow.y,
-									alpha = enemyArrow.alpha,
-									visible = enemyArrow.visible,
-								},
-								note.col
-							)
-							if useAltAnims then
-								if whohit then 
-									whohit:play(curAnim .. "-alt", true, false)
-									if whohit.call then
-										whohit:call("onNoteHit", {noteType = note.ver, direction = note.col, anim = curAnim .. "-alt"})
-									end
-									self.stage:call("onNoteHit", whohit, note.ver, "EnemyHit", note.col, curAnim .. "-alt")
-									self.song:call("onNoteHit", whohit, note.ver, "EnemyHit", note.col, curAnim .. "-alt")
-								end
-							else
-								if whohit then 
-									whohit:play(curAnim, true, false)
-									if whohit.call then
-										whohit:call("onNoteHit", {noteType = note.ver, direction = note.col, anim = curAnim})
-									end
-									self.stage:call("onNoteHit", whohit, note.ver, "EnemyHit", note.col, curAnim)
-									self.song:call("onNoteHit", whohit, note.ver, "EnemyHit", note.col, curAnim)
-								end
-							end
-
-							whohit.holdTimer = 0
-						end
-					end
-
-					if whohit then whohit.lastHit = musicTime end
-				end
-			end
-		end
-
-		return nil
-	end,
-
-	enemyKeyReleased = function(self, key)
-		for i = 1, #enemyNotes[key] do
-			if enemyNotes[key][i] == self.pressedNotes[key+4] then
-				table.remove(enemyNotes[key], i)
-			end
-		end
-	end,
-
-	enemyKeyDown = function(self, key, whohit)
-		local curAnim = CONSTANTS.WEEKS.ANIM_LIST[key]
-		for _, note in ipairs(enemyNotes[key]) do
-			enemyArrows[key]:animate(CONSTANTS.WEEKS.NOTE_LIST[key] .. " confirm")
-			if useAltAnims then
-				for _, obj in ipairs(self.objects) do
-					if obj.characterType == CHARACTER_TYPE.DAD then
-						obj:play(curAnim .. "-alt", true, false)
-						break
-					end
-				end
-			else
-				for _, obj in ipairs(self.objects) do
-					if obj.characterType == CHARACTER_TYPE.DAD then
-						obj:play(curAnim, true, false)
-						break
-					end
-				end
-			end
-			if note.children and note.endTime - musicTime <= 30 then
-				table.remove(enemyNotes[key], 1)
-			end
-		end
 	end,
 
 	debugKeyPressed = function(self, k)
