@@ -14,13 +14,13 @@ function songscript.getSong(id)
             weeks:remove(obj)
         end,
         getBoyfriend = function()
-            return boyfriend
+            return weeks.boyfriend
         end,
         getGirlfriend = function()
-            return girlfriend
+            return weeks.girlfriend
         end,
         getEnemy = function()
-            return enemy
+            return weeks.enemy
         end,
         get = function(name)
             return weeks:get(name)

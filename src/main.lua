@@ -65,7 +65,7 @@ function love.load()
     popupScore = require("modules.game.popupScore")
 	eventCreator = require("modules.game.eventCreator")
     settings.pixelPerfect = false
-
+	
 	Character = require("game.character")
 	Stage = require("game.stage")
 	Song = require("game.song")
@@ -74,12 +74,12 @@ function love.load()
 	MultiSparrowCharacter = require("game.multiSparrowCharacter")
 	AnimateAtlasCharacter = require("game.animateAtlasCharacter")
 	MultiAnimateAtlasCharacter = require("game.multiAnimateAtlas")
+	playfield = require("game.playfield")
 
     Sprite = require("modules.xml.Sprite")
     Checkbox = require("modules.objects.Checkbox")
 	signal = require("modules.signal")
 
-    playMenuMusic = true
 	local t = love.filesystem.read("data/IMAGE_FORMAT.txt")
 	if t == "dxt5" then t = "dds" end
     graphics.setImageType(t)

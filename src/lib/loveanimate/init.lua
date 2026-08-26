@@ -35,6 +35,7 @@ end
 love.animate = la
 
 ---@deprecated
+---@diagnostic disable-next-line: deprecated
 graphics.newAtlas = la.newAtlas
 graphics.newTextureAtlas = la.newTextureAtlas
 graphics.newSparrowAtlas = la.newSparrowAtlas

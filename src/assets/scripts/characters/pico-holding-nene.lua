@@ -31,7 +31,7 @@ function Character:onSongRetry()
 end
 
 function Character:getDeathQuote()
-    local dadID = enemy and enemy._data and enemy.id or "dad"
+    local dadID = weeks.enemy and weeks.enemy._data and weeks.enemy.id or "dad"
 
     if dadID == "tankman" then
         return "week7/sounds/jeffGameover-pico/jeffGameover-" .. love.math.random(1, 10) .. ".ogg"

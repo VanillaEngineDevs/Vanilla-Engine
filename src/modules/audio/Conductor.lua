@@ -5,6 +5,7 @@ Conductor.ROWS_PER_BEAT = 48
 Conductor.BEATS_PER_MEASURE = 4
 Conductor.ROWS_PER_MEASURE = Conductor.ROWS_PER_BEAT * Conductor.BEATS_PER_MEASURE
 Conductor.MAX_NOTE_ROW = bit.lshift(1, 30)
+Conductor.timeSignatureNum = 4
 
 function Conductor.new(bpm)
     local self = setmetatable({}, Conductor)

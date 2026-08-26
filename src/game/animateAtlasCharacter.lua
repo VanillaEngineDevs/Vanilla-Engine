@@ -109,6 +109,7 @@ function AnimateAtlasCharacter:getAllAnimations()
 end
 
 function AnimateAtlasCharacter:setAntialiasing(enabled)
+    ---@diagnostic disable-next-line: undefined-field
     self.sprite:setAntialiasing(enabled)
 end
 
