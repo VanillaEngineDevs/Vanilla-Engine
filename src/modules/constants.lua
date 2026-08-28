@@ -53,7 +53,7 @@ CONSTANTS.HAPTICS = {
 }
 
 CONSTANTS.WEEKS = {
-    STRUM_Y = -400,
+    STRUM_Y = -375,
     STRUM_X_OFFSET = 0,
     PIXELS_PER_MS = 0.55,
     ANIM_LIST = {

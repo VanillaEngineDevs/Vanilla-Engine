@@ -105,13 +105,13 @@ function stage.getStage(id)
             weeks:remove(obj)
         end,
         getBoyfriend = function()
-            return boyfriend
+            return weeks.boyfriend
         end,
         getGirlfriend = function()
-            return girlfriend
+            return weeks.girlfriend
         end,
         getEnemy = function()
-            return enemy
+            return weeks.enemy
         end,
         get = function(name)
             for _, obj in ipairs(weeks.objects) do

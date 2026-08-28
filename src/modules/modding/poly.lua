@@ -98,17 +98,9 @@ end
 local getDirectoryItems = love.filesystem.getDirectoryItems
 love.filesystem._originalGetDirectoryItems = getDirectoryItems
 function love.filesystem.getDirectoryItems(dir)
-    --local path = resolveAsset(dir)
-    --if love.filesystem.getInfo(path) then
-    --    return getDirectoryItems(path)
-    --end
-    
-    --return getDirectoryItems(dir)
-
-    -- merge the PRIORITY mod ONLY and the base game directory items
     local items = {}
     local seen = {}
-    
+
     if poly.priority then
         local modPath = poly.priority.path .. dir
         if getInfo(modPath) then
@@ -126,6 +118,13 @@ function love.filesystem.getDirectoryItems(dir)
                 table.insert(items, item)
                 seen[item] = true
             end
+        end
+    end
+
+    -- fallback to normal game filesystem
+    if #items == 0 and getInfo(dir) then
+        for _, item in ipairs(getDirectoryItems(dir)) do
+            table.insert(items, item)
         end
     end
 

@@ -29,7 +29,7 @@ end
 function playfield:new(playable, receptorSprite, targetType)
     self.playable = playable
 
-    self.offsetX = 0
+    self.offsetX = -750
     self.receptors = {}
     self.notes = {}
     self.noteStart = {}
@@ -159,13 +159,9 @@ function playfield:onEnemyNoteHit(lane, note, receptor)
     local didEvent = false
 
     for _, obj in ipairs(weeks.objects) do
-        if obj.CHARACTER_TYPE == self.targetType then
-            local whohit = obj
-
-            local continue
-
+        if obj.characterType == self.targetType then
             if not didEvent then
-                continue = (Gamestate.onNoteHit(enemy, note.ver, "EnemyHit", lane) == nil or false) and true or false
+                Gamestate.onNoteHit(enemy, note.ver, "EnemyHit", lane)
 
                 local event = eventCreator:noteHit(note.ver, lane, "EnemyHit", 0)
                 event.mustHit = false
@@ -173,53 +169,38 @@ function playfield:onEnemyNoteHit(lane, note, receptor)
                 self:callEvent("onNoteHit", event)
 
                 didEvent = true
+            end
+
+            local noteAnim = note:getAnimName()
+
+            if noteAnim == "hold" or noteAnim == "end" then
+                obj:play(CONSTANTS.WEEKS.ANIM_LIST[lane], false, false)
+                obj.holdTimer = 0
             else
-                continue = true
-            end
+                -- NoteSplash:new(
+                --     {
+                --         anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
+                --         posX = receptor.x,
+                --         posY = receptor.y,
+                --         alpha = receptor.alpha,
+                --         visible = receptor.visible,
+                --     },
+                --     i
+                -- )
 
-            if continue then
-                local noteAnim = note:getAnimName()
+                obj:play(CONSTANTS.WEEKS.ANIM_LIST[lane], true, false)
 
-                if noteAnim == "hold" or noteAnim == "end" then
-                    if whohit then
-                        whohit:play(CONSTANTS.WEEKS.ANIM_LIST[lane], false, false)
-                    end
-
-                    if whohit then
-                        whohit.holdTimer = 0
-                    end
-                else
-                    -- NoteSplash:new(
-                    --     {
-                    --         anim = CONSTANTS.WEEKS.NOTE_LIST[i] .. tostring(love.math.random(1, 2)),
-                    --         posX = receptor.x,
-                    --         posY = receptor.y,
-                    --         alpha = receptor.alpha,
-                    --         visible = receptor.visible,
-                    --     },
-                    --     i
-                    -- )
-
-                    if whohit then
-                        whohit:play(CONSTANTS.WEEKS.ANIM_LIST[lane], true, false)
-
-                        if whohit.call then
-                            whohit:call("onNoteHit", {noteType = note.ver, direction = lane, anim = CONSTANTS.WEEKS.ANIM_LIST[lane]})
-                        end
-
-                        weeks.stage:call("onNoteHit", whohit, note.ver, "EnemyHit", lane, CONSTANTS.WEEKS.ANIM_LIST[lane])
-                        weeks.song:call("onNoteHit", whohit, note.ver, "EnemyHit", lane, CONSTANTS.WEEKS.ANIM_LIST[lane])
-                    end
-
-                    if whohit then
-                        whohit.holdTimer = 0
-                    end
+                if obj.call then
+                    obj:call("onNoteHit", {noteType = note.ver, direction = lane, anim = CONSTANTS.WEEKS.ANIM_LIST[lane]})
                 end
+
+                weeks.stage:call("onNoteHit", obj, note.ver, "EnemyHit", lane, CONSTANTS.WEEKS.ANIM_LIST[lane])
+                weeks.song:call("onNoteHit", obj, note.ver, "EnemyHit", lane, CONSTANTS.WEEKS.ANIM_LIST[lane])
+
+                obj.holdTimer = 0
             end
 
-            if whohit then
-                whohit.lastHit = musicTime
-            end
+            obj.lastHit = musicTime
         end
     end
 end
@@ -233,7 +214,7 @@ function playfield:missNote(lane, note)
     local event = eventCreator:noteMiss(note.ver, lane, nil, healthChange)
 
     for _, obj in ipairs(weeks.objects) do
-        if obj.characterType == CHARACTER_TYPE.BF then
+        if obj.characterType == self.targetType then
             obj:play(CONSTANTS.WEEKS.ANIM_LIST[lane] .. "miss", true, false)
         end
 
@@ -247,7 +228,7 @@ function playfield:missNote(lane, note)
 
     local noteAnim = note:getAnimName()
 
-    weeks.health = weeks.health - event.healthChange
+    weeks.health = weeks.health + event.healthChange
 
     if noteAnim ~= "hold" and noteAnim ~= "end" then
         --misses = misses + 1
@@ -388,7 +369,7 @@ function playfield:processInput(lane, notes, receptor)
         end
 
         receptor:animate(noteName .. " confirm", false)
-        health = health + 0.0125 * weeks.healthGainMult * note.healthGainMult
+        weeks.health = weeks.health + 0.0125 * weeks.healthGainMult * note.healthGainMult
 
         if weeks.boyfriend then
             weeks.boyfriend.lastHit = musicTime

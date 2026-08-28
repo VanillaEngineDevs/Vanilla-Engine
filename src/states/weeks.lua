@@ -208,7 +208,7 @@ function weeks:load(wasntRestart)
         end
     end
 
-    -- self.healthbar:load()
+    self.healthbar = Healthbar()
     -- self.healthbar.p1Colors = {0, 1, 0}
     -- self.healthbar.p2Colors = {1, 0, 0}
 
@@ -261,6 +261,15 @@ function weeks:initUI(mode)
     end
 end
 
+function weeks:preloadIcon(path, name, scale)
+    name = name or path
+    if not healthIconPreloads[name] then
+        healthIconPreloads[name] = icon.newIcon(icon.imagePath(path), scale or 1)
+    end
+
+    return healthIconPreloads[name]
+end
+
 function weeks:setNoteSprites(receptors, left, down, up, right)
     self.noteSprites = {
         left,
@@ -311,8 +320,8 @@ function weeks:generateNotes(name, diff)
     end
 
     self.boyfriendPlayfield = playfield(true, self.noteSprites[5])
-    self.boyfriendPlayfield.offsetX = 1280 - 250
-    self.enemyPlayfield = playfield(true, self.noteSprites[5], CHARACTER_TYPE.DAD)
+    self.boyfriendPlayfield.offsetX = 250
+    self.enemyPlayfield = playfield(false, self.noteSprites[5], CHARACTER_TYPE.DAD)
 
     self.chart = chartData
     self.metadata = metadata
@@ -586,6 +595,9 @@ function weeks:update(dt)
             previousFrameTime = love.timer.getTime() * 1000
         end
     end
+    beatHandler.update(dt)
+    self.conductor.musicTime = musicTime
+    self.conductor:update(dt)
 
     local decayRate = 0.95
     local elapsed = dt * 60
@@ -654,13 +666,28 @@ function weeks:updateUI(dt)
     self.boyfriendPlayfield:update(dt)
     self.enemyPlayfield:update(dt)
 
+    if not self.ignoreHealthClamping then
+        self.health = util.clamp(self.health, CONSTANTS.WEEKS.HEALTH.MIN, CONSTANTS.WEEKS.HEALTH.MAX)
+    end
+    if self.health > CONSTANTS.WEEKS.HEALTH.LOSING_THRESHOLD and self.healthbar.p2Icon:getCurFrame() == 2 then
+        self.healthbar.p2Icon:setFrame(1)
+    elseif self.health <= 0 and self.useBuiltinGameover then -- Game over
+        if not settings.practiceMode and not self.dying then
+            self.dying = true
+            self:onDeath()
+        end
+    elseif self.health <= CONSTANTS.WEEKS.HEALTH.LOSING_THRESHOLD and self.healthbar.p2Icon:getCurFrame() == 1 then
+        self.healthbar.p2Icon:setFrame(2)
+    end
+    self.healthLerp = util.coolLerp(self.healthLerp, self.health, 0.15)
+
+    self.healthbar:update(dt)
+
     if camera.IS_CLASSIC_MOVEMENT then
         local adjustedLerp = 1 - math.pow(1.0 - 0.04, dt * 60)
         camera.x = camera.x + (CAM_LERP_POINT.x - camera.x) * adjustedLerp
         camera.y = camera.y + (CAM_LERP_POINT.y - camera.y) * adjustedLerp
     end
-
-
 end
 
 function weeks:add(object, sort)
@@ -783,7 +810,7 @@ function weeks:drawUI()
 	love.graphics.setCanvas({self.uiCanvas, stencil = true})
         love.graphics.clear()
         love.graphics.push()
-            love.graphics.translate(100, 720/2)
+            love.graphics.translate(1280/2, 720/2)
             love.graphics.scale(0.7, 0.7)
             love.graphics.scale(uiCam.zoom, uiCam.zoom)
             love.graphics.translate(uiCam.x, uiCam.y)
@@ -798,6 +825,8 @@ function weeks:drawUI()
             love.graphics.rectangle("fill", -1000, -1000, 25000, 10000)
             graphics.setColor(1, 1, 1)
         love.graphics.pop()
+
+        self.healthbar:draw(hudFade[1])
     love.graphics.setCanvas({lastCanvas, stencil = true})
     local lastShader = love.graphics.getShader()
     love.graphics.setShader(self.uiShader)
