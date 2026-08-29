@@ -94,6 +94,8 @@ function uitextfColored(text,x,y,limit,align,col1,col2,r,sx,sy,ox,oy,kx,ky)
 	local oy = oy or 0
 	local kx = kx or 0
 	local ky = ky or 0
+	col1 = col1 or {0, 0, 0}
+	col2 = col2 or {1, 1, 1}
 	graphics.setColor(col1[1],col1[2],col1[3],col1[4])
 	for i = -1, 1 do
 		for j = -1, 1 do

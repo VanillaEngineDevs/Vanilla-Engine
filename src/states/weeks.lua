@@ -10,9 +10,6 @@ weeks.dying = false
 
 weeks.noteSprites = nil
 
-local nps
-weeks.maxNPS = 0
-
 local isResetting = false
 local resettingTime = {0}
 local camZoomTween
@@ -36,10 +33,14 @@ local states = {
     shitCounter = 0,
     missCounter = 0,
     maxCombo = 0,
+    combo = 0,
+    total = 0,
+    score = 0,
+    ratingPercent = 0.0,
+    nps = {},
+    maxNPS = 0
 }
-weeks.score = 0
 
-local ratingTextScale = 1
 local hudFade = {1}
 
 local FLASH = {0}
@@ -97,9 +98,12 @@ function weeks:enter(_, songNum, songAppend, _songExt, _audioAppend, _, weekID)
         shitCounter = 0,
         missCounter = 0,
         maxCombo = 0,
+        combo = 0,
         total = 0,
         score = 0,
-        ratingPercent = 0.0
+        ratingPercent = 0.0,
+        nps = {},
+        maxNPS = 0
     }
 
     beatHandler.reset()
@@ -155,9 +159,11 @@ function weeks:load(wasntRestart)
         maxCombo = 0,
         combo = 0,
         total = 0,
-        ratingPercent = 0.0
+        score = 0,
+        ratingPercent = 0.0,
+        nps = {},
+        maxNPS = 0
     }
-    self.score = 0
 
     self.hudFade = {1}
 
@@ -209,14 +215,17 @@ function weeks:load(wasntRestart)
     end
 
     self.healthbar = Healthbar()
-    -- self.healthbar.p1Colors = {0, 1, 0}
-    -- self.healthbar.p2Colors = {1, 0, 0}
 
     local vwoosh = 0.5
     musicTime = (-vwoosh * 1000) + (self.conductor:getBeatLengthsMS() * -5)
 
-    Timer.after(vwoosh, function()
-        -- self:vwooshArrows()
+    self.enemyPlayfield:initVwoosh()
+    self.boyfriendPlayfield:initVwoosh()
+    self.enemyPlayfield:update(0)
+    self.boyfriendPlayfield:update(0)
+    self.timer:after(vwoosh, function()
+        self:vwooshArrows(self.enemyPlayfield)
+        self:vwooshArrows(self.boyfriendPlayfield)
         self:performCountdown(vwoosh)
     end)
 
@@ -278,6 +287,30 @@ function weeks:setNoteSprites(receptors, left, down, up, right)
         right,
         receptors
     }
+end
+
+function weeks:getStates()
+    return states
+end
+
+function weeks:vwooshArrows(playfield)
+    local vwooshTime = 0.5
+    for i, receptor in ipairs(playfield.receptors) do
+        receptor.alpha = 0
+        receptor.y = receptor.y - playfield.vwooshYAmt
+        local vwooshSteps = vwooshTime / #playfield.receptors
+        Timer.after(vwooshSteps * (i-1), function()
+            local target = CONSTANTS.WEEKS.STRUM_Y * (settings.downscroll and -1 or 1)
+
+            Timer.tween(vwooshSteps, receptor, {
+                alpha = receptor.finishedAlpha,
+                y = target
+            }, "out-circ", function()
+                receptor.alpha = receptor.finishedAlpha
+                receptor.y = target
+            end)
+        end)
+    end
 end
 
 function weeks:generateNotes(name, diff)
@@ -687,6 +720,64 @@ function weeks:updateUI(dt)
         local adjustedLerp = 1 - math.pow(1.0 - 0.04, dt * 60)
         camera.x = camera.x + (CAM_LERP_POINT.x - camera.x) * adjustedLerp
         camera.y = camera.y + (CAM_LERP_POINT.y - camera.y) * adjustedLerp
+    end
+
+    for i, note in ipairs(states.nps) do
+        if note - love.timer.getTime() <= -1 then
+            table.remove(states.nps, i)
+        end
+    end
+end
+
+function weeks:calculateRating()
+    if settings.accuracyMode == "complex" then
+        states.ratingPercent = states.score / ((states.sickCounter + states.goodCounter + states.badCounter + states.shitCounter + states.missCounter) * 500)
+        if states.ratingPercent == nil or states.ratingPercent < 0 then
+            states.ratingPercent = 0
+        elseif states.ratingPercent > 1 then
+            states.ratingPercent = 1
+        end
+    else
+        local sickRating = 1
+        local goodRating = 0.85
+        local badRating = 0.67
+        local shitRating = 0.5
+
+        local totalHit = states.sickCounter + states.goodCounter + states.badCounter + states.shitCounter + states.missCounter
+
+        states.ratingPercent = (states.sickCounter * sickRating +
+            states.goodCounter * goodRating +
+            states.badCounter * badRating +
+            states.shitCounter * shitRating) /
+            totalHit
+    end
+end
+
+function weeks:judgeNote(msTiming)
+    if msTiming <= CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].SICK_THRES then
+        return "sick"
+    elseif msTiming < CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].GOOD_THRES then
+        return "good"
+    elseif msTiming < CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].BAD_THRES then
+        return "bad"
+    elseif msTiming < CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].SHIT_THRES then
+        return "shit"
+    else
+        return "miss"
+    end
+end
+
+function weeks:scoreNote(msTiming)
+    if msTiming > CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].MISS_THRES then
+        return CONSTANTS.WEEKS.MISS_SCORE
+    else
+        if msTiming < CONSTANTS.WEEKS.JUDGE_THRES[settings.judgePreset].PERFECT_THRES then
+            return CONSTANTS.WEEKS.MAX_SCORE
+        else
+            local factor = 1 - 1 / (1 + math.exp(-CONSTANTS.WEEKS.SCORING_SLOPE * (msTiming - CONSTANTS.WEEKS.SCORING_OFFSET)))
+            local score = math.floor(CONSTANTS.WEEKS.MAX_SCORE * factor + CONSTANTS.WEEKS.MIN_SCORE)
+            return score
+        end
     end
 end
 

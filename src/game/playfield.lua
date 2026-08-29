@@ -15,7 +15,7 @@ function playfield:callEvent(eventName, event)
 end
 
 function playfield:playMissAnimation(characterType, animation)
-    for _, obj in ipairs(self.objects) do
+    for _, obj in ipairs(weeks.objects) do
         if obj.characterType == characterType then
             obj:play(animation, true, false)
         end
@@ -30,15 +30,18 @@ function playfield:new(playable, receptorSprite, targetType)
     self.playable = playable
 
     self.offsetX = -750
+    self.vwooshYAmt = 50
     self.receptors = {}
     self.notes = {}
     self.noteStart = {}
     self.receptorY = {}
+    self.inHolds = {}
 
     self.laneCount = 4
     self.targetType = targetType or CHARACTER_TYPE.BF
 
     for i = 1, self.laneCount do
+        self.inHolds[i] = false
         self.notes[i] = {}
         self.noteStart[i] = 1
 
@@ -100,6 +103,13 @@ function playfield:addNote(d, sprite)
     end
 end
 
+function playfield:initVwoosh()
+    for _, receptor in ipairs(self.receptors) do
+        receptor.y = receptor.y - self.vwooshYAmt
+        receptor.alpha = 0
+    end
+end
+
 function playfield:sortNotes()
     for lane = 1, self.laneCount do
         table.sort(self.notes[lane], function(a, b)
@@ -131,12 +141,13 @@ function playfield:onNoteHit(lane, note, receptor, ratingAnim, character)
 
     local continue = Gamestate.onNoteHit(character, note.ver, ratingAnim, lane) == nil and true or false
 
+    local event
     if continue then
         local healthChange = (CONSTANTS.WEEKS.HEALTH.BONUS[string.upper(ratingAnim)] or 0) * weeks.healthGainMult * note.healthGainMult
         if note:getAnimName() == "hold" or note:getAnimName() == "end" then
             healthChange = 0.0125 * weeks.healthGainMult * note.healthGainMult
         end
-        local event = eventCreator:noteHit(note.ver, lane, ratingAnim, healthChange)
+        event = eventCreator:noteHit(note.ver, lane, ratingAnim, healthChange)
 
         for _, obj in ipairs(weeks.objects) do
             if obj.characterType == self.targetType then
@@ -152,7 +163,23 @@ function playfield:onNoteHit(lane, note, receptor, ratingAnim, character)
         weeks.song:call("onNoteHit", event)
     end
 
-    -- self:calculateRating()
+    local states = weeks:getStates()
+    table.insert(states.nps, love.timer.getTime())
+    states.maxNPS = math.max(states.maxNPS, #states.nps)
+    if ratingAnim == "sick" then
+        states.sickCounter = states.sickCounter + 1
+    elseif ratingAnim == "good" then
+        states.goodCounter = states.goodCounter + 1
+    elseif ratingAnim == "bad" then
+        states.badCounter = states.badCounter + 1
+    elseif ratingAnim == "shit" then
+        states.shitCounter = states.shitCounter + 1
+    end
+
+    if weeks.healthbar.scoringDisplay and weeks.healthbar.scoringDisplay.onNoteHit then
+        weeks.healthbar.scoringDisplay:onNoteHit(event)
+    end
+    weeks:calculateRating()
 end
 
 function playfield:onEnemyNoteHit(lane, note, receptor)
@@ -231,20 +258,23 @@ function playfield:missNote(lane, note)
     weeks.health = weeks.health + event.healthChange
 
     if noteAnim ~= "hold" and noteAnim ~= "end" then
-        --misses = misses + 1
+        weeks:getStates().missCounter = weeks:getStates().missCounter + 1
     else
         Gamestate.onNoteMiss(weeks.boyfriend, note.ver, "BoyfriendMiss", lane)
     end
 
-    -- if combo >= 70 then
-    --     for _, obj in ipairs(self.objects) do
-    --         if obj.characterType == CHARACTER_TYPE.GF then
-    --             obj:play("drop70", true, false)
-    --             obj.holdTimer = 0
-    --         end
-    --     end
-    -- end
-    -- combo = 0
+    if weeks:getStates().combo >= 70 then
+        for _, obj in ipairs(weeks.objects) do
+            if obj.characterType == CHARACTER_TYPE.GF then
+                obj:play("drop70", true, false)
+                obj.holdTimer = 0
+            end
+        end
+    end
+    weeks:getStates().combo = 0
+
+     weeks:getStates().missCounter =  weeks:getStates().missCounter + 1
+    weeks:calculateRating()
 end
 
 function playfield:processInput(lane, notes, receptor)
@@ -279,11 +309,9 @@ function playfield:processInput(lane, notes, receptor)
                         weeks.boyfriend.lastHit = musicTime
                     end
 
-                    local ratingAnim = "sick"--self:judgeNote(notePos)
+                    local ratingAnim = weeks:judgeNote(notePos)
 
-                    -- table.insert(nps, love.timer.getTime())
-                    -- maxNPS = math.max(maxNPS, #nps)
-                    weeks.score = weeks.score + 500--self:scoreNote(notePos)
+                    weeks:getStates().score = weeks:getStates().score + weeks:scoreNote(notePos)
 
                     -- if settings.scoringType == "Psych" then
                     --     ratingTextScale = 1.075
@@ -302,24 +330,23 @@ function playfield:processInput(lane, notes, receptor)
                         -- )
                     end
 
-                    -- combo = combo + 1
-                    -- if combo == 50 then
-                    --     for _, obj in ipairs(self.objects) do
-                    --         if obj.characterType == CHARACTER_TYPE.GF then
-                    --             obj:play("combo50", true, false)
-                    --             obj.holdTimer = 0
-                    --         end
-                    --     end
-                    -- elseif combo == 200 then
-                    --     for _, obj in ipairs(self.objects) do
-                    --         if obj.characterType == CHARACTER_TYPE.GF then
-                    --             obj:play("combo200", true, false)
-                    --             obj.holdTimer = 0
-                    --         end
-                    --     end
-                    -- end
-                    -- if combo > maxCombo then maxCombo = combo end
-                    -- noteCounter = noteCounter + 1
+                    weeks:getStates().combo = weeks:getStates().combo + 1
+                    if weeks:getStates().combo == 50 then
+                        for _, obj in ipairs(weeks.objects) do
+                            if obj.characterType == CHARACTER_TYPE.GF then
+                                obj:play("combo50", true, false)
+                                obj.holdTimer = 0
+                            end
+                        end
+                    elseif weeks:getStates().combo == 200 then
+                        for _, obj in ipairs(weeks.objects) do
+                            if obj.characterType == CHARACTER_TYPE.GF then
+                                obj:play("combo200", true, false)
+                                obj.holdTimer = 0
+                            end
+                        end
+                    end
+                    if weeks:getStates().combo > weeks:getStates().maxCombo then weeks:getStates().maxCombo = weeks:getStates().combo end
 
                     if not settings.ghostTapping or success then
                         self:onNoteHit(lane, note, receptor, ratingAnim, weeks.boyfriend)
@@ -340,9 +367,9 @@ function playfield:processInput(lane, notes, receptor)
             self:playMissAnimation(self.targetType, CONSTANTS.WEEKS.ANIM_LIST[lane] .. "miss")
 
             if didHitNote then
-                weeks.score = math.max(0, weeks.score - 100) -- if note was "missed" but hit, remove 100 points
+                weeks:getStates().score = math.max(0, weeks:getStates().score - 100) -- if note was "missed" but hit, remove 100 points
             else
-                weeks.score = math.max(0, weeks.score - 10) -- If ghost tapped, remove 10 points
+                weeks:getStates().score = math.max(0, weeks:getStates().score - 10) -- If ghost tapped, remove 10 points
             end
 
             if #notes > 0 then
@@ -358,10 +385,10 @@ function playfield:processInput(lane, notes, receptor)
 
         if note:getAnimName() == "hold" then
             -- HoldCover:show(i, 1, notes[1].x, notes[1].y)
-            -- inHolds[i] = true
+            self.inHolds[lane] = true
         else
             -- HoldCover:hide(i, 1)
-            -- inHolds[i] = false
+            self.inHolds[lane] = false
         end
 
         if weeks.voicesBF then
@@ -380,7 +407,7 @@ function playfield:processInput(lane, notes, receptor)
 
     if not input:down(inputKey) --[[and not HoldCover:getVisibility(i, 1)]] then
         -- HoldCover:hide(i, 1)
-        -- inHolds[i] = false
+        self.inHolds[lane] = false
     end
 
     if input:released(inputKey) then
@@ -426,9 +453,10 @@ function playfield:processNoteMisses(lane, notes)
 end
 
 function playfield:update(dt)
+    local range = 5000
     local currentTime = musicTime
-    local minTime = currentTime - 2500
-    local maxTime = currentTime + 2500
+    local minTime = currentTime - range
+    local maxTime = currentTime + range
 
     local pixelsPerMs = CONSTANTS.WEEKS.PIXELS_PER_MS
     local speed = weeks.speed
@@ -472,6 +500,12 @@ function playfield:update(dt)
             self:processInput(lane, notes, receptor)
         else
             self:processAutomatic(lane, notes, receptor)
+        end
+    end
+
+    for _, hold in ipairs(self.inHolds) do
+        if hold then
+            weeks:getStates().score = weeks:getStates().score + CONSTANTS.WEEKS.SCORE_HOLD_BONUS_PER_SECOND * dt
         end
     end
 end
