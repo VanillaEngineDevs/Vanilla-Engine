@@ -130,7 +130,7 @@ function stage.getStage(id)
             return camera
         end,
         getCameraLerpPoint = function()
-            return CAM_LERP_POINT
+            return weeks:getCameraLerpPoint()
         end,
     }, {__index = _G})
     if stageLuaChunk then

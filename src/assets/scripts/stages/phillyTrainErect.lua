@@ -165,24 +165,24 @@ function Stage:doppleGangerCutscene()
     picoOpponent.shader = getEnemy().shader
 
     IS_CLASSIC_MOVEMENT = true
-    CAM_LERP_POINT.x = midpoint[1]
-    CAM_LERP_POINT.y = midpoint[2]
+    weeks:getCameraLerpPoint().x = midpoint[1]
+    weeks:getCameraLerpPoint().y = midpoint[2]
 
     cutsceneTimer:after(4, function()
-        CAM_LERP_POINT.x = cigPos[1]
-        CAM_LERP_POINT.y = cigPos[2]
+        weeks:getCameraLerpPoint().x = cigPos[1]
+        weeks:getCameraLerpPoint().y = cigPos[2]
     end)
 
     cutsceneTimer:after(6.3, function()
-        CAM_LERP_POINT.x = shooterPos[1]
-        CAM_LERP_POINT.y = shooterPos[2]
+        weeks:getCameraLerpPoint().x = shooterPos[1]
+        weeks:getCameraLerpPoint().y = shooterPos[2]
     end)
 
     cutsceneTimer:after(8.75, function()
         cutsceneSkipped = true
         canSkipCutscene = false
-        CAM_LERP_POINT.x = cigPos[1]
-        CAM_LERP_POINT.y = cigPos[2]
+        weeks:getCameraLerpPoint().x = cigPos[1]
+        weeks:getCameraLerpPoint().y = cigPos[2]
         if explode then getGirlfriend():play("drop70", true, false) end
     end)
 

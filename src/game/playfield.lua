@@ -40,6 +40,8 @@ function playfield:new(playable, receptorSprite, targetType)
     self.laneCount = 4
     self.targetType = targetType or CHARACTER_TYPE.BF
 
+    self.visible = true
+
     for i = 1, self.laneCount do
         self.inHolds[i] = false
         self.notes[i] = {}
@@ -152,10 +154,10 @@ function playfield:onNoteHit(lane, note, receptor, ratingAnim, character)
         for _, obj in ipairs(weeks.objects) do
             if obj.characterType == self.targetType then
                 obj:play(CONSTANTS.WEEKS.ANIM_LIST[lane], true, false)
+            end
 
-                if obj.call then
-                    obj:call("onNoteHit", event)
-                end
+            if obj.call then
+                obj:call("onNoteHit", event)
             end
         end
 
@@ -511,6 +513,8 @@ function playfield:update(dt)
 end
 
 function playfield:draw()
+    if not self.visible then return end
+
     love.graphics.push()
         love.graphics.translate(self.offsetX, 0)
 

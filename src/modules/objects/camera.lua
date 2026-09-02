@@ -130,8 +130,8 @@ function camera:forcePos(x, y)
     camera.defaultY = y
     camera.targetX = x
     camera.targetY = y
-    CAM_LERP_POINT.x = x
-    CAM_LERP_POINT.y = y
+    weeks:getCameraLerpPoint().x = x
+    weeks:getCameraLerpPoint().y = y
 end
 
 return camera

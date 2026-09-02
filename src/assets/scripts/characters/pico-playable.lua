@@ -174,7 +174,7 @@ function Character:onAnimationFrame(name, frameNumber, _)
 end
 
 function Character:onAnimationFinished(name)
-    if name == "shootMISS" and health > 0 and not dying then
+    if name == "shootMISS" and weeks.health > 0 and not dying then
         -- fuiasfhsdhb
     end
 end

@@ -92,12 +92,7 @@ function Stage:build()
     doorKick1 = love.audio.newSource("sserafim/sounds/doorKick1.ogg", "static")
     doorKick2 = love.audio.newSource("sserafim/sounds/doorKick2.ogg", "static")
 
-    for i = 1, #enemyArrows do
-        enemyArrows[i].visible = false
-        for j = 1, #enemyNotes[i] do
-            enemyNotes[i][j].visible = false
-        end
-    end
+    weeks.enemyPlayfield.visible = false
 end
 
 function Stage:onUpdate(dt)

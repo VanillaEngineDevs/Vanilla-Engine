@@ -29,7 +29,7 @@ function songscript.getSong(id)
             return camera
         end,
         getCameraLerpPoint = function()
-            return CAM_LERP_POINT
+            return weeks:getCameraLerpPoint()
         end,
     }, {__index = _G})
     if songLuaChunk then

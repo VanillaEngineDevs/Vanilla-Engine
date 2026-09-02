@@ -170,13 +170,13 @@ end
 
 function Character:transitionState()
     if state == STATE_DEFAULT then
-        if health <= VULTURE_THRESHOLD then
+        if weeks.health <= VULTURE_THRESHOLD then
             state = STATE_PRE_RAISE
         else
             state = STATE_DEFAULT
         end
     elseif state == STATE_PRE_RAISE then
-        if health > VULTURE_THRESHOLD then
+        if weeks.health > VULTURE_THRESHOLD then
             state = STATE_DEFAULT
         elseif animationFinished then
             state = STATE_RAISE
@@ -189,7 +189,7 @@ function Character:transitionState()
             animationFinished = false
         end
     elseif state == STATE_READY then
-        if health > VULTURE_THRESHOLD then
+        if weeks.health > VULTURE_THRESHOLD then
             state = STATE_LOWER
             self.data:play("lowerKnife", true, false)
         elseif animationFinished then

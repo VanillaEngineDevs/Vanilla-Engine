@@ -10,7 +10,6 @@ local function loadScoreDisplay(id)
     local path = "assets/scripts/scoredisplays/" .. id .. ".lua"
 
     if not love.filesystem.getInfo(path) then
-        print("WTF?", path)
         return nil
     end
 
@@ -33,7 +32,8 @@ local function loadScoreDisplay(id)
         getCamera = function()
             return uiCam
         end,
-        weeks = weeks
+        weeks = weeks,
+        CONSTANTS = CONSTANTS,
     }, {
         __index = _G
     })

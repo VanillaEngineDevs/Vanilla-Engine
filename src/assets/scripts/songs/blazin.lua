@@ -15,19 +15,21 @@ function Song:onUpdate(dt)
 end
 
 function Song:hideOpponentStrumline()
-    for i = 1, #enemyArrows do
+    --[[ for i = 1, #enemyArrows do
         enemyArrows[i].visible = false
         for j = 1, #enemyNotes[i] do
             enemyNotes[i][j].visible = false
         end
-    end
+    end ]]
+    weeks.enemyPlayfield.visible = false
 end
 
 function Song:centerPlayerStrumline()
-    for i = 1, #boyfriendArrows do
+    --[[ for i = 1, #boyfriendArrows do
         boyfriendArrows[i].x = -410 + 165 * i
         for j = 1, #boyfriendNotes[i] do
             boyfriendNotes[i][j].x = boyfriendArrows[i].x
         end
-    end
+    end ]]
+    weeks.boyfriendPlayfield.offsetX = -245
 end

@@ -120,12 +120,12 @@ function gameover:setCameraTarget()
     if boyfriend then
         local bfpoint = {boyfriend:getMidpoint()}
         local offsets = boyfriend:getDeathCameraOffsets()
-        CAM_LERP_POINT.x = bfpoint[1] + offsets[1] + 50
-        CAM_LERP_POINT.y = bfpoint[2] + offsets[2] - 25
+        weeks:getCameraLerpPoint().x = bfpoint[1] + offsets[1] + 50
+        weeks:getCameraLerpPoint().y = bfpoint[2] + offsets[2] - 25
         targetCameraZoom = targetCameraZoom * (boyfriend:getDeathCameraZoom())
     end
 
-    print("Camera target set to: (" .. CAM_LERP_POINT.x .. ", " .. CAM_LERP_POINT.y .. ") with zoom " .. targetCameraZoom)
+    print("Camera target set to: (" .. weeks:getCameraLerpPoint().x .. ", " .. weeks:getCameraLerpPoint().y .. ") with zoom " .. targetCameraZoom)
 
     self.targetCameraZoom = targetCameraZoom
 end
@@ -253,8 +253,8 @@ function gameover:update(dt)
     end
 
     local adjustedLerp = 1 - math.pow(1.0 - (0.04/2), dt * 60)
-    camera.x = camera.x + (CAM_LERP_POINT.x - camera.x) * adjustedLerp
-    camera.y = camera.y + (CAM_LERP_POINT.y - camera.y) * adjustedLerp
+    camera.x = camera.x + (weeks:getCameraLerpPoint().x - camera.x) * adjustedLerp
+    camera.y = camera.y + (weeks:getCameraLerpPoint().y - camera.y) * adjustedLerp
     camera.zoom = util.lerp(self.targetCameraZoom, camera.zoom, math.pow(1/100, dt / CAMERA_ZOOM_DURATION))
 
     -- something sokmething confirm inputs

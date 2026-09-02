@@ -148,7 +148,7 @@ function Character:onNoteMiss(event)
 end
 
 function Character:willMissBeLethal(event)
-    return weeks:getHealth() - event.healthChange <= 0
+    return weeks.health + event.healthChange <= 0
 end
 
 function Character:onNoteGhostMiss(event)
@@ -169,7 +169,7 @@ function Character:onSongRetry()
 end
 
 function Character:getDarnell()
-    return weeks:getCharacter("enemy")
+    return weeks.enemy
 end
 
 function Character:moveToBack()
@@ -195,7 +195,7 @@ function Character:wasNoteHitPoorly(event)
 end
 
 function Character:isPlayerLowHealth()
-    return weeks:getHealth() <= 0.3 * 2
+    return weeks.health <= 0.3 * 2
 end
 
 local alternate = false

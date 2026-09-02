@@ -49,6 +49,7 @@ local countdownFade = {0}
 weeks.songs = {}
 
 local WEEKID = ""
+local SONGID = ""
 
 weeks.smoothReset = true
 weeks.currentSongNum = 1
@@ -62,6 +63,7 @@ local CAM_LERP_POINT = { x = 0, y = 0 }
 
 local healthIconPreloads = {}
 local inHolds = {false, false, false, false}
+local eventScripts
 
 local COUNTDOWN_STEPS ={
     BEFORE = 1,
@@ -72,6 +74,53 @@ local COUNTDOWN_STEPS ={
     AFTER = 6
 }
 weeks.countdownStep = 1
+
+local function loadEventScript(id)
+    if eventScripts[id] then
+        return eventScripts[id]
+    end
+
+    local path = "assets/scripts/events/" .. id .. ".lua"
+
+    if not love.filesystem.getInfo(path) then
+        return nil
+    end
+
+    local Event = Object:extend()
+
+    local env = setmetatable({
+        Event = Event,
+        add = function(obj)
+            weeks:add(obj)
+        end,
+        remove = function(obj)
+            weeks:remove(obj)
+        end,
+        getBoyfriend = function()
+            return weeks.boyfriend
+        end,
+        getEnemy = function()
+            return weeks.enemy
+        end,
+        getCamera = function()
+            return uiCam
+        end,
+        weeks = weeks,
+        CONSTANTS = CONSTANTS,
+    }, {
+        __index = _G
+    })
+
+    local chunk = love.filesystem.load(path)
+    setfenv(chunk, env)
+    chunk()
+
+    local event = Event()
+
+    eventScripts[id] = event
+
+    return event
+end
 
 function weeks:enter(_, songNum, songAppend, _songExt, _audioAppend, _, weekID)
     self.timer = Timer.new()
@@ -119,6 +168,18 @@ function weeks:enter(_, songNum, songAppend, _songExt, _audioAppend, _, weekID)
     weeks.songExt = _songExt or ""
     weeks.audioAppend = _audioAppend or ""
 
+    eventScripts = {}
+    for _, name in ipairs(love.filesystem.getDirectoryItems("assets/scripts/events/")) do
+        loadEventScript(name:gsub(".lua$", ""))
+        print(name:gsub(".lua$", ""))
+    end
+
+    self.CURCHART = {
+        BOYFRIEND = {},
+        ENEMY = {},
+        EVENTS = {}
+    }
+    
     self:load()
 end
 
@@ -150,6 +211,9 @@ function weeks:load(wasntRestart)
     self._useAltAnims = false
     self.objects = {}
 
+    self.stageShader = nil
+    self.uiShader = nil
+
     states = {
         sickCounter = 0,
         goodCounter = 0,
@@ -177,13 +241,13 @@ function weeks:load(wasntRestart)
 
     isResetting = false
 
+    self.songEvents = {}
     if not wasntRestart then
         local bfPoint = self.boyfriend and self.boyfriend:getCameraPoint() or {x = 0, y = 0}
         camera:forcePos(bfPoint.x, bfPoint.y)
 
-        self.songEvents = {}
         for _, event in ipairs(self.CURCHART.EVENTS) do
-            table.insert(songEvents, event)
+            table.insert(self.songEvents, event)
         end
 
         self.stage:call("onSongRetry")
@@ -358,6 +422,7 @@ function weeks:generateNotes(name, diff)
 
     self.chart = chartData
     self.metadata = metadata
+    SONGID = name
     self.conductor:mapBPMChanges(metadata)
     metadata.playData = metadata.playData or {}
     metadata.playData.characters = metadata.playData.characters or {}
@@ -507,6 +572,15 @@ function weeks:generateNotes(name, diff)
             self.boyfriendPlayfield:addNote(noteData, self.noteSprites[noteData.d%4+1])
         end
     end
+
+    self.CURCHART.EVENTS = {}
+    for _, event in ipairs(chartData.events) do
+        table.insert(self.CURCHART.EVENTS, event)
+        table.insert(self.songEvents, event)
+    end
+
+    table.sort(self.CURCHART.EVENTS, function(a, b) return a.t < b.t end)
+    table.sort(self.songEvents, function(a, b) return a.t < b.t end)
 
     self.enemyPlayfield:sortNotes()
     self.boyfriendPlayfield:sortNotes()
@@ -690,14 +764,35 @@ function weeks:update(dt)
         end
     end
 
+    self.boyfriendPlayfield:update(dt)
+    self.enemyPlayfield:update(dt)
+
+    if musicTime >= 0 then
+        for _, event in ipairs(self.songEvents) do
+            if musicTime >= event.t then
+                if eventScripts[event.e] then
+                    eventScripts[event.e]:on(event.t, event.v)
+                end
+
+                local processed = {name = event.e, value = event.v}
+                self.stage:call("onSongEvent", processed)
+                self.song:call("onSongEvent", processed)
+                for _, obj in ipairs(self.objects) do
+                    if obj.call then obj:call("onSongEvent", processed) end
+                end
+
+                table.remove(self.songEvents, 1)
+            else
+                break
+            end
+        end
+    end
+
     self:updateUI(dt)
 end
 
 function weeks:updateUI(dt)
     if paused then return end
-
-    self.boyfriendPlayfield:update(dt)
-    self.enemyPlayfield:update(dt)
 
     if not self.ignoreHealthClamping then
         self.health = util.clamp(self.health, CONSTANTS.WEEKS.HEALTH.MIN, CONSTANTS.WEEKS.HEALTH.MAX)
@@ -781,6 +876,33 @@ function weeks:scoreNote(msTiming)
     end
 end
 
+function weeks:setStageShader(shader)
+    self.stageShader = shader
+end
+
+function weeks:setUIShader(shader)
+    self.uiShader = shader
+end
+
+function weeks:getSongID()
+    return SONGID
+end
+
+function weeks:getCamera()
+    return camera
+end
+
+function weeks:getCameraLerpPoint()
+    return CAM_LERP_POINT
+end
+
+function weeks:getAudio(name)
+    if name == "inst" then return self.inst
+    elseif name == "enemy" then return self.voicesEnemy
+    elseif name == "bf" then return self.voicesBF
+    end
+end
+
 function weeks:add(object, sort)
     sort = sort == nil and false or sort
     table.insert(self.objects, object)
@@ -793,7 +915,7 @@ function weeks:add(object, sort)
     end
 end
 
-function weeks:get(self, name)
+function weeks:get(name)
     for _, obj in ipairs(self.objects) do
         if obj.name == name then
             return obj

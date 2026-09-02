@@ -4,7 +4,7 @@ local rainShaderEndIntensity = 0
 
 local lightsStop = false
 local lastChange = 0
-local changeInterval = 0
+local changeInterval = 8
 
 local carWaiting = false
 local carInterruptable = true
@@ -155,9 +155,9 @@ function Stage:finishCarLights(sprite)
     local startDelay = randomFloat(0.2, 1.2)
 
     local path = {
-        {x = 1950 - offset[0] - 70, y = 980 - offset[1] + 15},
-        {x = 2400 - offset[0], y = 980 - offset[1] - 50},
-        {x = 3102 - offset[0], y = 1187 - offset[1] + 40},
+        {x = 1950 - offset[1] - 70, y = 980 - offset[2] + 15},
+        {x = 2400 - offset[1], y = 980 - offset[2] - 50},
+        {x = 3102 - offset[1], y = 1187 - offset[2] + 40},
     }
 
     for i, point in ipairs(path) do
@@ -167,7 +167,7 @@ function Stage:finishCarLights(sprite)
 
     sprite.angle = math.rad(rotations[1])
     car1TweenAngle = Timer.tween(duration, sprite, {
-        angle = math.rad(rotations[rotations[2]])
+        angle = math.rad(rotations[2])
     }, "in-sine")
     car1Tween = tweenQuadPath(sprite, path, duration, {
         ease = "in-sine",
