@@ -60,7 +60,6 @@ function Stage:onCountdownStart(event)
         event:cancel()
 
         self:doppleGangerCutscene()
-        print("Starting in-game cutscene...")
     else
         self.hasPlayedInGameCutscene = true
     end
@@ -190,8 +189,10 @@ function Stage:doppleGangerCutscene()
     end)
 
     cutsceneTimer:after(11.5, function()
-        cig.visible = true
-        cig:play("cigarette spit", true, false)
+        if not explode then
+            cig.visible = true
+            cig:play("cigarette spit", true, false)
+        end
     end)
 
     cutsceneTimer:after(13, function()
@@ -201,13 +202,7 @@ function Stage:doppleGangerCutscene()
                 picoPlayer.visible = false
                 getBoyfriend().visible = true
                 weeks:performCountdown()
-                for i = 1, 4 do
-                    enemyArrows[i].visible = false
-                    HoldCover:hide(i, 2)
-                    for j = 1, #enemyNotes[i] do
-                        enemyNotes[i][j].visible = false
-                    end
-                end
+                weeks.enemyPlayfield.visible = false
                 weeks:showUI()
             else
                 picoOpponent.visible = false
@@ -215,7 +210,7 @@ function Stage:doppleGangerCutscene()
 
                 Timer.after(1, function()
                     graphics:fadeOutWipe(1, function()
-                        Gamestate.switch(resultsScreen, {
+                        Gamestate.switch(menuSelect --[[, {
                             diff = string.lower(CURDIFF or "normal"),
                             song = not storyMode and SONGNAME or weekDesc[weekNum],
                             artist = not storyMode and ARTIST or nil,
@@ -228,7 +223,7 @@ function Stage:doppleGangerCutscene()
                                 maxCombo = 0,
                                 score = 0
                             }
-                        })
+                        } ]])
                     end)
                 end)
             end

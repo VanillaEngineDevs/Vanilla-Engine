@@ -903,6 +903,27 @@ function weeks:getAudio(name)
     end
 end
 
+function weeks:removeAudio(name)
+    if name == "inst" then
+        if self.inst then self.inst:stop() end
+        self.inst = nil
+    elseif name == "enemy" then
+        if self.voicesEnemy then self.voicesEnemy:stop() end
+        self.voicesEnemy = nil
+    elseif name == "bf" then
+        if self.voicesBF then self.voicesBF:stop() end
+        self.voicesBF = nil
+    end
+end
+
+function weeks:hideUI()
+    self.UI_VISIBLE = false
+end
+
+function weeks:showUI()
+    self.UI_VISIBLE = true
+end
+
 function weeks:add(object, sort)
     sort = sort == nil and false or sort
     table.insert(self.objects, object)
