@@ -61,7 +61,6 @@ local quitPressed = false
 
 local CAM_LERP_POINT = { x = 0, y = 0 }
 
-local healthIconPreloads = {}
 local inHolds = {false, false, false, false}
 local eventScripts
 
@@ -107,6 +106,7 @@ local function loadEventScript(id)
         end,
         weeks = weeks,
         CONSTANTS = CONSTANTS,
+        icon = icon
     }, {
         __index = _G
     })
@@ -180,6 +180,7 @@ function weeks:enter(_, songNum, songAppend, _songExt, _audioAppend, _, weekID)
         EVENTS = {}
     }
     
+    self.healthIconPreloads = {}
     self:load()
 end
 
@@ -336,11 +337,11 @@ end
 
 function weeks:preloadIcon(path, name, scale)
     name = name or path
-    if not healthIconPreloads[name] then
-        healthIconPreloads[name] = icon.newIcon(icon.imagePath(path), scale or 1)
+    if not self.healthIconPreloads[name] then
+        self.healthIconPreloads[name] = icon.newIcon(icon.imagePath(path), scale or 1)
     end
 
-    return healthIconPreloads[name]
+    return self.healthIconPreloads[name]
 end
 
 function weeks:setNoteSprites(receptors, left, down, up, right)

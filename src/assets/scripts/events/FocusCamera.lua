@@ -52,7 +52,7 @@ function Event:on(time, v)
             targetX = targetX + bfpoint.x
             targetY = targetY + bfpoint.y
         elseif char == 1 then
-            if not enemy then return end
+            if not weeks.enemy then return end
             local dadpoint = weeks.enemy:getCameraPoint()
             targetX = targetX + dadpoint.x
             targetY = targetY + dadpoint.y
@@ -72,7 +72,6 @@ function Event:on(time, v)
             camera.IS_CLASSIC_MOVEMENT = true
             weeks:getCameraLerpPoint().x = targetX
             weeks:getCameraLerpPoint().y = targetY
-        elseif ease == "INSTANT" then
             camera.x = targetX
             camera.y = targetY
         else
@@ -88,7 +87,7 @@ function Event:on(time, v)
                     x = targetX,
                     y = targetY
                 },
-                CONSTANTS.WEEKS.EASING_TYPES[ease or "CLASSIC"]
+                CONSTANTS.WEEKS.EASING_TYPES[ease or "linear"]
             )
         end
     end
