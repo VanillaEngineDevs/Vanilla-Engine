@@ -24,9 +24,15 @@ if love.system.getOS() == "OS X" then
 	icon = "macos"
 end
 
-local version = love.filesystem.getInfo("data/version.txt") and love.filesystem.read("data/version.txt") or "vUnknown"
+-- some info about their version schema VE uses:
+-- X.Y.Z
+--- the x represents the MAJOR version
+--- the y represents the MINOR version
+--- the z represents the current PATCH for the minor/major version
+local version = love.filesystem.getInfo("assets/data/version.txt") and love.filesystem.read("assets/data/version.txt") or "vUnknown"
 local _debug = not love.filesystem.isFused()
 local loveVer
+
 function love.conf(t)
 	t.identity = "VE-FNFR"
 	t.version = "11.4"
@@ -35,7 +41,7 @@ function love.conf(t)
 
 	t.window.width = 1280
 	t.window.height = 720
-	
+
 	t.window.icon = "assets/icons/" .. icon .. ".png"
 
 	t.window.resizable = true
