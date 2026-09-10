@@ -132,6 +132,7 @@ function stage.getStage(id)
         getCameraLerpPoint = function()
             return weeks:getCameraLerpPoint()
         end,
+        graphics = graphics,
     }, {__index = _G})
     if stageLuaChunk then
         local chunk = love.filesystem.load("scripts/stages/" .. s.id .. ".lua")

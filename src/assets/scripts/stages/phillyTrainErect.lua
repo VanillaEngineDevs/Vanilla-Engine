@@ -338,7 +338,7 @@ function Stage:trainReset()
         else
             getGirlfriend():play("hairFall")
         end
-    get("train").x = 1280 + 200
+    get("train").x = graphics.getWidth() + 200
 
     trainMoving = false
     trainCars = 8

@@ -8,7 +8,7 @@ local current = 1
 
 local character
 local clone
-local background = love.graphics.newCanvas(1280, 720)
+local background = love.graphics.newCanvas(graphics.getWidth(), graphics.getHeight())
 
 local state = 0
 

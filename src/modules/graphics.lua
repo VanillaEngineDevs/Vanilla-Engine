@@ -45,10 +45,10 @@ local graphics = {
 		screenWidth, screenHeight = width, height
 	end,
 	getWidth = function()
-		return 1280 or love.graphics.getWidth()
+		return push:getWidth()
 	end,
 	getHeight = function()
-		return 720 or love.graphics.getHeight()
+		return push:getHeight()
 	end,
 
 	cache = {},

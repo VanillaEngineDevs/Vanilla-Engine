@@ -106,7 +106,7 @@ end
 
 function healthbar:draw(hudfade)
     love.graphics.push()
-        love.graphics.translate(1280 / 2, 720 / 2)
+        love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
         love.graphics.scale(0.7, 0.7)
         love.graphics.scale(uiCam.zoom, uiCam.zoom)
         love.graphics.translate(uiCam.x, uiCam.y)

@@ -16,14 +16,6 @@ return {
 		if not music:isPlaying() then
 			music:play()
 		end
-		function tweenMenu()
-			if logo.y == -150 then
-				Timer.tween(1, logo, {y = -100}, "out-expo")
-			end
-			if girlfriendTitle.x == 1280*0.5 then
-				Timer.tween(1, girlfriendTitle, {x = 1280 * 0.4}, "out-expo")
-			end
-		end
 
 		transparency = {0}
 		Timer.tween(
@@ -32,12 +24,10 @@ return {
 			{[1] = 1},
 			"out-quad"
 		)
-		titleBG = graphics.newSparrowAtlas()
-		titleBG:load("states/title/titleBG")
 		changingMenu = false
 		isIShowSpeed = love.math.random(0, 200) == 0
 		if not isIShowSpeed then
-			logo = graphics.newSparrowAtlas(-150, -150)
+			logo = graphics.newSparrowAtlas(-150 + (push:getGameCutoutSize().x / 2.5), -100)
 			logo:load("states/title/logoBumpin")
 			logo:addAnimByPrefix("bump", "logo bumpin", 24, false)
 			logo:updateHitbox()
@@ -46,7 +36,8 @@ return {
 		end
 
 		--[[ girlfriendTitle = love.filesystem.load("sprites/menu/girlfriend-title.lua")() ]]
-		girlfriendTitle = graphics.newSparrowAtlas(1280 * 0.5, 720 * 0.07)
+		print(push:getGameCutoutSize().x / 2.5)
+		girlfriendTitle = graphics.newSparrowAtlas((graphics.getWidth() * 0.4) + push:getGameCutoutSize().x / 2.5, graphics.getHeight() * 0.07)
 		girlfriendTitle:load("states/title/gfDanceTitle")
 		girlfriendTitle:addAnimByIndices("danceLeft", "gfDance", {
 			30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
@@ -55,8 +46,6 @@ return {
 			15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29
 		}, nil, 24, false)
 		girlfriendTitle:play("danceRight")
-
-		tweenMenu()
 
 		songNum = 0
 
@@ -106,9 +95,6 @@ return {
 	draw = function(self)
 		love.graphics.push()
 			love.graphics.push()
-				love.graphics.push()
-					titleBG:draw()
-				love.graphics.pop()
 				love.graphics.push()
 					logo:draw(isIShowSpeed and 50 or nil, isIShowSpeed and 50 or nil)
 				love.graphics.pop()

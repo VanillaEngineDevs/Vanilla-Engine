@@ -425,7 +425,7 @@ return {
     draw = function(self)
         love.graphics.push()
             graphics.setColor(255/255, 204/255, 92/255)
-                love.graphics.rectangle("fill", 0, 0, 1280, 720)
+                love.graphics.rectangle("fill", 0, 0, graphics.getWidth(), graphics.getHeight())
             graphics.setColor(1, 1, 1)
             curDiff:draw()
             love.graphics.push()

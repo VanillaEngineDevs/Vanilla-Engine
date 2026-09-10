@@ -72,8 +72,6 @@ function Event:on(time, v)
             camera.IS_CLASSIC_MOVEMENT = true
             weeks:getCameraLerpPoint().x = targetX
             weeks:getCameraLerpPoint().y = targetY
-            camera.x = targetX
-            camera.y = targetY
         else
             local time = (weeks.conductor:getStepLengthMs() * duration) / 1000
             if camTween then 

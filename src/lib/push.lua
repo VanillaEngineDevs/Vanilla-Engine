@@ -24,53 +24,125 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --]]
 
+-- Modified for VE by Fukita
+
 local settings
 
+local baseWidth, baseHeight
 local pushWidth, pushHeight
 local windowWidth, windowHeight
+
+local safeX, safeY
+local safeWidth, safeHeight
 
 local scale = {x = 0, y = 0}
 local offset = {x = 0, y = 0}
 
+local cutoutSize = {x = 0, y = 0}
+local gameCutoutSize = {x = 0, y = 0}
+
 local drawWidth, drawHeight
 
 local canvases
-
 local canvasOptions
 
-local function initValues()
-	if settings.upscale then
-		scale.x = windowWidth / pushWidth
-		scale.y = windowHeight / pushHeight
+local MAX_ASPECT_RATIO = 20 / 9
 
-		if settings.upscale == "normal" or settings.upscale == "pixel-perfect" then
-			local scaleVal
-
-			scaleVal = math.min(scale.x, scale.y)
-			if scaleVal >= 1 and settings.upscale == "pixel-perfect" then scaleVal = math.floor(scaleVal) end
-
-			offset.x = math.floor((scale.x - scaleVal) * (pushWidth / 2))
-			offset.y = math.floor((scale.y - scaleVal) * (pushHeight / 2))
-
-			scale.x, scale.y = scaleVal, scaleVal -- Apply same scale to width and height
-		elseif settings.upscale == "stretched" then -- If stretched, no need to apply offset
-			offset.x, offset.y = 0, 0
-		else
-			error("Invalid upscale setting")
-		end
+local function updateSafeArea()
+	if love.window.getSafeArea then
+		safeX, safeY, safeWidth, safeHeight = love.window.getSafeArea()
 	else
-		scale.x, scale.y = 1, 1
-
-		offset.x = math.floor((windowWidth / pushWidth - 1) * (pushWidth / 2))
-		offset.y = math.floor((windowHeight / pushHeight - 1) * (pushHeight / 2))
+		safeX, safeY = 0, 0
+		safeWidth, safeHeight = windowWidth, windowHeight
 	end
 
-	drawWidth = windowWidth - offset.x * 2
-	drawHeight = windowHeight - offset.y * 2
+	if safeWidth <= 0 or safeHeight <= 0 then
+		safeX, safeY = 0, 0
+		safeWidth, safeHeight = windowWidth, windowHeight
+	end
+end
+
+local function updateGameSize()
+	local gameRatio = baseWidth / baseHeight
+	local screenRatio = safeWidth / safeHeight
+
+	if screenRatio >= gameRatio then
+		pushHeight = baseHeight
+		pushWidth = math.floor(safeWidth * baseHeight / safeHeight + 0.5)
+
+		if pushWidth / pushHeight > MAX_ASPECT_RATIO then
+			pushWidth = math.floor(pushHeight * MAX_ASPECT_RATIO + 0.5)
+		end
+	else
+		pushWidth = baseWidth
+		pushHeight = math.floor(safeHeight * baseWidth / safeWidth + 0.5)
+	end
+
+	print(gameRatio, screenRatio, pushHeight, pushWidth)
+end
+
+local function updateDeviceCutout()
+	cutoutSize.x = 0
+	cutoutSize.y = 0
+
+	if safeX > 0 then
+		cutoutSize.x = safeX
+	end
+
+	if safeY > 0 then
+		cutoutSize.y = safeY
+	end
+
+	if safeX + safeWidth < windowWidth then
+		cutoutSize.x = math.max(cutoutSize.x, windowWidth - (safeX + safeWidth))
+	end
+
+	if safeY + safeHeight < windowHeight then
+		cutoutSize.y = math.max(cutoutSize.y, windowHeight - (safeY + safeHeight))
+	end
+
+	gameCutoutSize.x = cutoutSize.x / scale.x
+	gameCutoutSize.y = cutoutSize.y / scale.y
+end
+
+local function initValues()
+	updateSafeArea()
+	updateGameSize()
+
+	scale.x = safeWidth / pushWidth
+	scale.y = safeHeight / pushHeight
+
+	if settings.upscale == "normal" or settings.upscale == "pixel-perfect" then
+		local scaleVal = math.min(scale.x, scale.y)
+
+		if scaleVal >= 1 and settings.upscale == "pixel-perfect" then
+			scaleVal = math.floor(scaleVal)
+		end
+
+		scale.x = scaleVal
+		scale.y = scaleVal
+	elseif settings.upscale == "stretched" then
+		scale.x = safeWidth / pushWidth
+		scale.y = safeHeight / pushHeight
+	else
+		error("Invalid upscale setting")
+	end
+
+	updateDeviceCutout()
+
+	drawWidth = pushWidth * scale.x
+	drawHeight = pushHeight * scale.y
+
+	offset.x = math.floor(safeX + (safeWidth - drawWidth) / 2)
+	offset.y = math.floor(safeY + (safeHeight - drawHeight) / 2)
+end
+
+local function createCanvas(width, height)
+	return love.graphics.newCanvas(width, height)
 end
 
 local function setupCanvas(canvasTable)
-	table.insert(canvasTable, {name = "_render", private = true}) -- Final render
+	table.insert(canvasTable, {name = "_render", private = true})
 
 	canvases = {}
 
@@ -83,10 +155,40 @@ local function setupCanvas(canvasTable)
 				name = params.name,
 				private = params.private,
 				shader = params.shader,
-				canvas = love.graphics.newCanvas(pushWidth, pushHeight),
+				canvas = createCanvas(pushWidth, pushHeight),
 				stencil = params.stencil
 			}
 		)
+	end
+
+	canvasOptions = {canvases[1].canvas, stencil = true}
+end
+
+local function resizeCanvases()
+	if not settings.canvas or not canvases then
+		return
+	end
+
+	local oldCanvases = canvases
+	canvases = {}
+
+	for i = 1, #oldCanvases do
+		local old = oldCanvases[i]
+
+		table.insert(
+			canvases,
+			{
+				name = old.name,
+				private = old.private,
+				shader = old.shader,
+				canvas = createCanvas(pushWidth, pushHeight),
+				stencil = old.stencil
+			}
+		)
+
+		if old.canvas then
+			old.canvas:release()
+		end
 	end
 
 	canvasOptions = {canvases[1].canvas, stencil = true}
@@ -106,7 +208,7 @@ local function start()
 		love.graphics.setCanvas(canvasOptions)
 	else
 		love.graphics.translate(offset.x, offset.y)
-		love.graphics.setScissor(offset.x, offset.y, pushWidth * scale.x, pushHeight * scale.y)
+		love.graphics.setScissor(offset.x, offset.y, drawWidth, drawHeight)
 		love.graphics.push()
 		love.graphics.scale(scale.x, scale.y)
 	end
@@ -124,31 +226,33 @@ local function applyShaders(canvas, shaders)
 		local outputCanvas
 		local inputCanvas
 
-		-- Only create "_tmp" canvas if needed
 		if not tmp then
 			table.insert(
 				canvases,
 				{
-			 		name = "_tmp",
-			  		private = true,
-			  		canvas = love.graphics.newCanvas(pushWidth, pushHeight)
-		   		}
-	   		)
+					name = "_tmp",
+					private = true,
+					canvas = createCanvas(pushWidth, pushHeight)
+				}
+			)
 
 			tmp = getCanvasTable("_tmp")
 		end
 
 		love.graphics.push()
 		love.graphics.origin()
+
 		for i = 1, #shaders do
 			inputCanvas = i % 2 == 1 and canvas or tmp.canvas
 			outputCanvas = i % 2 == 0 and canvas or tmp.canvas
+
 			love.graphics.setCanvas(outputCanvas)
 			love.graphics.clear()
 			love.graphics.setShader(shaders[i])
 			love.graphics.draw(inputCanvas)
 			love.graphics.setCanvas(inputCanvas)
 		end
+
 		love.graphics.pop()
 
 		love.graphics.setCanvas(canvas)
@@ -164,32 +268,30 @@ local function finish(shader)
 
 		love.graphics.pop()
 
-		-- Draw canvas
 		love.graphics.setCanvas(render.canvas)
-		-- Do not draw render yet
+
 		for i = 1, #canvases do
 			local canvasTable = canvases[i]
 
 			if not canvasTable.private then
 				local shader = canvasTable.shader
-
 				applyShaders(canvasTable.canvas, type(shader) == "table" and shader or {shader})
 			end
 		end
+
 		love.graphics.setCanvas()
 
-		-- Now draw render
 		love.graphics.translate(offset.x, offset.y)
 		love.graphics.push()
 		love.graphics.scale(scale.x, scale.y)
+
 		do
 			local shader = shader or render.shader
-
 			applyShaders(render.canvas, type(shader) == "table" and shader or {shader})
 		end
+
 		love.graphics.pop()
 
-		-- Clear canvas
 		for i = 1, #canvases do
 			love.graphics.setCanvas(canvases[i].canvas)
 			love.graphics.clear()
@@ -205,7 +307,9 @@ end
 
 return {
 	setupScreen = function(width, height, settingsTable)
+		baseWidth, baseHeight = width, height
 		pushWidth, pushHeight = width, height
+
 		windowWidth, windowHeight = love.graphics.getDimensions()
 
 		settings = settingsTable
@@ -218,14 +322,19 @@ return {
 	end,
 
 	setupCanvas = setupCanvas,
+
 	setCanvas = function(name)
 		local canvasTable
 
-		if not settings.canvas then return true end
+		if not settings.canvas then
+			return true
+		end
 
 		canvasTable = getCanvasTable(name)
+
 		return love.graphics.setCanvas({canvasTable.canvas, stencil = true})
 	end,
+
 	setShader = function(name, shader)
 		if not shader then
 			getCanvasTable("_render").shader = name
@@ -240,19 +349,20 @@ return {
 	end,
 
 	toGame = function(x, y)
-		local normalX, normalY
-
 		x, y = x - offset.x, y - offset.y
-		normalX, normalY = x / drawWidth, y / drawHeight
 
-		x = (x >= 0 and x <= pushWidth * scale.x) and math.floor(normalX * pushWidth) or false
-		y = (y >= 0 and y <= pushHeight * scale.y) and math.floor(normalY * pushHeight) or false
+		local normalX = x / drawWidth
+		local normalY = y / drawHeight
+
+		x = (x >= 0 and x <= drawWidth) and math.floor(normalX * pushWidth) or false
+		y = (y >= 0 and y <= drawHeight) and math.floor(normalY * pushHeight) or false
 
 		return x, y
 	end,
+
 	toReal = function(x, y)
 		local realX = offset.x + (drawWidth * x) / pushWidth
-		local realY = offset.y + (drawHeight * y)/ pushHeight
+		local realY = offset.y + (drawHeight * y) / pushHeight
 
 		return realX, realY
 	end,
@@ -263,10 +373,45 @@ return {
 	resize = function(width, height)
 		windowWidth, windowHeight = width, height
 
+		local oldWidth = pushWidth
+		local oldHeight = pushHeight
+
 		initValues()
+
+		if settings.canvas and (oldWidth ~= pushWidth or oldHeight ~= pushHeight) then
+			resizeCanvases()
+		end
 	end,
 
-	getWidth = function() return pushWidth end,
-	getHeight = function() return pushHeight end,
-	getDimensions = function() return pushWidth, pushHeight end
+	getWidth = function()
+		return pushWidth
+	end,
+
+	getHeight = function()
+		return pushHeight
+	end,
+
+	getDimensions = function()
+		return pushWidth, pushHeight
+	end,
+
+	getScale = function()
+		return scale.x, scale.y
+	end,
+
+	getOffset = function()
+		return offset.x, offset.y
+	end,
+
+	getSafeArea = function()
+		return safeX, safeY, safeWidth, safeHeight
+	end,
+
+	getCutoutSize = function()
+		return {x = cutoutSize.x, y = cutoutSize.y}
+	end,
+
+	getGameCutoutSize = function()
+		return {x = gameCutoutSize.x, y = gameCutoutSize.y}
+	end,
 }

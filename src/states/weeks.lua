@@ -789,6 +789,8 @@ function weeks:update(dt)
         end
     end
 
+    self:checkSongOver()
+
     self:updateUI(dt)
 end
 
@@ -995,6 +997,34 @@ function weeks:checkSongOver()
 end
 
 function weeks:endSong()
+    local event = eventCreator:endSong()
+    self.stage:call("onSongEnd", event)
+    self.song:call("onSongEnd", event)
+    for _, obj in ipairs(self.objects) do
+        if obj.call then
+            obj:call("onSongEnd", event)
+        end
+    end
+    if event.cancelled then return end
+
+    if storyMode and self.currentSongNum < #Gamestate.current().songs and not status.getLoading() then
+        self.currentSongNum = self.currentSongNum + 1
+        
+        status.setLoading(true)
+        self:load()
+        status.setLoading(false)
+    elseif not status.getLoading() then
+        status.setLoading(true)
+        graphics:fadeOutWipe(
+            0.7,
+            function()
+                graphics.setFade(1)
+                --if not quitPressed then
+                    Gamestate.switch(not storyMode and menuFreeplay or menuWeek)
+                --end
+            end
+        )
+    end
 end
 
 function weeks:onDeath()
@@ -1010,7 +1040,7 @@ function weeks:debugKeyPressed(k)
 end
 
 function weeks:renderStage()
-    if not self.stageCanvas then self.stageCanvas = love.graphics.newCanvas(1280, 720) end
+    if not self.stageCanvas then self.stageCanvas = love.graphics.newCanvas(graphics.getWidth(), graphics.getHeight()) end
     local lastCanvas = love.graphics.getCanvas()
 
     love.graphics.setCanvas({self.stageCanvas, stencil = true})
@@ -1039,13 +1069,13 @@ end
 
 function weeks:drawUI()
     if not self.UI_VISIBLE then return end
-	if not self.uiCanvas then self.uiCanvas = love.graphics.newCanvas(1280, 720) end
+	if not self.uiCanvas then self.uiCanvas = love.graphics.newCanvas(graphics.getWidth(), graphics.getHeight()) end
 
     local lastCanvas = love.graphics.getCanvas()
 	love.graphics.setCanvas({self.uiCanvas, stencil = true})
         love.graphics.clear()
         love.graphics.push()
-            love.graphics.translate(1280/2, 720/2)
+            love.graphics.translate(graphics.getWidth()/2, graphics.getHeight()/2)
             love.graphics.scale(0.7, 0.7)
             love.graphics.scale(uiCam.zoom, uiCam.zoom)
             love.graphics.translate(uiCam.x, uiCam.y)
