@@ -802,12 +802,17 @@ function weeks:updateUI(dt)
     end
     if self.health > CONSTANTS.WEEKS.HEALTH.LOSING_THRESHOLD and self.healthbar.p2Icon:getCurFrame() == 2 then
         self.healthbar.p2Icon:setFrame(1)
-    elseif self.health <= 0 and self.useBuiltinGameover then -- Game over
+    end
+
+    print(self.health, self.health <= 0, self.useBuiltInGameover, self.health <= 0 and self.useBuiltinGameover)
+    if self.useBuiltInGameover and self.health <= 0 then -- Game over
+        print("died like a loser!!!", settings.practiceMode, self.useBuiltInGameover)
         if not settings.practiceMode and not self.dying then
             self.dying = true
             self:onDeath()
         end
-    elseif self.health <= CONSTANTS.WEEKS.HEALTH.LOSING_THRESHOLD and self.healthbar.p2Icon:getCurFrame() == 1 then
+    end
+    if self.health <= CONSTANTS.WEEKS.HEALTH.LOSING_THRESHOLD and self.healthbar.p2Icon:getCurFrame() == 1 then
         self.healthbar.p2Icon:setFrame(2)
     end
     self.healthLerp = util.coolLerp(self.healthLerp, self.health, 0.15)

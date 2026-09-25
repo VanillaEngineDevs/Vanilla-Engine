@@ -54,7 +54,7 @@ function stage.getStage(id)
     s._data = data
     s.id = id
     s.name = data.name or id
-    s.directory = (data.directory or "stages/")
+    s.directory = (data.directory or "shared/")
 
     s.cameraZoom = data.cameraZoom or 1
     camera.currentZoom = s.cameraZoom
