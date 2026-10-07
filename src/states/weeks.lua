@@ -171,7 +171,6 @@ function weeks:enter(_, songNum, songAppend, _songExt, _audioAppend, _, weekID)
     eventScripts = {}
     for _, name in ipairs(love.filesystem.getDirectoryItems("assets/scripts/events/")) do
         loadEventScript(name:gsub(".lua$", ""))
-        print(name:gsub(".lua$", ""))
     end
 
     self.CURCHART = {
@@ -472,6 +471,7 @@ function weeks:generateNotes(name, diff)
             voicesEnemyPath = "songs/" .. name .. "/Voices-" .. voiceConversions[vocalsEnemy] .. self.songExt .. ".ogg"
         end
     end
+    print(voicesEnemyPath, voicesBFPath)
     if love.filesystem.getInfo(voicesBFPath) then
         self.voicesBF = love.audio.newSource(voicesBFPath, "stream")
     else
@@ -666,7 +666,6 @@ function weeks:performCountdown()
         end
 
         if self.countdownStep == COUNTDOWN_STEPS.AFTER then
-            print("Countdown finished, starting song!")
             self:stopCountdown()
             self.mayPauseGame = true
 
@@ -804,12 +803,10 @@ function weeks:updateUI(dt)
         self.healthbar.p2Icon:setFrame(1)
     end
 
-    print(self.health, self.health <= 0, self.useBuiltInGameover, self.health <= 0 and self.useBuiltinGameover)
     if self.useBuiltInGameover and self.health <= 0 then -- Game over
-        print("died like a loser!!!", settings.practiceMode, self.useBuiltInGameover)
         if not settings.practiceMode and not self.dying then
-            self.dying = true
-            self:onDeath()
+            --self.dying = true
+            --self:onDeath()
         end
     end
     if self.health <= CONSTANTS.WEEKS.HEALTH.LOSING_THRESHOLD and self.healthbar.p2Icon:getCurFrame() == 1 then

@@ -39,11 +39,19 @@ function MultiAnimateAtlasCharacter:new(data, _atlasSettings)
 
     for _, anim in ipairs(self.animations) do
         if not self.sprites[anim.asset] then
-            self.sprites[anim.asset] = graphics.newTextureAtlas()
-            self.sprites[anim.asset].getAtlasSettings = function()
-                return base._atlasSettings or {}
-            end
-            self.sprites[anim.asset]:load(anim.asset)
+            util.tryExcept(function()
+                self.sprites[anim.asset] = graphics.newTextureAtlas()
+                self.sprites[anim.asset].getAtlasSettings = function()
+                    return base._atlasSettings or {}
+                end
+                self.sprites[anim.asset]:load(anim.asset)
+            end, function()
+                self.sprites[anim.asset] = graphics.newSparrowAtlas()
+                self.sprites[anim.asset].getAtlasSettings = function()
+                    return base._atlasSettings or {}
+                end
+                self.sprites[anim.asset]:load(anim.asset)
+            end)
         end
 
         --[[ self.sprites[anim.asset]:addAnimByPrefix(
@@ -95,7 +103,7 @@ function MultiAnimateAtlasCharacter:update(dt)
     MultiAnimateAtlasCharacter.super.update(self, dt)
     for _, spr in pairs(self.sprites) do
         spr:update(dt)
-        spr.x, spr.y = self.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES, self.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
+        spr.x, spr.y = self.x + self.offsets[1], self.y + self.offsets[2]
         spr.scale.x = self.scale.x
         spr.scale.y = self.scale.y
         spr.origin.x = self.origin.x
@@ -135,7 +143,7 @@ function MultiAnimateAtlasCharacter:play(name, forced, loop)
     else
         self.sprite:play(animname, forced, loop)
     end
-    self.sprite.x, self.sprite.y = self.x + self.offsets[1] - X_OFFSET_AMOUNT_FOR_SPITES, self.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
+    self.sprite.x, self.sprite.y = self.x + self.offsets[1], self.y + self.offsets[2] - Y_OFFSET_AMOUNT_FOR_SPRITES
     for _, anim in ipairs(self.animations) do
         if anim.name == animname then
             if anim.offsets then
@@ -160,15 +168,15 @@ function MultiAnimateAtlasCharacter:draw(camera)
 end
 
 function MultiAnimateAtlasCharacter:getWidth()
-    return self.sprite:getWidth()
+    return self.sprite.width
 end
 
 function MultiAnimateAtlasCharacter:getHeight()
-    return self.sprite:getHeight()
+    return self.sprite.height
 end
 
 function MultiAnimateAtlasCharacter:getDimensions()
-    return self.sprite:getWidth(), self.sprite:getHeight()
+    return self.sprite.width, self.sprite.height
 end
 
 function MultiAnimateAtlasCharacter:getMidpoint()
