@@ -105,6 +105,7 @@ local function loadEventScript(id)
             return uiCam
         end,
         weeks = weeks,
+        TweenManager = TweenManager,
         CONSTANTS = CONSTANTS,
         icon = icon
     }, {
@@ -482,6 +483,13 @@ function weeks:generateNotes(name, diff)
     else
         self.voicesEnemy = nil
     end
+    self.voicesGeneric = nil
+    if not self.voicesEnemy and not self.voicesBF then
+        -- none? look for generic Voices.ogg instead
+        if love.filesystem.getInfo("songs/" .. name .. "/Voices" .. self.songExt .. ".ogg") then
+            self.voicesGeneric = love.audio.newSource("songs/" .. name .. "/Voices" .. self.songExt .. ".ogg", "stream")
+        end
+    end
 
     self.boyfriend.zIndex = 10
     self.enemy.zIndex = 8
@@ -601,6 +609,19 @@ function weeks:resumeCountdown()
     self.countingDown = true
 end
 
+function weeks:keypressed(k)
+    if k == "escape" then
+        musicTime = self.inst:tell("seconds") * 1000
+        lastReportedPlaytime = self.inst:tell("seconds") * 1000
+        self.inst:seek(self.inst:tell("seconds"))
+        if self.voicesBF then self.voicesBF:seek(self.voicesBF:tell("seconds")) end
+        if self.voicesEnemy then self.voicesEnemy:seek(self.voicesEnemy:tell("seconds")) end
+        if self.voicesGeneric then self.voicesGeneric:seek(self.voicesGeneric:tell("seconds")) end
+
+        self:endSong()
+    end
+end
+
 function weeks:stopCountdown()
     if self.countdownTimer then
         Timer.cancel(self.countdownTimer)
@@ -673,6 +694,7 @@ function weeks:performCountdown()
             if self.inst then self.inst:play() end
             if self.voicesBF then self.voicesBF:play() end
             if self.voicesEnemy then self.voicesEnemy:play() end
+            if self.voicesGeneric then self.voicesGeneric:play() end
 
             --[[ inst:seek(musicTime / 1000)
             voicesBF:seek(musicTime / 1000)
@@ -914,9 +936,11 @@ function weeks:removeAudio(name)
         self.inst = nil
     elseif name == "enemy" then
         if self.voicesEnemy then self.voicesEnemy:stop() end
+        if self.voicesGeneric then self.voicesGeneric:stop() end
         self.voicesEnemy = nil
     elseif name == "bf" then
         if self.voicesBF then self.voicesBF:stop() end
+        if self.voicesGeneric then self.voicesGeneric:stop() end
         self.voicesBF = nil
     end
 end
@@ -1035,6 +1059,7 @@ function weeks:onDeath()
     if self.inst then self.inst:stop() end
     if self.voicesBF then self.voicesBF:stop() end
     if self.voicesEnemy then self.voicesEnemy:stop() end
+    if self.voicesGeneric then self.voicesGeneric:stop() end
     Gamestate.push(gameoverSubstate)
 end
 
@@ -1110,6 +1135,7 @@ function weeks:leave()
     if self.inst then self.inst:stop(); self.inst = false end
     if self.voicesBF then self.voicesBF:stop(); self.voicesBF = nil end
     if self.voicesEnemy then self.voicesEnemy:stop(); self.voicesEnemy = nil end
+    if self.voicesGeneric then self.voicesGeneric:stop(); self.voicesGeneric = nil end
 
     self.timer:clear()
 end

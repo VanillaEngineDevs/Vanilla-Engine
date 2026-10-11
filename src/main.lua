@@ -38,6 +38,7 @@ function love.load()
     xml = require("lib.xml")
     lovefftINST = require("lib.fft.lovefft")
 	GIF = require("lib.gif")
+	TweenManager = require("game.tween.tween_manager")
 	--HScript = require("lib.hscript")
 	--require("game.hscript")
 
@@ -407,6 +408,7 @@ function love.update(dt)
 	end
 
 	Timer.update(dt)
+	TweenManager:update(dt)
 end
 
 function love.draw(dt) -- love.draw has its own delta time

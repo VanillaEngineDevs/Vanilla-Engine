@@ -200,6 +200,8 @@ function playfield:onEnemyNoteHit(lane, note, receptor)
                 didEvent = true
             end
 
+            if weeks.voicesGeneric then weeks.voicesGeneric:setVolume(1) end
+
             local noteAnim = note:getAnimName()
 
             if noteAnim == "hold" or noteAnim == "end" then
@@ -237,6 +239,9 @@ end
 function playfield:missNote(lane, note)
     if weeks.voicesBF then
         weeks.voicesBF:setVolume(0)
+    end
+    if weeks.voicesGeneric then
+        weeks.voicesGeneric:setVolume(0)
     end
 
     local healthChange = -CONSTANTS.WEEKS.HEALTH.MISS_PENALTY * weeks.healthLossMult * note.healthLossMult
@@ -305,6 +310,9 @@ function playfield:processInput(lane, notes, receptor)
 
                     if weeks.voicesBF then
                         weeks.voicesBF:setVolume(1)
+                    end
+                    if weeks.voicesGeneric then
+                        weeks.voicesGeneric:setVolume(1)
                     end
 
                     if weeks.boyfriend then
@@ -395,6 +403,9 @@ function playfield:processInput(lane, notes, receptor)
 
         if weeks.voicesBF then
             weeks.voicesBF:setVolume(1)
+        end
+        if weeks.voicesGeneric then
+            weeks.voicesGeneric:setVolume(1)
         end
 
         receptor:animate(noteName .. " confirm", false)

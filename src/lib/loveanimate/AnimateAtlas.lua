@@ -827,17 +827,35 @@ local function renderSprite(self, sprite, spritemap, spriteMatrix, matrix, color
         return
     end
 
-    if not self.spriteBatches[texture] then
-        self.spriteBatches[texture] = love.graphics.newSpriteBatch(texture, 1024)
+    if not self.batchDisabled then
+        if not self.spriteBatches[texture] then
+            self.spriteBatches[texture] = love.graphics.newSpriteBatch(texture, 1024)
+        end
+        local batch = self.spriteBatches[texture]
+
+        local x, y = drawMatrix:translate(0, 0)
+        local sx, sy = drawMatrix:scale(1)
+        local rotation = drawMatrix:rotate(0)
+
+        batch:setColor(self.color[1], self.color[2], self.color[3], self.alpha)
+        batch:add(quad, x, y, rotation, sx, sy)
+    else
+        local lastShader = love.graphics.getShader()
+        love.graphics.setShader(self.shader or self._colorTransformShader)
+
+        self:setColorOffset(0, 0, 0, 0)
+        self:setColorMultiplier(self.color[1], self.color[2], self.color[3], self.alpha)
+
+        if colorTransforms[colorTransformMode] then
+            colorTransforms[colorTransformMode](self, colorTransform)
+        end
+
+        local last = {love.graphics.getColor()}
+        love.graphics.setColor(self.color[1], self.color[2], self.color[3], self.alpha)
+        love.graphics.draw(texture, quad, drawMatrix)
+        love.graphics.setColor(last)
+        love.graphics.setShader(lastShader)
     end
-    local batch = self.spriteBatches[texture]
-
-    local x, y = drawMatrix:translate(0, 0)
-    local sx, sy = drawMatrix:scale(1)
-    local rotation = drawMatrix:rotate(0)
-
-    batch:setColor(self.color[1], self.color[2], self.color[3], self.alpha)
-    batch:add(quad, x, y, rotation, sx, sy)
 end
 
 local function renderAtlasSprite(self, atlasSprite, matrix, colorTransform, optimized)
@@ -903,12 +921,22 @@ local function renderKeyFrame(self, keyframe, frame, matrix, colorTransform, opt
             element:draw(self._camera)
             love.graphics.pop()
         elseif element.draw then
+            love.graphics.push("all")
             love.graphics.push("transform")
+
             local newMat = matrix:clone()
             newMat:translate(element.x or 0, element.y or 0)
+
             love.graphics.applyTransform(newMat)
+
+            local oldShader = element.shader
             element.shader = self.shader
+
             element:draw()
+
+            element.shader = oldShader
+
+            love.graphics.pop()
             love.graphics.pop()
         end
     end
@@ -1265,7 +1293,9 @@ function AnimateAtlas:draw(camera, x, y, r, sx, sy, ox, oy)
     end
 
 
-    self:drawBatches()
+    if not self.batchDisabled then
+        self:drawBatches()
+    end
 end
 
 function AnimateAtlas:drawBatches()
@@ -1442,20 +1472,31 @@ function AnimateAtlas:_calcAS(self, atlasSprite, matrix, optimized, bounds)
 	return true
 end
 
-function AnimateAtlas:addElementToFrames(keyword, element) --ogurifap.gif
+function AnimateAtlas:addElementToFrames(keyword, element)
     local frames = self:getFramesWithKeyword(keyword)
     local optimized = self.timeline.optimized or self.timeline.data.L ~= nil
 
     for i = 1, #frames do
         local frame = frames[i]
-        local elements = frame[optimized and "E" or "elements"]
-        elements.keywordReference = keyword
+        local key = optimized and "E" or "elements"
+        local elements = frame[key]
+
         if not elements then
             elements = {}
-            frame[optimized and "E" or "elements"] = elements
+            frame[key] = elements
         end
 
-        table.insert(elements, element)
+        local alreadyAdded = false
+        for _, existing in ipairs(elements) do
+            if existing == element then
+                alreadyAdded = true
+                break
+            end
+        end
+
+        if not alreadyAdded then
+            table.insert(elements, element)
+        end
     end
 
     self.batchDisabled = true

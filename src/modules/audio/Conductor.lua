@@ -67,6 +67,10 @@ function Conductor:getStepLengthMs()
     return (60 / self.bpm) * 1000 / 4
 end
 
+function Conductor:getBeatTimeInMs(beat)
+    return beat * (60 / self.bpm) * 1000
+end
+
 function Conductor:changeBPM(newBpm)
     self.bpm = newBpm
     self.crotchet = self:calculateCrochet(newBpm)
