@@ -229,7 +229,7 @@ if __name__ == "__main__":
         print("[INFO] Building all targets... This may take a while.")
         buildLovefile()
         buildWin64()
-        buildMacos()
+        # buildMacos()
         buildSwitch()
     elif args.target == "clean":
         clean()
