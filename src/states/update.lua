@@ -16,10 +16,6 @@ end
 function UpdateState:enter(_, nextState)
 	self.nextState = nextState
 	self.appVersion = love.filesystem.read(APP_VERSION_PATH) or "vUnknown"
-	if love.system.getOS() == "NX" then
-		self:continueToGame()
-		return
-	end
 	self.status = "Checking for updates..."
 	self.changelog = ""
 	self.release = nil
