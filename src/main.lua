@@ -2,7 +2,7 @@
 
 poly = require("modules.modding.poly")
 
-__VERSION__ = love.filesystem.read("data/version.txt")
+__VERSION__ = love.filesystem.read("assets/data/version.txt")
 if love.filesystem.isFused() then function print() end end
 
 local capturedScreenshot = {x=0, y=0, flash=0, alpha=0, img=nil, hovered=false, timers={}}
@@ -183,7 +183,7 @@ function love.load()
     }
 
     require("modules.game.extras")
-    __VERSION__ = love.filesystem.getInfo("data/version.txt") and love.filesystem.read("data/version.txt") or "vUnknown"
+    __VERSION__ = love.filesystem.getInfo("assets/data/version.txt") and love.filesystem.read("assets/data/version.txt") or "vUnknown"
 
     push.setupScreen(1280, 720, {upscale="normal", canvas = true, stencil = true})
 
@@ -233,7 +233,7 @@ function love.load()
 	modmanager:loadMods()
 
     love.audio.setVolume(0.1)
-    Gamestate.switch(menu)
+    Gamestate.switch(require("states.update"), menu)
 end
 
 function love.resize(width, height)

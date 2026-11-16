@@ -93,8 +93,8 @@ def buildWin64():
     shutil.copytree("resources/win64_libs", winDir, dirs_exist_ok=True)
 
     for dll in [
-        "OpenAL32.dll", "SDL2.dll", "license.txt", "lua51.dll",
-        "mpg123.dll", "love.dll", "msvcp120.dll", "msvcr120.dll"
+        "OpenAL32.dll", "SDL2.dll", "lua51.dll",
+        "mpg123.dll", "love.dll"
     ]:
         shutil.copy(f"resources/win64/love/{dll}", winDir)
 

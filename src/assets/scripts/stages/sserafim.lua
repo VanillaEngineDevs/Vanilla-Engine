@@ -7,7 +7,7 @@ local lightsDurations = {}
 local lightsIntensities = {}
 
 local baseVisible = {true, false, false, false, false}
-local baseVisible = {true, true, true, true, true}
+--local baseVisible = {true, true, true, true, true}
 local baseSinging = {false, false, false, false, false, false}
 
 local lightsEnabled = false

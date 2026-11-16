@@ -1,2 +1,2 @@
-love-nx 11.5-nx1: https://github.com/retronx-team/love-nx/releases/download/11.5-nx1/love.elf
+love-nx 11.5-luahttps: https://github.com/larphang/love-nx/releases/tag/11.5-luahttps
 	Download it to .
